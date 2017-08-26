@@ -1,0 +1,65 @@
+<resources>
+    <string name="app_name">A01d</string>
+    <string name="blank"> </string>
+
+    <string name="configuration">Settings</string>
+    <string name="restore">Restore</string>
+    <string name="icon">icon</string>
+
+    <string name="dialog_positive_execute">OK</string>
+    <string name="dialog_negative_cancel">Cancel</string>
+
+    <string name="dialog_title_confirmation">Confirmation</string>
+    <string name="dialog_message_restore_camera_property">Restore Camera Property</string>
+    <string name="dialog_title_loading_properties">Loading Camera Properties</string>
+    <string name="dialog_message_loading_properties">Please wait&#8230;</string>
+
+    <string name="pref_cat_camera">Camera</string>
+    <string name="pref_take_mode">Take Mode</string>
+    <string name="pref_camera_sound_volume">Shutter Sound</string>
+    <string name="pref_take_raw">Take Raw</string>
+
+    <string name="pref_cat_application_control">App. Control</string>
+    <string name="pref_exit_power_off">Exit Application(and Camera OFF)</string>
+
+
+    <string name="pref_cat_initialize">App. Startup</string>
+    <string name="pref_auto_connect_camera">Auto Connect To Camera</string>
+    <string name="dialog_message_power_off">Power Off</string>
+
+    <string name="pref_cat_live_view">Live View Settings</string>
+    <string name="pref_live_view_quality">Live View Quality</string>
+
+    <string name="pref_cat_info">Information</string>
+    <string name="pref_focal_length">Focal Length</string>
+    <string name="pref_lens_status">Lens Status</string>
+    <string name="pref_media_status">SD Card Status</string>
+    <string name="pref_camera_version">Camera Version</string>
+    <string name="pref_camerakit_version">Camera kit Version</string>
+
+    <string name="pref_cat_gokigen">GOKIGEN(Currently not open directly)</string>
+    <string name="pref_instruction_manual">A01d Instructions</string>
+    <string name="pref_privacy_policy">Privacy Policy</string>
+
+    <string name="information">Hello!</string>
+    <string name="favorite">Favorite</string>
+    <string name="preferences">Preferences</string>
+    <string name="grid">Grid</string>
+
+    <string name="network_connection_timeout">Connection time out</string>
+    <string name="dialog_title_connect_failed">Connect failed</string>
+    <string name="dialog_title_button_retry">Retry</string>
+    <string name="dialog_title_button_network_settings">WiFi Settings</string>
+
+
+    <string name="connect_start">start</string>
+    <string name="connect_check_wifi">check WIFI</string>
+    <string name="connect_connect">connecting</string>
+    <string name="connect_connected">connected</string>
+    <string name="connect_change_run_mode">changeRunMode</string>
+    <string name="connect_restore_camera_settings">restoreCameraSettings</string>
+
+    <string name="fatal_cannot_use_camera">The CameraKit SDK can not work because the running mode of camera is UNKNOWN.   So please long press the power button of camera more than 8 seconds. (This is the camera reset operation.) After that turn on the camera power again.</string>
+    <string name="camera_reset_required">The camera reset operation is required.</string>
+    <string name="camera_disconnected">Disconnected</string>
+</resources>

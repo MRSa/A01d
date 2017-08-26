@@ -1,0 +1,48 @@
+<resources>
+    <string name="app_name">A01d</string>
+    <string name="blank"> </string>
+
+    <string name="configuration">Settings</string>
+    <string name="restore">Restore</string>
+    <string name="icon">icon</string>
+
+    <string name="dialog_positive_execute">OK</string>
+    <string name="dialog_negative_cancel">Cancel</string>
+
+    <string name="dialog_title_confirmation">確認</string>
+    <string name="dialog_message_restore_camera_property">カメラプロパティを画面オープン時の状態に戻します。</string>
+    <string name="dialog_title_loading_properties">カメラプロパティ読出中</string>
+    <string name="dialog_message_loading_properties">しばらくお待ち下さい…</string>
+
+    <string name="pref_cat_camera">カメラ設定</string>
+    <string name="pref_take_mode">撮影モード</string>
+    <string name="pref_camera_sound_volume">シャッター音</string>
+    <string name="pref_take_raw">RAW撮影</string>
+
+    <string name="pref_cat_application_control">アプリ制御</string>
+    <string name="pref_exit_power_off">アプリ終了(とカメラOFF)</string>
+
+    <string name="pref_cat_initialize">起動時設定</string>
+    <string name="pref_auto_connect_camera">カメラに自動接続</string>
+    <string name="dialog_message_power_off">カメラの電源を切り、アプリケーションを終了します。</string>
+
+
+    <string name="pref_cat_live_view">ライブビュー設定</string>
+    <string name="pref_live_view_quality">ライブビュー品質</string>
+
+    <string name="pref_cat_info">カメラ情報</string>
+    <string name="pref_focal_length">焦点距離</string>
+    <string name="pref_lens_status">レンズ状態</string>
+    <string name="pref_media_status">SDカード状態</string>
+    <string name="pref_camera_version">Camera Version</string>
+    <string name="pref_camerakit_version">Camera kit Version</string>
+
+    <string name="pref_cat_gokigen">GOKIGEN Project(現在、直接開けません)</string>
+    <string name="pref_instruction_manual">操作説明</string>
+    <string name="pref_privacy_policy">プライバシーポリシー</string>
+
+    <string name="information">ハロー!</string>
+    <string name="favorite">お気に入り</string>
+    <string name="preferences">Preferences</string>
+    <string name="grid">Grid</string>
+</resources>
