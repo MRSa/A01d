@@ -28,10 +28,8 @@ import jp.co.olympus.camerakit.OLYCameraKitException;
 /**
  *   カメラの接続・切断処理クラス
  *
- *
- * Created by MRSa on 2017/02/28.
  */
-class OlyCameraConnection implements IOlyCameraConnection, OLYCameraConnectionListener
+public class OlyCameraConnection implements IOlyCameraConnection, OLYCameraConnectionListener
 {
     private final String TAG = toString();
     private final Activity context;
@@ -40,7 +38,8 @@ class OlyCameraConnection implements IOlyCameraConnection, OLYCameraConnectionLi
     private final BroadcastReceiver connectionReceiver;
     private final ICameraStatusReceiver statusReceiver;
 
-    private boolean isWatchingWifiStatus = false;
+    //private boolean isWatchingWifiStatus = false;
+    private CameraConnectionStatus connectionStatus = CameraConnectionStatus.UNKNOWN;
 
     private ConnectivityManager connectivityManager;
     //private ConnectivityManager.NetworkCallback networkCallback = null;
@@ -56,11 +55,12 @@ class OlyCameraConnection implements IOlyCameraConnection, OLYCameraConnectionLi
      *    コンストラクタ
      *
      */
-    OlyCameraConnection(final Activity context, OLYCamera camera, ICameraStatusReceiver statusReceiver)
+    public OlyCameraConnection(final Activity context, OLYCamera camera, ICameraStatusReceiver statusReceiver)
     {
         Log.v(TAG, "OlyCameraConnection()");
         this.context = context;
         this.camera = camera;
+        this.camera.setConnectionListener(this);
         connectivityManager = (ConnectivityManager) context.getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
         networkConnectionTimeoutHandler = new Handler()
         {
@@ -72,6 +72,7 @@ class OlyCameraConnection implements IOlyCameraConnection, OLYCameraConnectionLi
                     case MESSAGE_CONNECTIVITY_TIMEOUT:
                         Log.d(TAG, "Network connection timeout");
                         alertConnectingFailed(context.getString(R.string.network_connection_timeout));
+                        connectionStatus = CameraConnectionStatus.DISCONNECTED;
                         break;
                 }
             }
@@ -104,8 +105,11 @@ class OlyCameraConnection implements IOlyCameraConnection, OLYCameraConnectionLi
             WifiInfo info = wifiManager.getConnectionInfo();
             if (wifiManager.isWifiEnabled() && info != null && info.getNetworkId() != -1)
             {
-                // カメラとの接続処理を行う
-                connectToCamera();
+                // 自動接続が指示されていた場合は、カメラとの接続処理を行う
+                if (statusReceiver.isAutoConnectCamera())
+                {
+                    connectToCamera();
+                }
             }
         }
     }
@@ -124,7 +128,6 @@ class OlyCameraConnection implements IOlyCameraConnection, OLYCameraConnectionLi
         filter.addAction(WifiManager.NETWORK_STATE_CHANGED_ACTION);
         filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
         context.registerReceiver(connectionReceiver, filter);
-        isWatchingWifiStatus = true;
     }
 
     /**
@@ -135,18 +138,7 @@ class OlyCameraConnection implements IOlyCameraConnection, OLYCameraConnectionLi
     {
         Log.v(TAG, "stopWatchWifiStatus()");
         context.unregisterReceiver(connectionReceiver);
-        isWatchingWifiStatus = false;
         disconnect(false);
-    }
-
-    /**
-     * Wifi接続状態の監視処理を行っているかどうか
-     *
-     * @return true : 監視中 / false : 停止中
-     */
-    @Override
-    public boolean isWatchWifiStatus() {
-        return (isWatchingWifiStatus);
     }
 
     /**
@@ -159,6 +151,7 @@ class OlyCameraConnection implements IOlyCameraConnection, OLYCameraConnectionLi
     {
         Log.v(TAG, "disconnect()");
         disconnectFromCamera(powerOff);
+        connectionStatus = CameraConnectionStatus.DISCONNECTED;
         statusReceiver.onCameraDisconnected();
     }
 
@@ -170,6 +163,23 @@ class OlyCameraConnection implements IOlyCameraConnection, OLYCameraConnectionLi
         connectToCamera();
     }
 
+    @Override
+    public CameraConnectionStatus getConnectionStatus()
+    {
+        return (connectionStatus);
+    }
+
+    /**
+     *   カメラの接続状態を強制更新する
+     *
+     */
+    @Override
+    public void forceUpdateConnectionStatus(CameraConnectionStatus status)
+    {
+        connectionStatus = status;
+    }
+
+
     /**
      * カメラの通信状態変化を監視するためのインターフェース
      *
@@ -179,6 +189,8 @@ class OlyCameraConnection implements IOlyCameraConnection, OLYCameraConnectionLi
     @Override
     public void onDisconnectedByError(OLYCamera camera, OLYCameraKitException e)
     {
+        connectionStatus = CameraConnectionStatus.DISCONNECTED;
+
         // カメラが切れた時に通知する
         statusReceiver.onCameraDisconnected();
     }
@@ -205,6 +217,7 @@ class OlyCameraConnection implements IOlyCameraConnection, OLYCameraConnectionLi
     private void connectToCamera()
     {
         Log.v(TAG, "connectToCamera()");
+        connectionStatus = CameraConnectionStatus.CONNECTING;
         try
         {
             cameraExecutor.execute(new CameraConnectSequence(context, camera, statusReceiver));
@@ -214,6 +227,7 @@ class OlyCameraConnection implements IOlyCameraConnection, OLYCameraConnectionLi
             e.printStackTrace();
         }
     }
+
     /**
      *   接続リトライのダイアログを出す
      *

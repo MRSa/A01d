@@ -10,4 +10,6 @@ public interface ICameraStatusReceiver
     void onCameraConnected();
     void onCameraDisconnected();
     void onCameraOccursException(String message, Exception e);
+
+    boolean isAutoConnectCamera();
 }

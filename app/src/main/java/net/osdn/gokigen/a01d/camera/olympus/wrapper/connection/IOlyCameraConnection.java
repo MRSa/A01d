@@ -8,13 +8,24 @@ import android.content.Context;
  */
 public interface IOlyCameraConnection
 {
+    enum CameraConnectionStatus
+    {
+        UNKNOWN,
+        DISCONNECTED,
+        CONNECTING,
+        CONNECTED
+    }
+
     // WIFI 接続系
     void startWatchWifiStatus(Context context);
     void stopWatchWifiStatus(Context context);
-    boolean isWatchWifiStatus();
 
     /** カメラ接続系 **/
     void disconnect(final boolean powerOff);
     void connect();
+
+    /** 接続状態 **/
+    CameraConnectionStatus getConnectionStatus();
+    void forceUpdateConnectionStatus(CameraConnectionStatus status);
 
 }

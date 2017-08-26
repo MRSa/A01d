@@ -150,7 +150,6 @@ public class CameraLiveImageView extends View implements CameraLiveViewListenerI
         return getIntrinsicContentSizeHeight();
     }
 
-
     private float getIntrinsicContentSizeWidth()
     {
         if (imageBitmap == null)
@@ -176,7 +175,8 @@ public class CameraLiveImageView extends View implements CameraLiveViewListenerI
      * @param data     A image of live-view.
      * @param metadata A metadata of the image.
      */
-    public void setImageData(byte[] data, Map<String, Object> metadata) {
+    public void setImageData(byte[] data, Map<String, Object> metadata)
+    {
         Bitmap bitmap;
         int rotationDegrees;
 
@@ -214,7 +214,6 @@ public class CameraLiveImageView extends View implements CameraLiveViewListenerI
             imageBitmap = bitmap;
             imageRotationDegrees = rotationDegrees;
         }
-
         refreshCanvas();
     }
 

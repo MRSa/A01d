@@ -2,10 +2,12 @@ package net.osdn.gokigen.a01d.liveview;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.res.ResourcesCompat;
+import android.support.v7.preference.PreferenceManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,6 +18,7 @@ import android.widget.TextView;
 
 import net.osdn.gokigen.a01d.IChangeScene;
 import net.osdn.gokigen.a01d.R;
+import net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor;
 
 import java.io.File;
 
@@ -118,7 +121,7 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer
         if ((imageViewCreated)&&(myView != null))
         {
             // Viewを再利用。。。
-            Log.v(TAG, "onCreateView() : called again, so do nothing...");
+            Log.v(TAG, "onCreateView() : called again, so do nothing... : " + myView);
             return (myView);
         }
         View view = inflater.inflate(R.layout.fragment_live_view, container, false);
@@ -384,12 +387,26 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer
 
         // 画面下部の表示エリアの用途を切り替える
         setupLowerDisplayArea();
-
+*/
         // propertyを取得
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getContext());
 
-        // グリッド・フォーカスアシストの情報を戻す
-        imageView.setShowGridFrame(preferences.getBoolean(IPreferencePropertyAccessor.SHOW_GRID_STATUS, false));
+        try
+        {
+            // グリッド・フォーカスアシストの情報を戻す
+            boolean showGrid = preferences.getBoolean(IPreferencePropertyAccessor.SHOW_GRID_STATUS, false);
+            if ((imageView != null)&&(imageView.isShowGrid() != showGrid))
+            {
+                imageView.toggleShowGridFrame();
+                imageView.postInvalidate();
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        /*
         imageView.setFocusAssist(preferences.getBoolean(IPreferencePropertyAccessor.SHOW_FOCUS_ASSIST_STATUS, false));
         updateCameraPropertyStatus();
 

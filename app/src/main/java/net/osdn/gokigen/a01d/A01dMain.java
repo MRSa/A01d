@@ -8,10 +8,13 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.WindowManager;
 
 import net.osdn.gokigen.a01d.camera.olympus.IOlympusInterfaceProvider;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.OlympusInterfaceProvider;
+import net.osdn.gokigen.a01d.camera.olympus.wrapper.connection.ICameraStatusReceiver;
+import net.osdn.gokigen.a01d.camera.olympus.wrapper.connection.IOlyCameraConnection;
 import net.osdn.gokigen.a01d.liveview.LiveViewFragment;
 import net.osdn.gokigen.a01d.preference.PreferenceFragment;
 
@@ -19,8 +22,9 @@ import net.osdn.gokigen.a01d.preference.PreferenceFragment;
  *
  *
  */
-public class A01dMain extends AppCompatActivity implements IChangeScene
+public class A01dMain extends AppCompatActivity implements ICameraStatusReceiver, IChangeScene
 {
+    private final String TAG = toString();
     private IOlympusInterfaceProvider interfaceProvider = null;
 
     @Override
@@ -67,7 +71,7 @@ public class A01dMain extends AppCompatActivity implements IChangeScene
     {
         try
         {
-            interfaceProvider = new OlympusInterfaceProvider();
+            interfaceProvider = new OlympusInterfaceProvider(this, this);
         }
         catch (Exception e)
         {
@@ -134,7 +138,24 @@ public class A01dMain extends AppCompatActivity implements IChangeScene
     @Override
     public void changeCameraConnection()
     {
+        if (interfaceProvider == null)
+        {
+            Log.v(TAG, "changeCameraConnection() : interfaceProvider is NULL");
+            return;
+        }
 
+        IOlyCameraConnection connection = interfaceProvider.getOlyCameraConnection();
+        if (connection != null)
+        {
+            IOlyCameraConnection.CameraConnectionStatus status = connection.getConnectionStatus();
+            if (status == IOlyCameraConnection.CameraConnectionStatus.CONNECTED)
+            {
+                //
+                connection.disconnect(false);
+                return;
+            }
+            connection.startWatchWifiStatus(this);
+        }
     }
 
     /**
@@ -144,6 +165,60 @@ public class A01dMain extends AppCompatActivity implements IChangeScene
     @Override
     public void exitApplication()
     {
+        Log.v(TAG, "exitApplication()");
+        try
+        {
+            IOlyCameraConnection connection = interfaceProvider.getOlyCameraConnection();
+            if (connection != null)
+            {
+                connection.disconnect(true);
+            }
+            finish();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
 
+    @Override
+    public void onStatusNotify(String message)
+    {
+        Log.v(TAG, " CONNECTION MESSAGE : " + message);
+    }
+
+
+    @Override
+    public void onCameraConnected()
+    {
+        Log.v(TAG, "onCameraConnected()");
+
+        IOlyCameraConnection connection = interfaceProvider.getOlyCameraConnection();
+        if (connection != null)
+        {
+            // クラス構造をミスった...のでこんなところで、無理やりステータスを更新する
+            connection.forceUpdateConnectionStatus(IOlyCameraConnection.CameraConnectionStatus.CONNECTED);
+        }
+
+    }
+
+    @Override
+    public void onCameraDisconnected()
+    {
+        Log.v(TAG, "onCameraDisconnected()");
+
+    }
+
+    @Override
+    public void onCameraOccursException(String message, Exception e)
+    {
+        Log.v(TAG, "onCameraOccursException() " + message);
+
+    }
+
+    @Override
+    public boolean isAutoConnectCamera()
+    {
+        return  (true);
     }
 }
