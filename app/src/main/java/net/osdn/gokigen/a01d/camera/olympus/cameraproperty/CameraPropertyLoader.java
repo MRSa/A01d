@@ -4,7 +4,7 @@ package net.osdn.gokigen.a01d.camera.olympus.cameraproperty;
 import android.util.Log;
 
 import net.osdn.gokigen.a01d.R;
-import net.osdn.gokigen.a01d.camera.olympus.wrapper.IOlyCameraPropertyProvider;
+import net.osdn.gokigen.a01d.camera.olympus.wrapper.property.IOlyCameraPropertyProvider;
 
 import java.util.ArrayList;
 import java.util.Collections;

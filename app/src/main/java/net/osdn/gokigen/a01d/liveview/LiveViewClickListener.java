@@ -10,7 +10,6 @@ import net.osdn.gokigen.a01d.R;
  *
  *
  */
-
 class LiveViewClickListener implements View.OnClickListener
 {
     final String TAG = toString();

@@ -1,6 +1,7 @@
 package net.osdn.gokigen.a01d;
 
 import android.Manifest;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentTransaction;
@@ -8,24 +9,32 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.preference.PreferenceManager;
 import android.util.Log;
 import android.view.WindowManager;
 
 import net.osdn.gokigen.a01d.camera.olympus.IOlympusInterfaceProvider;
+import net.osdn.gokigen.a01d.camera.olympus.cameraproperty.OlyCameraPropertyListFragment;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.OlympusInterfaceProvider;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.connection.ICameraStatusReceiver;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.connection.IOlyCameraConnection;
+import net.osdn.gokigen.a01d.liveview.IStatusViewDrawer;
 import net.osdn.gokigen.a01d.liveview.LiveViewFragment;
+import net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor;
 import net.osdn.gokigen.a01d.preference.PreferenceFragment;
 
 /**
- *
+ *   A01d ;
  *
  */
 public class A01dMain extends AppCompatActivity implements ICameraStatusReceiver, IChangeScene
 {
     private final String TAG = toString();
     private IOlympusInterfaceProvider interfaceProvider = null;
+    private IStatusViewDrawer statusViewDrawer = null;
+
+    private PreferenceFragment preferenceFragment = null;
+    private OlyCameraPropertyListFragment propertyListFragment = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -85,8 +94,11 @@ public class A01dMain extends AppCompatActivity implements ICameraStatusReceiver
      */
     private void onReadyClass()
     {
-
-
+        // 自動接続の支持があったとき
+        if (isAutoConnectCamera())
+        {
+            changeCameraConnection();
+        }
     }
 
     /**
@@ -96,11 +108,33 @@ public class A01dMain extends AppCompatActivity implements ICameraStatusReceiver
     private void initializeFragment()
     {
         LiveViewFragment fragment = new LiveViewFragment();
+        statusViewDrawer = fragment;
         fragment.prepare(this);
         fragment.setRetainInstance(true);
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.replace(R.id.fragment1, fragment);
         transaction.commitAllowingStateLoss();
+    }
+
+    /**
+     *
+     */
+    @Override
+    protected void onPause()
+    {
+        super.onPause();
+        try
+        {
+            IOlyCameraConnection connection = interfaceProvider.getOlyCameraConnection();
+            if (connection != null)
+            {
+                connection.stopWatchWifiStatus(this);
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -111,7 +145,24 @@ public class A01dMain extends AppCompatActivity implements ICameraStatusReceiver
     @Override
     public void changeSceneToCameraPropertyList()
     {
-
+        IOlyCameraConnection connection = interfaceProvider.getOlyCameraConnection();
+        if (connection != null)
+        {
+            IOlyCameraConnection.CameraConnectionStatus status = connection.getConnectionStatus();
+            if (status == IOlyCameraConnection.CameraConnectionStatus.CONNECTED)
+            {
+                if (propertyListFragment == null)
+                {
+                    propertyListFragment = new OlyCameraPropertyListFragment();
+                }
+                propertyListFragment.setInterface(this, interfaceProvider.getCameraPropertyProvider());
+                FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+                transaction.replace(R.id.fragment1, propertyListFragment);
+                // backstackに追加
+                transaction.addToBackStack(null);
+                transaction.commit();
+            }
+        }
     }
 
     /**
@@ -121,14 +172,16 @@ public class A01dMain extends AppCompatActivity implements ICameraStatusReceiver
     @Override
     public void changeSceneToConfiguration()
     {
-        PreferenceFragment fragment = new PreferenceFragment();
-        fragment.setInterface(this, interfaceProvider, this);
+        if (preferenceFragment == null)
+        {
+            preferenceFragment = new PreferenceFragment();
+        }
+        preferenceFragment.setInterface(this, interfaceProvider, this);
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.replace(R.id.fragment1, fragment);
+        transaction.replace(R.id.fragment1, preferenceFragment);
         // backstackに追加
         transaction.addToBackStack(null);
         transaction.commit();
-
     }
 
     /**
@@ -150,10 +203,11 @@ public class A01dMain extends AppCompatActivity implements ICameraStatusReceiver
             IOlyCameraConnection.CameraConnectionStatus status = connection.getConnectionStatus();
             if (status == IOlyCameraConnection.CameraConnectionStatus.CONNECTED)
             {
-                //
+                // 接続中のときには切断する
                 connection.disconnect(false);
                 return;
             }
+            // 接続中でない時は、接続中にする
             connection.startWatchWifiStatus(this);
         }
     }
@@ -181,44 +235,94 @@ public class A01dMain extends AppCompatActivity implements ICameraStatusReceiver
         }
     }
 
+    /**
+     *
+     *
+     */
     @Override
     public void onStatusNotify(String message)
     {
         Log.v(TAG, " CONNECTION MESSAGE : " + message);
+        if (statusViewDrawer != null)
+        {
+            statusViewDrawer.updateStatusView(message);
+            IOlyCameraConnection connection = interfaceProvider.getOlyCameraConnection();
+            if (connection != null)
+            {
+                statusViewDrawer.updateConnectionStatus(connection.getConnectionStatus());
+            }
+        }
     }
 
-
+    /**
+     *
+     *
+     */
     @Override
     public void onCameraConnected()
     {
         Log.v(TAG, "onCameraConnected()");
 
-        IOlyCameraConnection connection = interfaceProvider.getOlyCameraConnection();
-        if (connection != null)
-        {
-            // クラス構造をミスった...のでこんなところで、無理やりステータスを更新する
-            connection.forceUpdateConnectionStatus(IOlyCameraConnection.CameraConnectionStatus.CONNECTED);
+        try {
+            IOlyCameraConnection connection = interfaceProvider.getOlyCameraConnection();
+            if (connection != null)
+            {
+                // クラス構造をミスった...のでこんなところで、無理やりステータスを更新する
+                connection.forceUpdateConnectionStatus(IOlyCameraConnection.CameraConnectionStatus.CONNECTED);
+            }
+            if (statusViewDrawer != null)
+            {
+                statusViewDrawer.updateConnectionStatus(IOlyCameraConnection.CameraConnectionStatus.CONNECTED);
+            }
         }
-
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
     }
 
+    /**
+     *
+     *
+     */
     @Override
     public void onCameraDisconnected()
     {
         Log.v(TAG, "onCameraDisconnected()");
+        if (statusViewDrawer != null)
+        {
+            statusViewDrawer.updateStatusView(getString(R.string.camera_disconnected));
+            statusViewDrawer.updateConnectionStatus(IOlyCameraConnection.CameraConnectionStatus.DISCONNECTED);
+        }
 
     }
 
+    /**
+     *
+     *
+     */
     @Override
     public void onCameraOccursException(String message, Exception e)
     {
         Log.v(TAG, "onCameraOccursException() " + message);
-
+        IOlyCameraConnection connection = interfaceProvider.getOlyCameraConnection();
+        if (connection != null)
+        {
+            connection.alertConnectingFailed(message + " " + e.getLocalizedMessage());
+        }
+        if (statusViewDrawer != null)
+        {
+            statusViewDrawer.updateStatusView(message);
+            if (connection != null)
+            {
+                statusViewDrawer.updateConnectionStatus(connection.getConnectionStatus());
+            }
+        }
     }
 
-    @Override
-    public boolean isAutoConnectCamera()
+    private boolean isAutoConnectCamera()
     {
-        return  (true);
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        return (preferences.getBoolean(IPreferencePropertyAccessor.AUTO_CONNECT_TO_CAMERA, true));
     }
 }

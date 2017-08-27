@@ -20,7 +20,7 @@ import android.widget.ListView;
 import java.util.HashMap;
 
 import net.osdn.gokigen.a01d.R;
-import net.osdn.gokigen.a01d.camera.olympus.wrapper.IOlyCameraPropertyProvider;
+import net.osdn.gokigen.a01d.camera.olympus.wrapper.property.IOlyCameraPropertyProvider;
 
 public class OlyCameraPropertyListFragment extends Fragment implements CameraPropertyLoader.IPropertyLoaderCallback
 {

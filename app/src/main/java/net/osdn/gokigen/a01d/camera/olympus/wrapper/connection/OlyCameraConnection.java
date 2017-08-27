@@ -101,15 +101,14 @@ public class OlyCameraConnection implements IOlyCameraConnection, OLYCameraConne
         String action = intent.getAction();
         if (action.equals(ConnectivityManager.CONNECTIVITY_ACTION))
         {
+            Log.v(TAG,"onReceiveBroadcastOfConnection() : CONNECTIVITY_ACTION");
+
             WifiManager wifiManager = (WifiManager) context.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
             WifiInfo info = wifiManager.getConnectionInfo();
             if (wifiManager.isWifiEnabled() && info != null && info.getNetworkId() != -1)
             {
                 // 自動接続が指示されていた場合は、カメラとの接続処理を行う
-                if (statusReceiver.isAutoConnectCamera())
-                {
-                    connectToCamera();
-                }
+                connectToCamera();
             }
         }
     }
@@ -189,6 +188,7 @@ public class OlyCameraConnection implements IOlyCameraConnection, OLYCameraConne
     @Override
     public void onDisconnectedByError(OLYCamera camera, OLYCameraKitException e)
     {
+        Log.v(TAG, "onDisconnectedByError()");
         connectionStatus = CameraConnectionStatus.DISCONNECTED;
 
         // カメラが切れた時に通知する
@@ -233,7 +233,8 @@ public class OlyCameraConnection implements IOlyCameraConnection, OLYCameraConne
      *
      * @param message 表示用のメッセージ
      */
-    private void alertConnectingFailed(String message)
+    @Override
+    public void alertConnectingFailed(String message)
     {
         final AlertDialog.Builder builder = new AlertDialog.Builder(context)
                 .setTitle(context.getString(R.string.dialog_title_connect_failed))

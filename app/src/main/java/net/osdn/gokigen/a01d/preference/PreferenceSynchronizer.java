@@ -3,9 +3,9 @@ package net.osdn.gokigen.a01d.preference;
 import android.content.SharedPreferences;
 import android.util.Log;
 
-import net.osdn.gokigen.a01d.camera.olympus.wrapper.IOlyCameraProperty;
-import net.osdn.gokigen.a01d.camera.olympus.wrapper.IOlyCameraPropertyProvider;
-import net.osdn.gokigen.a01d.camera.olympus.wrapper.CameraPropertyUtilities;
+import net.osdn.gokigen.a01d.camera.olympus.wrapper.property.IOlyCameraProperty;
+import net.osdn.gokigen.a01d.camera.olympus.wrapper.property.IOlyCameraPropertyProvider;
+import net.osdn.gokigen.a01d.camera.olympus.wrapper.property.CameraPropertyUtilities;
 
 class PreferenceSynchronizer implements Runnable
 {

@@ -98,7 +98,7 @@
             android:gravity="start"
             android:text="@string/information"
             android:textColor="@color/background_translucent_dark"
-            android:textSize="12pt" />
+            android:textSize="9pt" />
 
         <ImageButton
             android:id="@+id/camera_property_settings_button"

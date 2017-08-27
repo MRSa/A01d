@@ -16,8 +16,8 @@ import net.osdn.gokigen.a01d.IChangeScene;
 import net.osdn.gokigen.a01d.R;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.ICameraHardwareStatus;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.ICameraRunMode;
-import net.osdn.gokigen.a01d.camera.olympus.wrapper.IOlyCameraProperty;
-import net.osdn.gokigen.a01d.camera.olympus.wrapper.IOlyCameraPropertyProvider;
+import net.osdn.gokigen.a01d.camera.olympus.wrapper.property.IOlyCameraProperty;
+import net.osdn.gokigen.a01d.camera.olympus.wrapper.property.IOlyCameraPropertyProvider;
 import net.osdn.gokigen.a01d.camera.olympus.IOlympusInterfaceProvider;
 import net.osdn.gokigen.a01d.camera.olympus.operation.CameraPowerOff;
 

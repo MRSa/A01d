@@ -11,7 +11,7 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 
 import net.osdn.gokigen.a01d.R;
-import net.osdn.gokigen.a01d.camera.olympus.wrapper.IOlyCameraPropertyProvider;
+import net.osdn.gokigen.a01d.camera.olympus.wrapper.property.IOlyCameraPropertyProvider;
 
 import java.util.List;
 

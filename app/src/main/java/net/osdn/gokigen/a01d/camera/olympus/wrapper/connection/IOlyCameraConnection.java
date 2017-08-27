@@ -24,6 +24,8 @@ public interface IOlyCameraConnection
     void disconnect(final boolean powerOff);
     void connect();
 
+    void alertConnectingFailed(String message);
+
     /** 接続状態 **/
     CameraConnectionStatus getConnectionStatus();
     void forceUpdateConnectionStatus(CameraConnectionStatus status);

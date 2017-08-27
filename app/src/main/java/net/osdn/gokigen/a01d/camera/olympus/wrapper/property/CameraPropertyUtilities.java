@@ -1,4 +1,4 @@
-package net.osdn.gokigen.a01d.camera.olympus.wrapper;
+package net.osdn.gokigen.a01d.camera.olympus.wrapper.property;
 
 import jp.co.olympus.camerakit.OLYCamera;
 

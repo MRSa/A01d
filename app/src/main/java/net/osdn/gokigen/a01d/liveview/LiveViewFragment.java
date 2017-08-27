@@ -18,6 +18,7 @@ import android.widget.TextView;
 
 import net.osdn.gokigen.a01d.IChangeScene;
 import net.osdn.gokigen.a01d.R;
+import net.osdn.gokigen.a01d.camera.olympus.wrapper.connection.IOlyCameraConnection;
 import net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor;
 
 import java.io.File;
@@ -201,7 +202,7 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer
 
            connectStatus = view.findViewById(R.id.connect_disconnect_button);
            connectStatus.setOnClickListener(onClickListener);
-           updateConnectionStatus();
+           updateConnectionStatus(IOlyCameraConnection.CameraConnectionStatus.UNKNOWN);
 
            statusArea = view.findViewById(R.id.informationMessageTextView);
        }
@@ -226,11 +227,19 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer
      *
      */
     @Override
-    public void updateConnectionStatus()
+    public void updateConnectionStatus(IOlyCameraConnection.CameraConnectionStatus connectionStatus)
     {
         try
         {
             int id = R.drawable.ic_cloud_off_black_24dp;
+            if (connectionStatus == IOlyCameraConnection.CameraConnectionStatus.CONNECTING)
+            {
+                id = R.drawable.ic_cloud_queue_black_24dp;
+            }
+            else if  (connectionStatus == IOlyCameraConnection.CameraConnectionStatus.CONNECTED)
+            {
+                id = R.drawable.ic_cloud_done_black_24dp;
+            }
             connectStatus.setImageDrawable(ResourcesCompat.getDrawable(getResources(), id, null));
             connectStatus.invalidate();
             imageView.invalidate();
@@ -685,6 +694,7 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer
      *   表示エリアに文字を表示する
      *
      */
+    @Override
     public void updateStatusView(String message)
     {
         messageValue = message;
@@ -759,7 +769,6 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer
         }
     }
 */
-
 
     private void runOnUiThread(Runnable action)
     {
