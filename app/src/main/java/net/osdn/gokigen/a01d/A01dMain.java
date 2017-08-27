@@ -18,6 +18,7 @@ import net.osdn.gokigen.a01d.camera.olympus.cameraproperty.OlyCameraPropertyList
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.OlympusInterfaceProvider;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.connection.ICameraStatusReceiver;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.connection.IOlyCameraConnection;
+import net.osdn.gokigen.a01d.liveview.CameraLiveViewListenerImpl;
 import net.osdn.gokigen.a01d.liveview.IStatusViewDrawer;
 import net.osdn.gokigen.a01d.liveview.LiveViewFragment;
 import net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor;
@@ -27,8 +28,7 @@ import net.osdn.gokigen.a01d.preference.PreferenceFragment;
  *   A01d ;
  *
  */
-public class A01dMain extends AppCompatActivity implements ICameraStatusReceiver, IChangeScene
-{
+public class A01dMain extends AppCompatActivity implements ICameraStatusReceiver, IChangeScene {
     private final String TAG = toString();
     private IOlympusInterfaceProvider interfaceProvider = null;
     private IStatusViewDrawer statusViewDrawer = null;
@@ -37,27 +37,24 @@ public class A01dMain extends AppCompatActivity implements ICameraStatusReceiver
     private OlyCameraPropertyListFragment propertyListFragment = null;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState)
-    {
+    protected void onCreate(Bundle savedInstanceState) {
         final int REQUEST_NEED_PERMISSIONS = 1010;
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_a01d_main);
 
         ActionBar bar = getSupportActionBar();
-        if (bar != null)
-        {
+        if (bar != null) {
             // タイトルバーは表示しない
             bar.hide();
         }
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         // 外部メモリアクセス権のオプトイン
-        if ((ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)||
-                (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_NETWORK_STATE) != PackageManager.PERMISSION_GRANTED)||
-                (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_WIFI_STATE) != PackageManager.PERMISSION_GRANTED)||
-                (ContextCompat.checkSelfPermission(this, Manifest.permission.INTERNET) != PackageManager.PERMISSION_GRANTED))
-        {
+        if ((ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) ||
+                (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_NETWORK_STATE) != PackageManager.PERMISSION_GRANTED) ||
+                (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_WIFI_STATE) != PackageManager.PERMISSION_GRANTED) ||
+                (ContextCompat.checkSelfPermission(this, Manifest.permission.INTERNET) != PackageManager.PERMISSION_GRANTED)) {
             ActivityCompat.requestPermissions(this,
                     new String[]{
                             Manifest.permission.WRITE_EXTERNAL_STORAGE,
@@ -73,43 +70,33 @@ public class A01dMain extends AppCompatActivity implements ICameraStatusReceiver
     }
 
     /**
-     *   クラスの初期化
-     *
+     * クラスの初期化
      */
-    private void initializeClass()
-    {
-        try
-        {
+    private void initializeClass() {
+        try {
             interfaceProvider = new OlympusInterfaceProvider(this, this);
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
     /**
-     *   初期化終了時の処理
-     *
+     * 初期化終了時の処理
      */
-    private void onReadyClass()
-    {
+    private void onReadyClass() {
         // 自動接続の支持があったとき
-        if (isAutoConnectCamera())
-        {
+        if (isAutoConnectCamera()) {
             changeCameraConnection();
         }
     }
 
     /**
-     *   フラグメントの初期化
-     *
+     * フラグメントの初期化
      */
-    private void initializeFragment()
-    {
+    private void initializeFragment() {
         LiveViewFragment fragment = new LiveViewFragment();
         statusViewDrawer = fragment;
-        fragment.prepare(this);
+        fragment.prepare(this, interfaceProvider.getLiveViewControl());
         fragment.setRetainInstance(true);
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.replace(R.id.fragment1, fragment);
@@ -120,39 +107,29 @@ public class A01dMain extends AppCompatActivity implements ICameraStatusReceiver
      *
      */
     @Override
-    protected void onPause()
-    {
+    protected void onPause() {
         super.onPause();
-        try
-        {
+        try {
             IOlyCameraConnection connection = interfaceProvider.getOlyCameraConnection();
-            if (connection != null)
-            {
+            if (connection != null) {
                 connection.stopWatchWifiStatus(this);
             }
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
     /**
-     *   カメラのプロパティ一覧画面を開く
-     *   （カメラと接続中のときのみ）
-     *
+     * カメラのプロパティ一覧画面を開く
+     * （カメラと接続中のときのみ）
      */
     @Override
-    public void changeSceneToCameraPropertyList()
-    {
+    public void changeSceneToCameraPropertyList() {
         IOlyCameraConnection connection = interfaceProvider.getOlyCameraConnection();
-        if (connection != null)
-        {
+        if (connection != null) {
             IOlyCameraConnection.CameraConnectionStatus status = connection.getConnectionStatus();
-            if (status == IOlyCameraConnection.CameraConnectionStatus.CONNECTED)
-            {
-                if (propertyListFragment == null)
-                {
+            if (status == IOlyCameraConnection.CameraConnectionStatus.CONNECTED) {
+                if (propertyListFragment == null) {
                     propertyListFragment = new OlyCameraPropertyListFragment();
                 }
                 propertyListFragment.setInterface(this, interfaceProvider.getCameraPropertyProvider());
@@ -166,14 +143,11 @@ public class A01dMain extends AppCompatActivity implements ICameraStatusReceiver
     }
 
     /**
-     *   設定画面を開く
-     *
+     * 設定画面を開く
      */
     @Override
-    public void changeSceneToConfiguration()
-    {
-        if (preferenceFragment == null)
-        {
+    public void changeSceneToConfiguration() {
+        if (preferenceFragment == null) {
             preferenceFragment = new PreferenceFragment();
         }
         preferenceFragment.setInterface(this, interfaceProvider, this);
@@ -185,24 +159,19 @@ public class A01dMain extends AppCompatActivity implements ICameraStatusReceiver
     }
 
     /**
-     *   カメラとの接続・切断のシーケンス
-     *
+     * カメラとの接続・切断のシーケンス
      */
     @Override
-    public void changeCameraConnection()
-    {
-        if (interfaceProvider == null)
-        {
+    public void changeCameraConnection() {
+        if (interfaceProvider == null) {
             Log.v(TAG, "changeCameraConnection() : interfaceProvider is NULL");
             return;
         }
 
         IOlyCameraConnection connection = interfaceProvider.getOlyCameraConnection();
-        if (connection != null)
-        {
+        if (connection != null) {
             IOlyCameraConnection.CameraConnectionStatus status = connection.getConnectionStatus();
-            if (status == IOlyCameraConnection.CameraConnectionStatus.CONNECTED)
-            {
+            if (status == IOlyCameraConnection.CameraConnectionStatus.CONNECTED) {
                 // 接続中のときには切断する
                 connection.disconnect(false);
                 return;
@@ -213,24 +182,18 @@ public class A01dMain extends AppCompatActivity implements ICameraStatusReceiver
     }
 
     /**
-     *   アプリを抜ける
-     *
+     * アプリを抜ける
      */
     @Override
-    public void exitApplication()
-    {
+    public void exitApplication() {
         Log.v(TAG, "exitApplication()");
-        try
-        {
+        try {
             IOlyCameraConnection connection = interfaceProvider.getOlyCameraConnection();
-            if (connection != null)
-            {
+            if (connection != null) {
                 connection.disconnect(true);
             }
             finish();
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -240,19 +203,17 @@ public class A01dMain extends AppCompatActivity implements ICameraStatusReceiver
      *
      */
     @Override
-    public void onStatusNotify(String message)
-    {
+    public void onStatusNotify(String message) {
         Log.v(TAG, " CONNECTION MESSAGE : " + message);
-        if (statusViewDrawer != null)
-        {
+        if (statusViewDrawer != null) {
             statusViewDrawer.updateStatusView(message);
             IOlyCameraConnection connection = interfaceProvider.getOlyCameraConnection();
-            if (connection != null)
-            {
+            if (connection != null) {
                 statusViewDrawer.updateConnectionStatus(connection.getConnectionStatus());
             }
         }
     }
+
 
     /**
      *
@@ -273,6 +234,9 @@ public class A01dMain extends AppCompatActivity implements ICameraStatusReceiver
             if (statusViewDrawer != null)
             {
                 statusViewDrawer.updateConnectionStatus(IOlyCameraConnection.CameraConnectionStatus.CONNECTED);
+
+                // ライブビューの開始...
+                statusViewDrawer.startLiveView();
             }
         }
         catch (Exception e)

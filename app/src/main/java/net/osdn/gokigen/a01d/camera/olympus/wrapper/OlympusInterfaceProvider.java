@@ -49,6 +49,12 @@ public class OlympusInterfaceProvider implements IOlympusInterfaceProvider
     @Override
     public ICameraRunMode getCameraRunMode()
     {
-        return null;
+        return (wrapper);
+    }
+
+    @Override
+    public ILiveViewControl getLiveViewControl()
+    {
+        return (wrapper);
     }
 }

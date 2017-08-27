@@ -3,13 +3,16 @@ package net.osdn.gokigen.a01d.camera.olympus.wrapper;
 import android.app.Activity;
 import android.util.Log;
 
+import net.osdn.gokigen.a01d.camera.olympus.wrapper.property.CameraPropertyUtilities;
+import net.osdn.gokigen.a01d.liveview.CameraLiveViewListenerImpl;
+
 import jp.co.olympus.camerakit.OLYCamera;
 
 /**
  *
  *
  */
-class OlyCameraWrapper implements ICameraRunMode
+class OlyCameraWrapper implements ICameraRunMode, ILiveViewControl
 {
     private final String TAG = toString();
     //private final Activity context;
@@ -27,6 +30,12 @@ class OlyCameraWrapper implements ICameraRunMode
         return (camera);
     }
 
+
+
+    /**
+     *   ICameraRunMode の実装
+     *
+     */
     @Override
     public void changeRunMode(boolean isRecording)
     {
@@ -56,5 +65,51 @@ class OlyCameraWrapper implements ICameraRunMode
             e.printStackTrace();
         }
         return (isRecordingMode);
+    }
+
+
+    /**
+     *   ILiveViewControl の実装
+     *
+     */
+
+    @Override
+    public void changeLiveViewSize(String size)
+    {
+        try
+        {
+            camera.changeLiveViewSize(CameraPropertyUtilities.toLiveViewSizeType(size));
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void setLiveViewListener(CameraLiveViewListenerImpl listener)
+    {
+        try
+        {
+            camera.setLiveViewListener(listener);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+    }
+
+    @Override
+    public void startLiveView()
+    {
+        try
+        {
+            camera.startLiveView();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
     }
 }

@@ -7,6 +7,8 @@ public interface IStatusViewDrawer
     void updateGridIcon();
     void updateConnectionStatus(IOlyCameraConnection.CameraConnectionStatus connectionStatus);
     void updateStatusView(String message);
+    void startLiveView();
+
     /*
     void updateStatusView(String message);
     void updateFocusAssistStatus();

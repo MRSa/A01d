@@ -18,6 +18,7 @@ import android.widget.TextView;
 
 import net.osdn.gokigen.a01d.IChangeScene;
 import net.osdn.gokigen.a01d.R;
+import net.osdn.gokigen.a01d.camera.olympus.wrapper.ILiveViewControl;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.connection.IOlyCameraConnection;
 import net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor;
 
@@ -32,6 +33,8 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer
 {
     private final String TAG = this.toString();
     private static final int COMMAND_MY_PROPERTY = 0x00000100;
+
+    private ILiveViewControl liveViewControl = null;
 
 //    private IOlyCameraCoordinator camera = null;
 //    private MyInterfaceProvider factory = null;
@@ -216,11 +219,11 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer
     /**
      *
      */
-    public void prepare(IChangeScene sceneSelector)
+    public void prepare(IChangeScene sceneSelector, ILiveViewControl liveViewControl)
     {
         this.changeScene = sceneSelector;
+        this.liveViewControl = liveViewControl;
     }
-
 
     /**
      *  カメラとの接続状態の更新
@@ -714,7 +717,36 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer
             }
         });
     }
-/*
+
+    /**
+     *   ライブビューの開始
+     *
+     */
+    @Override
+    public void startLiveView()
+    {
+        if (liveViewControl == null)
+        {
+            Log.v(TAG, "startLiveView() : liveViewControl is null.");
+            return;
+        }
+        try
+        {
+            // ライブビューの開始
+            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getContext());
+            liveViewControl.changeLiveViewSize(preferences.getString(IPreferencePropertyAccessor.LIVE_VIEW_QUALITY, IPreferencePropertyAccessor.LIVE_VIEW_QUALITY_DEFAULT_VALUE));
+            liveViewControl.setLiveViewListener(liveViewListener);
+            liveViewListener.setCameraLiveImageView(imageView);
+            liveViewControl.startLiveView();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+
+    /*
     @Override
     public void toggleGpsTracking()
     {
