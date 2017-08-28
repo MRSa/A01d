@@ -13,11 +13,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import net.osdn.gokigen.a01d.IChangeScene;
 import net.osdn.gokigen.a01d.R;
+import net.osdn.gokigen.a01d.camera.olympus.IOlympusDisplayInjector;
+import net.osdn.gokigen.a01d.camera.olympus.IOlympusInterfaceProvider;
+import net.osdn.gokigen.a01d.camera.olympus.operation.IFocusingControl;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.ILiveViewControl;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.connection.IOlyCameraConnection;
 import net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor;
@@ -35,6 +37,8 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer
     private static final int COMMAND_MY_PROPERTY = 0x00000100;
 
     private ILiveViewControl liveViewControl = null;
+    private IOlympusInterfaceProvider interfaceProvider = null;
+    private IOlympusDisplayInjector interfaceInjector = null;
 
 //    private IOlyCameraCoordinator camera = null;
 //    private MyInterfaceProvider factory = null;
@@ -46,7 +50,9 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer
 
     private IChangeScene changeScene = null;
 
-    private LiveViewClickListener onClickListener = null;
+    private IFocusingControl focusingControl = null;
+
+    private LiveViewClickTouchListener onClickTouchListener = null;
 
 
     private TextView statusArea = null;
@@ -66,7 +72,6 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer
     private View myView = null;
     private String messageValue = "";
 
-
     /**
      *
      *
@@ -84,7 +89,6 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer
 
 
 /*
-
         if (onTouchListener == null)
         {
             onTouchListener = new OlyCameraLiveViewOnTouchListener(getContext().getApplicationContext());
@@ -121,22 +125,50 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer
         super.onCreateView(inflater, container, savedInstanceState);
 
         Log.v(TAG, "onCreateView()");
-
         if ((imageViewCreated)&&(myView != null))
         {
             // Viewを再利用。。。
             Log.v(TAG, "onCreateView() : called again, so do nothing... : " + myView);
             return (myView);
         }
+
         View view = inflater.inflate(R.layout.fragment_live_view, container, false);
         myView = view;
         imageViewCreated = true;
-
-        imageView = view.findViewById(R.id.cameraLiveImageView);
-
-        if (onClickListener == null)
+        try
         {
-            onClickListener = new LiveViewClickListener(imageView, this, changeScene);
+           imageView = view.findViewById(R.id.cameraLiveImageView);
+            if (interfaceInjector != null)
+            {
+                interfaceInjector.injectOlympusDisplay(imageView, imageView);
+            }
+            if ((interfaceProvider != null) &&(focusingControl == null))
+            {
+                focusingControl = interfaceProvider.getFocusingControl();
+            }
+           if (onClickTouchListener == null)
+           {
+               onClickTouchListener = new LiveViewClickTouchListener(imageView, this, changeScene, focusingControl);
+           }
+            imageView.setOnClickListener(onClickTouchListener);
+            imageView.setOnTouchListener(onClickTouchListener);
+
+            view.findViewById(R.id.show_preference_button).setOnClickListener(onClickTouchListener);
+            view.findViewById(R.id.camera_property_settings_button).setOnClickListener(onClickTouchListener);
+
+            showGrid = view.findViewById(R.id.show_hide_grid_button);
+            showGrid.setOnClickListener(onClickTouchListener);
+            updateGridIcon();
+
+            connectStatus = view.findViewById(R.id.connect_disconnect_button);
+            connectStatus.setOnClickListener(onClickTouchListener);
+            updateConnectionStatus(IOlyCameraConnection.CameraConnectionStatus.UNKNOWN);
+
+            statusArea = view.findViewById(R.id.informationMessageTextView);
+        }
+        catch (Exception e)
+        {
+           e.printStackTrace();
         }
 
         /*
@@ -194,35 +226,22 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer
         focusAssist = (ImageView) view.findViewById(R.id.FocusAssistImageView);
         focusAssist.setOnClickListener(onTouchListener);
 */
-       try
-       {
-           view.findViewById(R.id.show_preference_button).setOnClickListener(onClickListener);
-           view.findViewById(R.id.camera_property_settings_button).setOnClickListener(onClickListener);
 
-           showGrid = view.findViewById(R.id.show_hide_grid_button);
-           showGrid.setOnClickListener(onClickListener);
-           updateGridIcon();
 
-           connectStatus = view.findViewById(R.id.connect_disconnect_button);
-           connectStatus.setOnClickListener(onClickListener);
-           updateConnectionStatus(IOlyCameraConnection.CameraConnectionStatus.UNKNOWN);
 
-           statusArea = view.findViewById(R.id.informationMessageTextView);
-       }
-       catch (Exception e)
-       {
-           e.printStackTrace();
-       }
+
        return (view);
     }
 
     /**
      *
      */
-    public void prepare(IChangeScene sceneSelector, ILiveViewControl liveViewControl)
+    public void prepare(IChangeScene sceneSelector, IOlympusInterfaceProvider interfaceProvider, IOlympusDisplayInjector interfaceInjector)
     {
         this.changeScene = sceneSelector;
-        this.liveViewControl = liveViewControl;
+        this.interfaceProvider = interfaceProvider;
+        this.liveViewControl = interfaceProvider.getLiveViewControl();
+        this.interfaceInjector = interfaceInjector;
     }
 
     /**

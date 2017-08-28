@@ -1,5 +1,6 @@
 package net.osdn.gokigen.a01d.camera.olympus;
 
+import net.osdn.gokigen.a01d.camera.olympus.operation.IFocusingControl;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.ICameraHardwareStatus;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.ICameraRunMode;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.ILiveViewControl;
@@ -16,4 +17,5 @@ public interface IOlympusInterfaceProvider
     IOlyCameraPropertyProvider getCameraPropertyProvider();
     ICameraRunMode getCameraRunMode();
     ILiveViewControl getLiveViewControl();
+    IFocusingControl getFocusingControl();
 }

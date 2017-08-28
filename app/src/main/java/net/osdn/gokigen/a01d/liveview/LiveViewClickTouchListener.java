@@ -1,35 +1,42 @@
 package net.osdn.gokigen.a01d.liveview;
 
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 
 import net.osdn.gokigen.a01d.IChangeScene;
 import net.osdn.gokigen.a01d.R;
+import net.osdn.gokigen.a01d.camera.olympus.operation.IFocusingControl;
 
 /**
  *
  *
  */
-class LiveViewClickListener implements View.OnClickListener
+class LiveViewClickTouchListener implements View.OnClickListener, View.OnTouchListener
 {
-    final String TAG = toString();
-    final ILiveImageStatusNotify statusNotify;
-    final IStatusViewDrawer statusViewDrawer;
-    final IChangeScene changeScene;
+    private final String TAG = toString();
+    private final ILiveImageStatusNotify statusNotify;
+    private final IStatusViewDrawer statusViewDrawer;
+    private final IChangeScene changeScene;
+    private final IFocusingControl focusingControl;
 
-
-    LiveViewClickListener(ILiveImageStatusNotify imageStatusNotify, IStatusViewDrawer statusView, IChangeScene changeScene)
+    LiveViewClickTouchListener(ILiveImageStatusNotify imageStatusNotify, IStatusViewDrawer statusView, IChangeScene changeScene, IFocusingControl focusingControl)
     {
         this.statusNotify = imageStatusNotify;
         this.statusViewDrawer = statusView;
         this.changeScene = changeScene;
+        this.focusingControl = focusingControl;
     }
 
-
+    /**
+     *   オブジェクトをクリックする処理
+     *
+     */
     @Override
     public void onClick(View view)
     {
         int id = view.getId();
+        Log.v(TAG, "onClick() " + id);
         try
         {
             switch (id)
@@ -64,5 +71,17 @@ class LiveViewClickListener implements View.OnClickListener
         {
             e.printStackTrace();
         }
+    }
+
+    /**
+     *   オブジェクトをタッチする処理
+     *
+     */
+    @Override
+    public boolean onTouch(View view, MotionEvent motionEvent)
+    {
+        int id = view.getId();
+        Log.v(TAG, "onTouch() : " + id);
+        return ((id == R.id.cameraLiveImageView)&&(focusingControl.driveAutoFocus(motionEvent)));
     }
 }

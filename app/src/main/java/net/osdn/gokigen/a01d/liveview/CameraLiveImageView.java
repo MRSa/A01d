@@ -42,7 +42,7 @@ import jp.co.olympus.camerakit.OLYCamera;
  *    (OLYMPUS の ImageCaptureSample そのまま)
  *
  */
-public class CameraLiveImageView extends View implements CameraLiveViewListenerImpl.IImageDataReceiver, IAutoFocusFrameDisplay, ILiveImageStatusNotify
+public class CameraLiveImageView extends View implements CameraLiveViewListenerImpl.IImageDataReceiver, IAutoFocusFrameDisplay, ILiveImageStatusNotify, IIndicatorControl
 {
     private final String TAG = this.toString();
 
@@ -237,9 +237,13 @@ public class CameraLiveImageView extends View implements CameraLiveViewListenerI
         if (imageRotationDegrees == 0 || imageRotationDegrees == 180) {
             imageWidth = imageBitmap.getWidth();
             imageHeight = imageBitmap.getHeight();
+            //imageWidth = this.getWidth();
+            //imageHeight = this.getHeight();
         } else {
             imageWidth = imageBitmap.getHeight();
             imageHeight = imageBitmap.getWidth();
+            //imageWidth = this.getHeight();
+            //imageHeight = this.getWidth();
         }
         return (OLYCamera.convertPointOnLiveImageIntoViewfinder(pointOnImage, imageWidth, imageHeight, imageRotationDegrees));
     }
@@ -815,25 +819,29 @@ public class CameraLiveImageView extends View implements CameraLiveViewListenerI
             imageSizeWidth = imageBitmap.getHeight();
             imageSizeHeight = imageBitmap.getWidth();
         }
+
         float viewSizeWidth = this.getWidth();
         float viewSizeHeight = this.getHeight();
         float ratioX = viewSizeWidth / imageSizeWidth;
         float ratioY = viewSizeHeight / imageSizeHeight;
-        float scale;
+        float scale = 1.0f;
 
-        switch (imageScaleType) {
+        switch (imageScaleType)
+        {
             case FIT_XY:
                 imagePointX /= ratioX;
                 imagePointY /= ratioY;
                 break;
+
             case FIT_CENTER:	// go to next label.
             case CENTER_INSIDE:
                 scale = Math.min(ratioX, ratioY);
-                imagePointX -= (viewSizeWidth  - imageSizeWidth  * scale) / 2.0f;
-                imagePointY -= (viewSizeHeight - imageSizeHeight * scale) / 2.0f;
-                imagePointX /= scale;
-                imagePointY /= scale;
+                imagePointX = imagePointX - (viewSizeWidth  - imageSizeWidth * scale) / 2.0f;
+                imagePointY = imagePointY - (viewSizeHeight - imageSizeHeight * scale) / 2.0f;
+                imagePointX = imagePointX / scale;
+                imagePointY = imagePointY / scale;
                 break;
+
             case CENTER_CROP:
                 scale = Math.max(ratioX, ratioY);
                 imagePointX -= (viewSizeWidth  - imageSizeWidth  * scale) / 2.0f;
@@ -841,15 +849,17 @@ public class CameraLiveImageView extends View implements CameraLiveViewListenerI
                 imagePointX /= scale;
                 imagePointY /= scale;
                 break;
+
             case CENTER:
                 imagePointX -= (viewSizeWidth - imageSizeWidth)  / 2.0f;
                 imagePointY -= (viewSizeHeight - imageSizeHeight) / 2.0f;
                 break;
+
             default:
                 break;
         }
-
-        return new PointF(imagePointX, imagePointY);
+        //return new PointF((imagePointX / scale), (imagePointY / scale));
+        return new PointF((imagePointX), (imagePointY));
     }
 
     /**
@@ -901,4 +911,34 @@ public class CameraLiveImageView extends View implements CameraLiveViewListenerI
         return (messageHolder.getMessageDrawer());
     }
 
+
+    /**
+     *    IIndicatorControl の実装
+     *
+     *
+     *
+     */
+    @Override
+    public void onAfLockUpdate(boolean isAfLocked)
+    {
+        //Log.v(TAG, "onAfLockUpdate() : " + isAfLocked);
+    }
+
+    @Override
+    public void onShootingStatusUpdate(shootingStatus status)
+    {
+        //Log.v(TAG, "onShootingStatusUpdate() : " + status);
+    }
+
+    @Override
+    public void onMovieStatusUpdate(shootingStatus status)
+    {
+        //Log.v(TAG, "onMovieStatusUpdate() : " + status);
+    }
+
+    @Override
+    public void onBracketingStatusUpdate(String message)
+    {
+       // Log.v(TAG, "onBracketingStatusUpdate() : " + message);
+    }
 }

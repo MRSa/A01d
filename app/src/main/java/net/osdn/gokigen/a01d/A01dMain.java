@@ -13,6 +13,7 @@ import android.support.v7.preference.PreferenceManager;
 import android.util.Log;
 import android.view.WindowManager;
 
+import net.osdn.gokigen.a01d.camera.olympus.IOlympusDisplayInjector;
 import net.osdn.gokigen.a01d.camera.olympus.IOlympusInterfaceProvider;
 import net.osdn.gokigen.a01d.camera.olympus.cameraproperty.OlyCameraPropertyListFragment;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.OlympusInterfaceProvider;
@@ -31,6 +32,7 @@ import net.osdn.gokigen.a01d.preference.PreferenceFragment;
 public class A01dMain extends AppCompatActivity implements ICameraStatusReceiver, IChangeScene {
     private final String TAG = toString();
     private IOlympusInterfaceProvider interfaceProvider = null;
+    private IOlympusDisplayInjector interfaceInjector = null;
     private IStatusViewDrawer statusViewDrawer = null;
 
     private PreferenceFragment preferenceFragment = null;
@@ -72,10 +74,15 @@ public class A01dMain extends AppCompatActivity implements ICameraStatusReceiver
     /**
      * クラスの初期化
      */
-    private void initializeClass() {
-        try {
-            interfaceProvider = new OlympusInterfaceProvider(this, this);
-        } catch (Exception e) {
+    private void initializeClass()
+    {
+        try
+        {
+            OlympusInterfaceProvider provider = new OlympusInterfaceProvider(this, this);
+            interfaceProvider = provider;
+            interfaceInjector = provider;
+        } catch (Exception e)
+        {
             e.printStackTrace();
         }
     }
@@ -93,10 +100,11 @@ public class A01dMain extends AppCompatActivity implements ICameraStatusReceiver
     /**
      * フラグメントの初期化
      */
-    private void initializeFragment() {
+    private void initializeFragment()
+    {
         LiveViewFragment fragment = new LiveViewFragment();
         statusViewDrawer = fragment;
-        fragment.prepare(this, interfaceProvider.getLiveViewControl());
+        fragment.prepare(this, interfaceProvider, interfaceInjector);
         fragment.setRetainInstance(true);
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.replace(R.id.fragment1, fragment);
