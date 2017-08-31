@@ -150,6 +150,7 @@ public class CameraLiveImageView extends View implements CameraLiveViewListenerI
         return getIntrinsicContentSizeHeight();
     }
 
+
     private float getIntrinsicContentSizeWidth()
     {
         if (imageBitmap == null)
@@ -175,8 +176,7 @@ public class CameraLiveImageView extends View implements CameraLiveViewListenerI
      * @param data     A image of live-view.
      * @param metadata A metadata of the image.
      */
-    public void setImageData(byte[] data, Map<String, Object> metadata)
-    {
+    public void setImageData(byte[] data, Map<String, Object> metadata) {
         Bitmap bitmap;
         int rotationDegrees;
 
@@ -214,6 +214,7 @@ public class CameraLiveImageView extends View implements CameraLiveViewListenerI
             imageBitmap = bitmap;
             imageRotationDegrees = rotationDegrees;
         }
+
         refreshCanvas();
     }
 
@@ -230,21 +231,17 @@ public class CameraLiveImageView extends View implements CameraLiveViewListenerI
             return null;
         }
 
-        PointF pointOnView = new PointF(event.getX(), event.getY());
+        PointF pointOnView = new PointF(event.getX() - getX(), event.getY() - getY()); // Viewの表示位置に補正
         PointF pointOnImage = convertPointFromViewArea(pointOnView);
         float imageWidth;
         float imageHeight;
         if (imageRotationDegrees == 0 || imageRotationDegrees == 180) {
             imageWidth = imageBitmap.getWidth();
             imageHeight = imageBitmap.getHeight();
-            //imageWidth = this.getWidth();
-            //imageHeight = this.getHeight();
         } else {
             imageWidth = imageBitmap.getHeight();
             imageHeight = imageBitmap.getWidth();
-            //imageWidth = this.getHeight();
-            //imageHeight = this.getWidth();
-        }
+         }
         return (OLYCamera.convertPointOnLiveImageIntoViewfinder(pointOnImage, imageWidth, imageHeight, imageRotationDegrees));
     }
 
@@ -819,20 +816,17 @@ public class CameraLiveImageView extends View implements CameraLiveViewListenerI
             imageSizeWidth = imageBitmap.getHeight();
             imageSizeHeight = imageBitmap.getWidth();
         }
-
         float viewSizeWidth = this.getWidth();
         float viewSizeHeight = this.getHeight();
         float ratioX = viewSizeWidth / imageSizeWidth;
         float ratioY = viewSizeHeight / imageSizeHeight;
         float scale = 1.0f;
 
-        switch (imageScaleType)
-        {
+        switch (imageScaleType) {
             case FIT_XY:
                 imagePointX /= ratioX;
                 imagePointY /= ratioY;
                 break;
-
             case FIT_CENTER:	// go to next label.
             case CENTER_INSIDE:
                 scale = Math.min(ratioX, ratioY);
@@ -841,7 +835,6 @@ public class CameraLiveImageView extends View implements CameraLiveViewListenerI
                 imagePointX = imagePointX / scale;
                 imagePointY = imagePointY / scale;
                 break;
-
             case CENTER_CROP:
                 scale = Math.max(ratioX, ratioY);
                 imagePointX -= (viewSizeWidth  - imageSizeWidth  * scale) / 2.0f;
@@ -849,17 +842,15 @@ public class CameraLiveImageView extends View implements CameraLiveViewListenerI
                 imagePointX /= scale;
                 imagePointY /= scale;
                 break;
-
             case CENTER:
                 imagePointX -= (viewSizeWidth - imageSizeWidth)  / 2.0f;
                 imagePointY -= (viewSizeHeight - imageSizeHeight) / 2.0f;
                 break;
-
             default:
                 break;
         }
-        //return new PointF((imagePointX / scale), (imagePointY / scale));
-        return new PointF((imagePointX), (imagePointY));
+
+        return new PointF(imagePointX, imagePointY);
     }
 
     /**

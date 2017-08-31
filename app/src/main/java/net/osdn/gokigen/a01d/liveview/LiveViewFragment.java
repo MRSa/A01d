@@ -137,7 +137,7 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer
         imageViewCreated = true;
         try
         {
-           imageView = view.findViewById(R.id.cameraLiveImageView);
+            imageView = view.findViewById(R.id.cameraLiveImageView);
             if (interfaceInjector != null)
             {
                 interfaceInjector.injectOlympusDisplay(imageView, imageView);
@@ -146,10 +146,10 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer
             {
                 focusingControl = interfaceProvider.getFocusingControl();
             }
-           if (onClickTouchListener == null)
-           {
-               onClickTouchListener = new LiveViewClickTouchListener(imageView, this, changeScene, focusingControl);
-           }
+            if (onClickTouchListener == null)
+            {
+                onClickTouchListener = new LiveViewClickTouchListener(imageView, this, changeScene, focusingControl);
+            }
             imageView.setOnClickListener(onClickTouchListener);
             imageView.setOnTouchListener(onClickTouchListener);
 

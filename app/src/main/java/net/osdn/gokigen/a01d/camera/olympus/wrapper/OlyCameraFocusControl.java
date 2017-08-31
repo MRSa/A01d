@@ -32,7 +32,7 @@ public class OlyCameraFocusControl implements IFocusingControl
         {
             return (false);
         }
-        Log.v(TAG, "motionEvent() : pointOnView [" + Math.ceil(motionEvent.getX()) + "," + Math.ceil(motionEvent.getY()) + "] ");
+
         if (frameDisplay != null)
         {
             Thread thread = new Thread(new Runnable() {

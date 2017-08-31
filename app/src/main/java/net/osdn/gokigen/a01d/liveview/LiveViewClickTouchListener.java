@@ -36,7 +36,7 @@ class LiveViewClickTouchListener implements View.OnClickListener, View.OnTouchLi
     public void onClick(View view)
     {
         int id = view.getId();
-        Log.v(TAG, "onClick() " + id);
+        //Log.v(TAG, "onClick() : " + id);
         try
         {
             switch (id)
@@ -81,7 +81,7 @@ class LiveViewClickTouchListener implements View.OnClickListener, View.OnTouchLi
     public boolean onTouch(View view, MotionEvent motionEvent)
     {
         int id = view.getId();
-        Log.v(TAG, "onTouch() : " + id);
+        //Log.v(TAG, "onTouch() : " + id + " (" + motionEvent.getX() + "," + motionEvent.getY() + ")");
         return ((id == R.id.cameraLiveImageView)&&(focusingControl.driveAutoFocus(motionEvent)));
     }
 }
