@@ -25,6 +25,13 @@ public interface IPreferencePropertyAccessor
     String CAMERAKIT_VERSION = "camerakit_version";
 
     String SHOW_GRID_STATUS = "show_grid";
+
+    String DIGITAL_ZOOM_LEVEL = "digital_zoom_level";
+    String DIGITAL_ZOOM_LEVEL_DEFAULT_VALUE = "MAX";
+
+    String MAGNIFYING_LIVE_VIEW_SCALE = "magnifying_live_view_scale";
+    String MAGNIFYING_LIVE_VIEW_SCALE_DEFAULT_VALUE = "1.0";
+
 /*****
     int CHOICE_SPLASH_SCREEN = 10;
 

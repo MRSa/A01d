@@ -757,6 +757,12 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer
             liveViewControl.setLiveViewListener(liveViewListener);
             liveViewListener.setCameraLiveImageView(imageView);
             liveViewControl.startLiveView();
+
+            // デジタルズームの設定
+            liveViewControl.updateDigitalZoom();
+
+            // ライブビューの倍率設定
+            liveViewControl.updateMagnifyingLiveViewScale();
         }
         catch (Exception e)
         {

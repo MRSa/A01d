@@ -43,6 +43,10 @@ public class PreferenceFragment extends PreferenceFragmentCompat implements Shar
     private ProgressDialog busyDialog = null;
     private PreferenceSynchronizer preferenceSynchronizer = null;
 
+    /**
+     *
+     *
+     */
     public void setInterface(Context context, IOlympusInterfaceProvider factory, IChangeScene changeScene)
     {
         Log.v(TAG, "setInterface()");
@@ -104,9 +108,21 @@ public class PreferenceFragment extends PreferenceFragmentCompat implements Shar
         {
             editor.putString(net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor.SOUND_VOLUME_LEVEL, net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor.SOUND_VOLUME_LEVEL_DEFAULT_VALUE);
         }
+        if (!items.containsKey(net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor.MAGNIFYING_LIVE_VIEW_SCALE))
+        {
+            editor.putString(net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor.MAGNIFYING_LIVE_VIEW_SCALE, net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor.MAGNIFYING_LIVE_VIEW_SCALE_DEFAULT_VALUE);
+        }
+        if (!items.containsKey(net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor.DIGITAL_ZOOM_LEVEL))
+        {
+            editor.putString(net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor.DIGITAL_ZOOM_LEVEL, net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor.DIGITAL_ZOOM_LEVEL_DEFAULT_VALUE);
+        }
         editor.apply();
     }
 
+    /**
+     *
+     *
+     */
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey)
     {
@@ -133,8 +149,27 @@ public class PreferenceFragment extends PreferenceFragmentCompat implements Shar
                 }
             });
             liveViewQuality.setSummary(liveViewQuality.getValue() + " " + sizeTable.get(liveViewQuality.getValue()));
-        }
 
+            ListPreference liveViewScale = (ListPreference) findPreference(IPreferencePropertyAccessor.MAGNIFYING_LIVE_VIEW_SCALE);
+            liveViewScale.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+                @Override
+                public boolean onPreferenceChange(Preference preference, Object newValue) {
+                    preference.setSummary(newValue + " ");
+                    return (true);
+                }
+            });
+            liveViewScale.setSummary(liveViewScale.getValue() + " ");
+
+            ListPreference digitalZoom = (ListPreference) findPreference(IPreferencePropertyAccessor.DIGITAL_ZOOM_LEVEL);
+            digitalZoom.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+                @Override
+                public boolean onPreferenceChange(Preference preference, Object newValue) {
+                    preference.setSummary(newValue + " ");
+                    return (true);
+                }
+            });
+            digitalZoom.setSummary(digitalZoom.getValue() + " ");
+        }
         findPreference("exit_application").setOnPreferenceClickListener(powerOffController);
     }
 
@@ -159,7 +194,7 @@ public class PreferenceFragment extends PreferenceFragmentCompat implements Shar
             focalLength = String.format(Locale.ENGLISH, "%3.0fmm", actualLength);
         }
         else
-            {
+        {
             focalLength = String.format(Locale.ENGLISH, "%3.0fmm - %3.0fmm (%3.0fmm)", minLength, maxLength, actualLength);
         }
         findPreference("focal_length").setSummary(focalLength);
@@ -185,6 +220,10 @@ public class PreferenceFragment extends PreferenceFragmentCompat implements Shar
         }
     }
 
+    /**
+     *
+     *
+     */
     private void setCameraProperty(String name, String value)
     {
         try
@@ -199,6 +238,10 @@ public class PreferenceFragment extends PreferenceFragmentCompat implements Shar
         }
     }
 
+    /**
+     *
+     *
+     */
     @Override
     public void onResume()
     {
@@ -216,6 +259,10 @@ public class PreferenceFragment extends PreferenceFragmentCompat implements Shar
 
     }
 
+    /**
+     *
+     *
+     */
     @Override
     public void onPause()
     {

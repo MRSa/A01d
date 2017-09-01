@@ -49,4 +49,37 @@
         <item >XGA</item>
         <item >QUAD_VGA</item>
     </string-array>
+
+    <string-array name="digital_zoom_level">
+        <item >1.0</item>
+        <item >1.5</item>
+        <item >2.0</item>
+        <item >2.5</item>
+        <item >MAX</item>
+    </string-array>
+
+    <string-array name="digital_zoom_level_value">
+        <item >1.0</item>
+        <item >1.5</item>
+        <item >2.0</item>
+        <item >2.5</item>
+        <item >MAX</item>
+    </string-array>
+
+    <string-array name="magnifying_live_view_scale">
+        <item >1.0</item>
+        <item >5.0</item>
+        <item >7.0</item>
+        <item >10.0</item>
+        <item >14.0</item>
+    </string-array>
+
+    <string-array name="magnifying_live_view_scale_value">
+        <item >1.0</item>
+        <item >5.0</item>
+        <item >7.0</item>
+        <item >10.0</item>
+        <item >14.0</item>
+    </string-array>
+
 </resources>

@@ -11,4 +11,10 @@ public interface ILiveViewControl
     void changeLiveViewSize(String size);
     void setLiveViewListener(CameraLiveViewListenerImpl listener);
     void startLiveView();
+
+    void setDigitalZoom(float scale);
+    void setLiveViewScale(float scale);
+
+    void updateDigitalZoom();
+    void updateMagnifyingLiveViewScale();
 }

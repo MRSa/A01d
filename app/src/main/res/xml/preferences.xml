@@ -43,11 +43,26 @@
     <PreferenceCategory
         android:title="@string/pref_cat_live_view">
         <ListPreference
-            android:title="@string/pref_live_view_quality"
-            android:entryValues="@array/live_view_quality_value"
-            android:entries="@array/live_view_quality"
-            android:key="live_view_quality"
-            android:defaultValue="QVGA"/>
+        android:title="@string/pref_live_view_quality"
+        android:entryValues="@array/live_view_quality_value"
+        android:entries="@array/live_view_quality"
+        android:key="live_view_quality"
+        android:defaultValue="QVGA"/>
+
+        <ListPreference
+            android:title="@string/pref_magnifying_live_view_scale"
+            android:entryValues="@array/magnifying_live_view_scale_value"
+            android:entries="@array/magnifying_live_view_scale"
+            android:key="magnifying_live_view_scale"
+            android:defaultValue="1.0" />
+
+        <ListPreference
+            android:title="@string/pref_digital_zoom_level"
+            android:entryValues="@array/digital_zoom_level_value"
+            android:entries="@array/digital_zoom_level"
+            android:key="digital_zoom_level"
+            android:defaultValue="MAX" />
+
     </PreferenceCategory>
 
     <PreferenceCategory

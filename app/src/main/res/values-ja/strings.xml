@@ -26,9 +26,10 @@
     <string name="pref_auto_connect_camera">カメラに自動接続</string>
     <string name="dialog_message_power_off">カメラの電源を切り、アプリケーションを終了します。</string>
 
-
     <string name="pref_cat_live_view">ライブビュー設定</string>
     <string name="pref_live_view_quality">ライブビュー品質</string>
+    <string name="pref_digital_zoom_level">デジタルズーム倍率</string>
+    <string name="pref_magnifying_live_view_scale">ライブビュー拡大倍率</string>
 
     <string name="pref_cat_info">カメラ情報</string>
     <string name="pref_focal_length">焦点距離</string>

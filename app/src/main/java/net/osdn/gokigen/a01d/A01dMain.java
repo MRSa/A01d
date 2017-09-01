@@ -179,7 +179,8 @@ public class A01dMain extends AppCompatActivity implements ICameraStatusReceiver
         IOlyCameraConnection connection = interfaceProvider.getOlyCameraConnection();
         if (connection != null) {
             IOlyCameraConnection.CameraConnectionStatus status = connection.getConnectionStatus();
-            if (status == IOlyCameraConnection.CameraConnectionStatus.CONNECTED) {
+            if (status == IOlyCameraConnection.CameraConnectionStatus.CONNECTED)
+            {
                 // 接続中のときには切断する
                 connection.disconnect(false);
                 return;
