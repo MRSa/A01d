@@ -32,6 +32,9 @@ public interface IPreferencePropertyAccessor
     String MAGNIFYING_LIVE_VIEW_SCALE = "magnifying_live_view_scale";
     String MAGNIFYING_LIVE_VIEW_SCALE_DEFAULT_VALUE = "1.0";
 
+    String CAPTURE_BOTH_CAMERA_AND_LIVE_VIEW = "capture_both_camera_and_live_view";
+
+
 /*****
     int CHOICE_SPLASH_SCREEN = 10;
 

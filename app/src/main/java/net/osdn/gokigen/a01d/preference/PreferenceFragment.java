@@ -104,6 +104,10 @@ public class PreferenceFragment extends PreferenceFragmentCompat implements Shar
         {
             editor.putBoolean(net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor.RAW, true);
         }
+        if (!items.containsKey(net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor.CAPTURE_BOTH_CAMERA_AND_LIVE_VIEW))
+        {
+            editor.putBoolean(net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor.CAPTURE_BOTH_CAMERA_AND_LIVE_VIEW, true);
+        }
         if (!items.containsKey(net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor.SOUND_VOLUME_LEVEL))
         {
             editor.putString(net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor.SOUND_VOLUME_LEVEL, net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor.SOUND_VOLUME_LEVEL_DEFAULT_VALUE);
@@ -319,6 +323,11 @@ public class PreferenceFragment extends PreferenceFragmentCompat implements Shar
                     break;
 
                 case IPreferencePropertyAccessor.AUTO_CONNECT_TO_CAMERA:
+                    value = preferences.getBoolean(key, true);
+                    Log.v(TAG, " " + key + " , " + value);
+                    break;
+
+                case IPreferencePropertyAccessor.CAPTURE_BOTH_CAMERA_AND_LIVE_VIEW:
                     value = preferences.getBoolean(key, true);
                     Log.v(TAG, " " + key + " , " + value);
                     break;
