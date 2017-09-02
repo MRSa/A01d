@@ -70,4 +70,10 @@ public class OlyCameraFocusControl implements IFocusingControl
             e.printStackTrace();
         }
     }
+
+    @Override
+    public void changeFocusingMode()
+    {
+
+    }
 }

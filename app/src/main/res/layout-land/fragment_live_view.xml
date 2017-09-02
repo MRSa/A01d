@@ -30,26 +30,52 @@
             android:visibility="visible" />
 
         <view
-            class="net.osdn.gokigen.a01d.liveview.CameraLiveImageView"
             android:id="@+id/cameraLiveImageView"
+            class="net.osdn.gokigen.a01d.liveview.CameraLiveImageView"
             android:layout_width="0dip"
             android:layout_height="fill_parent"
             android:layout_weight="5"
             android:gravity="center"
             android:scaleType="fitCenter"
-            android:visibility="visible"/>
+            android:visibility="visible" />
 
-        <view
-            android:id="@+id/consoleImageView2"
-            class="net.osdn.gokigen.a01d.liveview.ScalableImageViewPanel"
+        <RelativeLayout
+            android:id="@+id/operationPanelLayout"
             android:layout_width="0dip"
             android:layout_height="fill_parent"
             android:layout_weight="1"
-            android:clickable="true"
-            android:contentDescription="@string/favorite"
-            android:gravity="center"
-            android:scaleType="fitCenter"
-            android:visibility="visible" />
+            android:background="@color/background_translucent_dark"
+            android:orientation="vertical">
+
+            <ImageView
+                android:id="@+id/focusing_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentBottom="true"
+                android:clickable="true"
+                android:contentDescription="@string/button"
+                android:layout_marginBottom="2pt"
+                android:gravity="center"
+                android:scaleType="fitCenter"
+                android:src="@drawable/btn_manual_focus"
+                android:visibility="visible" />
+
+            <ImageButton
+                android:id="@+id/shutter_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:clickable="true"
+                android:contentDescription="@string/button"
+                android:gravity="center"
+                android:scaleType="fitCenter"
+                android:src="@drawable/ic_camera_black_24dp"
+                android:visibility="visible" />
+
+        </RelativeLayout>
+
     </LinearLayout>
 
     <RelativeLayout

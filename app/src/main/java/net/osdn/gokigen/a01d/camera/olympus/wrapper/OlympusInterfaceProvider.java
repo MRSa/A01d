@@ -4,6 +4,7 @@ import android.app.Activity;
 
 import net.osdn.gokigen.a01d.camera.olympus.IOlympusDisplayInjector;
 import net.osdn.gokigen.a01d.camera.olympus.IOlympusInterfaceProvider;
+import net.osdn.gokigen.a01d.camera.olympus.operation.ICaptureControl;
 import net.osdn.gokigen.a01d.camera.olympus.operation.IFocusingControl;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.connection.ICameraStatusReceiver;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.connection.IOlyCameraConnection;
@@ -25,6 +26,7 @@ public class OlympusInterfaceProvider implements IOlympusInterfaceProvider, IOly
     private final OlyCameraPropertyProxy propertyProxy;
     private final OlyCameraHardwareStatus hardwareStatus;
     private OlyCameraFocusControl focusControl = null;
+    private OlyCameraCaptureControl captureControl = null;
 
     public OlympusInterfaceProvider(Activity context, ICameraStatusReceiver provider)
     {
@@ -39,6 +41,7 @@ public class OlympusInterfaceProvider implements IOlympusInterfaceProvider, IOly
     public void injectOlympusDisplay(IAutoFocusFrameDisplay frameDisplayer, IIndicatorControl indicator)
     {
         focusControl = new OlyCameraFocusControl(wrapper, frameDisplayer, indicator);
+        captureControl = new OlyCameraCaptureControl (wrapper, frameDisplayer, indicator);
     }
 
     @Override
@@ -75,5 +78,10 @@ public class OlympusInterfaceProvider implements IOlympusInterfaceProvider, IOly
     public IFocusingControl getFocusingControl()
     {
         return (focusControl);
+    }
+
+    @Override
+    public ICaptureControl getCaptureControl() {
+        return (captureControl);
     }
 }

@@ -19,6 +19,7 @@ import net.osdn.gokigen.a01d.IChangeScene;
 import net.osdn.gokigen.a01d.R;
 import net.osdn.gokigen.a01d.camera.olympus.IOlympusDisplayInjector;
 import net.osdn.gokigen.a01d.camera.olympus.IOlympusInterfaceProvider;
+import net.osdn.gokigen.a01d.camera.olympus.operation.ICaptureControl;
 import net.osdn.gokigen.a01d.camera.olympus.operation.IFocusingControl;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.ILiveViewControl;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.connection.IOlyCameraConnection;
@@ -50,7 +51,7 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer
 
     private IChangeScene changeScene = null;
 
-    private IFocusingControl focusingControl = null;
+    //private IFocusingControl focusingControl = null;
 
     private LiveViewClickTouchListener onClickTouchListener = null;
 
@@ -142,19 +143,17 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer
             {
                 interfaceInjector.injectOlympusDisplay(imageView, imageView);
             }
-            if ((interfaceProvider != null) &&(focusingControl == null))
-            {
-                focusingControl = interfaceProvider.getFocusingControl();
-            }
             if (onClickTouchListener == null)
             {
-                onClickTouchListener = new LiveViewClickTouchListener(imageView, this, changeScene, focusingControl);
+                onClickTouchListener = new LiveViewClickTouchListener(this.getContext(), imageView, this, changeScene, interfaceProvider);
             }
             imageView.setOnClickListener(onClickTouchListener);
             imageView.setOnTouchListener(onClickTouchListener);
 
             view.findViewById(R.id.show_preference_button).setOnClickListener(onClickTouchListener);
             view.findViewById(R.id.camera_property_settings_button).setOnClickListener(onClickTouchListener);
+            view.findViewById(R.id.shutter_button).setOnClickListener(onClickTouchListener);
+            view.findViewById(R.id.focusing_button).setOnClickListener(onClickTouchListener);
 
             showGrid = view.findViewById(R.id.show_hide_grid_button);
             showGrid.setOnClickListener(onClickTouchListener);

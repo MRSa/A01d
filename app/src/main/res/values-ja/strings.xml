@@ -1,10 +1,12 @@
 <resources>
     <string name="app_name">A01d</string>
+    <string name="app_name2">AirA01a</string>
     <string name="blank"> </string>
 
     <string name="configuration">Settings</string>
     <string name="restore">Restore</string>
     <string name="icon">icon</string>
+    <string name="button">Button</string>
 
     <string name="dialog_positive_execute">OK</string>
     <string name="dialog_negative_cancel">Cancel</string>
@@ -44,8 +46,12 @@
     <string name="pref_instruction_manual">操作説明</string>
     <string name="pref_privacy_policy">プライバシーポリシー</string>
 
-    <string name="information">ハロー!</string>
+    <string name="information">.</string>
     <string name="favorite">お気に入り</string>
     <string name="preferences">Preferences</string>
     <string name="grid">Grid</string>
+
+    <string name="data_saving">保存中、お待ちください&#8230;</string>
+    <string name="save_image_failure">画像保存に失敗しました。</string>
+
 </resources>

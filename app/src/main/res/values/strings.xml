@@ -1,10 +1,12 @@
 <resources>
     <string name="app_name">A01d</string>
+    <string name="app_name2">AirA01a</string>
     <string name="blank"> </string>
 
     <string name="configuration">Settings</string>
     <string name="restore">Restore</string>
     <string name="icon">icon</string>
+    <string name="button">Button</string>
 
     <string name="dialog_positive_execute">OK</string>
     <string name="dialog_negative_cancel">Cancel</string>
@@ -45,7 +47,7 @@
     <string name="pref_instruction_manual">A01d Instructions</string>
     <string name="pref_privacy_policy">Privacy Policy</string>
 
-    <string name="information">Hello!</string>
+    <string name="information">.</string>
     <string name="favorite">Favorite</string>
     <string name="preferences">Preferences</string>
     <string name="grid">Grid</string>
@@ -55,6 +57,8 @@
     <string name="dialog_title_button_retry">Retry</string>
     <string name="dialog_title_button_network_settings">WiFi Settings</string>
 
+    <string name="data_saving">Please wait&#8230;</string>
+    <string name="save_image_failure">Save image is failed.</string>
 
     <string name="connect_start">start</string>
     <string name="connect_check_wifi">check WIFI</string>

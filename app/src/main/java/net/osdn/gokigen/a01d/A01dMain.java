@@ -19,7 +19,6 @@ import net.osdn.gokigen.a01d.camera.olympus.cameraproperty.OlyCameraPropertyList
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.OlympusInterfaceProvider;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.connection.ICameraStatusReceiver;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.connection.IOlyCameraConnection;
-import net.osdn.gokigen.a01d.liveview.CameraLiveViewListenerImpl;
 import net.osdn.gokigen.a01d.liveview.IStatusViewDrawer;
 import net.osdn.gokigen.a01d.liveview.LiveViewFragment;
 import net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor;
@@ -29,7 +28,8 @@ import net.osdn.gokigen.a01d.preference.PreferenceFragment;
  *   A01d ;
  *
  */
-public class A01dMain extends AppCompatActivity implements ICameraStatusReceiver, IChangeScene {
+public class A01dMain extends AppCompatActivity implements ICameraStatusReceiver, IChangeScene
+{
     private final String TAG = toString();
     private IOlympusInterfaceProvider interfaceProvider = null;
     private IOlympusDisplayInjector interfaceInjector = null;

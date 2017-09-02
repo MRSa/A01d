@@ -61,6 +61,7 @@ public class CameraLiveImageView extends View implements CameraLiveViewListenerI
     private IGridFrameDrawer gridFrameDrawer = null;
     private IPreviewImageConverter bitmapConverter = null;
     private IMessageHolder messageHolder;
+    private IStoreImage storeImage = null;
 
     public CameraLiveImageView(Context context)
     {
@@ -82,6 +83,7 @@ public class CameraLiveImageView extends View implements CameraLiveViewListenerI
 
     private void initComponent(Context context)
     {
+        storeImage = new StoreImage(context);
         messageHolder = new ShowMessageHolder();
         imageScaleType = ImageView.ScaleType.FIT_CENTER;
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
@@ -889,6 +891,23 @@ public class CameraLiveImageView extends View implements CameraLiveViewListenerI
         SharedPreferences.Editor editor = preferences.edit();
         editor.putBoolean(IPreferencePropertyAccessor.SHOW_GRID_STATUS, showGridFeature);
         editor.apply();
+    }
+
+    /**
+     *   現在のライブビュー画像を保管する
+     *
+     *
+     */
+    @Override
+    public void takePicture()
+    {
+        if ((imageBitmap == null)||(storeImage == null))
+        {
+            //　保管する画像がなかった...　何もせずに終了する
+            //
+            return;
+        }
+        storeImage.doStore(imageBitmap);
     }
 
     public boolean isShowGrid()
