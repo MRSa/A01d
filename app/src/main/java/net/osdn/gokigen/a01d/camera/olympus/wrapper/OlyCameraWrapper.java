@@ -36,8 +36,6 @@ class OlyCameraWrapper implements ICameraRunMode, ILiveViewControl
         return (camera);
     }
 
-
-
     /**
      *   ICameraRunMode の実装
      *
@@ -119,24 +117,17 @@ class OlyCameraWrapper implements ICameraRunMode, ILiveViewControl
         }
     }
 
-    /**
-     *   デジタルズームする
-     *
-     */
     @Override
-    public void setDigitalZoom(float scale)
+    public void stopLiveView()
     {
-
-    }
-
-    /**
-     *   ライブビューを拡大する
-     *
-     */
-    @Override
-    public void setLiveViewScale(float scale)
-    {
-
+        try
+        {
+            camera.stopLiveView();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -163,44 +154,80 @@ class OlyCameraWrapper implements ICameraRunMode, ILiveViewControl
      *
      */
     @Override
-    public void updateMagnifyingLiveViewScale()
+    public void updateMagnifyingLiveViewScale(boolean isChangeScale)
     {
        try
        {
-           float scale = getMagnifyingLiveViewScale();
-           if (scale < 5.0f)
-           {
-               if (camera.isMagnifyingLiveView())
-               {
-                   camera.stopMagnifyingLiveView();
-                   Log.v(TAG, "RESET LIVE VIEW SCALE : " + 1.0f);
-               }
-               return;
-           }
-           OLYCamera.MagnifyingLiveViewScale setScale;
-           if (scale >= 14.0f)
-           {
-               setScale = OLYCamera.MagnifyingLiveViewScale.X14;
-           }
-           else if (scale >= 10.0f)
-           {
-               setScale = OLYCamera.MagnifyingLiveViewScale.X10;
-           }
-           else if (scale >= 7.0f)
-           {
-               setScale = OLYCamera.MagnifyingLiveViewScale.X7;
-           }
-           else // if (scale >= 5.0f)
-           {
-               setScale = OLYCamera.MagnifyingLiveViewScale.X5;
-           }
-           changeMagnifyingLiveView(setScale);
-           Log.v(TAG, "SET LIVE VIEW SCALE : " + scale);
+           updateMagnifyingLiveViewScale(getMagnifyingLiveViewScale(isChangeScale));
        }
        catch (Exception e)
        {
            e.printStackTrace();
        }
+    }
+
+    /**
+     *   ライブビューのサイズ
+     *
+     * @return  ライブビュー倍率
+     */
+    @Override
+    public float getMagnifyingLiveViewScale()
+    {
+        return (getMagnifyingLiveViewScale(false));
+    }
+
+    /**
+     *   デジタルズームの倍率を取得する
+     *
+     */
+    @Override
+    public float getDigitalZoomScale()
+    {
+        return (getDigitalZoomScalePreference());
+    }
+
+    /**
+     *
+     *
+     */
+    private void updateMagnifyingLiveViewScale(float scale)
+    {
+        try
+        {
+            if (scale < 5.0f)
+            {
+                if (camera.isMagnifyingLiveView())
+                {
+                    camera.stopMagnifyingLiveView();
+                    Log.v(TAG, "RESET LIVE VIEW SCALE : " + 1.0f);
+                }
+                return;
+            }
+            OLYCamera.MagnifyingLiveViewScale setScale;
+            if (scale >= 14.0f)
+            {
+                setScale = OLYCamera.MagnifyingLiveViewScale.X14;
+            }
+            else if (scale >= 10.0f)
+            {
+                setScale = OLYCamera.MagnifyingLiveViewScale.X10;
+            }
+            else if (scale >= 7.0f)
+            {
+                setScale = OLYCamera.MagnifyingLiveViewScale.X7;
+            }
+            else // if (scale >= 5.0f)
+            {
+                setScale = OLYCamera.MagnifyingLiveViewScale.X5;
+            }
+            changeMagnifyingLiveView(setScale);
+            Log.v(TAG, "SET LIVE VIEW SCALE : " + scale);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -231,7 +258,7 @@ class OlyCameraWrapper implements ICameraRunMode, ILiveViewControl
      *   ライブビュー拡大倍率の設定値を応答する
      *
      */
-    private float getMagnifyingLiveViewScale()
+    private float getMagnifyingLiveViewScale(boolean isChangeScale)
     {
         float scale = 1.0f;
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
@@ -239,6 +266,41 @@ class OlyCameraWrapper implements ICameraRunMode, ILiveViewControl
         try
         {
             scale = Float.parseFloat(value);
+            String changeValue = null;
+            if(isChangeScale)
+            {
+                if (scale >= 14.0f)
+                {
+                    scale = 1.0f;
+                    changeValue = "1.0";
+                }
+                else if (scale >= 10.0f)
+                {
+                    scale = 14.0f;
+                    changeValue = "14.0";
+                }
+                else if (scale >= 7.0f)
+                {
+                    scale = 10.0f;
+                    changeValue = "10.0";
+                }
+                else if (scale >= 5.0f)
+                {
+                    scale = 7.0f;
+                    changeValue = "7.0";
+                }
+                else // if (scale < 5.0f)
+                {
+                    scale = 5.0f;
+                    changeValue = "5.0";
+                }
+            }
+            if (changeValue != null)
+            {
+                SharedPreferences.Editor editor = preferences.edit();
+                editor.putString(net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor.MAGNIFYING_LIVE_VIEW_SCALE, changeValue);
+                editor.apply();
+            }
         }
         catch (Exception e)
         {

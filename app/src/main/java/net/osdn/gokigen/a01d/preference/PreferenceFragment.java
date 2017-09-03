@@ -221,6 +221,7 @@ public class PreferenceFragment extends PreferenceFragmentCompat implements Shar
         catch (Exception e)
         {
             findPreference("camera_version").setSummary("Unknown");
+            e.printStackTrace();
         }
     }
 

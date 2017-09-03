@@ -27,10 +27,10 @@ public interface IPreferencePropertyAccessor
     String SHOW_GRID_STATUS = "show_grid";
 
     String DIGITAL_ZOOM_LEVEL = "digital_zoom_level";
-    String DIGITAL_ZOOM_LEVEL_DEFAULT_VALUE = "MAX";
+    String DIGITAL_ZOOM_LEVEL_DEFAULT_VALUE = "1.0";
 
     String MAGNIFYING_LIVE_VIEW_SCALE = "magnifying_live_view_scale";
-    String MAGNIFYING_LIVE_VIEW_SCALE_DEFAULT_VALUE = "1.0";
+    String MAGNIFYING_LIVE_VIEW_SCALE_DEFAULT_VALUE = "10.0";
 
     String CAPTURE_BOTH_CAMERA_AND_LIVE_VIEW = "capture_both_camera_and_live_view";
 

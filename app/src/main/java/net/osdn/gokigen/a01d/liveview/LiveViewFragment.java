@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -61,6 +62,7 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer, IFo
 
 
     private TextView statusArea = null;
+    private TextView focalLengthArea = null;
     private CameraLiveImageView imageView = null;
     //private CameraControlPanel cameraPanel = null;
 
@@ -73,10 +75,13 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer, IFo
     private ImageView manualFocus = null;
     private ImageButton showGrid = null;
     private ImageButton connectStatus = null;
+    private Button changeLiveViewScale = null;
 
     private boolean imageViewCreated = false;
     private View myView = null;
     private String messageValue = "";
+
+    private IOlyCameraConnection.CameraConnectionStatus currentConnectionStatus =  IOlyCameraConnection.CameraConnectionStatus.UNKNOWN;
 
     /**
      *
@@ -166,6 +171,12 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer, IFo
             }
             changedFocusingMode();
 
+            changeLiveViewScale = view.findViewById(R.id.live_view_scale_button);
+            if (changeLiveViewScale != null)
+            {
+                changeLiveViewScale.setOnClickListener(onClickTouchListener);
+            }
+
             showGrid = view.findViewById(R.id.show_hide_grid_button);
             showGrid.setOnClickListener(onClickTouchListener);
             updateGridIcon();
@@ -175,6 +186,7 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer, IFo
             updateConnectionStatus(IOlyCameraConnection.CameraConnectionStatus.UNKNOWN);
 
             statusArea = view.findViewById(R.id.informationMessageTextView);
+            focalLengthArea = view.findViewById(R.id.focal_length_with_digital_zoom_view);
         }
         catch (Exception e)
         {
@@ -264,18 +276,27 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer, IFo
     {
         try
         {
-            int id = R.drawable.ic_cloud_off_black_24dp;
-            if (connectionStatus == IOlyCameraConnection.CameraConnectionStatus.CONNECTING)
+            currentConnectionStatus = connectionStatus;
+            runOnUiThread(new Runnable()
             {
-                id = R.drawable.ic_cloud_queue_black_24dp;
-            }
-            else if  (connectionStatus == IOlyCameraConnection.CameraConnectionStatus.CONNECTED)
-            {
-                id = R.drawable.ic_cloud_done_black_24dp;
-            }
-            connectStatus.setImageDrawable(ResourcesCompat.getDrawable(getResources(), id, null));
-            connectStatus.invalidate();
-            imageView.invalidate();
+                @Override
+                public void run()
+                {
+                    int id = R.drawable.ic_cloud_off_black_24dp;
+                    if (currentConnectionStatus == IOlyCameraConnection.CameraConnectionStatus.CONNECTING)
+                    {
+                        id = R.drawable.ic_cloud_queue_black_24dp;
+                    }
+                    else if  (currentConnectionStatus == IOlyCameraConnection.CameraConnectionStatus.CONNECTED)
+                    {
+                        id = R.drawable.ic_cloud_done_black_24dp;
+                    }
+                    connectStatus.setImageDrawable(ResourcesCompat.getDrawable(getResources(), id, null));
+                    connectStatus.invalidate();
+                    imageView.invalidate();
+                }
+            });
+
         }
         catch (Exception e)
         {
@@ -321,8 +342,49 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer, IFo
                 @Override
                 public void run()
                 {
-                    manualFocus.setSelected(cameraInformation.isManualFocus());
-                    manualFocus.invalidate();
+                    if (currentConnectionStatus == IOlyCameraConnection.CameraConnectionStatus.CONNECTED)
+                    {
+                        manualFocus.setSelected(cameraInformation.isManualFocus());
+                        manualFocus.invalidate();
+                    }
+                }
+            });
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void updateLiveViewScale(boolean isChangeScale)
+    {
+        try
+        {
+            Log.v(TAG, "updateLiveViewScale() : " + isChangeScale);
+
+            // ライブビューの倍率設定
+            liveViewControl.updateMagnifyingLiveViewScale(isChangeScale);
+
+            // ボタンの文字を更新する
+            float scale = liveViewControl.getMagnifyingLiveViewScale();
+            final String datavalue = "LV: " + scale;
+
+            // デジタルズームの倍率を表示する
+            float digitalZoom = liveViewControl.getDigitalZoomScale();
+            final String digitalValue = (digitalZoom > 1.0f) ? "D x" + digitalZoom : "";
+
+            // 更新自体は、UIスレッドで行う
+            runOnUiThread(new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    changeLiveViewScale.setText(datavalue);
+                    changeLiveViewScale.postInvalidate();
+
+                    focalLengthArea.setText(digitalValue);
+                    focalLengthArea.postInvalidate();
                 }
             });
         }
@@ -461,7 +523,6 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer, IFo
 */
         // propertyを取得
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getContext());
-
         try
         {
             // グリッド・フォーカスアシストの情報を戻す
@@ -470,6 +531,10 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer, IFo
             {
                 imageView.toggleShowGridFrame();
                 imageView.postInvalidate();
+            }
+            if (currentConnectionStatus == IOlyCameraConnection.CameraConnectionStatus.CONNECTED)
+            {
+                startLiveView();
             }
         }
         catch (Exception e)
@@ -511,6 +576,16 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer, IFo
     {
         super.onPause();
         Log.v(TAG, "onPause() Start");
+
+        // ライブビューの停止
+        try
+        {
+            liveViewControl.stopLiveView();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
 
 /*
         // ライブビューの停止
@@ -802,7 +877,7 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer, IFo
             liveViewControl.updateDigitalZoom();
 
             // ライブビューの倍率設定
-            liveViewControl.updateMagnifyingLiveViewScale();
+            updateLiveViewScale(false);
         }
         catch (Exception e)
         {

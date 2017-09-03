@@ -89,6 +89,11 @@ class LiveViewClickTouchListener implements View.OnClickListener, View.OnTouchLi
                     changeFocusingMode();
                     break;
 
+                case R.id.live_view_scale_button:
+                    //  ライブビューの倍率を更新する
+                    statusViewDrawer.updateLiveViewScale(true);
+                    break;
+
                 default:
                     Log.v(TAG, "onClick() : " + id);
                     break;

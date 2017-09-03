@@ -60,6 +60,9 @@
     <string name="data_saving">Please wait&#8230;</string>
     <string name="save_image_failure">Save image is failed.</string>
 
+    <string name="live_view_scale_default">LV : ???</string>
+    <string name="focal_length_with_digital_zoom_view_default"> </string>
+
     <string name="connect_start">start</string>
     <string name="connect_check_wifi">check WIFI</string>
     <string name="connect_connect">connecting</string>
