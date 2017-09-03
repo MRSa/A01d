@@ -10,6 +10,4 @@ public interface IFocusingControl
 {
     boolean driveAutoFocus(MotionEvent motionEvent);
     void unlockAutoFocus();
-    void changeFocusingMode();
-
 }

@@ -12,6 +12,9 @@ import net.osdn.gokigen.a01d.R;
 import net.osdn.gokigen.a01d.camera.olympus.IOlympusInterfaceProvider;
 import net.osdn.gokigen.a01d.camera.olympus.operation.ICaptureControl;
 import net.osdn.gokigen.a01d.camera.olympus.operation.IFocusingControl;
+import net.osdn.gokigen.a01d.camera.olympus.wrapper.ICameraInformation;
+import net.osdn.gokigen.a01d.camera.olympus.wrapper.property.IOlyCameraProperty;
+import net.osdn.gokigen.a01d.camera.olympus.wrapper.property.IOlyCameraPropertyProvider;
 import net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor;
 
 /**
@@ -27,6 +30,8 @@ class LiveViewClickTouchListener implements View.OnClickListener, View.OnTouchLi
     private final IChangeScene changeScene;
     private final IFocusingControl focusingControl;
     private final ICaptureControl captureControl;
+    private final IOlyCameraPropertyProvider propertyProvider;
+    private final ICameraInformation cameraInformation;
 
     LiveViewClickTouchListener(Context context, ILiveImageStatusNotify imageStatusNotify, IStatusViewDrawer statusView, IChangeScene changeScene, IOlympusInterfaceProvider interfaceProvider)
     {
@@ -36,6 +41,8 @@ class LiveViewClickTouchListener implements View.OnClickListener, View.OnTouchLi
         this.changeScene = changeScene;
         this.focusingControl = interfaceProvider.getFocusingControl();
         this.captureControl = interfaceProvider.getCaptureControl();
+        this.propertyProvider = interfaceProvider.getCameraPropertyProvider();
+        this.cameraInformation = interfaceProvider.getCameraInformation();
     }
 
     /**
@@ -79,7 +86,7 @@ class LiveViewClickTouchListener implements View.OnClickListener, View.OnTouchLi
 
                 case R.id.focusing_button:
                     // AF と MFの切り替えボタンが押された
-                    focusingControl.changeFocusingMode();
+                    changeFocusingMode();
                     break;
 
                 default:
@@ -103,6 +110,7 @@ class LiveViewClickTouchListener implements View.OnClickListener, View.OnTouchLi
         Log.v(TAG, "pushedShutterButton()");
         try
         {
+            // カメラで撮影する
             captureControl.doCapture(0);
 
             SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
@@ -111,6 +119,34 @@ class LiveViewClickTouchListener implements View.OnClickListener, View.OnTouchLi
                 // ライブビュー画像も保管する
                 statusNotify.takePicture();
             }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     *   AF/MFの切り替えを行う
+     *
+     */
+    private void changeFocusingMode()
+    {
+        if ((propertyProvider == null)||(cameraInformation == null))
+        {
+            Log.v(TAG, "changeFocusingMode() : OBJECT IS NULL.");
+            return;
+        }
+        try
+        {
+            boolean isManualFocus = cameraInformation.isManualFocus();
+            if (!isManualFocus)
+            {
+                // AF ⇒ MF時には、オートフォーカスのロックを解除する
+                focusingControl.unlockAutoFocus();
+            }
+            String value = (isManualFocus) ? IOlyCameraProperty.STILL_AF :  IOlyCameraProperty.STILL_MF;
+            propertyProvider.setCameraPropertyValue(IOlyCameraProperty.FOCUS_STILL, value);
         }
         catch (Exception e)
         {

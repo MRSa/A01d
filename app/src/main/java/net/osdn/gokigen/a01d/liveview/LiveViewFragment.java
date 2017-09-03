@@ -13,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import net.osdn.gokigen.a01d.IChangeScene;
@@ -21,6 +22,8 @@ import net.osdn.gokigen.a01d.camera.olympus.IOlympusDisplayInjector;
 import net.osdn.gokigen.a01d.camera.olympus.IOlympusInterfaceProvider;
 import net.osdn.gokigen.a01d.camera.olympus.operation.ICaptureControl;
 import net.osdn.gokigen.a01d.camera.olympus.operation.IFocusingControl;
+import net.osdn.gokigen.a01d.camera.olympus.wrapper.ICameraInformation;
+import net.osdn.gokigen.a01d.camera.olympus.wrapper.IFocusingModeNotify;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.ILiveViewControl;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.connection.IOlyCameraConnection;
 import net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor;
@@ -32,7 +35,7 @@ import java.io.File;
  *  撮影用ライブビュー画面
  *
  */
-public class LiveViewFragment extends Fragment implements IStatusViewDrawer
+public class LiveViewFragment extends Fragment implements IStatusViewDrawer, IFocusingModeNotify
 {
     private final String TAG = this.toString();
     private static final int COMMAND_MY_PROPERTY = 0x00000100;
@@ -50,6 +53,7 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer
 //    private IGpsLocationPicker locationPicker = null;
 
     private IChangeScene changeScene = null;
+    private ICameraInformation cameraInformation = null;
 
     //private IFocusingControl focusingControl = null;
 
@@ -60,12 +64,13 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer
     private CameraLiveImageView imageView = null;
     //private CameraControlPanel cameraPanel = null;
 
-/*
+    /*
+
+        private ImageView afLock = null;
+        private ImageView aeLock = null;
+        private ImageView focusAssist = null;
+    */
     private ImageView manualFocus = null;
-    private ImageView afLock = null;
-    private ImageView aeLock = null;
-    private ImageView focusAssist = null;
-*/
     private ImageButton showGrid = null;
     private ImageButton connectStatus = null;
 
@@ -141,7 +146,7 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer
             imageView = view.findViewById(R.id.cameraLiveImageView);
             if (interfaceInjector != null)
             {
-                interfaceInjector.injectOlympusDisplay(imageView, imageView);
+                interfaceInjector.injectOlympusDisplay(imageView, imageView, this);
             }
             if (onClickTouchListener == null)
             {
@@ -153,7 +158,13 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer
             view.findViewById(R.id.show_preference_button).setOnClickListener(onClickTouchListener);
             view.findViewById(R.id.camera_property_settings_button).setOnClickListener(onClickTouchListener);
             view.findViewById(R.id.shutter_button).setOnClickListener(onClickTouchListener);
-            view.findViewById(R.id.focusing_button).setOnClickListener(onClickTouchListener);
+
+            manualFocus = view.findViewById(R.id.focusing_button);
+            if (manualFocus != null)
+            {
+                manualFocus.setOnClickListener(onClickTouchListener);
+            }
+            changedFocusingMode();
 
             showGrid = view.findViewById(R.id.show_hide_grid_button);
             showGrid.setOnClickListener(onClickTouchListener);
@@ -241,6 +252,7 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer
         this.interfaceProvider = interfaceProvider;
         this.liveViewControl = interfaceProvider.getLiveViewControl();
         this.interfaceInjector = interfaceInjector;
+        this.cameraInformation = interfaceProvider.getCameraInformation();
     }
 
     /**
@@ -284,6 +296,35 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer
             showGrid.setImageDrawable(ResourcesCompat.getDrawable(getResources(), id, null));
             showGrid.invalidate();
             imageView.invalidate();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     *   AF/MFの表示を更新する
+     *
+     */
+    @Override
+    public void changedFocusingMode()
+    {
+        try
+        {
+            if ((cameraInformation == null)||(manualFocus == null))
+            {
+                return;
+            }
+            runOnUiThread(new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    manualFocus.setSelected(cameraInformation.isManualFocus());
+                    manualFocus.invalidate();
+                }
+            });
         }
         catch (Exception e)
         {

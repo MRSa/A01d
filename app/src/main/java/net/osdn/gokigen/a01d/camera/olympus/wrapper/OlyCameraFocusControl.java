@@ -6,6 +6,7 @@ import android.view.MotionEvent;
 
 import net.osdn.gokigen.a01d.camera.olympus.operation.IFocusingControl;
 import net.osdn.gokigen.a01d.camera.olympus.operation.takepicture.AutoFocusControl;
+import net.osdn.gokigen.a01d.camera.olympus.wrapper.property.IOlyCameraPropertyProvider;
 import net.osdn.gokigen.a01d.liveview.IAutoFocusFrameDisplay;
 import net.osdn.gokigen.a01d.liveview.IIndicatorControl;
 
@@ -71,9 +72,4 @@ public class OlyCameraFocusControl implements IFocusingControl
         }
     }
 
-    @Override
-    public void changeFocusingMode()
-    {
-
-    }
 }

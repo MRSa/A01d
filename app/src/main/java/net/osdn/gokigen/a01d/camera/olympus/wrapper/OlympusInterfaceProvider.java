@@ -25,6 +25,7 @@ public class OlympusInterfaceProvider implements IOlympusInterfaceProvider, IOly
     private final OlyCameraConnection connection;
     private final OlyCameraPropertyProxy propertyProxy;
     private final OlyCameraHardwareStatus hardwareStatus;
+    private final OLYCameraPropertyListenerImpl propertyListener;
     private OlyCameraFocusControl focusControl = null;
     private OlyCameraCaptureControl captureControl = null;
 
@@ -34,14 +35,15 @@ public class OlympusInterfaceProvider implements IOlympusInterfaceProvider, IOly
         this.connection = new OlyCameraConnection(context, this.wrapper.getOLYCamera(), provider);
         this.propertyProxy = new OlyCameraPropertyProxy(this.wrapper.getOLYCamera());
         this.hardwareStatus = new OlyCameraHardwareStatus(this.wrapper.getOLYCamera());
-
+        this.propertyListener = new OLYCameraPropertyListenerImpl(this.wrapper.getOLYCamera());
     }
 
     @Override
-    public void injectOlympusDisplay(IAutoFocusFrameDisplay frameDisplayer, IIndicatorControl indicator)
+    public void injectOlympusDisplay(IAutoFocusFrameDisplay frameDisplayer, IIndicatorControl indicator, IFocusingModeNotify focusingModeNotify)
     {
         focusControl = new OlyCameraFocusControl(wrapper, frameDisplayer, indicator);
         captureControl = new OlyCameraCaptureControl (wrapper, frameDisplayer, indicator);
+        propertyListener.setFocusingControl(focusingModeNotify);
     }
 
     @Override
@@ -83,5 +85,11 @@ public class OlympusInterfaceProvider implements IOlympusInterfaceProvider, IOly
     @Override
     public ICaptureControl getCaptureControl() {
         return (captureControl);
+    }
+
+    @Override
+    public ICameraInformation getCameraInformation()
+    {
+        return (propertyListener);
     }
 }

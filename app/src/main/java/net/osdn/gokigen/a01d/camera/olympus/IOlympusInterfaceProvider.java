@@ -3,6 +3,7 @@ package net.osdn.gokigen.a01d.camera.olympus;
 import net.osdn.gokigen.a01d.camera.olympus.operation.ICaptureControl;
 import net.osdn.gokigen.a01d.camera.olympus.operation.IFocusingControl;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.ICameraHardwareStatus;
+import net.osdn.gokigen.a01d.camera.olympus.wrapper.ICameraInformation;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.ICameraRunMode;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.ILiveViewControl;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.property.IOlyCameraPropertyProvider;
@@ -20,4 +21,5 @@ public interface IOlympusInterfaceProvider
     ILiveViewControl getLiveViewControl();
     IFocusingControl getFocusingControl();
     ICaptureControl getCaptureControl();
+    ICameraInformation getCameraInformation();
 }

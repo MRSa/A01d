@@ -14,6 +14,10 @@ public interface IOlyCameraProperty
     String FOCUS_STILL = "FOCUS_STILL";
     String AE_LOCK_STATE = "AE_LOCK_STATE";
 
+
+    String STILL_MF = "<FOCUS_STILL/FOCUS_MF>";
+    String STILL_AF = "<FOCUS_STILL/FOCUS_SAF>";
+
     //String TAKE_MODE_MOVIE = "<TAKEMODE/movie>";
     //String DRIVE_MODE_SINGLE = "<TAKE_DRIVE/DRIVE_NORMAL>";
 }
