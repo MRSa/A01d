@@ -9,18 +9,4 @@ public interface IStatusViewDrawer
     void updateStatusView(String message);
     void updateLiveViewScale(boolean isChangeScale);
     void startLiveView();
-
-    /*
-    void updateStatusView(String message);
-    void updateFocusAssistStatus();
-    void updateGridFrameStatus();
-    void showFavoriteSettingDialog();
-
-    void toggleTimerStatus();
-
-    void toggleGpsTracking();
-    void updateGpsTrackingStatus();
-
-    IMessageDrawer getMessageDrawer();
-*/
 }

@@ -822,7 +822,7 @@ public class CameraLiveImageView extends View implements CameraLiveViewListenerI
         float viewSizeHeight = this.getHeight();
         float ratioX = viewSizeWidth / imageSizeWidth;
         float ratioY = viewSizeHeight / imageSizeHeight;
-        float scale = 1.0f;
+        float scale;// = 1.0f;
 
         switch (imageScaleType) {
             case FIT_XY:
