@@ -3,10 +3,9 @@
     <string name="app_name2">AirA01a</string>
     <string name="blank"> </string>
 
-    <string name="configuration">Settings</string>
-    <string name="restore">Restore</string>
-    <string name="icon">icon</string>
-    <string name="button">Button</string>
+    <string name="configuration">設定</string>
+    <string name="restore">リストア</string>
+    <string name="icon">アイコン</string>
 
     <string name="dialog_positive_execute">OK</string>
     <string name="dialog_negative_cancel">Cancel</string>
@@ -14,7 +13,7 @@
     <string name="dialog_title_confirmation">確認</string>
     <string name="dialog_message_restore_camera_property">カメラプロパティを画面オープン時の状態に戻します。</string>
     <string name="dialog_title_loading_properties">カメラプロパティ読出中</string>
-    <string name="dialog_message_loading_properties">しばらくお待ち下さい…</string>
+    <string name="dialog_message_loading_properties">しばらくお待ち下さい&#8230;</string>
 
     <string name="pref_cat_camera">カメラ設定</string>
     <string name="pref_take_mode">撮影モード</string>
@@ -48,15 +47,15 @@
     <string name="pref_instruction_manual">操作説明</string>
     <string name="pref_privacy_policy">プライバシーポリシー</string>
 
-    <string name="information">.</string>
+    <string name="information"> </string>
     <string name="favorite">お気に入り</string>
-    <string name="preferences">Preferences</string>
-    <string name="grid">Grid</string>
+    <string name="preferences">設定</string>
+    <string name="grid">グリッド</string>
 
     <string name="data_saving">保存中、お待ちください&#8230;</string>
     <string name="save_image_failure">画像保存に失敗しました。</string>
 
-    <string name="live_view_scale_default">LV : ???</string>
+    <string name="live_view_scale_default">LV : </string>
     <string name="focal_length_with_digital_zoom_view_default"> </string>
 
     <string name="save_props">保存</string>
@@ -67,4 +66,23 @@
     <string name="title_tab_title_load">設定反映</string>
     <string name="title_tab_title_save">設定保存</string>
     <string name="title_my_settings">お気に入りカメラ設定</string>
+    <string name="camera_disconnected">切断</string>
+    <string name="camera_reset_required">カメラ側のリセット操作をお願いします。</string>
+    <string name="button">ボタン</string>
+    <string name="connect_check_wifi">Wifi(OS)待ち</string>
+    <string name="connect_change_run_mode">動作モード変更</string>
+    <string name="connect_connect">接続開始</string>
+    <string name="connect_connected">接続済</string>
+    <string name="connect_restore_camera_settings">カメラ設定を展開</string>
+    <string name="connect_start">接続開始</string>
+    <string name="dialog_start_load_property_message">しばらくお待ち下さい&#8230;</string>
+    <string name="dialog_start_save_property_message">しばらくお待ち下さい&#8230;</string>
+    <string name="dialog_start_save_property_title">カメラプロパティ保存中</string>
+    <string name="dialog_start_load_property_title">カメラプロパティ設定中</string>
+    <string name="dialog_title_button_network_settings">WiFi設定</string>
+    <string name="dialog_title_button_retry">再試行</string>
+    <string name="dialog_title_connect_failed">接続失敗</string>
+    <string name="fatal_cannot_use_camera">Olympus Camera Kitが動作しないモードのため、カメラのリセットが必要です。電源ボタンを8秒以上長押しして、カメラをリセットしてください。</string>
+    <string name="network_connection_timeout">接続タイムアウト</string>
+    <string name="restored_my_props">設定を展開しました。 : </string>
 </resources>

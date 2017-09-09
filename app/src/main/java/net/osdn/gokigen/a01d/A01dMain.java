@@ -75,6 +75,17 @@ public class A01dMain extends AppCompatActivity implements ICameraStatusReceiver
     }
 
     /**
+     *   なぜか、onReadyClass() が有効ではなさそうなので...
+     *
+     */
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults)
+    {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        onReadyClass();
+    }
+
+    /**
      * クラスの初期化
      */
     private void initializeClass()
@@ -93,9 +104,11 @@ public class A01dMain extends AppCompatActivity implements ICameraStatusReceiver
     /**
      * 初期化終了時の処理
      */
-    private void onReadyClass() {
-        // 自動接続の支持があったとき
-        if (isAutoConnectCamera()) {
+    private void onReadyClass()
+    {
+        // 自動接続の指示があったとき
+        if (isAutoConnectCamera())
+        {
             changeCameraConnection();
         }
     }
@@ -135,7 +148,8 @@ public class A01dMain extends AppCompatActivity implements ICameraStatusReceiver
      * （カメラと接続中のときのみ）
      */
     @Override
-    public void changeSceneToCameraPropertyList() {
+    public void changeSceneToCameraPropertyList()
+    {
         IOlyCameraConnection connection = interfaceProvider.getOlyCameraConnection();
         if (connection != null) {
             IOlyCameraConnection.CameraConnectionStatus status = connection.getConnectionStatus();
@@ -157,8 +171,10 @@ public class A01dMain extends AppCompatActivity implements ICameraStatusReceiver
      * 設定画面を開く
      */
     @Override
-    public void changeSceneToConfiguration() {
-        if (preferenceFragment == null) {
+    public void changeSceneToConfiguration()
+    {
+        if (preferenceFragment == null)
+        {
             preferenceFragment = new PreferenceFragment();
         }
         preferenceFragment.setInterface(this, interfaceProvider, this);
@@ -173,8 +189,10 @@ public class A01dMain extends AppCompatActivity implements ICameraStatusReceiver
      * カメラとの接続・切断のシーケンス
      */
     @Override
-    public void changeCameraConnection() {
-        if (interfaceProvider == null) {
+    public void changeCameraConnection()
+    {
+        if (interfaceProvider == null)
+        {
             Log.v(TAG, "changeCameraConnection() : interfaceProvider is NULL");
             return;
         }
@@ -298,7 +316,17 @@ public class A01dMain extends AppCompatActivity implements ICameraStatusReceiver
 
     private boolean isAutoConnectCamera()
     {
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-        return (preferences.getBoolean(IPreferencePropertyAccessor.AUTO_CONNECT_TO_CAMERA, true));
+        boolean ret = true;
+        try
+        {
+            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+            ret = preferences.getBoolean(IPreferencePropertyAccessor.AUTO_CONNECT_TO_CAMERA, true);
+            // Log.v(TAG, "isAutoConnectCamera() : " + ret);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        return (ret);
     }
 }

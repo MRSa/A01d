@@ -37,8 +37,9 @@ class OlyCameraZoomLensControl implements IZoomLensControl
         if (camera != null)
         {
             String mountStatus = camera.getLensMountStatus();
+            //Log.v(TAG, "OlyCameraZoomLensControl() : " + mountStatus);
             canZoom = ((mountStatus != null)&&(mountStatus.contains("electriczoom")));
-            if (canZoom)
+            if (mountStatus != null)
             {
                 try
                 {
@@ -128,9 +129,10 @@ class OlyCameraZoomLensControl implements IZoomLensControl
     public void moveInitialZoomPosition()
     {
         initialize();
-        if (canZoom())
+        if (!canZoom())
         {
             // ズームできない場合、何もせずに応答する
+            Log.v(TAG, "moveInitialZoomPosition() : not PZ lens.");
             return;
         }
 
@@ -154,6 +156,7 @@ class OlyCameraZoomLensControl implements IZoomLensControl
                 focalLength = (maximumLength + minimumLength) / scale;
             }
             driveZoomLens(focalLength);
+            //Log.v(TAG, "moveInitialZoomPosition() : zoom to " + focalLength + "mm");
         }
         catch (Exception e)
         {

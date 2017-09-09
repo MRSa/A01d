@@ -409,6 +409,7 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer, IFo
                 if (statusArea != null)
                 {
                     statusArea.setText(messageValue);
+                    statusArea.invalidate();
                 }
             }
         });
