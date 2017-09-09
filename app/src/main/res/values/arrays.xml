@@ -83,4 +83,20 @@
         <item >14.0</item>
     </string-array>
 
+    <string-array name="power_zoom_level">
+        <item >WIDE (0.0)</item>
+        <item >&#188; (0.25)</item>
+        <item >HALF (0.5)</item>
+        <item >&#190; (0.75)</item>
+        <item >TELE (1.0)</item>
+    </string-array>
+
+    <string-array name="power_zoom_level_value">
+        <item >0.0</item>
+        <item >0.25</item>
+        <item >0.5</item>
+        <item >0.75</item>
+        <item >1.0</item>
+    </string-array>
+
 </resources>

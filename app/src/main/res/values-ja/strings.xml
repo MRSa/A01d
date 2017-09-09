@@ -28,11 +28,13 @@
 
     <string name="pref_cat_initialize">起動時設定</string>
     <string name="pref_auto_connect_camera">カメラに自動接続</string>
+    <string name="pref_summary_auto_connect_camera">通常、チェックを入れたままご使用ください</string>
     <string name="dialog_message_power_off">カメラの電源を切り、アプリケーションを終了します。</string>
 
     <string name="pref_cat_live_view">ライブビュー設定</string>
     <string name="pref_live_view_quality">ライブビュー品質</string>
     <string name="pref_digital_zoom_level">デジタルズーム倍率</string>
+    <string name="pref_power_zoom_level">パワーズーム装着時の位置</string>
     <string name="pref_magnifying_live_view_scale">ライブビュー拡大倍率</string>
 
     <string name="pref_cat_info">カメラ情報</string>

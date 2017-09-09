@@ -6,6 +6,7 @@ import net.osdn.gokigen.a01d.camera.olympus.IOlympusDisplayInjector;
 import net.osdn.gokigen.a01d.camera.olympus.IOlympusInterfaceProvider;
 import net.osdn.gokigen.a01d.camera.olympus.operation.ICaptureControl;
 import net.osdn.gokigen.a01d.camera.olympus.operation.IFocusingControl;
+import net.osdn.gokigen.a01d.camera.olympus.operation.IZoomLensControl;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.connection.ICameraStatusReceiver;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.connection.IOlyCameraConnection;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.connection.OlyCameraConnection;
@@ -26,6 +27,7 @@ public class OlympusInterfaceProvider implements IOlympusInterfaceProvider, IOly
     private final OlyCameraPropertyProxy propertyProxy;
     private final OlyCameraHardwareStatus hardwareStatus;
     private final OLYCameraPropertyListenerImpl propertyListener;
+    private final OlyCameraZoomLensControl zoomLensControl;
     private OlyCameraFocusControl focusControl = null;
     private OlyCameraCaptureControl captureControl = null;
 
@@ -36,6 +38,7 @@ public class OlympusInterfaceProvider implements IOlympusInterfaceProvider, IOly
         this.propertyProxy = new OlyCameraPropertyProxy(this.wrapper.getOLYCamera());
         this.hardwareStatus = new OlyCameraHardwareStatus(this.wrapper.getOLYCamera());
         this.propertyListener = new OLYCameraPropertyListenerImpl(this.wrapper.getOLYCamera());
+        this.zoomLensControl = new OlyCameraZoomLensControl(context, this.wrapper.getOLYCamera());
     }
 
     @Override
@@ -68,6 +71,12 @@ public class OlympusInterfaceProvider implements IOlympusInterfaceProvider, IOly
     public ICameraRunMode getCameraRunMode()
     {
         return (wrapper);
+    }
+
+    @Override
+    public IZoomLensControl getZoomLensControl()
+    {
+        return (zoomLensControl);
     }
 
     @Override

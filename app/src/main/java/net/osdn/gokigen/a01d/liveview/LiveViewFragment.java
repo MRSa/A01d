@@ -23,6 +23,7 @@ import net.osdn.gokigen.a01d.camera.olympus.IOlympusDisplayInjector;
 import net.osdn.gokigen.a01d.camera.olympus.IOlympusInterfaceProvider;
 import net.osdn.gokigen.a01d.camera.olympus.operation.ICaptureControl;
 import net.osdn.gokigen.a01d.camera.olympus.operation.IFocusingControl;
+import net.osdn.gokigen.a01d.camera.olympus.operation.IZoomLensControl;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.ICameraInformation;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.IFocusingModeNotify;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.ILiveViewControl;
@@ -42,6 +43,7 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer, IFo
     private static final int COMMAND_MY_PROPERTY = 0x00000100;
 
     private ILiveViewControl liveViewControl = null;
+    private IZoomLensControl zoomLensControl = null;
     private IOlympusInterfaceProvider interfaceProvider = null;
     private IOlympusDisplayInjector interfaceInjector = null;
     private CameraLiveViewListenerImpl liveViewListener = null;
@@ -169,6 +171,7 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer, IFo
         this.changeScene = sceneSelector;
         this.interfaceProvider = interfaceProvider;
         this.liveViewControl = interfaceProvider.getLiveViewControl();
+        this.zoomLensControl = interfaceProvider.getZoomLensControl();
         this.interfaceInjector = interfaceInjector;
         this.cameraInformation = interfaceProvider.getCameraInformation();
     }
@@ -430,6 +433,9 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer, IFo
 
             // デジタルズームの設定
             liveViewControl.updateDigitalZoom();
+
+            // パワーズームの設定 (初期化位置の設定)
+            zoomLensControl.moveInitialZoomPosition();
 
             // ライブビューの倍率設定
             updateLiveViewScale(false);

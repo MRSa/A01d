@@ -29,6 +29,9 @@ public interface IPreferencePropertyAccessor
     String DIGITAL_ZOOM_LEVEL = "digital_zoom_level";
     String DIGITAL_ZOOM_LEVEL_DEFAULT_VALUE = "1.0";
 
+    String POWER_ZOOM_LEVEL = "power_zoom_level";
+    String POWER_ZOOM_LEVEL_DEFAULT_VALUE = "1.0";
+
     String MAGNIFYING_LIVE_VIEW_SCALE = "magnifying_live_view_scale";
     String MAGNIFYING_LIVE_VIEW_SCALE_DEFAULT_VALUE = "10.0";
 

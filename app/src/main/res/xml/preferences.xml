@@ -10,14 +10,6 @@
     </PreferenceCategory>
 
     <PreferenceCategory
-        android:title="@string/pref_cat_initialize">
-
-        <CheckBoxPreference
-            android:key="auto_connect_to_camera"
-            android:title="@string/pref_auto_connect_camera" />
-    </PreferenceCategory>
-
-    <PreferenceCategory
         android:title="@string/pref_cat_camera">
 
         <ListPreference
@@ -67,6 +59,13 @@
             android:key="digital_zoom_level"
             android:defaultValue="MAX" />
 
+        <ListPreference
+            android:title="@string/pref_power_zoom_level"
+            android:entryValues="@array/power_zoom_level_value"
+            android:entries="@array/power_zoom_level"
+            android:key="power_zoom_level"
+            android:defaultValue="1.0" />
+
     </PreferenceCategory>
 
     <PreferenceCategory
@@ -96,6 +95,15 @@
         android:key="camerakit_version"
         android:title="@string/pref_camerakit_version"
         android:selectable="false" />
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="@string/pref_cat_initialize">
+
+        <CheckBoxPreference
+            android:key="auto_connect_to_camera"
+            android:title="@string/pref_auto_connect_camera"
+            android:summary="@string/pref_summary_auto_connect_camera" />
     </PreferenceCategory>
 
     <PreferenceCategory
