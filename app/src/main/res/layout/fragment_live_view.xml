@@ -52,7 +52,7 @@
             android:layout_height="match_parent"
             android:clickable="true"
             android:gravity="center"
-            android:scaleType="fitCenter"
+            android:scaleType="fitEnd"
             android:contentDescription="@string/button"
             android:src="@drawable/btn_manual_focus"
             android:visibility="visible"
@@ -155,10 +155,10 @@
             android:layout_toRightOf="@id/connect_disconnect_button"
             android:layout_toEndOf="@id/connect_disconnect_button"
             android:clickable="true"
-            android:gravity="start"
+            android:gravity="start|center"
             android:text="@string/information"
             android:textColor="@color/background_translucent_dark"
-            android:textSize="9pt" />
+            android:textSize="6pt" />
 
         <ImageButton
             android:id="@+id/camera_property_settings_button"
@@ -175,7 +175,7 @@
             android:visibility="visible" />
 
         <ImageButton
-            android:id="@+id/show_hide_grid_button"
+            android:id="@+id/show_favorite_settings_button"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:clickable="true"
@@ -184,6 +184,20 @@
             android:layout_alignTop="@id/show_preference_button"
             android:layout_toLeftOf="@id/camera_property_settings_button"
             android:layout_toStartOf="@id/camera_property_settings_button"
+            android:contentDescription="@string/button"
+            android:src="@drawable/ic_bookmark_border_black_24dp"
+            android:visibility="visible" />
+
+        <ImageButton
+            android:id="@+id/show_hide_grid_button"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:clickable="true"
+            android:gravity="center"
+            android:scaleType="fitCenter"
+            android:layout_alignTop="@id/show_preference_button"
+            android:layout_toLeftOf="@id/show_favorite_settings_button"
+            android:layout_toStartOf="@id/show_favorite_settings_button"
             android:contentDescription="@string/grid"
             android:src="@drawable/ic_grid_on_black_24dp"
             android:visibility="visible" />

@@ -59,4 +59,12 @@
     <string name="live_view_scale_default">LV : ???</string>
     <string name="focal_length_with_digital_zoom_view_default"> </string>
 
+    <string name="save_props">保存</string>
+    <string name="hint_save_props">ラベル</string>
+    <string name="saved_my_props">設定を保存しました。 : </string>
+
+    <string name="auto_save_props">(自動保存)</string>
+    <string name="title_tab_title_load">設定反映</string>
+    <string name="title_tab_title_save">設定保存</string>
+    <string name="title_my_settings">お気に入りカメラ設定</string>
 </resources>

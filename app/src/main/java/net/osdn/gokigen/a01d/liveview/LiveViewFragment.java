@@ -21,6 +21,8 @@ import net.osdn.gokigen.a01d.IChangeScene;
 import net.osdn.gokigen.a01d.R;
 import net.osdn.gokigen.a01d.camera.olympus.IOlympusDisplayInjector;
 import net.osdn.gokigen.a01d.camera.olympus.IOlympusInterfaceProvider;
+import net.osdn.gokigen.a01d.camera.olympus.myolycameraprops.LoadSaveCameraProperties;
+import net.osdn.gokigen.a01d.camera.olympus.myolycameraprops.LoadSaveMyCameraPropertyDialog;
 import net.osdn.gokigen.a01d.camera.olympus.operation.ICaptureControl;
 import net.osdn.gokigen.a01d.camera.olympus.operation.IFocusingControl;
 import net.osdn.gokigen.a01d.camera.olympus.operation.IZoomLensControl;
@@ -37,7 +39,7 @@ import java.io.File;
  *  撮影用ライブビュー画面
  *
  */
-public class LiveViewFragment extends Fragment implements IStatusViewDrawer, IFocusingModeNotify
+public class LiveViewFragment extends Fragment implements IStatusViewDrawer, IFocusingModeNotify, IFavoriteSettingDialogKicker
 {
     private final String TAG = this.toString();
     private static final int COMMAND_MY_PROPERTY = 0x00000100;
@@ -122,7 +124,7 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer, IFo
             }
             if (onClickTouchListener == null)
             {
-                onClickTouchListener = new LiveViewClickTouchListener(this.getContext(), imageView, this, changeScene, interfaceProvider);
+                onClickTouchListener = new LiveViewClickTouchListener(this.getContext(), imageView, this, changeScene, interfaceProvider, this);
             }
             imageView.setOnClickListener(onClickTouchListener);
             imageView.setOnTouchListener(onClickTouchListener);
@@ -130,6 +132,7 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer, IFo
             view.findViewById(R.id.show_preference_button).setOnClickListener(onClickTouchListener);
             view.findViewById(R.id.camera_property_settings_button).setOnClickListener(onClickTouchListener);
             view.findViewById(R.id.shutter_button).setOnClickListener(onClickTouchListener);
+            view.findViewById(R.id.show_favorite_settings_button).setOnClickListener(onClickTouchListener);
 
             manualFocus = view.findViewById(R.id.focusing_button);
             if (manualFocus != null)
@@ -154,6 +157,7 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer, IFo
 
             statusArea = view.findViewById(R.id.informationMessageTextView);
             focalLengthArea = view.findViewById(R.id.focal_length_with_digital_zoom_view);
+
         }
         catch (Exception e)
         {
@@ -444,6 +448,16 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer, IFo
         {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public void showFavoriteSettingDialog()
+    {
+        Log.v(TAG, "showFavoriteSettingDialog()");
+        LoadSaveMyCameraPropertyDialog dialog = new LoadSaveMyCameraPropertyDialog();
+        dialog.setTargetFragment(this, COMMAND_MY_PROPERTY);
+        dialog.setPropertyOperationsHolder(new LoadSaveCameraProperties(getActivity(), interfaceProvider));
+        dialog.show(getFragmentManager(), "my_dialog");
     }
 
     private void runOnUiThread(Runnable action)

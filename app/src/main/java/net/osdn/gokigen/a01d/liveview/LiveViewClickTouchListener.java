@@ -13,6 +13,7 @@ import net.osdn.gokigen.a01d.camera.olympus.IOlympusInterfaceProvider;
 import net.osdn.gokigen.a01d.camera.olympus.operation.ICaptureControl;
 import net.osdn.gokigen.a01d.camera.olympus.operation.IFocusingControl;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.ICameraInformation;
+import net.osdn.gokigen.a01d.camera.olympus.wrapper.connection.IOlyCameraConnection;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.property.IOlyCameraProperty;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.property.IOlyCameraPropertyProvider;
 import net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor;
@@ -32,8 +33,10 @@ class LiveViewClickTouchListener implements View.OnClickListener, View.OnTouchLi
     private final ICaptureControl captureControl;
     private final IOlyCameraPropertyProvider propertyProvider;
     private final ICameraInformation cameraInformation;
+    private final IOlyCameraConnection cameraConnection;
+    private final IFavoriteSettingDialogKicker dialogKicker;
 
-    LiveViewClickTouchListener(Context context, ILiveImageStatusNotify imageStatusNotify, IStatusViewDrawer statusView, IChangeScene changeScene, IOlympusInterfaceProvider interfaceProvider)
+    LiveViewClickTouchListener(Context context, ILiveImageStatusNotify imageStatusNotify, IStatusViewDrawer statusView, IChangeScene changeScene, IOlympusInterfaceProvider interfaceProvider, IFavoriteSettingDialogKicker dialogKicker)
     {
         this.context = context;
         this.statusNotify = imageStatusNotify;
@@ -43,6 +46,8 @@ class LiveViewClickTouchListener implements View.OnClickListener, View.OnTouchLi
         this.captureControl = interfaceProvider.getCaptureControl();
         this.propertyProvider = interfaceProvider.getCameraPropertyProvider();
         this.cameraInformation = interfaceProvider.getCameraInformation();
+        this.cameraConnection = interfaceProvider.getOlyCameraConnection();
+        this.dialogKicker = dialogKicker;
     }
 
     /**
@@ -92,6 +97,11 @@ class LiveViewClickTouchListener implements View.OnClickListener, View.OnTouchLi
                 case R.id.live_view_scale_button:
                     //  ライブビューの倍率を更新する
                     statusViewDrawer.updateLiveViewScale(true);
+                    break;
+
+                case R.id.show_favorite_settings_button:
+                    // お気に入り設定のダイアログを表示する
+                    showFavoriteDialog();
                     break;
 
                 default:
@@ -152,6 +162,27 @@ class LiveViewClickTouchListener implements View.OnClickListener, View.OnTouchLi
             }
             String value = (isManualFocus) ? IOlyCameraProperty.STILL_AF :  IOlyCameraProperty.STILL_MF;
             propertyProvider.setCameraPropertyValue(IOlyCameraProperty.FOCUS_STILL, value);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     *   お気に入り設定ダイアログの表示
+     *
+     */
+    private void showFavoriteDialog()
+    {
+        Log.v(TAG, "showFavoriteDialog()");
+        try
+        {
+            if (cameraConnection.getConnectionStatus() == IOlyCameraConnection.CameraConnectionStatus.CONNECTED)
+            {
+                //  お気に入り設定のダイアログを表示する
+                dialogKicker.showFavoriteSettingDialog();
+            }
         }
         catch (Exception e)
         {
