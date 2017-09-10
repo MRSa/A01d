@@ -7,7 +7,7 @@ android {
         applicationId "net.osdn.gokigen.a01d"
         minSdkVersion 14
         targetSdkVersion 26
-        versionCode 100
+        versionCode 10000
         versionName "1.0.0"
     }
     buildTypes {
