@@ -30,6 +30,8 @@ import net.osdn.gokigen.a01d.camera.olympus.wrapper.ICameraInformation;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.IFocusingModeNotify;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.ILiveViewControl;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.connection.IOlyCameraConnection;
+import net.osdn.gokigen.a01d.camera.olympus.wrapper.property.IOlyCameraProperty;
+import net.osdn.gokigen.a01d.camera.olympus.wrapper.property.IOlyCameraPropertyProvider;
 import net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor;
 
 import java.io.File;
@@ -442,6 +444,9 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer, IFo
             // パワーズームの設定 (初期化位置の設定)
             zoomLensControl.moveInitialZoomPosition();
 
+            // 測光モードをスポットに切り替える
+            setAEtoSpot();
+
             // ライブビューの倍率設定
             updateLiveViewScale(false);
         }
@@ -450,6 +455,27 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer, IFo
             e.printStackTrace();
         }
     }
+
+    /**
+     *    測光モードをスポットに切り替える
+     *
+     */
+    private void setAEtoSpot()
+    {
+        try
+        {
+            IOlyCameraPropertyProvider propertyProvider = interfaceProvider.getCameraPropertyProvider();
+            if (propertyProvider != null)
+            {
+                propertyProvider.setCameraPropertyValue(IOlyCameraProperty.AE, IOlyCameraProperty.AE_PINPOINT);
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+
 
     @Override
     public void showFavoriteSettingDialog()

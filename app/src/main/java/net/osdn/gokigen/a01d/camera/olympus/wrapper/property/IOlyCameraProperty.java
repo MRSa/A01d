@@ -14,6 +14,8 @@ public interface IOlyCameraProperty
     String FOCUS_STILL = "FOCUS_STILL";
     String AE_LOCK_STATE = "AE_LOCK_STATE";
 
+    String AE = "AE";
+    String AE_PINPOINT = "<AE/AE_PINPOINT>";
 
     String STILL_MF = "<FOCUS_STILL/FOCUS_MF>";
     String STILL_AF = "<FOCUS_STILL/FOCUS_SAF>";
