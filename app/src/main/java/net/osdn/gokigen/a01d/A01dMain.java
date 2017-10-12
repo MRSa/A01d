@@ -3,6 +3,7 @@ package net.osdn.gokigen.a01d;
 import android.Manifest;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
@@ -11,6 +12,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.preference.PreferenceManager;
 import android.util.Log;
+import android.view.View;
 import android.view.WindowManager;
 
 import net.osdn.gokigen.a01d.camera.olympus.IOlympusDisplayInjector;
@@ -42,10 +44,27 @@ public class A01dMain extends AppCompatActivity implements ICameraStatusReceiver
     private OlyCameraPropertyListFragment propertyListFragment = null;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState)
+    {
         final int REQUEST_NEED_PERMISSIONS = 1010;
 
         super.onCreate(savedInstanceState);
+/*
+        try {
+            // 全画面表示...
+            if (Build.VERSION.SDK_INT >= 19)
+            {
+                View decor = this.getWindow().getDecorView();
+                decor.setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
+            } else {
+                getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+*/
         setContentView(R.layout.activity_a01d_main);
 
         ActionBar bar = getSupportActionBar();
