@@ -5,6 +5,7 @@ import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.os.Build;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
@@ -97,8 +98,11 @@ class StoreImage implements IStoreImage
             values.put(MediaStore.Images.Media.DATE_ADDED, now);
             values.put(MediaStore.Images.Media.DATE_TAKEN, now);
             values.put(MediaStore.Images.Media.DATE_MODIFIED, now);
-            //values.put(MediaStore.Images.Media.WIDTH, targetImage.getWidth());
-            //values.put(MediaStore.Images.Media.HEIGHT, targetImage.getHeight());
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN)
+            {
+                values.put(MediaStore.Images.Media.WIDTH, targetImage.getWidth());
+                values.put(MediaStore.Images.Media.HEIGHT, targetImage.getHeight());
+            }
             resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
         }
         catch (Throwable t)
