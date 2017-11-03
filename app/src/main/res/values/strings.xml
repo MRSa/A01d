@@ -7,6 +7,7 @@
     <string name="restore">Restore</string>
     <string name="icon">icon</string>
     <string name="button">Button</string>
+    <string name="imageview">Image View</string>
 
     <string name="dialog_positive_execute">OK</string>
     <string name="dialog_negative_cancel">Cancel</string>

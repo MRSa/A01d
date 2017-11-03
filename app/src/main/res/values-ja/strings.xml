@@ -6,6 +6,7 @@
     <string name="configuration">設定</string>
     <string name="restore">リストア</string>
     <string name="icon">アイコン</string>
+    <string name="imageview">画像</string>
 
     <string name="dialog_positive_execute">OK</string>
     <string name="dialog_negative_cancel">Cancel</string>
