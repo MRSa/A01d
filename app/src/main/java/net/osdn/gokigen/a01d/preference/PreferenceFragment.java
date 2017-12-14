@@ -104,6 +104,10 @@ public class PreferenceFragment extends PreferenceFragmentCompat implements Shar
         {
             editor.putBoolean(net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor.RAW, true);
         }
+        if (!items.containsKey(IPreferencePropertyAccessor.BLE_POWER_ON))
+        {
+            editor.putBoolean(net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor.BLE_POWER_ON, false);
+        }
         if (!items.containsKey(net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor.AUTO_CONNECT_TO_CAMERA))
         {
             editor.putBoolean(net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor.AUTO_CONNECT_TO_CAMERA, true);
@@ -341,6 +345,11 @@ public class PreferenceFragment extends PreferenceFragmentCompat implements Shar
                     setCameraProperty(IOlyCameraProperty.RAW, propertyValue);
                     break;
 
+                case IPreferencePropertyAccessor.BLE_POWER_ON:
+                    value = preferences.getBoolean(key, false);
+                    Log.v(TAG, " " + key + " , " + value);
+                    break;
+
                 case IPreferencePropertyAccessor.AUTO_CONNECT_TO_CAMERA:
                     value = preferences.getBoolean(key, true);
                     Log.v(TAG, " " + key + " , " + value);
@@ -456,6 +465,8 @@ public class PreferenceFragment extends PreferenceFragmentCompat implements Shar
                     setListPreference(IPreferencePropertyAccessor.TAKE_MODE, IPreferencePropertyAccessor.TAKE_MODE, net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor.TAKE_MODE_DEFAULT_VALUE);
                     setListPreference(IPreferencePropertyAccessor.SOUND_VOLUME_LEVEL, IPreferencePropertyAccessor.SOUND_VOLUME_LEVEL, net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor.SOUND_VOLUME_LEVEL_DEFAULT_VALUE);
                     setBooleanPreference(IPreferencePropertyAccessor.RAW, IPreferencePropertyAccessor.RAW, true);
+                    setBooleanPreference(IPreferencePropertyAccessor.BLE_POWER_ON, IPreferencePropertyAccessor.BLE_POWER_ON, false);
+                    setBooleanPreference(IPreferencePropertyAccessor.AUTO_CONNECT_TO_CAMERA, IPreferencePropertyAccessor.AUTO_CONNECT_TO_CAMERA, true);
 
                     // カメラキットのバージョン
                     findPreference(IPreferencePropertyAccessor.CAMERAKIT_VERSION).setSummary(OLYCamera.getVersion());

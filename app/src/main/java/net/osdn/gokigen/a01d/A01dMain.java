@@ -3,6 +3,7 @@ package net.osdn.gokigen.a01d;
 import android.Manifest;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
@@ -19,6 +20,7 @@ import net.osdn.gokigen.a01d.camera.olympus.cameraproperty.OlyCameraPropertyList
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.OlympusInterfaceProvider;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.connection.ICameraStatusReceiver;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.connection.IOlyCameraConnection;
+import net.osdn.gokigen.a01d.camera.olympus.wrapper.connection.ble.PowerOnCamera;
 import net.osdn.gokigen.a01d.liveview.IStatusViewDrawer;
 import net.osdn.gokigen.a01d.liveview.LiveViewFragment;
 import net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor;
@@ -28,7 +30,7 @@ import net.osdn.gokigen.a01d.preference.PreferenceFragment;
  *   A01d ;
  *
  */
-public class A01dMain extends AppCompatActivity implements ICameraStatusReceiver, IChangeScene
+public class A01dMain extends AppCompatActivity implements ICameraStatusReceiver, IChangeScene, PowerOnCamera.PowerOnCameraCallback
 {
     private final String TAG = toString();
     private IOlympusInterfaceProvider interfaceProvider = null;
@@ -73,12 +75,18 @@ public class A01dMain extends AppCompatActivity implements ICameraStatusReceiver
         if ((ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) ||
                 (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_NETWORK_STATE) != PackageManager.PERMISSION_GRANTED) ||
                 (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_WIFI_STATE) != PackageManager.PERMISSION_GRANTED) ||
+                (ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH) != PackageManager.PERMISSION_GRANTED) ||
+                (ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_ADMIN) != PackageManager.PERMISSION_GRANTED) ||
+                (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) ||
                 (ContextCompat.checkSelfPermission(this, Manifest.permission.INTERNET) != PackageManager.PERMISSION_GRANTED)) {
             ActivityCompat.requestPermissions(this,
                     new String[]{
                             Manifest.permission.WRITE_EXTERNAL_STORAGE,
                             Manifest.permission.ACCESS_NETWORK_STATE,
                             Manifest.permission.ACCESS_WIFI_STATE,
+                            Manifest.permission.BLUETOOTH,
+                            Manifest.permission.BLUETOOTH_ADMIN,
+                            Manifest.permission.ACCESS_COARSE_LOCATION,
                             Manifest.permission.INTERNET,
                     },
                     REQUEST_NEED_PERMISSIONS);
@@ -93,7 +101,7 @@ public class A01dMain extends AppCompatActivity implements ICameraStatusReceiver
      *
      */
     @Override
-    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults)
+    public void onRequestPermissionsResult(int requestCode, @NonNull String  permissions[], @NonNull int[] grantResults)
     {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         onReadyClass();
@@ -109,7 +117,8 @@ public class A01dMain extends AppCompatActivity implements ICameraStatusReceiver
             OlympusInterfaceProvider provider = new OlympusInterfaceProvider(this, this);
             interfaceProvider = provider;
             interfaceInjector = provider;
-        } catch (Exception e)
+        }
+        catch (Exception e)
         {
             e.printStackTrace();
         }
@@ -120,9 +129,23 @@ public class A01dMain extends AppCompatActivity implements ICameraStatusReceiver
      */
     private void onReadyClass()
     {
-        // 自動接続の指示があったとき
-        if (isAutoConnectCamera())
+        if (isBlePowerOn())
         {
+            // BLEでカメラの電源をONにする設定だった時
+            try
+            {
+                // カメラの電源ONクラスを呼び出しておく
+                PowerOnCamera powerOnCamera = new PowerOnCamera(this);
+                powerOnCamera.wakeup();
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+        }
+        else if (isAutoConnectCamera())
+        {
+            // 自動接続の指示があったとき
             changeCameraConnection();
         }
     }
@@ -145,14 +168,19 @@ public class A01dMain extends AppCompatActivity implements ICameraStatusReceiver
      *
      */
     @Override
-    protected void onPause() {
+    protected void onPause()
+    {
         super.onPause();
-        try {
+        try
+        {
             IOlyCameraConnection connection = interfaceProvider.getOlyCameraConnection();
-            if (connection != null) {
+            if (connection != null)
+            {
                 connection.stopWatchWifiStatus(this);
             }
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             e.printStackTrace();
         }
     }
@@ -165,10 +193,13 @@ public class A01dMain extends AppCompatActivity implements ICameraStatusReceiver
     public void changeSceneToCameraPropertyList()
     {
         IOlyCameraConnection connection = interfaceProvider.getOlyCameraConnection();
-        if (connection != null) {
+        if (connection != null)
+        {
             IOlyCameraConnection.CameraConnectionStatus status = connection.getConnectionStatus();
-            if (status == IOlyCameraConnection.CameraConnectionStatus.CONNECTED) {
-                if (propertyListFragment == null) {
+            if (status == IOlyCameraConnection.CameraConnectionStatus.CONNECTED)
+            {
+                if (propertyListFragment == null)
+                {
                     propertyListFragment = new OlyCameraPropertyListFragment();
                 }
                 propertyListFragment.setInterface(this, interfaceProvider.getCameraPropertyProvider());
@@ -182,7 +213,8 @@ public class A01dMain extends AppCompatActivity implements ICameraStatusReceiver
     }
 
     /**
-     * 設定画面を開く
+     *   設定画面を開く
+     *
      */
     @Override
     public void changeSceneToConfiguration()
@@ -200,7 +232,7 @@ public class A01dMain extends AppCompatActivity implements ICameraStatusReceiver
     }
 
     /**
-     * カメラとの接続・切断のシーケンス
+     *   カメラとの接続・切断のシーケンス
      */
     @Override
     public void changeCameraConnection()
@@ -212,7 +244,8 @@ public class A01dMain extends AppCompatActivity implements ICameraStatusReceiver
         }
 
         IOlyCameraConnection connection = interfaceProvider.getOlyCameraConnection();
-        if (connection != null) {
+        if (connection != null)
+        {
             IOlyCameraConnection.CameraConnectionStatus status = connection.getConnectionStatus();
             if (status == IOlyCameraConnection.CameraConnectionStatus.CONNECTED)
             {
@@ -229,15 +262,20 @@ public class A01dMain extends AppCompatActivity implements ICameraStatusReceiver
      * アプリを抜ける
      */
     @Override
-    public void exitApplication() {
+    public void exitApplication()
+    {
         Log.v(TAG, "exitApplication()");
-        try {
+        try
+        {
             IOlyCameraConnection connection = interfaceProvider.getOlyCameraConnection();
-            if (connection != null) {
+            if (connection != null)
+            {
                 connection.disconnect(true);
             }
             finish();
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             e.printStackTrace();
         }
     }
@@ -247,17 +285,19 @@ public class A01dMain extends AppCompatActivity implements ICameraStatusReceiver
      *
      */
     @Override
-    public void onStatusNotify(String message) {
+    public void onStatusNotify(String message)
+    {
         Log.v(TAG, " CONNECTION MESSAGE : " + message);
-        if (statusViewDrawer != null) {
+        if (statusViewDrawer != null)
+        {
             statusViewDrawer.updateStatusView(message);
             IOlyCameraConnection connection = interfaceProvider.getOlyCameraConnection();
-            if (connection != null) {
+            if (connection != null)
+            {
                 statusViewDrawer.updateConnectionStatus(connection.getConnectionStatus());
             }
         }
     }
-
 
     /**
      *
@@ -328,6 +368,30 @@ public class A01dMain extends AppCompatActivity implements ICameraStatusReceiver
         }
     }
 
+    /**
+     *   BLE経由でカメラの電源を入れるかどうか
+     *
+     */
+    private boolean isBlePowerOn()
+    {
+        boolean ret = false;
+        try
+        {
+            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+            ret = preferences.getBoolean(IPreferencePropertyAccessor.BLE_POWER_ON, false);
+            // Log.v(TAG, "isBlePowerOn() : " + ret);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        return (ret);
+    }
+
+    /**
+     *    カメラへの自動接続を行うかどうか
+     *
+     */
     private boolean isAutoConnectCamera()
     {
         boolean ret = true;
@@ -342,5 +406,21 @@ public class A01dMain extends AppCompatActivity implements ICameraStatusReceiver
             e.printStackTrace();
         }
         return (ret);
+    }
+
+    /**
+     *   カメラへのBLE接続指示が完了したとき
+     *
+     * @param isExecuted  true : BLEで起動した, false : 起動していない、その他
+     */
+    @Override
+    public void wakeupExecuted(boolean isExecuted)
+    {
+        Log.v(TAG, "wakeupExecuted() : " + isExecuted);
+        if ((isExecuted)&&(isAutoConnectCamera()))
+        {
+            // カメラへ自動接続する設定だった場合、カメラへWiFi接続する
+            changeCameraConnection();
+        }
     }
 }

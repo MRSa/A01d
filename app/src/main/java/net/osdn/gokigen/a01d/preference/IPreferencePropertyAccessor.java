@@ -10,6 +10,7 @@ public interface IPreferencePropertyAccessor
     String EXIT_APPLICATION = "exit_application";
 
     String AUTO_CONNECT_TO_CAMERA = "auto_connect_to_camera";
+    String BLE_POWER_ON = "ble_power_on";
 
     String TAKE_MODE =  "take_mode";
     String TAKE_MODE_DEFAULT_VALUE =  "P";
@@ -37,8 +38,7 @@ public interface IPreferencePropertyAccessor
 
     String CAPTURE_BOTH_CAMERA_AND_LIVE_VIEW = "capture_both_camera_and_live_view";
 
-
-/*****
+/*
     int CHOICE_SPLASH_SCREEN = 10;
 
     int SELECT_SAMPLE_IMAGE_CODE = 110;

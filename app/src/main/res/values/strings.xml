@@ -32,6 +32,8 @@
     <string name="pref_auto_connect_camera">Auto Connect To Camera</string>
     <string name="pref_summary_auto_connect_camera">Normally to keep ON.</string>
     <string name="dialog_message_power_off">Power Off</string>
+    <string name="pref_bluetooth_power_on">BLE Power On</string>
+    <string name="pref_summary_bluetooth_power_on">Camera Power on via BLE</string>
 
     <string name="pref_cat_live_view">Live View Settings</string>
     <string name="pref_live_view_quality">Live View Quality</string>
@@ -46,7 +48,7 @@
     <string name="pref_camera_version">Camera Version</string>
     <string name="pref_camerakit_version">Camera kit Version</string>
 
-    <string name="pref_cat_gokigen">GOKIGEN(Currently not open directly)</string>
+    <string name="pref_cat_gokigen">GOKIGEN</string>
     <string name="pref_instruction_manual">A01d Instructions</string>
     <string name="pref_privacy_policy">Privacy Policy</string>
 
