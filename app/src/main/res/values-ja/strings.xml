@@ -65,6 +65,10 @@
     <string name="hint_save_props">ラベル</string>
     <string name="saved_my_props">設定を保存しました。 : </string>
 
+
+    <string name="hint_save_bt_name">名前</string>
+    <string name="hint_save_bt_passcode">パスコード</string>
+
     <string name="auto_save_props">(自動保存)</string>
     <string name="title_tab_title_load">設定反映</string>
     <string name="title_tab_title_save">設定保存</string>

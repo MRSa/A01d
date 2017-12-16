@@ -10,6 +10,8 @@ import net.osdn.gokigen.a01d.camera.olympus.operation.IZoomLensControl;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.connection.ICameraStatusReceiver;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.connection.IOlyCameraConnection;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.connection.OlyCameraConnection;
+import net.osdn.gokigen.a01d.camera.olympus.wrapper.connection.ble.ICameraPowerOn;
+import net.osdn.gokigen.a01d.camera.olympus.wrapper.connection.ble.PowerOnCamera;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.property.IOlyCameraPropertyProvider;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.property.OlyCameraPropertyProxy;
 import net.osdn.gokigen.a01d.liveview.IAutoFocusFrameDisplay;
@@ -28,6 +30,7 @@ public class OlympusInterfaceProvider implements IOlympusInterfaceProvider, IOly
     private final OlyCameraHardwareStatus hardwareStatus;
     private final OLYCameraPropertyListenerImpl propertyListener;
     private final OlyCameraZoomLensControl zoomLensControl;
+    private final ICameraPowerOn cameraPowerOn;
     private OlyCameraFocusControl focusControl = null;
     private OlyCameraCaptureControl captureControl = null;
 
@@ -39,6 +42,7 @@ public class OlympusInterfaceProvider implements IOlympusInterfaceProvider, IOly
         this.hardwareStatus = new OlyCameraHardwareStatus(this.wrapper.getOLYCamera());
         this.propertyListener = new OLYCameraPropertyListenerImpl(this.wrapper.getOLYCamera());
         this.zoomLensControl = new OlyCameraZoomLensControl(context, this.wrapper.getOLYCamera());
+        this.cameraPowerOn = new PowerOnCamera(this.wrapper.getOLYCamera());
     }
 
     @Override
@@ -47,6 +51,12 @@ public class OlympusInterfaceProvider implements IOlympusInterfaceProvider, IOly
         focusControl = new OlyCameraFocusControl(wrapper, frameDisplayer, indicator);
         captureControl = new OlyCameraCaptureControl (wrapper, frameDisplayer, indicator);
         propertyListener.setFocusingControl(focusingModeNotify);
+    }
+
+    @Override
+    public ICameraPowerOn getCameraPowerOn()
+    {
+        return (cameraPowerOn);
     }
 
     @Override

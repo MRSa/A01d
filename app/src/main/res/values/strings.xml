@@ -76,6 +76,10 @@
     <string name="title_tab_title_save">Save</string>
     <string name="title_my_settings">Favorite Camera Properties</string>
 
+    <string name="hint_save_bt_name">Name</string>
+    <string name="hint_save_bt_passcode">Passcode</string>
+
+
     <string name="connect_start">start</string>
     <string name="connect_check_wifi">check WIFI</string>
     <string name="connect_connect">connecting</string>

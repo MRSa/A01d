@@ -20,6 +20,7 @@ import net.osdn.gokigen.a01d.camera.olympus.cameraproperty.OlyCameraPropertyList
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.OlympusInterfaceProvider;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.connection.ICameraStatusReceiver;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.connection.IOlyCameraConnection;
+import net.osdn.gokigen.a01d.camera.olympus.wrapper.connection.ble.ICameraPowerOn;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.connection.ble.PowerOnCamera;
 import net.osdn.gokigen.a01d.liveview.IStatusViewDrawer;
 import net.osdn.gokigen.a01d.liveview.LiveViewFragment;
@@ -30,7 +31,7 @@ import net.osdn.gokigen.a01d.preference.PreferenceFragment;
  *   A01d ;
  *
  */
-public class A01dMain extends AppCompatActivity implements ICameraStatusReceiver, IChangeScene, PowerOnCamera.PowerOnCameraCallback
+public class A01dMain extends AppCompatActivity implements ICameraStatusReceiver, IChangeScene, ICameraPowerOn.PowerOnCameraCallback
 {
     private final String TAG = toString();
     private IOlympusInterfaceProvider interfaceProvider = null;
@@ -134,9 +135,8 @@ public class A01dMain extends AppCompatActivity implements ICameraStatusReceiver
             // BLEでカメラの電源をONにする設定だった時
             try
             {
-                // カメラの電源ONクラスを呼び出しておく
-                PowerOnCamera powerOnCamera = new PowerOnCamera(this);
-                powerOnCamera.wakeup();
+                // カメラの電源ONクラスを呼び出しておく (電源ONができたら、コールバックをもらう）
+                interfaceProvider.getCameraPowerOn().wakeup(this);
             }
             catch (Exception e)
             {
