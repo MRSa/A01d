@@ -111,6 +111,11 @@
             android:title="@string/pref_bluetooth_power_on"
             android:summary="@string/pref_summary_bluetooth_power_on" />
 
+        <PreferenceScreen
+            android:key="olympus_air_bt"
+            android:title="@string/pref_air_bt"
+            android:summary="@string/pref_summary_air_bt" />
+
     </PreferenceCategory>
 
     <PreferenceCategory
