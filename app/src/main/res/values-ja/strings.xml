@@ -65,9 +65,11 @@
     <string name="hint_save_props">ラベル</string>
     <string name="saved_my_props">設定を保存しました。 : </string>
 
-
     <string name="hint_save_bt_name">名前</string>
     <string name="hint_save_bt_passcode">パスコード</string>
+    <string name="pref_air_bt">OLYMPUS AIR設定</string>
+    <string name="pref_summary_air_bt">Olympus AIRの設定を登録します。</string>
+    <string name="saved_my_camera">登録しました : </string>
 
     <string name="auto_save_props">(自動保存)</string>
     <string name="title_tab_title_load">設定反映</string>
