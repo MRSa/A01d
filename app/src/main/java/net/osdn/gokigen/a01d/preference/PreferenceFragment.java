@@ -16,6 +16,7 @@ import net.osdn.gokigen.a01d.IChangeScene;
 import net.osdn.gokigen.a01d.R;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.ICameraHardwareStatus;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.ICameraRunMode;
+import net.osdn.gokigen.a01d.camera.olympus.wrapper.connection.ble.OlyCameraPowerOnSelector;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.property.IOlyCameraProperty;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.property.IOlyCameraPropertyProvider;
 import net.osdn.gokigen.a01d.camera.olympus.IOlympusInterfaceProvider;
@@ -39,6 +40,7 @@ public class PreferenceFragment extends PreferenceFragmentCompat implements Shar
     private ICameraHardwareStatus hardwareStatusInterface = null;
     private ICameraRunMode changeRunModeExecutor = null;
     private CameraPowerOff powerOffController = null;
+    private OlyCameraPowerOnSelector powerOnSelector = null;
     private SharedPreferences preferences = null;
     private ProgressDialog busyDialog = null;
     private PreferenceSynchronizer preferenceSynchronizer = null;
@@ -47,7 +49,7 @@ public class PreferenceFragment extends PreferenceFragmentCompat implements Shar
      *
      *
      */
-    public void setInterface(Context context, IOlympusInterfaceProvider factory, IChangeScene changeScene)
+    public void setInterface(Activity context, IOlympusInterfaceProvider factory, IChangeScene changeScene)
     {
         Log.v(TAG, "setInterface()");
         this.propertyInterface = factory.getCameraPropertyProvider();
@@ -55,6 +57,8 @@ public class PreferenceFragment extends PreferenceFragmentCompat implements Shar
         hardwareStatusInterface = factory.getHardwareStatus();
         powerOffController = new CameraPowerOff(context, changeScene);
         powerOffController.prepare();
+        powerOnSelector = new OlyCameraPowerOnSelector(context);
+        powerOnSelector.prepare();
     }
 
     /**
@@ -197,6 +201,7 @@ public class PreferenceFragment extends PreferenceFragmentCompat implements Shar
             powerZoom.setSummary(powerZoom.getValue() + " ");
         }
         findPreference("exit_application").setOnPreferenceClickListener(powerOffController);
+        findPreference("olympus_air_bt").setOnPreferenceClickListener(powerOnSelector);
     }
 
     /**
