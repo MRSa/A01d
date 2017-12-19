@@ -38,6 +38,8 @@ public interface IPreferencePropertyAccessor
 
     String CAPTURE_BOTH_CAMERA_AND_LIVE_VIEW = "capture_both_camera_and_live_view";
 
+    String OLYCAMERA_BLUETOOTH_SETTINGS = "olympus_air_bt";
+
 /*
     int CHOICE_SPLASH_SCREEN = 10;
 
