@@ -1,6 +1,7 @@
 package net.osdn.gokigen.a01d.camera.olympus.cameraproperty;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,7 +17,7 @@ public class CameraPropertyArrayAdapter extends ArrayAdapter<CameraPropertyArray
     private final int textViewResourceId;
     private List<CameraPropertyArrayItem> listItems = null;
 
-    public CameraPropertyArrayAdapter(Context context, int textId, List<CameraPropertyArrayItem> items)
+    CameraPropertyArrayAdapter(Context context, int textId, List<CameraPropertyArrayItem> items)
     {
         super(context, textId, items);
 
@@ -30,7 +31,7 @@ public class CameraPropertyArrayAdapter extends ArrayAdapter<CameraPropertyArray
      *
      */
     @Override
-    public View getView(int position, View convertView, ViewGroup parent)
+    public @NonNull View getView(int position, View convertView, @NonNull  ViewGroup parent)
     {
         View view;
         if(convertView != null)
