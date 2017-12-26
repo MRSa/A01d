@@ -23,10 +23,13 @@ import jp.co.olympus.camerakit.OLYCamera;
 public class PowerOnCamera implements ICameraPowerOn
 {
     private final String TAG = toString();
-    private final int BLE_SCAN_TIMEOUT_MILLIS = 10 * 1000; // 10秒間
+    private final int BLE_SCAN_TIMEOUT_MILLIS = 5 * 1000; // 5秒間
+    private final int BLE_WAIT_DURATION  = 100;             // 100ms間隔
     private final Context context;
     private final OLYCamera camera;
     private List<OlyCameraSetArrayItem> myCameraList;
+    private BluetoothDevice myBluetoothDevice = null;
+    private String myBtDevicePassCode = "";
 
     /**
      *
@@ -59,7 +62,7 @@ public class PowerOnCamera implements ICameraPowerOn
             }
             final  List<OlyCameraSetArrayItem> deviceList = myCameraList;
 
-            //  10秒間だけBLEのスキャンを実施する
+            //  BLE_SCAN_TIMEOUT_MILLIS の間だけBLEのスキャンを実施する
             Thread thread = new Thread(new Runnable()
             {
                 @Override
@@ -69,44 +72,23 @@ public class PowerOnCamera implements ICameraPowerOn
                     {
                         class bleScanCallback implements BluetoothAdapter.LeScanCallback
                         {
-                            private List<String> checked = new ArrayList<>();
                             @Override
                             public void onLeScan(final BluetoothDevice bluetoothDevice, int i, byte[] bytes)
                             {
                                 try
                                 {
                                     final String btDeviceName = bluetoothDevice.getName();
-                                    Log.v(TAG, "onLeScan() " + btDeviceName);
+                                    // Log.v(TAG, "onLeScan() " + btDeviceName);   // BluetoothDevice::getName() でログ出力してくれるので
                                     for (OlyCameraSetArrayItem device : deviceList)
                                     {
                                         final String btName = device.getBtName();
                                         // Log.v(TAG, "onLeScan() [" + btName + "]");
-                                        if ((!checked.contains(btName))&&(btName.equals(btDeviceName)))
+                                        if (btName.equals(btDeviceName))
                                         {
+                                            // マイカメラ発見！
                                             // 別スレッドで起動する
-                                            final String passCode = device.getBtPassCode();
-                                            Thread thread = new Thread(new Runnable()
-                                            {
-                                                @Override
-                                                public void run()
-                                                {
-                                                    try
-                                                    {
-                                                        // カメラの起動
-                                                        camera.setBluetoothDevice(bluetoothDevice);
-                                                        camera.setBluetoothPassword(passCode);
-                                                        //camera.wakeup();
-                                                        callback.wakeupExecuted(true);
-                                                        checked.add(btName);
-                                                        Log.v(TAG, "WAKE UP! : " + btName + " [" + btDeviceName + "]");
-                                                    }
-                                                    catch (Exception e)
-                                                    {
-                                                        e.printStackTrace();
-                                                    }
-                                                }
-                                            });
-                                            thread.start();
+                                            myBluetoothDevice = bluetoothDevice;
+                                            myBtDevicePassCode = device.getBtPassCode();
                                             break;
                                         }
                                     }
@@ -120,7 +102,8 @@ public class PowerOnCamera implements ICameraPowerOn
                             {
                                 try
                                 {
-                                    checked.clear();
+                                    myBluetoothDevice = null;
+                                    myBtDevicePassCode = "";
                                 }
                                 catch (Exception e)
                                 {
@@ -143,14 +126,32 @@ public class PowerOnCamera implements ICameraPowerOn
                                 return;
                             }
                             Log.v(TAG, "BT SCAN STARTED");
+                            int passed = 0;
+                            while (passed < BLE_SCAN_TIMEOUT_MILLIS)
+                            {
+                                // BLEデバイスが見つかったときは抜ける...
+                                if (myBluetoothDevice != null)
+                                {
+                                    break;
+                                }
 
-                            // BLEのスキャン時間の間待つ
-                            Thread.sleep(BLE_SCAN_TIMEOUT_MILLIS);
-
+                                // BLEのスキャンが終わるまで待つ
+                                Thread.sleep(BLE_WAIT_DURATION);
+                                passed = passed + BLE_WAIT_DURATION;
+                            }
                             // スキャンを止める
                             adapter.stopLeScan(scanCallback);
-
                             Log.v(TAG, "BT SCAN STOPPED");
+
+                            if (myBluetoothDevice != null)
+                            {
+                                // カメラの起動
+                                Log.v(TAG, "WAKE UP CAMERA : " + myBluetoothDevice.getName() + " [" + myBluetoothDevice.getAddress() + "]");
+                                camera.setBluetoothDevice(myBluetoothDevice);
+                                camera.setBluetoothPassword(myBtDevicePassCode);
+                                camera.wakeup();
+                                callback.wakeupExecuted(true);
+                            }
                         }
                         catch (Exception e)
                         {
@@ -163,9 +164,6 @@ public class PowerOnCamera implements ICameraPowerOn
                 }
             });
             thread.start();
-
-            // 今は暫定で返しちゃう
-            // callback.wakeupExecuted(true);
         }
     }
 
