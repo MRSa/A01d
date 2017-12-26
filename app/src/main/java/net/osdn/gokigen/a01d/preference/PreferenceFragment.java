@@ -1,6 +1,7 @@
 package net.osdn.gokigen.a01d.preference;
 
-import android.app.Activity;
+import android.support.v4.app.FragmentActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -49,7 +50,7 @@ public class PreferenceFragment extends PreferenceFragmentCompat implements Shar
      *
      *
      */
-    public void setInterface(Activity context, IOlympusInterfaceProvider factory, IChangeScene changeScene)
+    public void setInterface(AppCompatActivity context, IOlympusInterfaceProvider factory, IChangeScene changeScene)
     {
         Log.v(TAG, "setInterface()");
         this.propertyInterface = factory.getCameraPropertyProvider();
@@ -448,7 +449,7 @@ public class PreferenceFragment extends PreferenceFragmentCompat implements Shar
     @Override
     public void synchronizedProperty()
     {
-        Activity activity = getActivity();
+        FragmentActivity activity = getActivity();
         if (activity == null)
         {
             try

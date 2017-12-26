@@ -42,7 +42,7 @@ public class OlympusInterfaceProvider implements IOlympusInterfaceProvider, IOly
         this.hardwareStatus = new OlyCameraHardwareStatus(this.wrapper.getOLYCamera());
         this.propertyListener = new OLYCameraPropertyListenerImpl(this.wrapper.getOLYCamera());
         this.zoomLensControl = new OlyCameraZoomLensControl(context, this.wrapper.getOLYCamera());
-        this.cameraPowerOn = new PowerOnCamera(this.wrapper.getOLYCamera());
+        this.cameraPowerOn = new PowerOnCamera(context, this.wrapper.getOLYCamera());
     }
 
     @Override

@@ -1,6 +1,7 @@
 package net.osdn.gokigen.a01d.camera.olympus.myolycameraprops;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTabHost;
@@ -28,7 +29,7 @@ public class LoadSaveMyCameraPropertyDialog extends DialogFragment implements Ta
 
     /**/
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
         try
         {

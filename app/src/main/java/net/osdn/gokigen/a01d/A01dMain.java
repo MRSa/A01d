@@ -21,7 +21,6 @@ import net.osdn.gokigen.a01d.camera.olympus.wrapper.OlympusInterfaceProvider;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.connection.ICameraStatusReceiver;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.connection.IOlyCameraConnection;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.connection.ble.ICameraPowerOn;
-import net.osdn.gokigen.a01d.camera.olympus.wrapper.connection.ble.PowerOnCamera;
 import net.osdn.gokigen.a01d.liveview.IStatusViewDrawer;
 import net.osdn.gokigen.a01d.liveview.LiveViewFragment;
 import net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor;
@@ -155,9 +154,8 @@ public class A01dMain extends AppCompatActivity implements ICameraStatusReceiver
      */
     private void initializeFragment()
     {
-        LiveViewFragment fragment = new LiveViewFragment();
+        LiveViewFragment fragment = LiveViewFragment.newInstance(this, interfaceProvider, interfaceInjector);
         statusViewDrawer = fragment;
-        fragment.prepare(this, interfaceProvider, interfaceInjector);
         fragment.setRetainInstance(true);
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.replace(R.id.fragment1, fragment);

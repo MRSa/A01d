@@ -3,8 +3,8 @@ package net.osdn.gokigen.a01d.liveview;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.preference.PreferenceManager;
@@ -23,8 +23,6 @@ import net.osdn.gokigen.a01d.camera.olympus.IOlympusDisplayInjector;
 import net.osdn.gokigen.a01d.camera.olympus.IOlympusInterfaceProvider;
 import net.osdn.gokigen.a01d.camera.olympus.myolycameraprops.LoadSaveCameraProperties;
 import net.osdn.gokigen.a01d.camera.olympus.myolycameraprops.LoadSaveMyCameraPropertyDialog;
-import net.osdn.gokigen.a01d.camera.olympus.operation.ICaptureControl;
-import net.osdn.gokigen.a01d.camera.olympus.operation.IFocusingControl;
 import net.osdn.gokigen.a01d.camera.olympus.operation.IZoomLensControl;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.ICameraInformation;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.IFocusingModeNotify;
@@ -33,9 +31,6 @@ import net.osdn.gokigen.a01d.camera.olympus.wrapper.connection.IOlyCameraConnect
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.property.IOlyCameraProperty;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.property.IOlyCameraPropertyProvider;
 import net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor;
-
-import java.io.File;
-
 
 /**
  *  撮影用ライブビュー画面
@@ -70,6 +65,23 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer, IFo
 
     private IOlyCameraConnection.CameraConnectionStatus currentConnectionStatus =  IOlyCameraConnection.CameraConnectionStatus.UNKNOWN;
 
+    public static LiveViewFragment newInstance(IChangeScene sceneSelector, IOlympusInterfaceProvider interfaceProvider, IOlympusDisplayInjector interfaceInjector)
+    {
+        LiveViewFragment instance = new LiveViewFragment();
+        instance.prepare(sceneSelector, interfaceProvider, interfaceInjector);
+
+        // パラメータはBundleにまとめておく
+        Bundle arguments = new Bundle();
+        //arguments.putString("title", title);
+        //arguments.putString("message", message);
+        instance.setArguments(arguments);
+
+        return (instance);
+    }
+
+
+
+
     /**
      *
      *
@@ -102,7 +114,7 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer, IFo
      *
      */
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
         super.onCreateView(inflater, container, savedInstanceState);
 
@@ -172,7 +184,7 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer, IFo
     /**
      *
      */
-    public void prepare(IChangeScene sceneSelector, IOlympusInterfaceProvider interfaceProvider, IOlympusDisplayInjector interfaceInjector)
+    private void prepare(IChangeScene sceneSelector, IOlympusInterfaceProvider interfaceProvider, IOlympusDisplayInjector interfaceInjector)
     {
         this.changeScene = sceneSelector;
         this.interfaceProvider = interfaceProvider;
@@ -345,9 +357,10 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer, IFo
         setupLowerDisplayArea();
 */
         // propertyを取得
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getContext());
         try
         {
+            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getContext());
+
             // グリッド・フォーカスアシストの情報を戻す
             boolean showGrid = preferences.getBoolean(IPreferencePropertyAccessor.SHOW_GRID_STATUS, false);
             if ((imageView != null)&&(imageView.isShowGrid() != showGrid))
@@ -476,15 +489,21 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer, IFo
         }
     }
 
-
     @Override
     public void showFavoriteSettingDialog()
     {
-        Log.v(TAG, "showFavoriteSettingDialog()");
-        LoadSaveMyCameraPropertyDialog dialog = new LoadSaveMyCameraPropertyDialog();
-        dialog.setTargetFragment(this, COMMAND_MY_PROPERTY);
-        dialog.setPropertyOperationsHolder(new LoadSaveCameraProperties(getActivity(), interfaceProvider));
-        dialog.show(getFragmentManager(), "my_dialog");
+        try
+        {
+            Log.v(TAG, "showFavoriteSettingDialog()");
+            LoadSaveMyCameraPropertyDialog dialog = new LoadSaveMyCameraPropertyDialog();
+            dialog.setTargetFragment(this, COMMAND_MY_PROPERTY);
+            dialog.setPropertyOperationsHolder(new LoadSaveCameraProperties(getActivity(), interfaceProvider));
+            dialog.show(getFragmentManager(), "my_dialog");
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
     }
 
     private void runOnUiThread(Runnable action)
