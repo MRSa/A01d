@@ -1,7 +1,7 @@
 package net.osdn.gokigen.a01d.camera.olympus.wrapper.connection.ble;
 
 
-public class OlyCameraSetArrayItem
+class OlyCameraSetArrayItem
 {
     private final String dataId;
     private String btName = "";
@@ -46,13 +46,14 @@ public class OlyCameraSetArrayItem
         return (information);
     }
 
+/*
     void setValue(String btName, String btPassCode, String information)
     {
         this.btName = btName;
         this.btPassCode = btPassCode;
         this.information = information;
     }
-/*
+
     public boolean isChanged()
     {
         return (!(btName.equals(initialBtName))&&(btPassCode.equals(initialBtPassCode))&&(information.equals(initialInformation)));
