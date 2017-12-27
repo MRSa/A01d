@@ -152,6 +152,10 @@ public class PowerOnCamera implements ICameraPowerOn
                                 camera.wakeup();
                                 callback.wakeupExecuted(true);
                             }
+                            else
+                            {
+                                callback.wakeupExecuted(false);
+                            }
                         }
                         catch (Exception e)
                         {
