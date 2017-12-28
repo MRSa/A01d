@@ -82,6 +82,9 @@
     <string name="pref_summary_air_bt">Entry your Olympus Air</string>
     <string name="saved_my_camera">Registerd : </string>
 
+    <string name="pref_degug_info">Debug Information</string>
+    <string name="pref_summary_debug_info">LogCat Information</string>
+
     <string name="connect_start">start</string>
     <string name="connect_check_wifi">check WIFI</string>
     <string name="connect_connect">connecting</string>
@@ -99,4 +102,6 @@
     <string name="dialog_start_load_property_title">Setting Properties&#8230;</string>
     <string name="restored_my_props">Restored Property : </string>
 
+    <string name="action_refresh">Refresh</string>
+    <string name="finish_refresh">Finished Refresh</string>
 </resources>

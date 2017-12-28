@@ -23,6 +23,7 @@ import net.osdn.gokigen.a01d.camera.olympus.wrapper.connection.IOlyCameraConnect
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.connection.ble.ICameraPowerOn;
 import net.osdn.gokigen.a01d.liveview.IStatusViewDrawer;
 import net.osdn.gokigen.a01d.liveview.LiveViewFragment;
+import net.osdn.gokigen.a01d.logcat.LogCatFragment;
 import net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor;
 import net.osdn.gokigen.a01d.preference.PreferenceFragment;
 
@@ -39,6 +40,7 @@ public class A01dMain extends AppCompatActivity implements ICameraStatusReceiver
 
     private PreferenceFragment preferenceFragment = null;
     private OlyCameraPropertyListFragment propertyListFragment = null;
+    private LogCatFragment logCatFragment = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -228,6 +230,26 @@ public class A01dMain extends AppCompatActivity implements ICameraStatusReceiver
         transaction.addToBackStack(null);
         transaction.commit();
     }
+
+    /**
+     *   デバッグ情報画面を開く
+     *
+     */
+    @Override
+    public void changeSceneToDebugInformation()
+    {
+        if (logCatFragment == null)
+        {
+            logCatFragment = LogCatFragment.newInstance();
+        }
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.replace(R.id.fragment1, logCatFragment);
+        // backstackに追加
+        transaction.addToBackStack(null);
+        transaction.commit();
+    }
+
+
 
     /**
      *   カメラとの接続・切断のシーケンス

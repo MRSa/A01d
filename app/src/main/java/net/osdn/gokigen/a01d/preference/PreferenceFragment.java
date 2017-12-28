@@ -22,6 +22,7 @@ import net.osdn.gokigen.a01d.camera.olympus.wrapper.property.IOlyCameraProperty;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.property.IOlyCameraPropertyProvider;
 import net.osdn.gokigen.a01d.camera.olympus.IOlympusInterfaceProvider;
 import net.osdn.gokigen.a01d.camera.olympus.operation.CameraPowerOff;
+import net.osdn.gokigen.a01d.logcat.LogCatViewer;
 
 import java.util.HashMap;
 import java.util.Locale;
@@ -42,6 +43,7 @@ public class PreferenceFragment extends PreferenceFragmentCompat implements Shar
     private ICameraRunMode changeRunModeExecutor = null;
     private CameraPowerOff powerOffController = null;
     private OlyCameraPowerOnSelector powerOnSelector = null;
+    private LogCatViewer logCatViewer = null;
     private SharedPreferences preferences = null;
     private ProgressDialog busyDialog = null;
     private PreferenceSynchronizer preferenceSynchronizer = null;
@@ -60,6 +62,8 @@ public class PreferenceFragment extends PreferenceFragmentCompat implements Shar
         powerOffController.prepare();
         powerOnSelector = new OlyCameraPowerOnSelector(context);
         powerOnSelector.prepare();
+        logCatViewer = new LogCatViewer(changeScene);
+        logCatViewer.prepare();
     }
 
     /**
@@ -203,6 +207,7 @@ public class PreferenceFragment extends PreferenceFragmentCompat implements Shar
         }
         findPreference("exit_application").setOnPreferenceClickListener(powerOffController);
         findPreference("olympus_air_bt").setOnPreferenceClickListener(powerOnSelector);
+        findPreference("debug_info").setOnPreferenceClickListener(logCatViewer);
     }
 
     /**

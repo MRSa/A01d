@@ -120,6 +120,7 @@
 
     <PreferenceCategory
         android:title="@string/pref_cat_gokigen">
+
         <Preference
             android:key="instruction_link"
             android:title="@string/pref_instruction_manual"
@@ -128,6 +129,7 @@
             <intent android:action="android.intent.action.VIEW"
                 android:data="https://osdn.net/projects/gokigen/wiki/A01d" />
         </Preference>
+
         <Preference
             android:key="privacy_policy"
             android:title="@string/pref_privacy_policy"
@@ -136,5 +138,11 @@
             <intent android:action="android.intent.action.VIEW"
                 android:data="https://osdn.net/projects/gokigen/wiki/PrivacyPolicy" />
         </Preference>
+
+        <PreferenceScreen
+            android:key="debug_info"
+            android:title="@string/pref_degug_info"
+            android:summary="@string/pref_summary_debug_info" />
+
     </PreferenceCategory>
 </PreferenceScreen>
