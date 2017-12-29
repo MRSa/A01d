@@ -103,6 +103,7 @@
     <string name="restored_my_props">Restored Property : </string>
 
     <string name="launch_fail_via_ble">  Launch fail. via BLE : </string>
+    <string name="ble_setting_is_off">Bluetooth is currently off.</string>
 
     <string name="action_refresh">Refresh</string>
     <string name="finish_refresh">Finished Refresh</string>

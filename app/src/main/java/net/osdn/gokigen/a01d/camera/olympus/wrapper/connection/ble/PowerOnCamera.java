@@ -50,6 +50,32 @@ public class PowerOnCamera implements ICameraPowerOn
     {
         Log.v(TAG, "PowerOnCamera::wakeup()");
 
+        try
+        {
+            BluetoothAdapter btAdapter = BluetoothAdapter.getDefaultAdapter();
+            if (!btAdapter.isEnabled()) {
+                // Bluetoothの設定がOFFだった
+                Log.v(TAG, "Bluetooth is currently off.");
+                context.runOnUiThread(new Runnable()
+                {
+                    @Override
+                    public void run()
+                    {
+                        // Toastで カメラ起動エラーがあったことを通知する
+                        Toast.makeText(context, context.getString(R.string.ble_setting_is_off), Toast.LENGTH_LONG).show();
+                    }
+                });
+                callback.wakeupExecuted(false);
+                return;
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            callback.wakeupExecuted(false);
+            return;
+        }
+
         final BluetoothManager btMgr;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
         {

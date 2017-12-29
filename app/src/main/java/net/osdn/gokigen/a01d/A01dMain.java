@@ -437,10 +437,11 @@ public class A01dMain extends AppCompatActivity implements ICameraStatusReceiver
     public void wakeupExecuted(boolean isExecuted)
     {
         Log.v(TAG, "wakeupExecuted() : " + isExecuted);
-        if ((isExecuted)&&(isAutoConnectCamera()))
+        if (isAutoConnectCamera())
         {
-            // カメラへ自動接続する設定だった場合、カメラへWiFi接続する
+            // カメラへ自動接続する設定だった場合、カメラへWiFi接続する (BLEで起動しなくても)
             changeCameraConnection();
         }
+
     }
 }
