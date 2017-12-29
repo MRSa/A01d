@@ -1,6 +1,7 @@
 package net.osdn.gokigen.a01d.camera.olympus.wrapper.connection.ble;
 
 
+import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothManager;
@@ -9,6 +10,9 @@ import android.content.SharedPreferences;
 import android.os.Build;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.widget.Toast;
+
+import net.osdn.gokigen.a01d.R;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +29,7 @@ public class PowerOnCamera implements ICameraPowerOn
     private final String TAG = toString();
     private final int BLE_SCAN_TIMEOUT_MILLIS = 5 * 1000; // 5秒間
     private final int BLE_WAIT_DURATION  = 100;             // 100ms間隔
-    private final Context context;
+    private final Activity context;
     private final OLYCamera camera;
     private List<OlyCameraSetArrayItem> myCameraList;
     private BluetoothDevice myBluetoothDevice = null;
@@ -34,7 +38,7 @@ public class PowerOnCamera implements ICameraPowerOn
     /**
      *
      */
-    public PowerOnCamera(Context context, OLYCamera camera)
+    public PowerOnCamera(Activity context, OLYCamera camera)
     {
         Log.v(TAG, "PowerOnCamera()");
         this.context = context;
@@ -162,6 +166,24 @@ public class PowerOnCamera implements ICameraPowerOn
                             e.printStackTrace();
                             Log.v(TAG, "Bluetooth LE SCAN EXCEPTION...");
                             callback.wakeupExecuted(false);
+
+                            try
+                            {
+                                final String btName = (myBluetoothDevice != null) ? myBluetoothDevice.getName() : "";
+                                context.runOnUiThread(new Runnable()
+                                {
+                                    @Override
+                                    public void run()
+                                    {
+                                        // Toastで カメラ起動エラーがあったことを通知する
+                                        Toast.makeText(context, context.getString(R.string.launch_fail_via_ble) + btName, Toast.LENGTH_LONG).show();
+                                    }
+                                });
+                            }
+                            catch (Exception ee)
+                            {
+                                ee.printStackTrace();
+                            }
                         }
                         Log.v(TAG, "Bluetooth LE SCAN STOPPED");
                     }

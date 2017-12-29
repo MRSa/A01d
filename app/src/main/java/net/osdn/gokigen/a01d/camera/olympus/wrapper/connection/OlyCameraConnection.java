@@ -99,17 +99,39 @@ public class OlyCameraConnection implements IOlyCameraConnection, OLYCameraConne
         Log.v(TAG,context.getString(R.string.connect_check_wifi));
 
         String action = intent.getAction();
-        if (action.equals(ConnectivityManager.CONNECTIVITY_ACTION))
-        {
-            Log.v(TAG,"onReceiveBroadcastOfConnection() : CONNECTIVITY_ACTION");
-
-            WifiManager wifiManager = (WifiManager) context.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-            WifiInfo info = wifiManager.getConnectionInfo();
-            if (wifiManager.isWifiEnabled() && info != null && info.getNetworkId() != -1)
+        try {
+            if (action.equals(ConnectivityManager.CONNECTIVITY_ACTION))
             {
-                // 自動接続が指示されていた場合は、カメラとの接続処理を行う
-                connectToCamera();
+                Log.v(TAG, "onReceiveBroadcastOfConnection() : CONNECTIVITY_ACTION");
+
+                WifiManager wifiManager = (WifiManager) context.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+                WifiInfo info = wifiManager.getConnectionInfo();
+                if (wifiManager.isWifiEnabled() && info != null )
+                {
+                    if (info.getNetworkId() != -1)
+                    {
+                        Log.v(TAG, "Network ID is -1, there is no currently connected network.");
+                    }
+                    // 自動接続が指示されていた場合は、カメラとの接続処理を行う
+                    connectToCamera();
+                }
+                else
+                {
+                    if (info == null)
+                    {
+                        Log.v(TAG, "NETWORK INFO IS NULL.");
+                    }
+                    else
+                    {
+                        Log.v(TAG, "isWifiEnabled : " + wifiManager.isWifiEnabled() + " NetworkId : " + info.getNetworkId());
+                    }
+                }
             }
+        }
+        catch (Exception e)
+        {
+            Log.w(TAG, "onReceiveBroadcastOfConnection() EXCEPTION" + e.getMessage());
+            e.printStackTrace();
         }
     }
 
@@ -224,6 +246,7 @@ public class OlyCameraConnection implements IOlyCameraConnection, OLYCameraConne
         }
         catch (Exception e)
         {
+            Log.v(TAG, "connectToCamera() EXCEPTION : " + e.getMessage());
             e.printStackTrace();
         }
     }

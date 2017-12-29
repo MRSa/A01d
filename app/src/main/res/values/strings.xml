@@ -102,6 +102,8 @@
     <string name="dialog_start_load_property_title">Setting Properties&#8230;</string>
     <string name="restored_my_props">Restored Property : </string>
 
+    <string name="launch_fail_via_ble">  Launch fail. via BLE : </string>
+
     <string name="action_refresh">Refresh</string>
     <string name="finish_refresh">Finished Refresh</string>
 </resources>
