@@ -4,6 +4,7 @@ import android.content.Context;
 import android.util.Log;
 
 import net.osdn.gokigen.a01d.R;
+import net.osdn.gokigen.a01d.camera.ICameraStatusReceiver;
 
 import jp.co.olympus.camerakit.OLYCamera;
 import jp.co.olympus.camerakit.OLYCameraKitException;

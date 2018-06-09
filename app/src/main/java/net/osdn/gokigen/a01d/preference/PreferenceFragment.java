@@ -141,6 +141,10 @@ public class PreferenceFragment extends PreferenceFragmentCompat implements Shar
         {
             editor.putString(net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor.POWER_ZOOM_LEVEL, net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor.POWER_ZOOM_LEVEL_DEFAULT_VALUE);
         }
+        if (!items.containsKey(net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor.CONNECTION_METHOD))
+        {
+            editor.putString(net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor.CONNECTION_METHOD, net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor.CONNECTION_METHOD_DEFAULT_VALUE);
+        }
         editor.apply();
     }
 
@@ -204,6 +208,16 @@ public class PreferenceFragment extends PreferenceFragmentCompat implements Shar
                 }
             });
             powerZoom.setSummary(powerZoom.getValue() + " ");
+
+            ListPreference connectionMethod = (ListPreference) findPreference(IPreferencePropertyAccessor.CONNECTION_METHOD);
+            connectionMethod.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+                @Override
+                public boolean onPreferenceChange(Preference preference, Object newValue) {
+                    preference.setSummary(newValue + " ");
+                    return (true);
+                }
+            });
+            connectionMethod.setSummary(connectionMethod.getValue() + " ");
         }
         findPreference("exit_application").setOnPreferenceClickListener(powerOffController);
         findPreference("olympus_air_bt").setOnPreferenceClickListener(powerOnSelector);

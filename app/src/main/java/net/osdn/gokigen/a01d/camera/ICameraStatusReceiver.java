@@ -1,4 +1,4 @@
-package net.osdn.gokigen.a01d.camera.olympus.wrapper.connection;
+package net.osdn.gokigen.a01d.camera;
 
 /**
  *

@@ -19,7 +19,8 @@ import android.widget.TextView;
 
 import net.osdn.gokigen.a01d.IChangeScene;
 import net.osdn.gokigen.a01d.R;
-import net.osdn.gokigen.a01d.camera.olympus.IOlympusDisplayInjector;
+import net.osdn.gokigen.a01d.camera.IInterfaceProvider;
+import net.osdn.gokigen.a01d.camera.sony.wrapper.IDisplayInjector;
 import net.osdn.gokigen.a01d.camera.olympus.IOlympusInterfaceProvider;
 import net.osdn.gokigen.a01d.camera.olympus.myolycameraprops.LoadSaveCameraProperties;
 import net.osdn.gokigen.a01d.camera.olympus.myolycameraprops.LoadSaveMyCameraPropertyDialog;
@@ -27,7 +28,7 @@ import net.osdn.gokigen.a01d.camera.olympus.operation.IZoomLensControl;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.ICameraInformation;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.IFocusingModeNotify;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.ILiveViewControl;
-import net.osdn.gokigen.a01d.camera.olympus.wrapper.connection.IOlyCameraConnection;
+import net.osdn.gokigen.a01d.camera.ICameraConnection;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.property.IOlyCameraProperty;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.property.IOlyCameraPropertyProvider;
 import net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor;
@@ -44,7 +45,7 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer, IFo
     private ILiveViewControl liveViewControl = null;
     private IZoomLensControl zoomLensControl = null;
     private IOlympusInterfaceProvider interfaceProvider = null;
-    private IOlympusDisplayInjector interfaceInjector = null;
+    private IDisplayInjector interfaceInjector = null;
     private CameraLiveViewListenerImpl liveViewListener = null;
     private IChangeScene changeScene = null;
     private ICameraInformation cameraInformation = null;
@@ -63,12 +64,12 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer, IFo
     private View myView = null;
     private String messageValue = "";
 
-    private IOlyCameraConnection.CameraConnectionStatus currentConnectionStatus =  IOlyCameraConnection.CameraConnectionStatus.UNKNOWN;
+    private ICameraConnection.CameraConnectionStatus currentConnectionStatus =  ICameraConnection.CameraConnectionStatus.UNKNOWN;
 
-    public static LiveViewFragment newInstance(IChangeScene sceneSelector, IOlympusInterfaceProvider interfaceProvider, IOlympusDisplayInjector interfaceInjector)
+    public static LiveViewFragment newInstance(IChangeScene sceneSelector, @NonNull IInterfaceProvider provider)
     {
         LiveViewFragment instance = new LiveViewFragment();
-        instance.prepare(sceneSelector, interfaceProvider, interfaceInjector);
+        instance.prepare(sceneSelector, provider.getOlympusInterface(), provider.getOlympusDisplayInjector());
 
         // パラメータはBundleにまとめておく
         Bundle arguments = new Bundle();
@@ -78,9 +79,6 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer, IFo
 
         return (instance);
     }
-
-
-
 
     /**
      *
@@ -134,7 +132,7 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer, IFo
             imageView = view.findViewById(R.id.cameraLiveImageView);
             if (interfaceInjector != null)
             {
-                interfaceInjector.injectOlympusDisplay(imageView, imageView, this);
+                interfaceInjector.injectDisplay(imageView, imageView, this);
             }
             if (onClickTouchListener == null)
             {
@@ -167,7 +165,7 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer, IFo
 
             connectStatus = view.findViewById(R.id.connect_disconnect_button);
             connectStatus.setOnClickListener(onClickTouchListener);
-            updateConnectionStatus(IOlyCameraConnection.CameraConnectionStatus.UNKNOWN);
+            updateConnectionStatus(ICameraConnection.CameraConnectionStatus.UNKNOWN);
 
             statusArea = view.findViewById(R.id.informationMessageTextView);
             focalLengthArea = view.findViewById(R.id.focal_length_with_digital_zoom_view);
@@ -184,7 +182,7 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer, IFo
     /**
      *
      */
-    private void prepare(IChangeScene sceneSelector, IOlympusInterfaceProvider interfaceProvider, IOlympusDisplayInjector interfaceInjector)
+    private void prepare(IChangeScene sceneSelector, IOlympusInterfaceProvider interfaceProvider, IDisplayInjector interfaceInjector)
     {
         this.changeScene = sceneSelector;
         this.interfaceProvider = interfaceProvider;
@@ -199,7 +197,7 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer, IFo
      *
      */
     @Override
-    public void updateConnectionStatus(IOlyCameraConnection.CameraConnectionStatus connectionStatus)
+    public void updateConnectionStatus(ICameraConnection.CameraConnectionStatus connectionStatus)
     {
         try
         {
@@ -210,11 +208,11 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer, IFo
                 public void run()
                 {
                     int id = R.drawable.ic_cloud_off_black_24dp;
-                    if (currentConnectionStatus == IOlyCameraConnection.CameraConnectionStatus.CONNECTING)
+                    if (currentConnectionStatus == ICameraConnection.CameraConnectionStatus.CONNECTING)
                     {
                         id = R.drawable.ic_cloud_queue_black_24dp;
                     }
-                    else if  (currentConnectionStatus == IOlyCameraConnection.CameraConnectionStatus.CONNECTED)
+                    else if  (currentConnectionStatus == ICameraConnection.CameraConnectionStatus.CONNECTED)
                     {
                         id = R.drawable.ic_cloud_done_black_24dp;
                     }
@@ -269,7 +267,7 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer, IFo
                 @Override
                 public void run()
                 {
-                    if (currentConnectionStatus == IOlyCameraConnection.CameraConnectionStatus.CONNECTED)
+                    if (currentConnectionStatus == ICameraConnection.CameraConnectionStatus.CONNECTED)
                     {
                         manualFocus.setSelected(cameraInformation.isManualFocus());
                         manualFocus.invalidate();
@@ -368,7 +366,7 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer, IFo
                 imageView.toggleShowGridFrame();
                 imageView.postInvalidate();
             }
-            if (currentConnectionStatus == IOlyCameraConnection.CameraConnectionStatus.CONNECTED)
+            if (currentConnectionStatus == ICameraConnection.CameraConnectionStatus.CONNECTED)
             {
                 startLiveView();
             }
@@ -495,6 +493,11 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer, IFo
         try
         {
             Log.v(TAG, "showFavoriteSettingDialog()");
+
+            // OPCチェック
+
+
+
             LoadSaveMyCameraPropertyDialog dialog = new LoadSaveMyCameraPropertyDialog();
             dialog.setTargetFragment(this, COMMAND_MY_PROPERTY);
             dialog.setPropertyOperationsHolder(new LoadSaveCameraProperties(getActivity(), interfaceProvider));

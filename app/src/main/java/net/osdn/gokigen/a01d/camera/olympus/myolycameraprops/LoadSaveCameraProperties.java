@@ -9,7 +9,7 @@ import android.widget.Toast;
 
 import net.osdn.gokigen.a01d.R;
 import net.osdn.gokigen.a01d.camera.olympus.IOlympusInterfaceProvider;
-import net.osdn.gokigen.a01d.camera.olympus.wrapper.connection.IOlyCameraConnection;
+import net.osdn.gokigen.a01d.camera.ICameraConnection;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.property.IOlyCameraProperty;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.property.IOlyCameraPropertyProvider;
 
@@ -27,7 +27,7 @@ public class LoadSaveCameraProperties implements ILoadSaveCameraProperties
     private final String TAG = toString();
 
     private final Activity parent;
-    private final IOlyCameraConnection cameraConnection;
+    private final ICameraConnection cameraConnection;
     private final IOlyCameraPropertyProvider propertyProvider;
 
     public LoadSaveCameraProperties(Activity context, IOlympusInterfaceProvider interfaceProvider)
@@ -47,7 +47,7 @@ public class LoadSaveCameraProperties implements ILoadSaveCameraProperties
         Log.v(TAG, "saveCameraSettings() : START [" + idHeader + "], dataName: " + dataName);
 
         // カメラから設定を一括で読みだして、Preferenceに記録する
-        if (cameraConnection.getConnectionStatus() == IOlyCameraConnection.CameraConnectionStatus.CONNECTED)
+        if (cameraConnection.getConnectionStatus() == ICameraConnection.CameraConnectionStatus.CONNECTED)
         {
             //
             // BUSYダイアログを表示する
@@ -103,7 +103,7 @@ public class LoadSaveCameraProperties implements ILoadSaveCameraProperties
     public void loadCameraSettings(final String idHeader, final String dataName)
     {
         Log.v(TAG, "loadCameraSettings() : START [" + idHeader + "], dataName: " + dataName);
-        if (cameraConnection.getConnectionStatus() == IOlyCameraConnection.CameraConnectionStatus.CONNECTED)
+        if (cameraConnection.getConnectionStatus() == ICameraConnection.CameraConnectionStatus.CONNECTED)
         {
             //Log.v(TAG, "PROPERTY RESTORE ENTER : (" + id + ") " + name);
 
@@ -202,7 +202,7 @@ public class LoadSaveCameraProperties implements ILoadSaveCameraProperties
         int setCount = 0;
         // Restores my settings.
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(parent);
-        if (cameraConnection.getConnectionStatus() == IOlyCameraConnection.CameraConnectionStatus.CONNECTED)
+        if (cameraConnection.getConnectionStatus() == ICameraConnection.CameraConnectionStatus.CONNECTED)
         {
             String takeModeValue = preferences.getString(idHeader + IOlyCameraProperty.TAKE_MODE, null);
             try
@@ -264,7 +264,7 @@ public class LoadSaveCameraProperties implements ILoadSaveCameraProperties
 
         // Restores my settings.
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(parent);
-        if (cameraConnection.getConnectionStatus() == IOlyCameraConnection.CameraConnectionStatus.CONNECTED)
+        if (cameraConnection.getConnectionStatus() == ICameraConnection.CameraConnectionStatus.CONNECTED)
         {
 
             //  現在の設定値を全部とってくる

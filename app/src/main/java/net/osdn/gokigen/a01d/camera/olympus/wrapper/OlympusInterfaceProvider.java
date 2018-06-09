@@ -2,13 +2,13 @@ package net.osdn.gokigen.a01d.camera.olympus.wrapper;
 
 import android.app.Activity;
 
-import net.osdn.gokigen.a01d.camera.olympus.IOlympusDisplayInjector;
+import net.osdn.gokigen.a01d.camera.sony.wrapper.IDisplayInjector;
 import net.osdn.gokigen.a01d.camera.olympus.IOlympusInterfaceProvider;
 import net.osdn.gokigen.a01d.camera.olympus.operation.ICaptureControl;
 import net.osdn.gokigen.a01d.camera.olympus.operation.IFocusingControl;
 import net.osdn.gokigen.a01d.camera.olympus.operation.IZoomLensControl;
-import net.osdn.gokigen.a01d.camera.olympus.wrapper.connection.ICameraStatusReceiver;
-import net.osdn.gokigen.a01d.camera.olympus.wrapper.connection.IOlyCameraConnection;
+import net.osdn.gokigen.a01d.camera.ICameraStatusReceiver;
+import net.osdn.gokigen.a01d.camera.ICameraConnection;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.connection.OlyCameraConnection;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.connection.ble.ICameraPowerOn;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.connection.ble.PowerOnCamera;
@@ -22,7 +22,7 @@ import net.osdn.gokigen.a01d.liveview.IIndicatorControl;
  *
  *
  */
-public class OlympusInterfaceProvider implements IOlympusInterfaceProvider, IOlympusDisplayInjector
+public class OlympusInterfaceProvider implements IOlympusInterfaceProvider, IDisplayInjector
 {
     private final OlyCameraWrapper wrapper;
     private final OlyCameraConnection connection;
@@ -46,7 +46,7 @@ public class OlympusInterfaceProvider implements IOlympusInterfaceProvider, IOly
     }
 
     @Override
-    public void injectOlympusDisplay(IAutoFocusFrameDisplay frameDisplayer, IIndicatorControl indicator, IFocusingModeNotify focusingModeNotify)
+    public void injectDisplay(IAutoFocusFrameDisplay frameDisplayer, IIndicatorControl indicator, IFocusingModeNotify focusingModeNotify)
     {
         focusControl = new OlyCameraFocusControl(wrapper, frameDisplayer, indicator);
         captureControl = new OlyCameraCaptureControl (wrapper, frameDisplayer, indicator);
@@ -60,7 +60,7 @@ public class OlympusInterfaceProvider implements IOlympusInterfaceProvider, IOly
     }
 
     @Override
-    public IOlyCameraConnection getOlyCameraConnection()
+    public ICameraConnection getOlyCameraConnection()
     {
         return (connection);
     }

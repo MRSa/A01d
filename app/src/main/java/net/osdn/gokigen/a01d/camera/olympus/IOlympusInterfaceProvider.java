@@ -9,7 +9,7 @@ import net.osdn.gokigen.a01d.camera.olympus.wrapper.ICameraRunMode;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.ILiveViewControl;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.connection.ble.ICameraPowerOn;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.property.IOlyCameraPropertyProvider;
-import net.osdn.gokigen.a01d.camera.olympus.wrapper.connection.IOlyCameraConnection;
+import net.osdn.gokigen.a01d.camera.ICameraConnection;
 
 /**
  *
@@ -17,7 +17,7 @@ import net.osdn.gokigen.a01d.camera.olympus.wrapper.connection.IOlyCameraConnect
 public interface IOlympusInterfaceProvider
 {
     ICameraPowerOn getCameraPowerOn();
-    IOlyCameraConnection getOlyCameraConnection();
+    ICameraConnection getOlyCameraConnection();
     ICameraHardwareStatus getHardwareStatus();
     IOlyCameraPropertyProvider getCameraPropertyProvider();
     ICameraRunMode getCameraRunMode();

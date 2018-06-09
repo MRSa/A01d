@@ -40,6 +40,10 @@ public interface IPreferencePropertyAccessor
 
     String OLYCAMERA_BLUETOOTH_SETTINGS = "olympus_air_bt";
 
+    String CONNECTION_METHOD = "connection_method";
+    String CONNECTION_METHOD_DEFAULT_VALUE = "OPC";
+
+
 /*
     int CHOICE_SPLASH_SCREEN = 10;
 

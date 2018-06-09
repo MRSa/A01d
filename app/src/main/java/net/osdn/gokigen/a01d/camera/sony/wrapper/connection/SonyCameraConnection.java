@@ -1,4 +1,4 @@
-package net.osdn.gokigen.a01d.camera.olympus.wrapper.connection;
+package net.osdn.gokigen.a01d.camera.sony.wrapper.connection;
 
 import android.app.Activity;
 import android.content.BroadcastReceiver;
@@ -9,61 +9,44 @@ import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
-import android.os.Handler;
-import android.os.Message;
 import android.provider.Settings;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
 
 import net.osdn.gokigen.a01d.R;
 import net.osdn.gokigen.a01d.camera.ICameraConnection;
 import net.osdn.gokigen.a01d.camera.ICameraStatusReceiver;
+import net.osdn.gokigen.a01d.camera.sony.wrapper.ISonyCameraHolder;
 
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
-import jp.co.olympus.camerakit.OLYCamera;
-import jp.co.olympus.camerakit.OLYCameraConnectionListener;
-import jp.co.olympus.camerakit.OLYCameraKitException;
-
-
 /**
- *   カメラの接続・切断処理クラス
+ *
  *
  */
-public class OlyCameraConnection implements ICameraConnection, OLYCameraConnectionListener
+public class SonyCameraConnection implements ICameraConnection
 {
     private final String TAG = toString();
     private final Activity context;
-    private final OLYCamera camera;
-    private final Executor cameraExecutor = Executors.newFixedThreadPool(1);
-    private final BroadcastReceiver connectionReceiver;
     private final ICameraStatusReceiver statusReceiver;
-
-    //private boolean isWatchingWifiStatus = false;
+    private final BroadcastReceiver connectionReceiver;
+    private final ISonyCameraHolder cameraHolder;
+    //private final ConnectivityManager connectivityManager;
+    private final Executor cameraExecutor = Executors.newFixedThreadPool(1);
+    //private final Handler networkConnectionTimeoutHandler;
+    //private static final int MESSAGE_CONNECTIVITY_TIMEOUT = 1;
     private CameraConnectionStatus connectionStatus = CameraConnectionStatus.UNKNOWN;
 
-    private ConnectivityManager connectivityManager;
-    //private ConnectivityManager.NetworkCallback networkCallback = null;
-
-    // Handler for dealing with network connection timeouts.
-    private Handler networkConnectionTimeoutHandler;
-
-
-    // Message to notify the network request timout handler that too much time has passed.
-    private static final int MESSAGE_CONNECTIVITY_TIMEOUT = 1;
-
-    /**
-     *    コンストラクタ
-     *
-     */
-    public OlyCameraConnection(final Activity context, OLYCamera camera, ICameraStatusReceiver statusReceiver)
+    public SonyCameraConnection(final Activity context, final ICameraStatusReceiver statusReceiver, @NonNull ISonyCameraHolder cameraHolder)
     {
-        Log.v(TAG, "OlyCameraConnection()");
+        Log.v(TAG, "SonyCameraConnection()");
         this.context = context;
-        this.camera = camera;
-        this.camera.setConnectionListener(this);
-        connectivityManager = (ConnectivityManager) context.getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+        this.statusReceiver = statusReceiver;
+        this.cameraHolder = cameraHolder;
+/*
+        ConnectivityManager connectivityManager = (ConnectivityManager) context.getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
         networkConnectionTimeoutHandler = new Handler()
         {
             @Override
@@ -79,7 +62,7 @@ public class OlyCameraConnection implements ICameraConnection, OLYCameraConnecti
                 }
             }
         };
-        this.statusReceiver = statusReceiver;
+*/
         connectionReceiver = new BroadcastReceiver()
         {
             @Override
@@ -88,44 +71,45 @@ public class OlyCameraConnection implements ICameraConnection, OLYCameraConnecti
                 onReceiveBroadcastOfConnection(context, intent);
             }
         };
-
     }
 
-    /**
-     *   Wifiが使える状態だったら、カメラと接続して動作するよ
-     *
-     */
     private void onReceiveBroadcastOfConnection(Context context, Intent intent)
     {
         statusReceiver.onStatusNotify(context.getString(R.string.connect_check_wifi));
         Log.v(TAG,context.getString(R.string.connect_check_wifi));
 
         String action = intent.getAction();
-        try {
+        if (action == null)
+        {
+            //
+            Log.v(TAG, "intent.getAction() : null");
+            return;
+        }
+
+        try
+        {
             if (action.equals(ConnectivityManager.CONNECTIVITY_ACTION))
             {
                 Log.v(TAG, "onReceiveBroadcastOfConnection() : CONNECTIVITY_ACTION");
 
                 WifiManager wifiManager = (WifiManager) context.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-                WifiInfo info = wifiManager.getConnectionInfo();
-                if (wifiManager.isWifiEnabled() && info != null )
-                {
-                    if (info.getNetworkId() != -1)
+                if (wifiManager != null) {
+                    WifiInfo info = wifiManager.getConnectionInfo();
+                    if (wifiManager.isWifiEnabled() && info != null)
                     {
-                        Log.v(TAG, "Network ID is -1, there is no currently connected network.");
-                    }
-                    // 自動接続が指示されていた場合は、カメラとの接続処理を行う
-                    connectToCamera();
-                }
-                else
-                {
-                    if (info == null)
-                    {
-                        Log.v(TAG, "NETWORK INFO IS NULL.");
-                    }
-                    else
-                    {
-                        Log.v(TAG, "isWifiEnabled : " + wifiManager.isWifiEnabled() + " NetworkId : " + info.getNetworkId());
+                        if (info.getNetworkId() != -1)
+                        {
+                            Log.v(TAG, "Network ID is -1, there is no currently connected network.");
+                        }
+                        // 自動接続が指示されていた場合は、カメラとの接続処理を行う
+                        connectToCamera();
+                    } else {
+                        if (info == null)
+                        {
+                            Log.v(TAG, "NETWORK INFO IS NULL.");
+                        } else {
+                            Log.v(TAG, "isWifiEnabled : " + wifiManager.isWifiEnabled() + " NetworkId : " + info.getNetworkId());
+                        }
                     }
                 }
             }
@@ -136,6 +120,7 @@ public class OlyCameraConnection implements ICameraConnection, OLYCameraConnecti
             e.printStackTrace();
         }
     }
+
 
     /**
      * Wifi接続状態の監視
@@ -167,11 +152,12 @@ public class OlyCameraConnection implements ICameraConnection, OLYCameraConnecti
     /**
      * 　 カメラとの接続を解除する
      *
-     * @param powerOff 真ならカメラの電源オフを伴う
+     *   @param powerOff 真ならカメラの電源オフを伴う
      */
     @Override
-    public void disconnect(final boolean powerOff)
+    public void disconnect(boolean powerOff)
     {
+        Log.v(TAG, "disconnect()");
         Log.v(TAG, "disconnect()");
         disconnectFromCamera(powerOff);
         connectionStatus = CameraConnectionStatus.DISCONNECTED;
@@ -182,75 +168,10 @@ public class OlyCameraConnection implements ICameraConnection, OLYCameraConnecti
      * カメラとの再接続を指示する
      */
     @Override
-    public void connect() {
+    public void connect()
+    {
+        Log.v(TAG, "connect()");
         connectToCamera();
-    }
-
-    @Override
-    public CameraConnectionStatus getConnectionStatus()
-    {
-        return (connectionStatus);
-    }
-
-    /**
-     *   カメラの接続状態を強制更新する
-     *
-     */
-    @Override
-    public void forceUpdateConnectionStatus(CameraConnectionStatus status)
-    {
-        connectionStatus = status;
-    }
-
-
-    /**
-     * カメラの通信状態変化を監視するためのインターフェース
-     *
-     * @param camera 例外が発生した OLYCamera
-     * @param e      カメラクラスの例外
-     */
-    @Override
-    public void onDisconnectedByError(OLYCamera camera, OLYCameraKitException e)
-    {
-        Log.v(TAG, "onDisconnectedByError()");
-        connectionStatus = CameraConnectionStatus.DISCONNECTED;
-
-        // カメラが切れた時に通知する
-        statusReceiver.onCameraDisconnected();
-    }
-
-    /**
-     * カメラとの切断処理
-     */
-    private void disconnectFromCamera(final boolean powerOff)
-    {
-        Log.v(TAG, "disconnectFromCamera()");
-        try
-        {
-            cameraExecutor.execute(new CameraDisconnectSequence(camera, powerOff));
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-    }
-
-    /**
-     * カメラとの接続処理
-     */
-    private void connectToCamera()
-    {
-        Log.v(TAG, "connectToCamera()");
-        connectionStatus = CameraConnectionStatus.CONNECTING;
-        try
-        {
-            cameraExecutor.execute(new CameraConnectSequence(context, camera, statusReceiver));
-        }
-        catch (Exception e)
-        {
-            Log.v(TAG, "connectToCamera() EXCEPTION : " + e.getMessage());
-            e.printStackTrace();
-        }
     }
 
     /**
@@ -261,6 +182,7 @@ public class OlyCameraConnection implements ICameraConnection, OLYCameraConnecti
     @Override
     public void alertConnectingFailed(String message)
     {
+        Log.v(TAG, "alertConnectingFailed() : " + message);
         final AlertDialog.Builder builder = new AlertDialog.Builder(context)
                 .setTitle(context.getString(R.string.dialog_title_connect_failed))
                 .setMessage(message)
@@ -302,5 +224,53 @@ public class OlyCameraConnection implements ICameraConnection, OLYCameraConnecti
                 builder.show();
             }
         });
+    }
+
+    @Override
+    public CameraConnectionStatus getConnectionStatus()
+    {
+        Log.v(TAG, "getConnectionStatus()");
+        return (connectionStatus);
+    }
+
+    @Override
+    public void forceUpdateConnectionStatus(CameraConnectionStatus status)
+    {
+        Log.v(TAG, "forceUpdateConnectionStatus()");
+        connectionStatus = status;
+    }
+
+    /**
+     * カメラとの切断処理
+     */
+    private void disconnectFromCamera(final boolean powerOff)
+    {
+        Log.v(TAG, "disconnectFromCamera()");
+        try
+        {
+            cameraExecutor.execute(new SonyCameraDisconnectSequence(powerOff));
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * カメラとの接続処理
+     */
+    private void connectToCamera()
+    {
+        Log.v(TAG, "connectToCamera()");
+        connectionStatus = CameraConnectionStatus.CONNECTING;
+        try
+        {
+            cameraExecutor.execute(new SonyCameraConnectSequence(context,statusReceiver, this, cameraHolder));
+        }
+        catch (Exception e)
+        {
+            Log.v(TAG, "connectToCamera() EXCEPTION : " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 }

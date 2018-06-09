@@ -1,4 +1,4 @@
-package net.osdn.gokigen.a01d.camera.olympus.wrapper.connection;
+package net.osdn.gokigen.a01d.camera;
 
 import android.content.Context;
 
@@ -6,7 +6,7 @@ import android.content.Context;
  *   カメラの接続/切断
  *
  */
-public interface IOlyCameraConnection
+public interface ICameraConnection
 {
     enum CameraConnectionStatus
     {
@@ -16,7 +16,7 @@ public interface IOlyCameraConnection
         CONNECTED
     }
 
-    // WIFI 接続系
+    /**  WIFI 接続系  **/
     void startWatchWifiStatus(Context context);
     void stopWatchWifiStatus(Context context);
 
@@ -24,6 +24,7 @@ public interface IOlyCameraConnection
     void disconnect(final boolean powerOff);
     void connect();
 
+    /** カメラ接続失敗 **/
     void alertConnectingFailed(String message);
 
     /** 接続状態 **/

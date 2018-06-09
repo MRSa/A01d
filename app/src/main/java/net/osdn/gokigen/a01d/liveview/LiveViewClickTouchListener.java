@@ -6,6 +6,7 @@ import android.support.v7.preference.PreferenceManager;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Toast;
 
 import net.osdn.gokigen.a01d.IChangeScene;
 import net.osdn.gokigen.a01d.R;
@@ -13,7 +14,7 @@ import net.osdn.gokigen.a01d.camera.olympus.IOlympusInterfaceProvider;
 import net.osdn.gokigen.a01d.camera.olympus.operation.ICaptureControl;
 import net.osdn.gokigen.a01d.camera.olympus.operation.IFocusingControl;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.ICameraInformation;
-import net.osdn.gokigen.a01d.camera.olympus.wrapper.connection.IOlyCameraConnection;
+import net.osdn.gokigen.a01d.camera.ICameraConnection;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.property.IOlyCameraProperty;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.property.IOlyCameraPropertyProvider;
 import net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor;
@@ -33,7 +34,7 @@ class LiveViewClickTouchListener implements View.OnClickListener, View.OnTouchLi
     private final ICaptureControl captureControl;
     private final IOlyCameraPropertyProvider propertyProvider;
     private final ICameraInformation cameraInformation;
-    private final IOlyCameraConnection cameraConnection;
+    private final ICameraConnection cameraConnection;
     private final IFavoriteSettingDialogKicker dialogKicker;
 
     LiveViewClickTouchListener(Context context, ILiveImageStatusNotify imageStatusNotify, IStatusViewDrawer statusView, IChangeScene changeScene, IOlympusInterfaceProvider interfaceProvider, IFavoriteSettingDialogKicker dialogKicker)
@@ -178,7 +179,14 @@ class LiveViewClickTouchListener implements View.OnClickListener, View.OnTouchLi
         Log.v(TAG, "showFavoriteDialog()");
         try
         {
-            if (cameraConnection.getConnectionStatus() == IOlyCameraConnection.CameraConnectionStatus.CONNECTED)
+            if (!useOlympusCamera())
+            {
+                // OPCカメラでない場合には、「OPCカメラのみ有効です」表示をして画面遷移させない
+                Toast.makeText(context, context.getText(R.string.only_opc_feature), Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            if (cameraConnection.getConnectionStatus() == ICameraConnection.CameraConnectionStatus.CONNECTED)
             {
                 //  お気に入り設定のダイアログを表示する
                 dialogKicker.showFavoriteSettingDialog();
@@ -201,4 +209,27 @@ class LiveViewClickTouchListener implements View.OnClickListener, View.OnTouchLi
         //Log.v(TAG, "onTouch() : " + id + " (" + motionEvent.getX() + "," + motionEvent.getY() + ")");
         return ((id == R.id.cameraLiveImageView)&&(focusingControl.driveAutoFocus(motionEvent)));
     }
+
+    /**
+     *   OPCカメラを使用するかどうか
+     *
+     * @return  true : OPCカメラ /  false : OPCカメラではない
+     */
+    private boolean useOlympusCamera()
+    {
+        boolean ret = true;
+        try
+        {
+            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+            String connectionMethod = preferences.getString(IPreferencePropertyAccessor.CONNECTION_METHOD, "OPC");
+            ret = connectionMethod.contains("OPC");
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        return (ret);
+    }
+
+
 }
