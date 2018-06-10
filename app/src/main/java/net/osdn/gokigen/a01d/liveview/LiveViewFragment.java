@@ -21,16 +21,17 @@ import net.osdn.gokigen.a01d.IChangeScene;
 import net.osdn.gokigen.a01d.R;
 import net.osdn.gokigen.a01d.camera.IInterfaceProvider;
 import net.osdn.gokigen.a01d.camera.sony.wrapper.IDisplayInjector;
-import net.osdn.gokigen.a01d.camera.olympus.IOlympusInterfaceProvider;
 import net.osdn.gokigen.a01d.camera.olympus.myolycameraprops.LoadSaveCameraProperties;
 import net.osdn.gokigen.a01d.camera.olympus.myolycameraprops.LoadSaveMyCameraPropertyDialog;
 import net.osdn.gokigen.a01d.camera.olympus.operation.IZoomLensControl;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.ICameraInformation;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.IFocusingModeNotify;
-import net.osdn.gokigen.a01d.camera.olympus.wrapper.ILiveViewControl;
+import net.osdn.gokigen.a01d.camera.ILiveViewControl;
 import net.osdn.gokigen.a01d.camera.ICameraConnection;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.property.IOlyCameraProperty;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.property.IOlyCameraPropertyProvider;
+import net.osdn.gokigen.a01d.liveview.liveviewlistener.ILiveViewListener;
+import net.osdn.gokigen.a01d.liveview.liveviewlistener.OlympusCameraLiveViewListenerImpl;
 import net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor;
 
 /**
@@ -44,9 +45,9 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer, IFo
 
     private ILiveViewControl liveViewControl = null;
     private IZoomLensControl zoomLensControl = null;
-    private IOlympusInterfaceProvider interfaceProvider = null;
+    private IInterfaceProvider interfaceProvider = null;
     private IDisplayInjector interfaceInjector = null;
-    private CameraLiveViewListenerImpl liveViewListener = null;
+    private OlympusCameraLiveViewListenerImpl liveViewListener = null;
     private IChangeScene changeScene = null;
     private ICameraInformation cameraInformation = null;
     private LiveViewClickTouchListener onClickTouchListener = null;
@@ -69,7 +70,7 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer, IFo
     public static LiveViewFragment newInstance(IChangeScene sceneSelector, @NonNull IInterfaceProvider provider)
     {
         LiveViewFragment instance = new LiveViewFragment();
-        instance.prepare(sceneSelector, provider.getOlympusInterface(), provider.getOlympusDisplayInjector());
+        instance.prepare(sceneSelector, provider, provider.getOlympusDisplayInjector());
 
         // パラメータはBundleにまとめておく
         Bundle arguments = new Bundle();
@@ -89,10 +90,9 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer, IFo
     {
         super.onCreate(savedInstanceState);
         Log.v(TAG, "onCreate()");
-
         if (liveViewListener == null)
         {
-            liveViewListener = new CameraLiveViewListenerImpl();
+            liveViewListener = new OlympusCameraLiveViewListenerImpl();
         }
     }
 
@@ -182,15 +182,27 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer, IFo
     /**
      *
      */
-    private void prepare(IChangeScene sceneSelector, IOlympusInterfaceProvider interfaceProvider, IDisplayInjector interfaceInjector)
+    private void prepare(IChangeScene sceneSelector, IInterfaceProvider interfaceProvider, IDisplayInjector interfaceInjector)
     {
+        Log.v(TAG, "prepare()");
         this.changeScene = sceneSelector;
         this.interfaceProvider = interfaceProvider;
-        this.liveViewControl = interfaceProvider.getLiveViewControl();
-        this.zoomLensControl = interfaceProvider.getZoomLensControl();
         this.interfaceInjector = interfaceInjector;
-        this.cameraInformation = interfaceProvider.getCameraInformation();
+
+        if (interfaceProvider.useOlympusCamera())
+        {
+            this.liveViewControl = interfaceProvider.getOlympusInterface().getLiveViewControl();
+            this.zoomLensControl = interfaceProvider.getOlympusInterface().getZoomLensControl();
+            this.cameraInformation = interfaceProvider.getOlympusInterface().getCameraInformation();
+        }
+        else
+        {
+            this.liveViewControl = interfaceProvider.getSonyInterface().getSonyLiveViewControl();
+            this.zoomLensControl = interfaceProvider.getOlympusInterface().getZoomLensControl();              // 要変更
+            this.cameraInformation = interfaceProvider.getOlympusInterface().getCameraInformation();          // 要変更
+        }
     }
+
 
     /**
      *  カメラとの接続状態の更新
@@ -437,16 +449,33 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer, IFo
     {
         if (liveViewControl == null)
         {
-            Log.v(TAG, "startLiveView() : liveViewControl is null.");
-            return;
+            if (interfaceProvider.useOlympusCamera())
+            {
+                Log.v(TAG, "startLiveView() : liveViewControl is null.");
+                return;
+            }
+            else
+            {
+                // ダミー
+                prepare(changeScene, interfaceProvider, interfaceInjector);
+            }
         }
         try
         {
             // ライブビューの開始
             SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getContext());
             liveViewControl.changeLiveViewSize(preferences.getString(IPreferencePropertyAccessor.LIVE_VIEW_QUALITY, IPreferencePropertyAccessor.LIVE_VIEW_QUALITY_DEFAULT_VALUE));
-            liveViewControl.setLiveViewListener(liveViewListener);
-            liveViewListener.setCameraLiveImageView(imageView);
+            ILiveViewListener lvListener;
+            if (interfaceProvider.useOlympusCamera())
+            {
+                interfaceProvider.getOlympusLiveViewListener().setOlympusLiveViewListener(liveViewListener);
+                lvListener = liveViewListener;
+            }
+            else
+            {
+                lvListener = interfaceProvider.getSonyInterface().getSonyLiveViewListener();
+            }
+            lvListener.setCameraLiveImageView(imageView);
             liveViewControl.startLiveView();
 
             // デジタルズームの設定
@@ -475,7 +504,7 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer, IFo
     {
         try
         {
-            IOlyCameraPropertyProvider propertyProvider = interfaceProvider.getCameraPropertyProvider();
+            IOlyCameraPropertyProvider propertyProvider = interfaceProvider.getOlympusInterface().getCameraPropertyProvider();
             if (propertyProvider != null)
             {
                 propertyProvider.setCameraPropertyValue(IOlyCameraProperty.AE, IOlyCameraProperty.AE_PINPOINT);
@@ -494,13 +523,10 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer, IFo
         {
             Log.v(TAG, "showFavoriteSettingDialog()");
 
-            // OPCチェック
-
-
 
             LoadSaveMyCameraPropertyDialog dialog = new LoadSaveMyCameraPropertyDialog();
             dialog.setTargetFragment(this, COMMAND_MY_PROPERTY);
-            dialog.setPropertyOperationsHolder(new LoadSaveCameraProperties(getActivity(), interfaceProvider));
+            dialog.setPropertyOperationsHolder(new LoadSaveCameraProperties(getActivity(), interfaceProvider.getOlympusInterface()));
             dialog.show(getFragmentManager(), "my_dialog");
         }
         catch (Exception e)

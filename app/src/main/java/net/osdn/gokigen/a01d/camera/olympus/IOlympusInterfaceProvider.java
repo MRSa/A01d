@@ -6,7 +6,8 @@ import net.osdn.gokigen.a01d.camera.olympus.operation.IZoomLensControl;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.ICameraHardwareStatus;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.ICameraInformation;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.ICameraRunMode;
-import net.osdn.gokigen.a01d.camera.olympus.wrapper.ILiveViewControl;
+import net.osdn.gokigen.a01d.camera.ILiveViewControl;
+import net.osdn.gokigen.a01d.camera.olympus.wrapper.IOlympusLiveViewListener;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.connection.ble.ICameraPowerOn;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.property.IOlyCameraPropertyProvider;
 import net.osdn.gokigen.a01d.camera.ICameraConnection;
@@ -26,4 +27,6 @@ public interface IOlympusInterfaceProvider
     IFocusingControl getFocusingControl();
     ICaptureControl getCaptureControl();
     ICameraInformation getCameraInformation();
+
+    IOlympusLiveViewListener getLiveViewListener();
 }

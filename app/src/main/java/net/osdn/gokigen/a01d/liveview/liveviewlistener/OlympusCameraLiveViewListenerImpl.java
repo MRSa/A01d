@@ -1,4 +1,4 @@
-package net.osdn.gokigen.a01d.liveview;
+package net.osdn.gokigen.a01d.liveview.liveviewlistener;
 
 import java.util.Map;
 
@@ -10,14 +10,14 @@ import jp.co.olympus.camerakit.OLYCameraLiveViewListener;
  *  （LiveViewFragment用）
  *
  */
-public class CameraLiveViewListenerImpl implements OLYCameraLiveViewListener
+public class OlympusCameraLiveViewListenerImpl implements OLYCameraLiveViewListener, ILiveViewListener
 {
     private IImageDataReceiver imageView = null;
 
     /**
      * コンストラクタ
      */
-    public CameraLiveViewListenerImpl()
+    public OlympusCameraLiveViewListenerImpl()
     {
         //
     }
@@ -26,6 +26,7 @@ public class CameraLiveViewListenerImpl implements OLYCameraLiveViewListener
      * 更新するImageViewを拾う
      *
      */
+    @Override
     public void setCameraLiveImageView(IImageDataReceiver target)
     {
         this.imageView = target;
@@ -42,13 +43,5 @@ public class CameraLiveViewListenerImpl implements OLYCameraLiveViewListener
         {
             imageView.setImageData(data, metadata);
         }
-    }
-
-    /**
-     * 　 CameraLiveImageView
-     */
-    public interface IImageDataReceiver
-    {
-        void setImageData(byte[] data, Map<String, Object> metadata);
     }
 }

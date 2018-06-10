@@ -26,6 +26,8 @@ import net.osdn.gokigen.a01d.liveview.bitmapconvert.IPreviewImageConverter;
 import net.osdn.gokigen.a01d.liveview.bitmapconvert.ImageConvertFactory;
 import net.osdn.gokigen.a01d.liveview.gridframe.GridFrameFactory;
 import net.osdn.gokigen.a01d.liveview.gridframe.IGridFrameDrawer;
+import net.osdn.gokigen.a01d.liveview.liveviewlistener.IImageDataReceiver;
+import net.osdn.gokigen.a01d.liveview.liveviewlistener.OlympusCameraLiveViewListenerImpl;
 import net.osdn.gokigen.a01d.liveview.message.IMessageDrawer;
 import net.osdn.gokigen.a01d.liveview.message.IMessageHolder;
 import net.osdn.gokigen.a01d.liveview.message.ShowMessageHolder;
@@ -42,7 +44,7 @@ import jp.co.olympus.camerakit.OLYCamera;
  *    (OLYMPUS の ImageCaptureSample そのまま)
  *
  */
-public class CameraLiveImageView extends View implements CameraLiveViewListenerImpl.IImageDataReceiver, IAutoFocusFrameDisplay, ILiveImageStatusNotify, IIndicatorControl
+public class CameraLiveImageView extends View implements IImageDataReceiver, IAutoFocusFrameDisplay, ILiveImageStatusNotify, IIndicatorControl
 {
     private final String TAG = this.toString();
 
@@ -173,30 +175,37 @@ public class CameraLiveImageView extends View implements CameraLiveViewListenerI
 
     /**
      * Sets a image to view.
-     * (CameraLiveViewListenerImpl.IImageDataReceiver の実装)
+     * (OlympusCameraLiveViewListenerImpl.IImageDataReceiver の実装)
      *
      * @param data     A image of live-view.
      * @param metadata A metadata of the image.
      */
-    public void setImageData(byte[] data, Map<String, Object> metadata) {
+    public void setImageData(byte[] data, Map<String, Object> metadata)
+    {
         Bitmap bitmap;
         int rotationDegrees;
 
-        if (data != null && metadata != null) {
+        if (data != null)
+        {
             // Create a bitmap.
-            try {
+            try
+            {
                 bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
-            } catch (OutOfMemoryError e) {
+            }
+            catch (OutOfMemoryError e)
+            {
                 e.printStackTrace();
                 return;
             }
 
             // Acquire a rotation degree of image.
             int orientation = ExifInterface.ORIENTATION_UNDEFINED;
-            if (metadata.containsKey(EXIF_ORIENTATION)) {
+            if ((metadata != null)&&(metadata.containsKey(EXIF_ORIENTATION)))
+            {
                 orientation = Integer.parseInt((String) metadata.get(EXIF_ORIENTATION));
             }
-            switch (orientation) {
+            switch (orientation)
+            {
                 case ExifInterface.ORIENTATION_NORMAL:
                     rotationDegrees = 0;
                     break;
@@ -216,7 +225,6 @@ public class CameraLiveImageView extends View implements CameraLiveViewListenerI
             imageBitmap = bitmap;
             imageRotationDegrees = rotationDegrees;
         }
-
         refreshCanvas();
     }
 
@@ -738,7 +746,8 @@ public class CameraLiveImageView extends View implements CameraLiveViewListenerI
      * @param point A point on image area. (e.g. a live preview image)
      * @return A point on view area. (e.g. a touch panel view)
      */
-    private PointF convertPointFromImageArea(PointF point) {
+    private PointF convertPointFromImageArea(PointF point)
+    {
         if (imageBitmap == null) {
             return new PointF();
         }

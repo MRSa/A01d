@@ -1,5 +1,6 @@
 package net.osdn.gokigen.a01d.camera.sony.wrapper.connection;
 
+import android.app.Activity;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.util.Log;
@@ -9,6 +10,7 @@ import net.osdn.gokigen.a01d.camera.ICameraConnection;
 import net.osdn.gokigen.a01d.camera.ICameraStatusReceiver;
 import net.osdn.gokigen.a01d.camera.sony.wrapper.ISonyCamera;
 import net.osdn.gokigen.a01d.camera.sony.wrapper.ISonyCameraHolder;
+import net.osdn.gokigen.a01d.camera.sony.wrapper.eventlistener.CameraChangeListerTemplate;
 
 
 /**
@@ -18,13 +20,13 @@ import net.osdn.gokigen.a01d.camera.sony.wrapper.ISonyCameraHolder;
 public class SonyCameraConnectSequence implements Runnable, SonySsdpClient.ISearchResultCallback
 {
     private final String TAG = this.toString();
-    private final Context context;
+    private final Activity context;
     private final ICameraConnection cameraConnection;
     private final ISonyCameraHolder cameraHolder;
     private final ICameraStatusReceiver cameraStatusReceiver;
     private final SonySsdpClient client;
 
-    SonyCameraConnectSequence(Context context, ICameraStatusReceiver statusReceiver, final ICameraConnection cameraConnection, final @NonNull ISonyCameraHolder cameraHolder)
+    SonyCameraConnectSequence(Activity context, ICameraStatusReceiver statusReceiver, final ICameraConnection cameraConnection, final @NonNull ISonyCameraHolder cameraHolder)
     {
         Log.v(TAG, "SonyCameraConnectSequence");
         this.context = context;
@@ -77,11 +79,14 @@ public class SonyCameraConnectSequence implements Runnable, SonySsdpClient.ISear
                     try
                     {
                         cameraHolder.prepare();
+                        cameraHolder.startEventWatch(new CameraChangeListerTemplate());
                     }
                     catch (Exception e)
                     {
                         e.printStackTrace();
                     }
+                    Log.v(TAG, "CameraConnectSequence:: connected.");
+                    onConnectNotify();
                 }
             });
             thread.start();
@@ -92,9 +97,47 @@ public class SonyCameraConnectSequence implements Runnable, SonySsdpClient.ISear
         }
     }
 
+    private void onConnectNotify()
+    {
+        try
+        {
+            final Thread thread = new Thread(new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    // カメラとの接続確立を通知する
+                    cameraStatusReceiver.onStatusNotify(context.getString(R.string.connect_connected));
+                    cameraStatusReceiver.onCameraConnected();
+                    Log.v(TAG, "onConnectNotify()");
+                }
+            });
+            thread.start();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    private void waitForAMoment(long mills)
+    {
+        if (mills > 0)
+        {
+            try {
+                Log.v(TAG, " WAIT " + mills + "ms");
+                Thread.sleep(mills);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+
     @Override
     public void onErrorFinished(String reason)
     {
         cameraConnection.alertConnectingFailed(reason);
     }
+
 }

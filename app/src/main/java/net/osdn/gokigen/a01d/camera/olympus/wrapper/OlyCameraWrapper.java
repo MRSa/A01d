@@ -6,19 +6,20 @@ import android.graphics.PointF;
 import android.support.v7.preference.PreferenceManager;
 import android.util.Log;
 
+import net.osdn.gokigen.a01d.camera.ILiveViewControl;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.property.CameraPropertyUtilities;
-import net.osdn.gokigen.a01d.liveview.CameraLiveViewListenerImpl;
 import net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor;
 
 import java.util.Map;
 
 import jp.co.olympus.camerakit.OLYCamera;
+import jp.co.olympus.camerakit.OLYCameraLiveViewListener;
 
 /**
  *
  *
  */
-class OlyCameraWrapper implements ICameraRunMode, ILiveViewControl
+class OlyCameraWrapper implements ICameraRunMode, ILiveViewControl, IOlympusLiveViewListener
 {
     private final String TAG = toString();
     private final Activity context;
@@ -91,7 +92,7 @@ class OlyCameraWrapper implements ICameraRunMode, ILiveViewControl
     }
 
     @Override
-    public void setLiveViewListener(CameraLiveViewListenerImpl listener)
+    public void setOlympusLiveViewListener(OLYCameraLiveViewListener listener)
     {
         try
         {
@@ -260,7 +261,7 @@ class OlyCameraWrapper implements ICameraRunMode, ILiveViewControl
      */
     private float getMagnifyingLiveViewScale(boolean isChangeScale)
     {
-        float scale = 1.0f;
+        float scale;
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
         String value = preferences.getString(IPreferencePropertyAccessor.MAGNIFYING_LIVE_VIEW_SCALE, IPreferencePropertyAccessor.MAGNIFYING_LIVE_VIEW_SCALE_DEFAULT_VALUE);
         try
@@ -316,7 +317,7 @@ class OlyCameraWrapper implements ICameraRunMode, ILiveViewControl
      */
     private float getDigitalZoomScalePreference()
     {
-        float scale = 1.0f;
+        float scale;
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
         String value = preferences.getString(IPreferencePropertyAccessor.DIGITAL_ZOOM_LEVEL, IPreferencePropertyAccessor.DIGITAL_ZOOM_LEVEL_DEFAULT_VALUE);
         try

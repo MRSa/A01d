@@ -10,6 +10,7 @@ import android.widget.Toast;
 
 import net.osdn.gokigen.a01d.IChangeScene;
 import net.osdn.gokigen.a01d.R;
+import net.osdn.gokigen.a01d.camera.IInterfaceProvider;
 import net.osdn.gokigen.a01d.camera.olympus.IOlympusInterfaceProvider;
 import net.osdn.gokigen.a01d.camera.olympus.operation.ICaptureControl;
 import net.osdn.gokigen.a01d.camera.olympus.operation.IFocusingControl;
@@ -30,6 +31,7 @@ class LiveViewClickTouchListener implements View.OnClickListener, View.OnTouchLi
     private final ILiveImageStatusNotify statusNotify;
     private final IStatusViewDrawer statusViewDrawer;
     private final IChangeScene changeScene;
+    private final IInterfaceProvider interfaceProvider;
     private final IFocusingControl focusingControl;
     private final ICaptureControl captureControl;
     private final IOlyCameraPropertyProvider propertyProvider;
@@ -37,17 +39,18 @@ class LiveViewClickTouchListener implements View.OnClickListener, View.OnTouchLi
     private final ICameraConnection cameraConnection;
     private final IFavoriteSettingDialogKicker dialogKicker;
 
-    LiveViewClickTouchListener(Context context, ILiveImageStatusNotify imageStatusNotify, IStatusViewDrawer statusView, IChangeScene changeScene, IOlympusInterfaceProvider interfaceProvider, IFavoriteSettingDialogKicker dialogKicker)
+    LiveViewClickTouchListener(Context context, ILiveImageStatusNotify imageStatusNotify, IStatusViewDrawer statusView, IChangeScene changeScene, IInterfaceProvider interfaceProvider, IFavoriteSettingDialogKicker dialogKicker)
     {
         this.context = context;
         this.statusNotify = imageStatusNotify;
         this.statusViewDrawer = statusView;
         this.changeScene = changeScene;
-        this.focusingControl = interfaceProvider.getFocusingControl();
-        this.captureControl = interfaceProvider.getCaptureControl();
-        this.propertyProvider = interfaceProvider.getCameraPropertyProvider();
-        this.cameraInformation = interfaceProvider.getCameraInformation();
-        this.cameraConnection = interfaceProvider.getOlyCameraConnection();
+        this.interfaceProvider = interfaceProvider;
+        this.focusingControl = interfaceProvider.getOlympusInterface().getFocusingControl();
+        this.captureControl = interfaceProvider.getOlympusInterface().getCaptureControl();
+        this.propertyProvider = interfaceProvider.getOlympusInterface().getCameraPropertyProvider();
+        this.cameraInformation = interfaceProvider.getOlympusInterface().getCameraInformation();
+        this.cameraConnection = interfaceProvider.getOlympusInterface().getOlyCameraConnection();
         this.dialogKicker = dialogKicker;
     }
 
@@ -179,7 +182,7 @@ class LiveViewClickTouchListener implements View.OnClickListener, View.OnTouchLi
         Log.v(TAG, "showFavoriteDialog()");
         try
         {
-            if (!useOlympusCamera())
+            if (!interfaceProvider.useOlympusCamera())
             {
                 // OPCカメラでない場合には、「OPCカメラのみ有効です」表示をして画面遷移させない
                 Toast.makeText(context, context.getText(R.string.only_opc_feature), Toast.LENGTH_SHORT).show();
@@ -209,27 +212,5 @@ class LiveViewClickTouchListener implements View.OnClickListener, View.OnTouchLi
         //Log.v(TAG, "onTouch() : " + id + " (" + motionEvent.getX() + "," + motionEvent.getY() + ")");
         return ((id == R.id.cameraLiveImageView)&&(focusingControl.driveAutoFocus(motionEvent)));
     }
-
-    /**
-     *   OPCカメラを使用するかどうか
-     *
-     * @return  true : OPCカメラ /  false : OPCカメラではない
-     */
-    private boolean useOlympusCamera()
-    {
-        boolean ret = true;
-        try
-        {
-            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-            String connectionMethod = preferences.getString(IPreferencePropertyAccessor.CONNECTION_METHOD, "OPC");
-            ret = connectionMethod.contains("OPC");
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-        return (ret);
-    }
-
 
 }

@@ -2,6 +2,7 @@ package net.osdn.gokigen.a01d.camera.olympus.wrapper;
 
 import android.app.Activity;
 
+import net.osdn.gokigen.a01d.camera.ILiveViewControl;
 import net.osdn.gokigen.a01d.camera.sony.wrapper.IDisplayInjector;
 import net.osdn.gokigen.a01d.camera.olympus.IOlympusInterfaceProvider;
 import net.osdn.gokigen.a01d.camera.olympus.operation.ICaptureControl;
@@ -110,5 +111,11 @@ public class OlympusInterfaceProvider implements IOlympusInterfaceProvider, IDis
     public ICameraInformation getCameraInformation()
     {
         return (propertyListener);
+    }
+
+    @Override
+    public IOlympusLiveViewListener getLiveViewListener()
+    {
+       return (wrapper);
     }
 }

@@ -362,9 +362,16 @@ public class A01dMain extends AppCompatActivity implements ICameraStatusReceiver
     {
         Log.v(TAG, "onCameraConnected()");
 
-        try
-        {
-            ICameraConnection connection = interfaceProvider.getOlympusInterface().getOlyCameraConnection();
+        try {
+            ICameraConnection connection;
+            if (interfaceProvider.useOlympusCamera())
+            {
+                connection = interfaceProvider.getOlympusInterface().getOlyCameraConnection();
+            } else
+            {
+                connection = interfaceProvider.getSonyInterface().getSonyCameraConnection();
+            }
+
             if (connection != null)
             {
                 // クラス構造をミスった...のでこんなところで、無理やりステータスを更新する
