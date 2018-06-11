@@ -11,7 +11,6 @@ import net.osdn.gokigen.a01d.camera.sony.ISonyInterfaceProvider;
 public interface IInterfaceProvider
 {
     IOlympusInterfaceProvider getOlympusInterface();
-    IDisplayInjector getOlympusDisplayInjector();
     IOlympusLiveViewListener getOlympusLiveViewListener();
 
     ISonyInterfaceProvider getSonyInterface();

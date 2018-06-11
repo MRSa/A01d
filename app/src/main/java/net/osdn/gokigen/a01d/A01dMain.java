@@ -130,15 +130,19 @@ public class A01dMain extends AppCompatActivity implements ICameraStatusReceiver
     {
         if (isBlePowerOn())
         {
-            // BLEでカメラの電源をONにする設定だった時
-            try
+            // BLEでPower ONは、OPCのみ対応
+            if (interfaceProvider.useOlympusCamera())
             {
-                // カメラの電源ONクラスを呼び出しておく (電源ONができたら、コールバックをもらう）
-                interfaceProvider.getOlympusInterface().getCameraPowerOn().wakeup(this);
-            }
-            catch (Exception e)
-            {
-                e.printStackTrace();
+                // BLEでカメラの電源をONにする設定だった時
+                try
+                {
+                    // カメラの電源ONクラスを呼び出しておく (電源ONができたら、コールバックをもらう）
+                    interfaceProvider.getOlympusInterface().getCameraPowerOn().wakeup(this);
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
             }
         }
         else if (isAutoConnectCamera())
@@ -177,7 +181,7 @@ public class A01dMain extends AppCompatActivity implements ICameraStatusReceiver
         super.onPause();
         try
         {
-            ICameraConnection connection = interfaceProvider.getOlympusInterface().getOlyCameraConnection();
+            ICameraConnection connection = getCameraConnection();
             if (connection != null)
             {
                 connection.stopWatchWifiStatus(this);
@@ -198,27 +202,31 @@ public class A01dMain extends AppCompatActivity implements ICameraStatusReceiver
     {
         try
         {
+            ICameraConnection connection = getCameraConnection();
             if (!useOlympusCamera())
             {
                 // OPCカメラでない場合には、「OPCカメラのみ有効です」表示をして画面遷移させない
                 Toast.makeText(getApplicationContext(), getText(R.string.only_opc_feature), Toast.LENGTH_SHORT).show();
-                return;
             }
-            ICameraConnection connection = interfaceProvider.getOlympusInterface().getOlyCameraConnection();
-            if (connection != null) {
-                ICameraConnection.CameraConnectionStatus status = connection.getConnectionStatus();
-                if (status == ICameraConnection.CameraConnectionStatus.CONNECTED)
+            else
+            {
+                // OPC カメラの場合...
+                if (connection != null)
                 {
-                    if (propertyListFragment == null)
+                    ICameraConnection.CameraConnectionStatus status = connection.getConnectionStatus();
+                    if (status == ICameraConnection.CameraConnectionStatus.CONNECTED)
                     {
-                        propertyListFragment = new OlyCameraPropertyListFragment();
+                        if (propertyListFragment == null)
+                        {
+                            propertyListFragment = new OlyCameraPropertyListFragment();
+                        }
+                        propertyListFragment.setInterface(this, interfaceProvider.getOlympusInterface().getCameraPropertyProvider());
+                        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+                        transaction.replace(R.id.fragment1, propertyListFragment);
+                        // backstackに追加
+                        transaction.addToBackStack(null);
+                        transaction.commit();
                     }
-                    propertyListFragment.setInterface(this, interfaceProvider.getOlympusInterface().getCameraPropertyProvider());
-                    FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-                    transaction.replace(R.id.fragment1, propertyListFragment);
-                    // backstackに追加
-                    transaction.addToBackStack(null);
-                    transaction.commit();
                 }
             }
         }
@@ -241,7 +249,7 @@ public class A01dMain extends AppCompatActivity implements ICameraStatusReceiver
             {
                 preferenceFragment = new PreferenceFragment();
             }
-            preferenceFragment.setInterface(this, interfaceProvider.getOlympusInterface(), this);
+            preferenceFragment.setInterface(this, interfaceProvider, this);
             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
             transaction.replace(R.id.fragment1, preferenceFragment);
             // backstackに追加
@@ -285,7 +293,7 @@ public class A01dMain extends AppCompatActivity implements ICameraStatusReceiver
         }
         try
         {
-            ICameraConnection connection = (useOlympusCamera()) ? interfaceProvider.getOlympusInterface().getOlyCameraConnection() : interfaceProvider.getSonyInterface().getSonyCameraConnection();
+            ICameraConnection connection = getCameraConnection();
             if (connection != null)
             {
                 ICameraConnection.CameraConnectionStatus status = connection.getConnectionStatus();
@@ -314,7 +322,7 @@ public class A01dMain extends AppCompatActivity implements ICameraStatusReceiver
         Log.v(TAG, "exitApplication()");
         try
         {
-            ICameraConnection connection = interfaceProvider.getOlympusInterface().getOlyCameraConnection();
+            ICameraConnection connection = getCameraConnection();
             if (connection != null)
             {
                 connection.disconnect(true);
@@ -340,7 +348,7 @@ public class A01dMain extends AppCompatActivity implements ICameraStatusReceiver
             if (statusViewDrawer != null)
             {
                 statusViewDrawer.updateStatusView(message);
-                ICameraConnection connection = interfaceProvider.getOlympusInterface().getOlyCameraConnection();
+                ICameraConnection connection = getCameraConnection();
                 if (connection != null)
                 {
                     statusViewDrawer.updateConnectionStatus(connection.getConnectionStatus());
@@ -362,16 +370,9 @@ public class A01dMain extends AppCompatActivity implements ICameraStatusReceiver
     {
         Log.v(TAG, "onCameraConnected()");
 
-        try {
-            ICameraConnection connection;
-            if (interfaceProvider.useOlympusCamera())
-            {
-                connection = interfaceProvider.getOlympusInterface().getOlyCameraConnection();
-            } else
-            {
-                connection = interfaceProvider.getSonyInterface().getSonyCameraConnection();
-            }
-
+        try
+        {
+            ICameraConnection connection = getCameraConnection();
             if (connection != null)
             {
                 // クラス構造をミスった...のでこんなところで、無理やりステータスを更新する
@@ -417,7 +418,7 @@ public class A01dMain extends AppCompatActivity implements ICameraStatusReceiver
         try
         {
             e.printStackTrace();
-            ICameraConnection connection = interfaceProvider.getOlympusInterface().getOlyCameraConnection();
+            ICameraConnection connection = getCameraConnection();
             if (connection != null)
             {
                 connection.alertConnectingFailed(message + " " + e.getLocalizedMessage());
@@ -499,6 +500,24 @@ public class A01dMain extends AppCompatActivity implements ICameraStatusReceiver
             e.printStackTrace();
         }
         return (ret);
+    }
+
+    /**
+     *
+     *
+     *
+     */
+    private ICameraConnection getCameraConnection()
+    {
+        ICameraConnection connection;
+        if (interfaceProvider.useOlympusCamera())
+        {
+            connection = interfaceProvider.getOlympusInterface().getOlyCameraConnection();
+        } else
+        {
+            connection = interfaceProvider.getSonyInterface().getSonyCameraConnection();
+        }
+        return (connection);
     }
 
     /**

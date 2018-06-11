@@ -15,6 +15,7 @@ import android.util.Log;
 
 import net.osdn.gokigen.a01d.IChangeScene;
 import net.osdn.gokigen.a01d.R;
+import net.osdn.gokigen.a01d.camera.IInterfaceProvider;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.ICameraHardwareStatus;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.ICameraRunMode;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.connection.ble.OlyCameraPowerOnSelector;
@@ -52,12 +53,12 @@ public class PreferenceFragment extends PreferenceFragmentCompat implements Shar
      *
      *
      */
-    public void setInterface(AppCompatActivity context, IOlympusInterfaceProvider factory, IChangeScene changeScene)
+    public void setInterface(AppCompatActivity context, IInterfaceProvider factory, IChangeScene changeScene)
     {
         Log.v(TAG, "setInterface()");
-        this.propertyInterface = factory.getCameraPropertyProvider();
-        this.changeRunModeExecutor = factory.getCameraRunMode();
-        hardwareStatusInterface = factory.getHardwareStatus();
+        this.propertyInterface = factory.getOlympusInterface().getCameraPropertyProvider();
+        this.changeRunModeExecutor = factory.getOlympusInterface().getCameraRunMode();
+        hardwareStatusInterface = factory.getOlympusInterface().getHardwareStatus();
         powerOffController = new CameraPowerOff(context, changeScene);
         powerOffController.prepare();
         powerOnSelector = new OlyCameraPowerOnSelector(context);

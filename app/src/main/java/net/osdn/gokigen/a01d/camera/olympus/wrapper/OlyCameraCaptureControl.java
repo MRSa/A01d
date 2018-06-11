@@ -2,7 +2,7 @@ package net.osdn.gokigen.a01d.camera.olympus.wrapper;
 
 import android.util.Log;
 
-import net.osdn.gokigen.a01d.camera.olympus.operation.ICaptureControl;
+import net.osdn.gokigen.a01d.camera.ICaptureControl;
 import net.osdn.gokigen.a01d.camera.olympus.operation.takepicture.SingleShotControl;
 import net.osdn.gokigen.a01d.liveview.IAutoFocusFrameDisplay;
 import net.osdn.gokigen.a01d.liveview.IIndicatorControl;

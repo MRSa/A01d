@@ -164,6 +164,49 @@ class SonyCameraApi implements ISonyCameraApi
     }
 
     @Override
+    public JSONObject setTouchAFPosition(double Xpos, double Ypos)
+    {
+        try
+        {
+            Log.v(TAG, "setTouchAFPosition (" + Xpos + ", " + Ypos + ")");
+            return (communicateJSON("camera", "setTouchAFPosition", new JSONArray().put(Xpos).put(Ypos), "1.0", -1));
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        return (new JSONObject());
+    }
+
+    @Override
+    public JSONObject getTouchAFPosition()
+    {
+        try
+        {
+            return (communicateJSON("camera", "getTouchAFPosition", new JSONArray(), "1.0", -1));
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        return (new JSONObject());
+    }
+
+    @Override
+    public JSONObject cancelTouchAFPosition()
+    {
+        try
+        {
+            return (communicateJSON("camera", "cancelTouchAFPosition", new JSONArray(), "1.0", -1));
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        return (new JSONObject());
+    }
+
+    @Override
     public JSONObject startLiveview()
     {
         try {
@@ -205,6 +248,20 @@ class SonyCameraApi implements ISonyCameraApi
         try {
             return (communicateJSON("camera", "actTakePicture", new JSONArray(), "1.0", -1));
         } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return (new JSONObject());
+    }
+
+    @Override
+    public JSONObject awaitTakePicture()
+    {
+        try
+        {
+            return (communicateJSON("camera", "awaitTakePicture", new JSONArray(), "1.0", -1));
+        }
+        catch (Exception e)
+        {
             e.printStackTrace();
         }
         return (new JSONObject());

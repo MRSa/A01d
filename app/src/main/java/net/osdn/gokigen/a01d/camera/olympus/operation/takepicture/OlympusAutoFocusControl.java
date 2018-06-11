@@ -19,7 +19,7 @@ import jp.co.olympus.camerakit.OLYCameraKitException;
  *     3. unlockAutoFocus() で AF-Unlock を実行
  *
  */
-public class AutoFocusControl implements OLYCamera.TakePictureCallback
+public class OlympusAutoFocusControl implements OLYCamera.TakePictureCallback
 {
     private final OLYCamera camera;
     private final IIndicatorControl indicator;
@@ -31,7 +31,7 @@ public class AutoFocusControl implements OLYCamera.TakePictureCallback
      *   コンストラクタ
      *
      */
-    public AutoFocusControl(OLYCamera camera, IAutoFocusFrameDisplay frameDisplayer, IIndicatorControl indicator)
+    public OlympusAutoFocusControl(OLYCamera camera, IAutoFocusFrameDisplay frameDisplayer, IIndicatorControl indicator)
     {
         this.camera = camera;
         this.frameDisplayer = frameDisplayer;

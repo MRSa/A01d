@@ -1,16 +1,17 @@
 package net.osdn.gokigen.a01d.camera.olympus;
 
-import net.osdn.gokigen.a01d.camera.olympus.operation.ICaptureControl;
-import net.osdn.gokigen.a01d.camera.olympus.operation.IFocusingControl;
-import net.osdn.gokigen.a01d.camera.olympus.operation.IZoomLensControl;
+import net.osdn.gokigen.a01d.camera.ICaptureControl;
+import net.osdn.gokigen.a01d.camera.IFocusingControl;
+import net.osdn.gokigen.a01d.camera.IZoomLensControl;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.ICameraHardwareStatus;
-import net.osdn.gokigen.a01d.camera.olympus.wrapper.ICameraInformation;
+import net.osdn.gokigen.a01d.camera.ICameraInformation;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.ICameraRunMode;
 import net.osdn.gokigen.a01d.camera.ILiveViewControl;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.IOlympusLiveViewListener;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.connection.ble.ICameraPowerOn;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.property.IOlyCameraPropertyProvider;
 import net.osdn.gokigen.a01d.camera.ICameraConnection;
+import net.osdn.gokigen.a01d.camera.sony.wrapper.IDisplayInjector;
 
 /**
  *
@@ -27,6 +28,7 @@ public interface IOlympusInterfaceProvider
     IFocusingControl getFocusingControl();
     ICaptureControl getCaptureControl();
     ICameraInformation getCameraInformation();
+    IDisplayInjector getDisplayInjector();
 
     IOlympusLiveViewListener getLiveViewListener();
 }

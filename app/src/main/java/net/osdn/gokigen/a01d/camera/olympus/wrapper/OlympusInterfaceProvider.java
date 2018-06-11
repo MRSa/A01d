@@ -2,12 +2,13 @@ package net.osdn.gokigen.a01d.camera.olympus.wrapper;
 
 import android.app.Activity;
 
+import net.osdn.gokigen.a01d.camera.ICameraInformation;
 import net.osdn.gokigen.a01d.camera.ILiveViewControl;
 import net.osdn.gokigen.a01d.camera.sony.wrapper.IDisplayInjector;
 import net.osdn.gokigen.a01d.camera.olympus.IOlympusInterfaceProvider;
-import net.osdn.gokigen.a01d.camera.olympus.operation.ICaptureControl;
-import net.osdn.gokigen.a01d.camera.olympus.operation.IFocusingControl;
-import net.osdn.gokigen.a01d.camera.olympus.operation.IZoomLensControl;
+import net.osdn.gokigen.a01d.camera.ICaptureControl;
+import net.osdn.gokigen.a01d.camera.IFocusingControl;
+import net.osdn.gokigen.a01d.camera.IZoomLensControl;
 import net.osdn.gokigen.a01d.camera.ICameraStatusReceiver;
 import net.osdn.gokigen.a01d.camera.ICameraConnection;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.connection.OlyCameraConnection;
@@ -118,4 +119,11 @@ public class OlympusInterfaceProvider implements IOlympusInterfaceProvider, IDis
     {
        return (wrapper);
     }
+
+    @Override
+    public IDisplayInjector getDisplayInjector()
+    {
+        return (this);
+    }
+
 }

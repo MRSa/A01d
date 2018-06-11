@@ -33,7 +33,7 @@ public class SonyCameraConnectSequence implements Runnable, SonySsdpClient.ISear
         this.cameraConnection = cameraConnection;
         this.cameraStatusReceiver = statusReceiver;
         this.cameraHolder = cameraHolder;
-        client = new SonySsdpClient(context, this, statusReceiver, -1);
+        client = new SonySsdpClient(context, this, statusReceiver, 1);
     }
 
     @Override

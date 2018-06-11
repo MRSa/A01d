@@ -5,7 +5,7 @@ import android.content.SharedPreferences;
 import android.support.v7.preference.PreferenceManager;
 import android.util.Log;
 
-import net.osdn.gokigen.a01d.camera.olympus.operation.IZoomLensControl;
+import net.osdn.gokigen.a01d.camera.IZoomLensControl;
 import net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor;
 
 import jp.co.olympus.camerakit.OLYCamera;

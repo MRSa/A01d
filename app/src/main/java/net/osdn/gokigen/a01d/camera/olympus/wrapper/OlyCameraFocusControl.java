@@ -1,12 +1,10 @@
 package net.osdn.gokigen.a01d.camera.olympus.wrapper;
 
 import android.graphics.PointF;
-import android.util.Log;
 import android.view.MotionEvent;
 
-import net.osdn.gokigen.a01d.camera.olympus.operation.IFocusingControl;
-import net.osdn.gokigen.a01d.camera.olympus.operation.takepicture.AutoFocusControl;
-import net.osdn.gokigen.a01d.camera.olympus.wrapper.property.IOlyCameraPropertyProvider;
+import net.osdn.gokigen.a01d.camera.IFocusingControl;
+import net.osdn.gokigen.a01d.camera.olympus.operation.takepicture.OlympusAutoFocusControl;
 import net.osdn.gokigen.a01d.liveview.IAutoFocusFrameDisplay;
 import net.osdn.gokigen.a01d.liveview.IIndicatorControl;
 
@@ -17,13 +15,13 @@ import net.osdn.gokigen.a01d.liveview.IIndicatorControl;
 public class OlyCameraFocusControl implements IFocusingControl
 {
     private final String TAG = toString();
-    private final AutoFocusControl afControl;
+    private final OlympusAutoFocusControl afControl;
     private final IAutoFocusFrameDisplay frameDisplay;
 
     public OlyCameraFocusControl(OlyCameraWrapper wrapper, IAutoFocusFrameDisplay frameDisplayer, IIndicatorControl indicator)
     {
         this.frameDisplay = frameDisplayer;
-        afControl = new AutoFocusControl(wrapper.getOLYCamera(), frameDisplayer, indicator);
+        afControl = new OlympusAutoFocusControl(wrapper.getOLYCamera(), frameDisplayer, indicator);
     }
 
     @Override

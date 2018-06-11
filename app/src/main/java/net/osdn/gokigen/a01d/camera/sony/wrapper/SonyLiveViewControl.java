@@ -92,7 +92,11 @@ public class SonyLiveViewControl implements ILiveViewControl
                 {
                     try
                     {
-                        cameraApi.stopLiveview();
+                        JSONObject resultsObj = cameraApi.stopLiveview();
+                        if (resultsObj == null)
+                        {
+                            Log.v(TAG, "stopLiveview() reply is null.");
+                        }
                     }
                     catch (Exception e)
                     {
@@ -169,12 +173,12 @@ public class SonyLiveViewControl implements ILiveViewControl
                             final SimpleLiveviewSlicer.Payload payload = slicer.nextPayload();
                             if (payload == null)
                             {
-                                Log.v(TAG, "Liveview Payload is null.");
+                                //Log.v(TAG, "Liveview Payload is null.");
                                 continuousNullDataReceived++;
                                 if (continuousNullDataReceived > FETCH_ERROR_MAX)
                                 {
                                     Log.d(TAG, " FETCH ERROR MAX OVER ");
-                                    //break;
+                                    break;
                                 }
                                 continue;
                             }
@@ -205,11 +209,11 @@ public class SonyLiveViewControl implements ILiveViewControl
                             e.printStackTrace();
                         }
                         //mJpegQueue.clear();
-                        whileFetching = false;
-                        if (continuousNullDataReceived > FETCH_ERROR_MAX)
+                        if ((!whileFetching)&&(continuousNullDataReceived > FETCH_ERROR_MAX))
                         {
                             // 再度ライブビューのスタートをやってみる。
-                            continuousNullDataReceived = 0;
+                            whileFetching = false;
+                            //continuousNullDataReceived = 0;
                             start(streamUrl);
                         }
                     }

@@ -23,8 +23,8 @@ import net.osdn.gokigen.a01d.camera.IInterfaceProvider;
 import net.osdn.gokigen.a01d.camera.sony.wrapper.IDisplayInjector;
 import net.osdn.gokigen.a01d.camera.olympus.myolycameraprops.LoadSaveCameraProperties;
 import net.osdn.gokigen.a01d.camera.olympus.myolycameraprops.LoadSaveMyCameraPropertyDialog;
-import net.osdn.gokigen.a01d.camera.olympus.operation.IZoomLensControl;
-import net.osdn.gokigen.a01d.camera.olympus.wrapper.ICameraInformation;
+import net.osdn.gokigen.a01d.camera.IZoomLensControl;
+import net.osdn.gokigen.a01d.camera.ICameraInformation;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.IFocusingModeNotify;
 import net.osdn.gokigen.a01d.camera.ILiveViewControl;
 import net.osdn.gokigen.a01d.camera.ICameraConnection;
@@ -70,7 +70,7 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer, IFo
     public static LiveViewFragment newInstance(IChangeScene sceneSelector, @NonNull IInterfaceProvider provider)
     {
         LiveViewFragment instance = new LiveViewFragment();
-        instance.prepare(sceneSelector, provider, provider.getOlympusDisplayInjector());
+        instance.prepare(sceneSelector, provider);
 
         // パラメータはBundleにまとめておく
         Bundle arguments = new Bundle();
@@ -134,6 +134,10 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer, IFo
             {
                 interfaceInjector.injectDisplay(imageView, imageView, this);
             }
+            else
+            {
+                Log.v(TAG, "interfaceInjector is NULL...");
+            }
             if (onClickTouchListener == null)
             {
                 onClickTouchListener = new LiveViewClickTouchListener(this.getContext(), imageView, this, changeScene, interfaceProvider, this);
@@ -182,9 +186,19 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer, IFo
     /**
      *
      */
-    private void prepare(IChangeScene sceneSelector, IInterfaceProvider interfaceProvider, IDisplayInjector interfaceInjector)
+    private void prepare(IChangeScene sceneSelector, IInterfaceProvider interfaceProvider)
     {
         Log.v(TAG, "prepare()");
+
+        IDisplayInjector interfaceInjector;
+        if (interfaceProvider.useOlympusCamera())
+        {
+            interfaceInjector = interfaceProvider.getOlympusInterface().getDisplayInjector();
+        }
+        else
+        {
+            interfaceInjector = interfaceProvider.getSonyInterface().getDisplayInjector();
+        }
         this.changeScene = sceneSelector;
         this.interfaceProvider = interfaceProvider;
         this.interfaceInjector = interfaceInjector;
@@ -198,11 +212,10 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer, IFo
         else
         {
             this.liveViewControl = interfaceProvider.getSonyInterface().getSonyLiveViewControl();
-            this.zoomLensControl = interfaceProvider.getOlympusInterface().getZoomLensControl();              // 要変更
-            this.cameraInformation = interfaceProvider.getOlympusInterface().getCameraInformation();          // 要変更
+            this.zoomLensControl = interfaceProvider.getSonyInterface().getZoomLensControl();
+            this.cameraInformation = interfaceProvider.getSonyInterface().getCameraInformation();
         }
     }
-
 
     /**
      *  カメラとの接続状態の更新
@@ -457,7 +470,7 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer, IFo
             else
             {
                 // ダミー
-                prepare(changeScene, interfaceProvider, interfaceInjector);
+                prepare(changeScene, interfaceProvider);
             }
         }
         try

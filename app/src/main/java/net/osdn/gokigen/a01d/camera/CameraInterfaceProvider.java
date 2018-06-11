@@ -33,12 +33,6 @@ public class CameraInterfaceProvider implements IInterfaceProvider
     }
 
     @Override
-    public IDisplayInjector getOlympusDisplayInjector()
-    {
-        return (olympus);
-    }
-
-    @Override
     public IOlympusLiveViewListener getOlympusLiveViewListener()
     {
         return (olympus.getLiveViewListener());

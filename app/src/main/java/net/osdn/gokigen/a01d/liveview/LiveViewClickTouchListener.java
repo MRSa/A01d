@@ -11,10 +11,9 @@ import android.widget.Toast;
 import net.osdn.gokigen.a01d.IChangeScene;
 import net.osdn.gokigen.a01d.R;
 import net.osdn.gokigen.a01d.camera.IInterfaceProvider;
-import net.osdn.gokigen.a01d.camera.olympus.IOlympusInterfaceProvider;
-import net.osdn.gokigen.a01d.camera.olympus.operation.ICaptureControl;
-import net.osdn.gokigen.a01d.camera.olympus.operation.IFocusingControl;
-import net.osdn.gokigen.a01d.camera.olympus.wrapper.ICameraInformation;
+import net.osdn.gokigen.a01d.camera.ICaptureControl;
+import net.osdn.gokigen.a01d.camera.IFocusingControl;
+import net.osdn.gokigen.a01d.camera.ICameraInformation;
 import net.osdn.gokigen.a01d.camera.ICameraConnection;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.property.IOlyCameraProperty;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.property.IOlyCameraPropertyProvider;
@@ -46,11 +45,23 @@ class LiveViewClickTouchListener implements View.OnClickListener, View.OnTouchLi
         this.statusViewDrawer = statusView;
         this.changeScene = changeScene;
         this.interfaceProvider = interfaceProvider;
-        this.focusingControl = interfaceProvider.getOlympusInterface().getFocusingControl();
-        this.captureControl = interfaceProvider.getOlympusInterface().getCaptureControl();
-        this.propertyProvider = interfaceProvider.getOlympusInterface().getCameraPropertyProvider();
-        this.cameraInformation = interfaceProvider.getOlympusInterface().getCameraInformation();
-        this.cameraConnection = interfaceProvider.getOlympusInterface().getOlyCameraConnection();
+
+        if (interfaceProvider.useOlympusCamera())
+        {
+            this.focusingControl = interfaceProvider.getOlympusInterface().getFocusingControl();
+            this.captureControl = interfaceProvider.getOlympusInterface().getCaptureControl();
+            this.propertyProvider = interfaceProvider.getOlympusInterface().getCameraPropertyProvider();
+            this.cameraInformation = interfaceProvider.getOlympusInterface().getCameraInformation();
+            this.cameraConnection = interfaceProvider.getOlympusInterface().getOlyCameraConnection();
+        }
+        else
+        {
+            this.focusingControl = interfaceProvider.getSonyInterface().getFocusingControl();
+            this.captureControl = interfaceProvider.getSonyInterface().getCaptureControl();
+            this.propertyProvider = interfaceProvider.getOlympusInterface().getCameraPropertyProvider();  // 要変更
+            this.cameraInformation = interfaceProvider.getSonyInterface().getCameraInformation();
+            this.cameraConnection = interfaceProvider.getSonyInterface().getSonyCameraConnection();
+        }
         this.dialogKicker = dialogKicker;
     }
 
@@ -209,6 +220,11 @@ class LiveViewClickTouchListener implements View.OnClickListener, View.OnTouchLi
     public boolean onTouch(View view, MotionEvent motionEvent)
     {
         int id = view.getId();
+        if (focusingControl == null)
+        {
+            Log.v(TAG, "focusingControl is NULL.");
+            return (false);
+        }
         //Log.v(TAG, "onTouch() : " + id + " (" + motionEvent.getX() + "," + motionEvent.getY() + ")");
         return ((id == R.id.cameraLiveImageView)&&(focusingControl.driveAutoFocus(motionEvent)));
     }

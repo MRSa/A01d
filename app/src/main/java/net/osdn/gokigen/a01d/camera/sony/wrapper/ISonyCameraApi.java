@@ -15,11 +15,16 @@ public interface ISonyCameraApi
     JSONObject getAvailableShootMode();
     JSONObject getSupportedShootMode();
 
+    JSONObject setTouchAFPosition(double Xpos, double Ypos);
+    JSONObject getTouchAFPosition();
+    JSONObject cancelTouchAFPosition();
+
     JSONObject startLiveview();
     JSONObject stopLiveview();
 
     JSONObject startRecMode();
     JSONObject actTakePicture();
+    JSONObject awaitTakePicture();
 
     JSONObject startMovieRec();
     JSONObject stopMovieRec();

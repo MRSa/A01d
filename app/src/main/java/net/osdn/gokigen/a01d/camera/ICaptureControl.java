@@ -1,4 +1,4 @@
-package net.osdn.gokigen.a01d.camera.olympus.operation;
+package net.osdn.gokigen.a01d.camera;
 
 /**
  *   撮影用のインタフェース

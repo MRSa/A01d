@@ -2,8 +2,8 @@ package net.osdn.gokigen.a01d.camera.olympus.wrapper;
 
 import android.util.Log;
 
+import net.osdn.gokigen.a01d.camera.ICameraInformation;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.property.IOlyCameraProperty;
-import net.osdn.gokigen.a01d.liveview.IStatusViewDrawer;
 
 import jp.co.olympus.camerakit.OLYCamera;
 import jp.co.olympus.camerakit.OLYCameraPropertyListener;
