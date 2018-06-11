@@ -67,8 +67,10 @@ public class SonyAutoFocusControl
                     {
                         showFocusFrame(preFocusFrameRect, IAutoFocusFrameDisplay.FocusFrameStatus.Running, 0.0);
 
-                        Log.v(TAG, "AF (" + point.x + ", " + point.y + ")");
-                        JSONObject resultsObj = cameraApi.setTouchAFPosition(point.x, point.y);
+                        double posX = point.x * 100.0;
+                        double posY = point.y * 100.0;
+                        Log.v(TAG, "AF (" + posX + ", " + posY + ")");
+                        JSONObject resultsObj = cameraApi.setTouchAFPosition(posX, posY);
                         if (resultsObj == null)
                         {
                             Log.v(TAG, "setTouchAFPosition() reply is null.");
