@@ -17,25 +17,57 @@
         android:background="@color/background_translucent_dark"
         android:orientation="horizontal">
 
-        <view
-            android:id="@+id/consoleImageView1"
-            class="net.osdn.gokigen.a01d.liveview.ScalableImageViewPanel"
+        <RelativeLayout
+            android:id="@+id/zoomPanelLayout"
             android:layout_width="0dip"
             android:layout_height="fill_parent"
             android:layout_weight="1"
-            android:clickable="true"
-            android:focusable="true"
-            android:contentDescription="@string/favorite"
-            android:gravity="center"
-            android:scaleType="fitCenter"
-            android:visibility="visible" />
+            android:background="@color/background_translucent_dark"
+            android:orientation="vertical">
 
+            <ImageButton
+                android:id="@+id/btn_zoomin"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:contentDescription="@string/button"
+                android:clickable="true"
+                android:focusable="true"
+                android:scaleType="fitCenter"
+                android:visibility="visible"
+                android:src="@drawable/ic_zoom_in_black_24dp" />
+
+            <view
+                android:id="@+id/consoleImageView1"
+                class="net.osdn.gokigen.a01d.liveview.ScalableImageViewPanel"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:clickable="true"
+                android:focusable="true"
+                android:contentDescription="@string/favorite"
+                android:gravity="center"
+                android:scaleType="fitCenter"
+                android:visibility="gone" />
+
+            <ImageButton
+                android:id="@+id/btn_zoomout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:contentDescription="@string/button"
+                android:clickable="true"
+                android:focusable="true"
+                android:scaleType="fitCenter"
+                android:visibility="visible"
+                android:src="@drawable/ic_zoom_out_black_24dp" />
+
+        </RelativeLayout>
         <view
             android:id="@+id/cameraLiveImageView"
             class="net.osdn.gokigen.a01d.liveview.CameraLiveImageView"
             android:layout_width="0dip"
             android:layout_height="fill_parent"
-            android:layout_weight="7"
+            android:layout_weight="8"
             android:gravity="center"
             android:scaleType="fitCenter"
             android:visibility="visible" />

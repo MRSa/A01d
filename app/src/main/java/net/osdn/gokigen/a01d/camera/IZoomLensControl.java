@@ -13,6 +13,7 @@ public interface IZoomLensControl
     float getMinimumFocalLength();
     float getCurrentFocalLength();
     void driveZoomLens(float targetLength);
+    void driveZoomLens(boolean isZoomIn);
     void moveInitialZoomPosition();
     boolean isDrivingZoomLens();
 

@@ -15,6 +15,7 @@ import net.osdn.gokigen.a01d.camera.ICaptureControl;
 import net.osdn.gokigen.a01d.camera.IFocusingControl;
 import net.osdn.gokigen.a01d.camera.ICameraInformation;
 import net.osdn.gokigen.a01d.camera.ICameraConnection;
+import net.osdn.gokigen.a01d.camera.IZoomLensControl;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.property.IOlyCameraProperty;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.property.IOlyCameraPropertyProvider;
 import net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor;
@@ -37,6 +38,7 @@ class LiveViewClickTouchListener implements View.OnClickListener, View.OnTouchLi
     private final ICameraInformation cameraInformation;
     private final ICameraConnection cameraConnection;
     private final IFavoriteSettingDialogKicker dialogKicker;
+    private final IZoomLensControl zoomLensControl;
 
     LiveViewClickTouchListener(Context context, ILiveImageStatusNotify imageStatusNotify, IStatusViewDrawer statusView, IChangeScene changeScene, IInterfaceProvider interfaceProvider, IFavoriteSettingDialogKicker dialogKicker)
     {
@@ -53,6 +55,7 @@ class LiveViewClickTouchListener implements View.OnClickListener, View.OnTouchLi
             this.propertyProvider = interfaceProvider.getOlympusInterface().getCameraPropertyProvider();
             this.cameraInformation = interfaceProvider.getOlympusInterface().getCameraInformation();
             this.cameraConnection = interfaceProvider.getOlympusInterface().getOlyCameraConnection();
+            this.zoomLensControl = interfaceProvider.getOlympusInterface().getZoomLensControl();
         }
         else
         {
@@ -61,6 +64,7 @@ class LiveViewClickTouchListener implements View.OnClickListener, View.OnTouchLi
             this.propertyProvider = interfaceProvider.getOlympusInterface().getCameraPropertyProvider();  // 要変更
             this.cameraInformation = interfaceProvider.getSonyInterface().getCameraInformation();
             this.cameraConnection = interfaceProvider.getSonyInterface().getSonyCameraConnection();
+            this.zoomLensControl = interfaceProvider.getSonyInterface().getZoomLensControl();
         }
         this.dialogKicker = dialogKicker;
     }
@@ -119,6 +123,15 @@ class LiveViewClickTouchListener implements View.OnClickListener, View.OnTouchLi
                     showFavoriteDialog();
                     break;
 
+                case R.id.btn_zoomin:
+                    // ズームインのボタンが押された
+                    actionZoomin();
+                    break;
+                case R.id.btn_zoomout:
+                    // ズームアウトのボタンが押された
+                    actionZoomout();
+                    break;
+
                 default:
                     Log.v(TAG, "onClick() : " + id);
                     break;
@@ -129,6 +142,43 @@ class LiveViewClickTouchListener implements View.OnClickListener, View.OnTouchLi
             e.printStackTrace();
         }
     }
+
+    private void actionZoomin()
+    {
+        Log.v(TAG, "actionZoomin()");
+        try
+        {
+            // ズーム可能な場合、ズームインする
+            if (zoomLensControl.canZoom())
+            {
+                zoomLensControl.driveZoomLens(true);
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    private void actionZoomout()
+    {
+        Log.v(TAG, "actionZoomout()");
+        try
+        {
+            // ズーム可能な場合、ズームアウトする
+            if (zoomLensControl.canZoom())
+            {
+                zoomLensControl.driveZoomLens(false);
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+
+
 
     /**
      *   シャッターボタンが押された時の処理

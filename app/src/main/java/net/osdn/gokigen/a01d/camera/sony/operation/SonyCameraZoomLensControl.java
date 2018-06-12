@@ -16,7 +16,7 @@ public class SonyCameraZoomLensControl implements IZoomLensControl
     @Override
     public boolean canZoom() {
         Log.v(TAG, "canZoom()");
-        return false;
+        return (true);
     }
 
     @Override
@@ -50,6 +50,12 @@ public class SonyCameraZoomLensControl implements IZoomLensControl
     public void driveZoomLens(float targetLength)
     {
         Log.v(TAG, "driveZoomLens() : " + targetLength);
+    }
+
+    @Override
+    public void driveZoomLens(boolean isZoomIn)
+    {
+        Log.v(TAG, "driveZoomLens() : " + isZoomIn);
     }
 
     @Override

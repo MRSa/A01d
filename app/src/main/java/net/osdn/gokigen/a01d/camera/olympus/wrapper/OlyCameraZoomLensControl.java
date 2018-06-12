@@ -94,8 +94,60 @@ class OlyCameraZoomLensControl implements IZoomLensControl
     {
         try
         {
+            // 現在位置を設定する
+            initialize();
+
             // レンズがサポートする焦点距離と、現在の焦点距離を取得する
             float targetFocalLength = targetLength;
+
+            // 焦点距離が最大値・最小値を超えないようにする
+            if (targetFocalLength > maximumLength)
+            {
+                targetFocalLength = maximumLength;
+            }
+            if (targetFocalLength < minimumLength)
+            {
+                targetFocalLength = minimumLength;
+            }
+
+            // レンズのスーム操作
+            Log.v(TAG, "ZOOM from " + currentLength + "mm to " + targetFocalLength + "mm");
+
+            // ズーム動作中でない時には、レンズをズームさせる
+            if (!camera.isDrivingZoomLens())
+            {
+                camera.startDrivingZoomLensToFocalLength(targetFocalLength);
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * ズームレンズを動作させる
+     *
+     * @param isZoomIn  寄る方向に動かす場合は true
+     */
+    @Override
+    public void driveZoomLens(boolean isZoomIn)
+    {
+        try
+        {
+            // 現在位置を設定する
+            initialize();
+            float targetFocalLength = currentLength;
+            if (isZoomIn)
+            {
+                // 寄る
+                targetFocalLength = targetFocalLength * 1.15f;
+            }
+            else
+            {
+                // 引く
+                targetFocalLength = targetFocalLength * 0.9f;
+            }
 
             // 焦点距離が最大値・最小値を超えないようにする
             if (targetFocalLength > maximumLength)

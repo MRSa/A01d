@@ -178,10 +178,8 @@ public class SonyAutoFocusControl
      */
     private RectF getPreFocusFrameRect(@NonNull PointF point)
     {
-        float imageWidth = 1.0f;
-        float imageHeight = 1.0f;
-        imageWidth = frameDisplayer.getContentSizeWidth();
-        imageHeight = frameDisplayer.getContentSizeHeight();
+        float imageWidth =  frameDisplayer.getContentSizeWidth();
+        float imageHeight =  frameDisplayer.getContentSizeHeight();
 
         // Display a provisional focus frame at the touched point.
         float focusWidth = 0.125f;  // 0.125 is rough estimate.
@@ -222,5 +220,4 @@ public class SonyAutoFocusControl
         }
         return (afResult);
     }
-
 }
