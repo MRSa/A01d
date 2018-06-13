@@ -293,7 +293,7 @@ class SonyCameraApi implements ISonyCameraApi
     public JSONObject actZoom(@NonNull String direction, @NonNull String movement)
     {
         try {
-            return (communicateJSON("camera", "stopMovieRec", new JSONArray().put(direction).put(movement), "1.0", -1));
+            return (communicateJSON("camera", "actZoom", new JSONArray().put(direction).put(movement), "1.0", -1));
         } catch (Exception e) {
             e.printStackTrace();
         }

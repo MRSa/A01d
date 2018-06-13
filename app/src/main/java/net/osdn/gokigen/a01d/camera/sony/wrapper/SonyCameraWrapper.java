@@ -16,6 +16,7 @@ import net.osdn.gokigen.a01d.camera.olympus.wrapper.IFocusingModeNotify;
 import net.osdn.gokigen.a01d.camera.sony.ISonyInterfaceProvider;
 import net.osdn.gokigen.a01d.camera.sony.operation.SonyCameraCaptureControl;
 import net.osdn.gokigen.a01d.camera.sony.operation.SonyCameraFocusControl;
+import net.osdn.gokigen.a01d.camera.sony.operation.SonyCameraZoomLensControl;
 import net.osdn.gokigen.a01d.camera.sony.wrapper.connection.SonyCameraConnection;
 import net.osdn.gokigen.a01d.camera.sony.wrapper.eventlistener.CameraEventObserver;
 import net.osdn.gokigen.a01d.camera.sony.wrapper.eventlistener.ICameraChangeListener;
@@ -35,6 +36,7 @@ public class SonyCameraWrapper implements ISonyCameraHolder, ISonyInterfaceProvi
     private SonyLiveViewControl liveViewControl = null;
     private SonyCameraFocusControl focusControl = null;
     private SonyCameraCaptureControl captureControl = null;
+    private SonyCameraZoomLensControl zoomControl = null;
 
     public SonyCameraWrapper(final Activity context, final ICameraStatusReceiver statusReceiver)
     {
@@ -46,12 +48,20 @@ public class SonyCameraWrapper implements ISonyCameraHolder, ISonyInterfaceProvi
     public void prepare()
     {
         Log.v(TAG, " prepare : " + sonyCamera.getFriendlyName() + " " + sonyCamera.getModelName());
-        ISonyCameraApi sonyCameraApi = SonyCameraApi.newInstance(sonyCamera);
-        eventObserver = CameraEventObserver.newInstance(context, sonyCameraApi);
-        liveViewControl = new SonyLiveViewControl(sonyCameraApi);
+        try
+        {
+            ISonyCameraApi sonyCameraApi = SonyCameraApi.newInstance(sonyCamera);
+            eventObserver = CameraEventObserver.newInstance(context, sonyCameraApi);
+            liveViewControl = new SonyLiveViewControl(sonyCameraApi);
 
-        focusControl.setCameraApi(sonyCameraApi);
-        captureControl.setCameraApi(sonyCameraApi);
+            focusControl.setCameraApi(sonyCameraApi);
+            captureControl.setCameraApi(sonyCameraApi);
+            zoomControl.setCameraApi(sonyCameraApi);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -116,7 +126,7 @@ public class SonyCameraWrapper implements ISonyCameraHolder, ISonyInterfaceProvi
     @Override
     public IZoomLensControl getZoomLensControl()
     {
-        return null;
+        return (zoomControl);
     }
 
     @Override
@@ -138,5 +148,6 @@ public class SonyCameraWrapper implements ISonyCameraHolder, ISonyInterfaceProvi
 
         focusControl = new SonyCameraFocusControl(frameDisplayer, indicator);
         captureControl = new SonyCameraCaptureControl(frameDisplayer, indicator);
+        zoomControl = new SonyCameraZoomLensControl();
     }
 }

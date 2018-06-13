@@ -1,16 +1,26 @@
 package net.osdn.gokigen.a01d.camera.sony.operation;
 
+import android.support.annotation.NonNull;
 import android.util.Log;
 
 import net.osdn.gokigen.a01d.camera.IZoomLensControl;
+import net.osdn.gokigen.a01d.camera.sony.wrapper.ISonyCameraApi;
+
+import org.json.JSONObject;
 
 public class SonyCameraZoomLensControl implements IZoomLensControl
 {
     private final String TAG = toString();
+    private ISonyCameraApi cameraApi = null;
 
     public SonyCameraZoomLensControl()
     {
         Log.v(TAG, "SonyCameraZoomLensControl()");
+    }
+
+    public void setCameraApi(@NonNull ISonyCameraApi sonyCameraApi)
+    {
+        cameraApi = sonyCameraApi;
     }
 
     @Override
@@ -53,12 +63,6 @@ public class SonyCameraZoomLensControl implements IZoomLensControl
     }
 
     @Override
-    public void driveZoomLens(boolean isZoomIn)
-    {
-        Log.v(TAG, "driveZoomLens() : " + isZoomIn);
-    }
-
-    @Override
     public void moveInitialZoomPosition()
     {
         Log.v(TAG, "moveInitialZoomPosition()");
@@ -70,4 +74,49 @@ public class SonyCameraZoomLensControl implements IZoomLensControl
         Log.v(TAG, "isDrivingZoomLens()");
         return (false);
     }
+
+    /**
+     *
+     *
+     */
+    @Override
+    public void driveZoomLens(boolean isZoomIn)
+    {
+        Log.v(TAG, "driveZoomLens() : " + isZoomIn);
+        if (cameraApi == null)
+        {
+            Log.v(TAG, "ISonyCameraApi is null...");
+            return;
+        }
+        try
+        {
+            final String direction = (isZoomIn) ? "in" : "out";
+            final String movement = "1shot";
+            Thread thread = new Thread(new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    try
+                    {
+                        JSONObject resultsObj = cameraApi.actZoom(direction, movement);
+                        if (resultsObj == null)
+                        {
+                            Log.v(TAG, "driveZoomLens() reply is null.");
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                    }
+                }
+            });
+            thread.start();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+
 }
