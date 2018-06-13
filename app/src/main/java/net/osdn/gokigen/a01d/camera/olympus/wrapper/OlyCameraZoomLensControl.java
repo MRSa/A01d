@@ -57,6 +57,7 @@ class OlyCameraZoomLensControl implements IZoomLensControl
     @Override
     public boolean canZoom()
     {
+        initialize();
         return (canZoom);
     }
 
@@ -188,8 +189,8 @@ class OlyCameraZoomLensControl implements IZoomLensControl
             return;
         }
 
-        float scale = 0.0f;
-        float focalLength = 0.0f;
+        float scale;
+        float focalLength;
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
         String value = preferences.getString(IPreferencePropertyAccessor.POWER_ZOOM_LEVEL, IPreferencePropertyAccessor.POWER_ZOOM_LEVEL_DEFAULT_VALUE);
         try

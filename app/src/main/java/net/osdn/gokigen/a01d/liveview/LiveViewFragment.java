@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.preference.PreferenceManager;
 import android.util.Log;
@@ -384,14 +385,17 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer, IFo
         // propertyを取得
         try
         {
-            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getContext());
-
-            // グリッド・フォーカスアシストの情報を戻す
-            boolean showGrid = preferences.getBoolean(IPreferencePropertyAccessor.SHOW_GRID_STATUS, false);
-            if ((imageView != null)&&(imageView.isShowGrid() != showGrid))
+            Context context = getContext();
+            if (context != null)
             {
-                imageView.toggleShowGridFrame();
-                imageView.postInvalidate();
+                SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getContext());
+
+                // グリッド・フォーカスアシストの情報を戻す
+                boolean showGrid = preferences.getBoolean(IPreferencePropertyAccessor.SHOW_GRID_STATUS, false);
+                if ((imageView != null) && (imageView.isShowGrid() != showGrid)) {
+                    imageView.toggleShowGridFrame();
+                    imageView.postInvalidate();
+                }
             }
             if (currentConnectionStatus == ICameraConnection.CameraConnectionStatus.CONNECTED)
             {
@@ -402,7 +406,6 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer, IFo
         {
             e.printStackTrace();
         }
-
         Log.v(TAG, "onResume() End");
     }
 
@@ -478,8 +481,12 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer, IFo
         try
         {
             // ライブビューの開始
-            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getContext());
-            liveViewControl.changeLiveViewSize(preferences.getString(IPreferencePropertyAccessor.LIVE_VIEW_QUALITY, IPreferencePropertyAccessor.LIVE_VIEW_QUALITY_DEFAULT_VALUE));
+            Context context = getContext();
+            if (context != null)
+            {
+                SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+                liveViewControl.changeLiveViewSize(preferences.getString(IPreferencePropertyAccessor.LIVE_VIEW_QUALITY, IPreferencePropertyAccessor.LIVE_VIEW_QUALITY_DEFAULT_VALUE));
+            }
             ILiveViewListener lvListener;
             if (interfaceProvider.useOlympusCamera())
             {
@@ -496,8 +503,28 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer, IFo
             // デジタルズームの設定
             liveViewControl.updateDigitalZoom();
 
-            // パワーズームの設定 (初期化位置の設定)
-            zoomLensControl.moveInitialZoomPosition();
+            // ズームが制御できない場合は、ボタンを消す
+            if (!zoomLensControl.canZoom())
+            {
+                final Activity activity  = getActivity();
+                if (activity != null)
+                {
+                    activity.runOnUiThread(new Runnable()
+                    {
+                        @Override
+                        public void run()
+                        {
+                            activity.findViewById(R.id.btn_zoomin).setVisibility(View.INVISIBLE);
+                            activity.findViewById(R.id.btn_zoomout).setVisibility(View.INVISIBLE);
+                        }
+                    });
+                }
+            }
+            else
+            {
+                // パワーズームの設定 (初期化位置の設定)
+                zoomLensControl.moveInitialZoomPosition();
+            }
 
             // 測光モードをスポットに切り替える
             setAEtoSpot();
@@ -542,7 +569,11 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer, IFo
             LoadSaveMyCameraPropertyDialog dialog = new LoadSaveMyCameraPropertyDialog();
             dialog.setTargetFragment(this, COMMAND_MY_PROPERTY);
             dialog.setPropertyOperationsHolder(new LoadSaveCameraProperties(getActivity(), interfaceProvider.getOlympusInterface()));
-            dialog.show(getFragmentManager(), "my_dialog");
+            FragmentManager manager = getFragmentManager();
+            if (manager != null)
+            {
+                dialog.show(manager, "my_dialog");
+            }
         }
         catch (Exception e)
         {
