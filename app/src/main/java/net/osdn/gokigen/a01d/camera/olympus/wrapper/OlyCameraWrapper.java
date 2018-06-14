@@ -8,7 +8,7 @@ import android.util.Log;
 
 import net.osdn.gokigen.a01d.camera.ILiveViewControl;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.property.CameraPropertyUtilities;
-import net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor;
+import net.osdn.gokigen.a01d.preference.olympus.IPreferencePropertyAccessor;
 
 import java.util.Map;
 
@@ -299,7 +299,7 @@ class OlyCameraWrapper implements ICameraRunMode, ILiveViewControl, IOlympusLive
             if (changeValue != null)
             {
                 SharedPreferences.Editor editor = preferences.edit();
-                editor.putString(net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor.MAGNIFYING_LIVE_VIEW_SCALE, changeValue);
+                editor.putString(IPreferencePropertyAccessor.MAGNIFYING_LIVE_VIEW_SCALE, changeValue);
                 editor.apply();
             }
         }

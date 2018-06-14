@@ -18,7 +18,7 @@ import net.osdn.gokigen.a01d.camera.ICameraConnection;
 import net.osdn.gokigen.a01d.camera.IZoomLensControl;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.property.IOlyCameraProperty;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.property.IOlyCameraPropertyProvider;
-import net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor;
+import net.osdn.gokigen.a01d.preference.olympus.IPreferencePropertyAccessor;
 
 /**
  *

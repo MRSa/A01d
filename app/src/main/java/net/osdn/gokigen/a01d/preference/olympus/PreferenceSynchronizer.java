@@ -1,4 +1,4 @@
-package net.osdn.gokigen.a01d.preference;
+package net.osdn.gokigen.a01d.preference.olympus;
 
 import android.content.SharedPreferences;
 import android.util.Log;
@@ -43,11 +43,11 @@ class PreferenceSynchronizer implements Runnable
     {
         Log.v(TAG, "run()");
         SharedPreferences.Editor editor = preference.edit();
-        editor.putString(net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor.TAKE_MODE, getPropertyValue(IOlyCameraProperty.TAKE_MODE));
-        editor.putString(net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor.SOUND_VOLUME_LEVEL, getPropertyValue(IOlyCameraProperty.SOUND_VOLUME_LEVEL));
+        editor.putString(IPreferencePropertyAccessor.TAKE_MODE, getPropertyValue(IOlyCameraProperty.TAKE_MODE));
+        editor.putString(IPreferencePropertyAccessor.SOUND_VOLUME_LEVEL, getPropertyValue(IOlyCameraProperty.SOUND_VOLUME_LEVEL));
 
         boolean value = getPropertyValue(IOlyCameraProperty.RAW).equals("ON");
-        editor.putBoolean(net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor.RAW, value);
+        editor.putBoolean(IPreferencePropertyAccessor.RAW, value);
         editor.apply();
         if (callback != null)
         {

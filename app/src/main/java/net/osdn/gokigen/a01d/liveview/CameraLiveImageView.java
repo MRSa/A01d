@@ -27,11 +27,10 @@ import net.osdn.gokigen.a01d.liveview.bitmapconvert.ImageConvertFactory;
 import net.osdn.gokigen.a01d.liveview.gridframe.GridFrameFactory;
 import net.osdn.gokigen.a01d.liveview.gridframe.IGridFrameDrawer;
 import net.osdn.gokigen.a01d.liveview.liveviewlistener.IImageDataReceiver;
-import net.osdn.gokigen.a01d.liveview.liveviewlistener.OlympusCameraLiveViewListenerImpl;
 import net.osdn.gokigen.a01d.liveview.message.IMessageDrawer;
 import net.osdn.gokigen.a01d.liveview.message.IMessageHolder;
 import net.osdn.gokigen.a01d.liveview.message.ShowMessageHolder;
-import net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor;
+import net.osdn.gokigen.a01d.preference.olympus.IPreferencePropertyAccessor;
 
 import java.util.Map;
 import java.util.Timer;

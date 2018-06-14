@@ -33,7 +33,7 @@ import net.osdn.gokigen.a01d.camera.olympus.wrapper.property.IOlyCameraProperty;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.property.IOlyCameraPropertyProvider;
 import net.osdn.gokigen.a01d.liveview.liveviewlistener.ILiveViewListener;
 import net.osdn.gokigen.a01d.liveview.liveviewlistener.OlympusCameraLiveViewListenerImpl;
-import net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor;
+import net.osdn.gokigen.a01d.preference.olympus.IPreferencePropertyAccessor;
 
 /**
  *  撮影用ライブビュー画面

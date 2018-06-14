@@ -6,12 +6,11 @@ import android.support.annotation.NonNull;
 import android.support.v7.preference.PreferenceManager;
 
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.IOlympusLiveViewListener;
-import net.osdn.gokigen.a01d.camera.sony.wrapper.IDisplayInjector;
 import net.osdn.gokigen.a01d.camera.olympus.IOlympusInterfaceProvider;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.OlympusInterfaceProvider;
 import net.osdn.gokigen.a01d.camera.sony.ISonyInterfaceProvider;
 import net.osdn.gokigen.a01d.camera.sony.wrapper.SonyCameraWrapper;
-import net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor;
+import net.osdn.gokigen.a01d.preference.olympus.IPreferencePropertyAccessor;
 
 public class CameraInterfaceProvider implements IInterfaceProvider
 {

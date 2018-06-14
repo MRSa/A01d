@@ -7,7 +7,7 @@ import android.support.v7.preference.Preference;
 import net.osdn.gokigen.a01d.ConfirmationDialog;
 import net.osdn.gokigen.a01d.IChangeScene;
 import net.osdn.gokigen.a01d.R;
-import net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor;
+import net.osdn.gokigen.a01d.preference.olympus.IPreferencePropertyAccessor;
 
 /**
  *  Preferenceがクリックされた時に処理するクラス

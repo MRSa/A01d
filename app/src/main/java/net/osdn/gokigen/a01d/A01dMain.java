@@ -10,6 +10,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.preference.PreferenceFragmentCompat;
 import android.support.v7.preference.PreferenceManager;
 import android.util.Log;
 import android.view.WindowManager;
@@ -24,8 +25,9 @@ import net.osdn.gokigen.a01d.camera.olympus.wrapper.connection.ble.ICameraPowerO
 import net.osdn.gokigen.a01d.liveview.IStatusViewDrawer;
 import net.osdn.gokigen.a01d.liveview.LiveViewFragment;
 import net.osdn.gokigen.a01d.logcat.LogCatFragment;
-import net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor;
-import net.osdn.gokigen.a01d.preference.PreferenceFragment;
+import net.osdn.gokigen.a01d.preference.olympus.IPreferencePropertyAccessor;
+import net.osdn.gokigen.a01d.preference.olympus.PreferenceFragment;
+import net.osdn.gokigen.a01d.preference.sony.SonyPreferenceFragment;
 
 /**
  *   A01d ;
@@ -37,7 +39,7 @@ public class A01dMain extends AppCompatActivity implements ICameraStatusReceiver
     private IInterfaceProvider interfaceProvider = null;
     private IStatusViewDrawer statusViewDrawer = null;
 
-    private PreferenceFragment preferenceFragment = null;
+    private PreferenceFragmentCompat preferenceFragment = null;
     private OlyCameraPropertyListFragment propertyListFragment = null;
     private LogCatFragment logCatFragment = null;
 
@@ -245,11 +247,17 @@ public class A01dMain extends AppCompatActivity implements ICameraStatusReceiver
     {
         try
         {
-            if (preferenceFragment == null)
-            {
-                preferenceFragment = new PreferenceFragment();
+            if (preferenceFragment == null) {
+                if (useOlympusCamera())
+                {
+                    preferenceFragment = PreferenceFragment.newInstance(this, interfaceProvider, this);
+                }
+                else
+                {
+                    preferenceFragment = SonyPreferenceFragment.newInstance(this, interfaceProvider, this);
+                }
             }
-            preferenceFragment.setInterface(this, interfaceProvider, this);
+
             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
             transaction.replace(R.id.fragment1, preferenceFragment);
             // backstackに追加

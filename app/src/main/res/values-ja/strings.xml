@@ -25,6 +25,7 @@
 
     <string name="pref_cat_application_control">アプリ制御</string>
     <string name="pref_exit_power_off">アプリ終了(とカメラOFF)</string>
+    <string name="pref_exit_power_off_sony">アプリ終了</string>
 
     <string name="pref_cat_initialize">起動時設定</string>
     <string name="pref_auto_connect_camera">カメラに自動接続</string>

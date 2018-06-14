@@ -1,4 +1,4 @@
-package net.osdn.gokigen.a01d.preference;
+package net.osdn.gokigen.a01d.preference.olympus;
 
 /**
  *

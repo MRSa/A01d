@@ -1,5 +1,6 @@
-package net.osdn.gokigen.a01d.preference;
+package net.osdn.gokigen.a01d.preference.olympus;
 
+import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.app.ProgressDialog;
@@ -21,7 +22,6 @@ import net.osdn.gokigen.a01d.camera.olympus.wrapper.ICameraRunMode;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.connection.ble.OlyCameraPowerOnSelector;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.property.IOlyCameraProperty;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.property.IOlyCameraPropertyProvider;
-import net.osdn.gokigen.a01d.camera.olympus.IOlympusInterfaceProvider;
 import net.osdn.gokigen.a01d.camera.olympus.operation.CameraPowerOff;
 import net.osdn.gokigen.a01d.logcat.LogCatViewer;
 
@@ -49,11 +49,27 @@ public class PreferenceFragment extends PreferenceFragmentCompat implements Shar
     private ProgressDialog busyDialog = null;
     private PreferenceSynchronizer preferenceSynchronizer = null;
 
+
+    public static PreferenceFragment newInstance(@NonNull AppCompatActivity context, @NonNull IInterfaceProvider factory, @NonNull IChangeScene changeScene)
+    {
+        PreferenceFragment instance = new PreferenceFragment();
+        instance.setInterface(context, factory, changeScene);
+
+        // パラメータはBundleにまとめておく
+        Bundle arguments = new Bundle();
+        //arguments.putString("title", title);
+        //arguments.putString("message", message);
+        instance.setArguments(arguments);
+
+        return (instance);
+    }
+
+
     /**
      *
      *
      */
-    public void setInterface(AppCompatActivity context, IInterfaceProvider factory, IChangeScene changeScene)
+    private void setInterface(@NonNull AppCompatActivity context, @NonNull IInterfaceProvider factory, @NonNull IChangeScene changeScene)
     {
         Log.v(TAG, "setInterface()");
         this.propertyInterface = factory.getOlympusInterface().getCameraPropertyProvider();
@@ -98,53 +114,53 @@ public class PreferenceFragment extends PreferenceFragmentCompat implements Shar
         Map<String, ?> items = preferences.getAll();
         SharedPreferences.Editor editor = preferences.edit();
 
-        if (!items.containsKey(net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor.TAKE_MODE))
+        if (!items.containsKey(IPreferencePropertyAccessor.TAKE_MODE))
         {
-            editor.putString(net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor.TAKE_MODE, net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor.TAKE_MODE_DEFAULT_VALUE);
+            editor.putString(IPreferencePropertyAccessor.TAKE_MODE, IPreferencePropertyAccessor.TAKE_MODE_DEFAULT_VALUE);
         }
-        if (!items.containsKey(net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor.LIVE_VIEW_QUALITY))
+        if (!items.containsKey(IPreferencePropertyAccessor.LIVE_VIEW_QUALITY))
         {
-            editor.putString(net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor.LIVE_VIEW_QUALITY, net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor.LIVE_VIEW_QUALITY_DEFAULT_VALUE);
+            editor.putString(IPreferencePropertyAccessor.LIVE_VIEW_QUALITY, IPreferencePropertyAccessor.LIVE_VIEW_QUALITY_DEFAULT_VALUE);
         }
-        if (!items.containsKey(net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor.SOUND_VOLUME_LEVEL))
+        if (!items.containsKey(IPreferencePropertyAccessor.SOUND_VOLUME_LEVEL))
         {
-            editor.putString(net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor.SOUND_VOLUME_LEVEL, net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor.SOUND_VOLUME_LEVEL_DEFAULT_VALUE);
+            editor.putString(IPreferencePropertyAccessor.SOUND_VOLUME_LEVEL, IPreferencePropertyAccessor.SOUND_VOLUME_LEVEL_DEFAULT_VALUE);
         }
-        if (!items.containsKey(net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor.RAW))
+        if (!items.containsKey(IPreferencePropertyAccessor.RAW))
         {
-            editor.putBoolean(net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor.RAW, true);
+            editor.putBoolean(IPreferencePropertyAccessor.RAW, true);
         }
         if (!items.containsKey(IPreferencePropertyAccessor.BLE_POWER_ON))
         {
-            editor.putBoolean(net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor.BLE_POWER_ON, false);
+            editor.putBoolean(IPreferencePropertyAccessor.BLE_POWER_ON, false);
         }
-        if (!items.containsKey(net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor.AUTO_CONNECT_TO_CAMERA))
+        if (!items.containsKey(IPreferencePropertyAccessor.AUTO_CONNECT_TO_CAMERA))
         {
-            editor.putBoolean(net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor.AUTO_CONNECT_TO_CAMERA, true);
+            editor.putBoolean(IPreferencePropertyAccessor.AUTO_CONNECT_TO_CAMERA, true);
         }
-        if (!items.containsKey(net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor.CAPTURE_BOTH_CAMERA_AND_LIVE_VIEW))
+        if (!items.containsKey(IPreferencePropertyAccessor.CAPTURE_BOTH_CAMERA_AND_LIVE_VIEW))
         {
-            editor.putBoolean(net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor.CAPTURE_BOTH_CAMERA_AND_LIVE_VIEW, true);
+            editor.putBoolean(IPreferencePropertyAccessor.CAPTURE_BOTH_CAMERA_AND_LIVE_VIEW, true);
         }
-        if (!items.containsKey(net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor.SOUND_VOLUME_LEVEL))
+        if (!items.containsKey(IPreferencePropertyAccessor.SOUND_VOLUME_LEVEL))
         {
-            editor.putString(net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor.SOUND_VOLUME_LEVEL, net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor.SOUND_VOLUME_LEVEL_DEFAULT_VALUE);
+            editor.putString(IPreferencePropertyAccessor.SOUND_VOLUME_LEVEL, IPreferencePropertyAccessor.SOUND_VOLUME_LEVEL_DEFAULT_VALUE);
         }
-        if (!items.containsKey(net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor.MAGNIFYING_LIVE_VIEW_SCALE))
+        if (!items.containsKey(IPreferencePropertyAccessor.MAGNIFYING_LIVE_VIEW_SCALE))
         {
-            editor.putString(net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor.MAGNIFYING_LIVE_VIEW_SCALE, net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor.MAGNIFYING_LIVE_VIEW_SCALE_DEFAULT_VALUE);
+            editor.putString(IPreferencePropertyAccessor.MAGNIFYING_LIVE_VIEW_SCALE, IPreferencePropertyAccessor.MAGNIFYING_LIVE_VIEW_SCALE_DEFAULT_VALUE);
         }
-        if (!items.containsKey(net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor.DIGITAL_ZOOM_LEVEL))
+        if (!items.containsKey(IPreferencePropertyAccessor.DIGITAL_ZOOM_LEVEL))
         {
-            editor.putString(net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor.DIGITAL_ZOOM_LEVEL, net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor.DIGITAL_ZOOM_LEVEL_DEFAULT_VALUE);
+            editor.putString(IPreferencePropertyAccessor.DIGITAL_ZOOM_LEVEL, IPreferencePropertyAccessor.DIGITAL_ZOOM_LEVEL_DEFAULT_VALUE);
         }
-        if (!items.containsKey(net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor.POWER_ZOOM_LEVEL))
+        if (!items.containsKey(IPreferencePropertyAccessor.POWER_ZOOM_LEVEL))
         {
-            editor.putString(net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor.POWER_ZOOM_LEVEL, net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor.POWER_ZOOM_LEVEL_DEFAULT_VALUE);
+            editor.putString(IPreferencePropertyAccessor.POWER_ZOOM_LEVEL, IPreferencePropertyAccessor.POWER_ZOOM_LEVEL_DEFAULT_VALUE);
         }
-        if (!items.containsKey(net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor.CONNECTION_METHOD))
+        if (!items.containsKey(IPreferencePropertyAccessor.CONNECTION_METHOD))
         {
-            editor.putString(net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor.CONNECTION_METHOD, net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor.CONNECTION_METHOD_DEFAULT_VALUE);
+            editor.putString(IPreferencePropertyAccessor.CONNECTION_METHOD, IPreferencePropertyAccessor.CONNECTION_METHOD_DEFAULT_VALUE);
         }
         editor.apply();
     }
@@ -488,8 +504,8 @@ public class PreferenceFragment extends PreferenceFragmentCompat implements Shar
             public void run() {
                 try {
                     // Preferenceの画面に反映させる
-                    setListPreference(IPreferencePropertyAccessor.TAKE_MODE, IPreferencePropertyAccessor.TAKE_MODE, net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor.TAKE_MODE_DEFAULT_VALUE);
-                    setListPreference(IPreferencePropertyAccessor.SOUND_VOLUME_LEVEL, IPreferencePropertyAccessor.SOUND_VOLUME_LEVEL, net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor.SOUND_VOLUME_LEVEL_DEFAULT_VALUE);
+                    setListPreference(IPreferencePropertyAccessor.TAKE_MODE, IPreferencePropertyAccessor.TAKE_MODE, IPreferencePropertyAccessor.TAKE_MODE_DEFAULT_VALUE);
+                    setListPreference(IPreferencePropertyAccessor.SOUND_VOLUME_LEVEL, IPreferencePropertyAccessor.SOUND_VOLUME_LEVEL, IPreferencePropertyAccessor.SOUND_VOLUME_LEVEL_DEFAULT_VALUE);
                     setBooleanPreference(IPreferencePropertyAccessor.RAW, IPreferencePropertyAccessor.RAW, true);
                     setBooleanPreference(IPreferencePropertyAccessor.BLE_POWER_ON, IPreferencePropertyAccessor.BLE_POWER_ON, false);
                     setBooleanPreference(IPreferencePropertyAccessor.AUTO_CONNECT_TO_CAMERA, IPreferencePropertyAccessor.AUTO_CONNECT_TO_CAMERA, true);
