@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -36,9 +37,24 @@ public class OlyCameraPropertyListFragment extends Fragment implements CameraPro
      *  カメラプロパティをやり取りするインタフェースを生成する
      *
      */
-    public void setInterface(Context context, IOlyCameraPropertyProvider propertyInterface)
+    public static OlyCameraPropertyListFragment newInstance(@NonNull Context context, @NonNull IOlyCameraPropertyProvider propertyInterface)
     {
-        Log.v(TAG, "setInterface()");
+        OlyCameraPropertyListFragment instance = new OlyCameraPropertyListFragment();
+        instance.prepare(context, propertyInterface);
+
+        // パラメータはBundleにまとめておく
+        Bundle arguments = new Bundle();
+        //arguments.putString("title", title);
+        //arguments.putString("message", message);
+        instance.setArguments(arguments);
+
+        return (instance);
+    }
+
+    private void prepare(@NonNull Context context, @NonNull IOlyCameraPropertyProvider propertyInterface)
+    {
+        Log.v(TAG, "prepare()");
+
         this.propertyInterface = propertyInterface;
         if (propertyLoader == null)
         {
@@ -77,7 +93,7 @@ public class OlyCameraPropertyListFragment extends Fragment implements CameraPro
      *
      */
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
         Log.v(TAG, "onCreateView()");
 
@@ -99,10 +115,12 @@ public class OlyCameraPropertyListFragment extends Fragment implements CameraPro
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
     {
         AppCompatActivity activity = (AppCompatActivity)getActivity();
-        ActionBar bar = activity.getSupportActionBar();
-        if (bar != null)
+        if (activity != null)
         {
-            bar.setTitle(getString(R.string.app_name));
+            ActionBar bar = activity.getSupportActionBar();
+            if (bar != null) {
+                bar.setTitle(getString(R.string.app_name));
+            }
         }
     }
 

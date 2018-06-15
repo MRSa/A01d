@@ -22,6 +22,7 @@ import net.osdn.gokigen.a01d.camera.olympus.cameraproperty.OlyCameraPropertyList
 import net.osdn.gokigen.a01d.camera.ICameraStatusReceiver;
 import net.osdn.gokigen.a01d.camera.ICameraConnection;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.connection.ble.ICameraPowerOn;
+import net.osdn.gokigen.a01d.camera.sony.cameraproperty.SonyCameraPropertyListFragment;
 import net.osdn.gokigen.a01d.liveview.IStatusViewDrawer;
 import net.osdn.gokigen.a01d.liveview.LiveViewFragment;
 import net.osdn.gokigen.a01d.logcat.LogCatFragment;
@@ -41,6 +42,7 @@ public class A01dMain extends AppCompatActivity implements ICameraStatusReceiver
 
     private PreferenceFragmentCompat preferenceFragment = null;
     private OlyCameraPropertyListFragment propertyListFragment = null;
+    private SonyCameraPropertyListFragment propertyListFragmentSony = null;
     private LogCatFragment logCatFragment = null;
 
     @Override
@@ -209,6 +211,25 @@ public class A01dMain extends AppCompatActivity implements ICameraStatusReceiver
             {
                 // OPCカメラでない場合には、「OPCカメラのみ有効です」表示をして画面遷移させない
                 Toast.makeText(getApplicationContext(), getText(R.string.only_opc_feature), Toast.LENGTH_SHORT).show();
+
+                /*   // フラグメントができたらつなぐ
+                if (connection != null)
+                {
+                    ICameraConnection.CameraConnectionStatus status = connection.getConnectionStatus();
+                    if (status == ICameraConnection.CameraConnectionStatus.CONNECTED)
+                    {
+                        if (propertyListFragmentSony == null)
+                        {
+                            propertyListFragmentSony = SonyCameraPropertyListFragment.newInstance(this, interfaceProvider);
+                        }
+                        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+                        transaction.replace(R.id.fragment1, propertyListFragmentSony);
+                        // backstackに追加
+                        transaction.addToBackStack(null);
+                        transaction.commit();
+                    }
+                }
+                */
             }
             else
             {
@@ -220,9 +241,8 @@ public class A01dMain extends AppCompatActivity implements ICameraStatusReceiver
                     {
                         if (propertyListFragment == null)
                         {
-                            propertyListFragment = new OlyCameraPropertyListFragment();
+                            propertyListFragment = OlyCameraPropertyListFragment.newInstance(this, interfaceProvider.getOlympusInterface().getCameraPropertyProvider());
                         }
-                        propertyListFragment.setInterface(this, interfaceProvider.getOlympusInterface().getCameraPropertyProvider());
                         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
                         transaction.replace(R.id.fragment1, propertyListFragment);
                         // backstackに追加
