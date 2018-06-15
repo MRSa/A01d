@@ -15,8 +15,7 @@ import android.util.Log;
 
 import net.osdn.gokigen.a01d.IChangeScene;
 import net.osdn.gokigen.a01d.R;
-import net.osdn.gokigen.a01d.camera.IInterfaceProvider;
-import net.osdn.gokigen.a01d.camera.olympus.operation.CameraPowerOff;
+import net.osdn.gokigen.a01d.camera.sony.operation.CameraPowerOffSony;
 import net.osdn.gokigen.a01d.logcat.LogCatViewer;
 import net.osdn.gokigen.a01d.preference.olympus.IPreferencePropertyAccessor;
 
@@ -30,17 +29,18 @@ public class SonyPreferenceFragment  extends PreferenceFragmentCompat implements
 {
     private final String TAG = toString();
     private SharedPreferences preferences = null;
-    private CameraPowerOff powerOffController = null;
+    private CameraPowerOffSony powerOffController = null;
     private LogCatViewer logCatViewer = null;
 
     /**
      *
      *
      */
-    public static SonyPreferenceFragment newInstance(@NonNull AppCompatActivity context, @NonNull IInterfaceProvider factory, @NonNull IChangeScene changeScene)
+    //public static SonyPreferenceFragment newInstance(@NonNull AppCompatActivity context, @NonNull IInterfaceProvider factory, @NonNull IChangeScene changeScene)
+    public static SonyPreferenceFragment newInstance(@NonNull AppCompatActivity context, @NonNull IChangeScene changeScene)
     {
         SonyPreferenceFragment instance = new SonyPreferenceFragment();
-        instance.prepare(context, factory, changeScene);
+        instance.prepare(context, changeScene);
 
         // パラメータはBundleにまとめておく
         Bundle arguments = new Bundle();
@@ -55,11 +55,11 @@ public class SonyPreferenceFragment  extends PreferenceFragmentCompat implements
      *
      *
      */
-    private void prepare(@NonNull AppCompatActivity context, @NonNull IInterfaceProvider factory, @NonNull IChangeScene changeScene)
+    private void prepare(@NonNull AppCompatActivity context, @NonNull IChangeScene changeScene)
     {
         try
         {
-            powerOffController = new CameraPowerOff(context, changeScene);
+            powerOffController = new CameraPowerOffSony(context, changeScene);
             powerOffController.prepare();
 
             logCatViewer = new LogCatViewer(changeScene);
@@ -290,6 +290,7 @@ public class SonyPreferenceFragment  extends PreferenceFragmentCompat implements
     private void synchronizedProperty()
     {
         final FragmentActivity activity = getActivity();
+        final boolean defaultValue = true;
         if (activity != null)
         {
             activity.runOnUiThread(new Runnable() {
@@ -298,8 +299,8 @@ public class SonyPreferenceFragment  extends PreferenceFragmentCompat implements
                     try
                     {
                         // Preferenceの画面に反映させる
-                        setBooleanPreference(IPreferencePropertyAccessor.AUTO_CONNECT_TO_CAMERA, IPreferencePropertyAccessor.AUTO_CONNECT_TO_CAMERA, true);
-                        setBooleanPreference(IPreferencePropertyAccessor.CAPTURE_BOTH_CAMERA_AND_LIVE_VIEW, IPreferencePropertyAccessor.CAPTURE_BOTH_CAMERA_AND_LIVE_VIEW, true);
+                        setBooleanPreference(IPreferencePropertyAccessor.AUTO_CONNECT_TO_CAMERA, IPreferencePropertyAccessor.AUTO_CONNECT_TO_CAMERA, defaultValue);
+                        setBooleanPreference(IPreferencePropertyAccessor.CAPTURE_BOTH_CAMERA_AND_LIVE_VIEW, IPreferencePropertyAccessor.CAPTURE_BOTH_CAMERA_AND_LIVE_VIEW, defaultValue);
                     }
                     catch (Exception e)
                     {

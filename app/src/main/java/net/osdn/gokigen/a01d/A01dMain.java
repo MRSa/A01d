@@ -254,7 +254,7 @@ public class A01dMain extends AppCompatActivity implements ICameraStatusReceiver
                 }
                 else
                 {
-                    preferenceFragment = SonyPreferenceFragment.newInstance(this, interfaceProvider, this);
+                    preferenceFragment = SonyPreferenceFragment.newInstance(this, this);
                 }
             }
 
