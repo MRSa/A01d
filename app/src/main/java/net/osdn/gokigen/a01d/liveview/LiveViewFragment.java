@@ -151,15 +151,19 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer, IFo
             view.findViewById(R.id.shutter_button).setOnClickListener(onClickTouchListener);
             view.findViewById(R.id.btn_zoomin).setOnClickListener(onClickTouchListener);
             view.findViewById(R.id.btn_zoomout).setOnClickListener(onClickTouchListener);
+
+            manualFocus = view.findViewById(R.id.focusing_button);
+            changeLiveViewScale = view.findViewById(R.id.live_view_scale_button);
+
             if (interfaceProvider.useOlympusCamera())
             {
                 view.findViewById(R.id.show_favorite_settings_button).setOnClickListener(onClickTouchListener);
             }
             else
             {
-                // お気に入りボタンは、SONYモードのときには表示しない
+                // お気に入りボタン(とMFボタン)は、SONYモードのときには表示しない
                 final View favoriteButton = view.findViewById(R.id.show_favorite_settings_button);
-                if (favoriteButton != null)
+                if ((favoriteButton != null)&&(manualFocus != null))
                 {
                     runOnUiThread(new Runnable()
                     {
@@ -167,19 +171,25 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer, IFo
                         public void run()
                         {
                             favoriteButton.setVisibility(View.INVISIBLE);
+                            if (manualFocus != null)
+                            {
+                                manualFocus.setVisibility(View.INVISIBLE);
+                            }
+                            if (changeLiveViewScale != null)
+                            {
+                                changeLiveViewScale.setVisibility(View.INVISIBLE);
+                            }
                         }
                     });
                 }
             }
 
-            manualFocus = view.findViewById(R.id.focusing_button);
             if (manualFocus != null)
             {
                 manualFocus.setOnClickListener(onClickTouchListener);
             }
             changedFocusingMode();
 
-            changeLiveViewScale = view.findViewById(R.id.live_view_scale_button);
             if (changeLiveViewScale != null)
             {
                 changeLiveViewScale.setOnClickListener(onClickTouchListener);

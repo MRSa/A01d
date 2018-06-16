@@ -19,6 +19,11 @@ public interface ISonyCameraApi
     JSONObject getTouchAFPosition();
     JSONObject cancelTouchAFPosition();
 
+    JSONObject setFocusMode(String focusMode);
+    JSONObject getFocusMode();
+    JSONObject getSupportedFocusMode();
+    JSONObject getAvailableFocusMode();
+
     JSONObject startLiveview();
     JSONObject stopLiveview();
 

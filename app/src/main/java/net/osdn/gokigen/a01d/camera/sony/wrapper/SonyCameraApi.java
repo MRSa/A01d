@@ -207,6 +207,63 @@ class SonyCameraApi implements ISonyCameraApi
     }
 
     @Override
+    public JSONObject setFocusMode(String focusMode)
+    {
+        try
+        {
+            Log.v(TAG, "setFocusMode (" + focusMode + ")");
+            return (communicateJSON("camera", "setFocusMode", new JSONArray().put(focusMode), "1.0", -1));
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        return (new JSONObject());
+    }
+
+    @Override
+    public JSONObject getFocusMode()
+    {
+        try
+        {
+            return (communicateJSON("camera", "getFocusMode", new JSONArray(), "1.0", -1));
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        return (new JSONObject());
+    }
+
+    @Override
+    public JSONObject getSupportedFocusMode()
+    {
+        try
+        {
+            return (communicateJSON("camera", "getSupportedFocusMode", new JSONArray(), "1.0", -1));
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        return (new JSONObject());
+    }
+
+    @Override
+    public JSONObject getAvailableFocusMode()
+    {
+        try
+        {
+            return (communicateJSON("camera", "getAvailableFocusMode", new JSONArray(), "1.0", -1));
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        return (new JSONObject());
+    }
+
+    @Override
     public JSONObject startLiveview()
     {
         try {
