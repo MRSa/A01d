@@ -1,11 +1,13 @@
 package net.osdn.gokigen.a01d.camera.sony.cameraproperty;
 
-import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentActivity;
 import	android.support.v4.app.ListFragment;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -14,6 +16,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -65,21 +68,22 @@ public class SonyCameraApiListFragment extends ListFragment
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
     {
         inflater.inflate(R.menu.api_view, menu);
-/*
-        String title = getString(R.string.app_name) + " " + getString(R.string.pref_degug_info);
+        String title = getString(R.string.app_name) + " " + getString(R.string.pref_sony_api_list);
         try {
             AppCompatActivity activity = (AppCompatActivity) getActivity();
-            ActionBar bar = activity.getSupportActionBar();
-            if (bar != null)
+            if (activity != null)
             {
-                bar.setTitle(title);
+                ActionBar bar = activity.getSupportActionBar();
+                if (bar != null)
+                {
+                    bar.setTitle(title);
+                }
             }
         }
         catch (Exception e)
         {
             e.printStackTrace();
         }
-*/
     }
 
     @Override
@@ -90,7 +94,48 @@ public class SonyCameraApiListFragment extends ListFragment
             update();
             return (true);
         }
+        if (item.getItemId() == R.id.action_share)
+        {
+            share();
+            return (true);
+        }
         return super.onOptionsItemSelected(item);
+    }
+
+    /**
+     *   API一覧の他アプリへ共有
+     *
+     */
+    private void share()
+    {
+        if ((dataItems != null)&&(dataItems.size() > 0))
+        {
+            try
+            {
+                StringBuilder shareData = new StringBuilder();
+                for (String item : dataItems)
+                {
+                    shareData.append(item);
+                    shareData.append("\r\n");
+                }
+                String title = "; " + getString(R.string.pref_sony_api_list);
+                Intent sendIntent = new Intent(android.content.Intent.ACTION_SEND);
+                sendIntent.putExtra(Intent.EXTRA_SUBJECT, title);
+                sendIntent.setType("text/plain");
+                sendIntent.putExtra(Intent.EXTRA_TEXT, new String(shareData));
+                FragmentActivity activity = getActivity();
+                if (activity != null)
+                {
+                    // Intent発行(ACTION_SEND)
+                    startActivity(sendIntent);
+                    Log.v(TAG, "<<< SEND INTENT >>> : " + title);
+                }
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+        }
     }
 
     /**
@@ -198,5 +243,20 @@ public class SonyCameraApiListFragment extends ListFragment
         adapter = new ArrayAdapter<>(inflater.getContext(), android.R.layout.simple_list_item_1, dataItems);
         setListAdapter(adapter);
         return (super.onCreateView(inflater, container, savedInstanceState));
+    }
+
+    @Override
+    public void onListItemClick (ListView l, View v, int position, long id)
+    {
+        try
+        {
+            ListAdapter listAdapter = l.getAdapter();
+            String apiName = (String) listAdapter.getItem(position);
+            Log.v(TAG, "onListItemClick() [" + position + "] " + apiName);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
     }
 }
