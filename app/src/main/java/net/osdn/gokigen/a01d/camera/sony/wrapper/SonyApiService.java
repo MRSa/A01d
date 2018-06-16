@@ -1,6 +1,6 @@
 package net.osdn.gokigen.a01d.camera.sony.wrapper;
 
-class SonyApiService
+class SonyApiService implements ISonyApiService
 {
     private final String name;
     private final String actionUrl;
@@ -11,10 +11,13 @@ class SonyApiService
         this.actionUrl = actionUrl;
     }
 
+    @Override
     public String getName()
     {
         return (name);
     }
+
+    @Override
     public String getActionUrl()
     {
         return (actionUrl);

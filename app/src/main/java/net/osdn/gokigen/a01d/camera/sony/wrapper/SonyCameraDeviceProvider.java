@@ -12,7 +12,7 @@ import java.util.List;
 public class SonyCameraDeviceProvider implements ISonyCamera
 {
     private static final String TAG = SonyCameraDeviceProvider.class.getSimpleName();
-    private final List<SonyApiService> apiServices;
+    private final List<ISonyApiService> apiServices;
     private final String ddUrl;
     private final String udn;
     private final String friendlyName;
@@ -44,7 +44,7 @@ public class SonyCameraDeviceProvider implements ISonyCamera
     {
         try
         {
-            for (SonyApiService apiService : apiServices)
+            for (ISonyApiService apiService : apiServices)
             {
                 if (serviceName.equals(apiService.getName()))
                 {
@@ -65,7 +65,7 @@ public class SonyCameraDeviceProvider implements ISonyCamera
      *
      */
     @Override
-    public List<SonyApiService> getApiServices()
+    public List<ISonyApiService> getApiServices()
     {
         return (apiServices);
     }

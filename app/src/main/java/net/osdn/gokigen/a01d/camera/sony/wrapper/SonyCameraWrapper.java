@@ -26,12 +26,20 @@ import net.osdn.gokigen.a01d.liveview.IAutoFocusFrameDisplay;
 import net.osdn.gokigen.a01d.liveview.IIndicatorControl;
 import net.osdn.gokigen.a01d.liveview.liveviewlistener.ILiveViewListener;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 public class SonyCameraWrapper implements ISonyCameraHolder, ISonyInterfaceProvider, IDisplayInjector
 {
     private final String TAG = toString();
     private final Activity context;
     private final ICameraStatusReceiver provider;
     private ISonyCamera sonyCamera = null;
+    private ISonyCameraApi sonyCameraApi = null;
     private ICameraEventObserver eventObserver = null;
     private SonyLiveViewControl liveViewControl = null;
     private SonyCameraFocusControl focusControl = null;
@@ -50,7 +58,7 @@ public class SonyCameraWrapper implements ISonyCameraHolder, ISonyInterfaceProvi
         Log.v(TAG, " prepare : " + sonyCamera.getFriendlyName() + " " + sonyCamera.getModelName());
         try
         {
-            ISonyCameraApi sonyCameraApi = SonyCameraApi.newInstance(sonyCamera);
+            this.sonyCameraApi = SonyCameraApi.newInstance(sonyCamera);
             eventObserver = CameraEventObserver.newInstance(context, sonyCameraApi);
             liveViewControl = new SonyLiveViewControl(sonyCameraApi);
 
@@ -139,6 +147,24 @@ public class SonyCameraWrapper implements ISonyCameraHolder, ISonyInterfaceProvi
     public IDisplayInjector getDisplayInjector()
     {
         return (this);
+    }
+
+    @Override
+    public List<String> getApiCommands()
+    {
+        List<String> availableApis = new ArrayList<>();
+        try
+        {
+            String apiList = sonyCameraApi.getAvailableApiList().getString("result");
+            apiList = apiList.replace("[","").replace("]", "").replace("\"","");
+            String[] apiListSplit = apiList.split(",");
+            availableApis = Arrays.asList(apiListSplit);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        return (availableApis);
     }
 
     @Override

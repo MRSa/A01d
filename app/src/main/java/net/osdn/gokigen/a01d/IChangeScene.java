@@ -9,5 +9,6 @@ public interface IChangeScene
     void changeSceneToConfiguration();
     void changeCameraConnection();
     void changeSceneToDebugInformation();
+    void changeSceneToApiList();
     void exitApplication();
 }

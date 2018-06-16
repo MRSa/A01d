@@ -5,7 +5,7 @@ import java.util.List;
 public interface ISonyCamera
 {
     boolean hasApiService(String serviceName);
-    List<SonyApiService> getApiServices();
+    List<ISonyApiService> getApiServices();
 
     String getFriendlyName();
     String getModelName();

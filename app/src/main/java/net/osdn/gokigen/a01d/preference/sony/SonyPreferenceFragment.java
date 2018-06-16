@@ -15,6 +15,7 @@ import android.util.Log;
 
 import net.osdn.gokigen.a01d.IChangeScene;
 import net.osdn.gokigen.a01d.R;
+import net.osdn.gokigen.a01d.camera.sony.cameraproperty.SonyCameraApiListViewer;
 import net.osdn.gokigen.a01d.camera.sony.operation.CameraPowerOffSony;
 import net.osdn.gokigen.a01d.logcat.LogCatViewer;
 import net.osdn.gokigen.a01d.preference.olympus.IPreferencePropertyAccessor;
@@ -31,6 +32,7 @@ public class SonyPreferenceFragment  extends PreferenceFragmentCompat implements
     private SharedPreferences preferences = null;
     private CameraPowerOffSony powerOffController = null;
     private LogCatViewer logCatViewer = null;
+    private SonyCameraApiListViewer cameraApiListViewer = null;
 
     /**
      *
@@ -64,6 +66,9 @@ public class SonyPreferenceFragment  extends PreferenceFragmentCompat implements
 
             logCatViewer = new LogCatViewer(changeScene);
             logCatViewer.prepare();
+
+            cameraApiListViewer = new SonyCameraApiListViewer(changeScene);
+            cameraApiListViewer.prepare();
         }
         catch (Exception e)
         {
@@ -181,6 +186,7 @@ public class SonyPreferenceFragment  extends PreferenceFragmentCompat implements
 
             findPreference("exit_application").setOnPreferenceClickListener(powerOffController);
             findPreference("debug_info").setOnPreferenceClickListener(logCatViewer);
+            findPreference("sony_api_list").setOnPreferenceClickListener(cameraApiListViewer);
         }
         catch (Exception e)
         {

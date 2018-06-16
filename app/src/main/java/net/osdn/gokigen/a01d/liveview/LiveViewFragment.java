@@ -163,6 +163,7 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer, IFo
             {
                 // お気に入りボタン(とMFボタン)は、SONYモードのときには表示しない
                 final View favoriteButton = view.findViewById(R.id.show_favorite_settings_button);
+                final View propertyButton = view.findViewById(R.id.camera_property_settings_button);
                 if ((favoriteButton != null)&&(manualFocus != null))
                 {
                     runOnUiThread(new Runnable()
@@ -179,6 +180,7 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer, IFo
                             {
                                 changeLiveViewScale.setVisibility(View.INVISIBLE);
                             }
+                            propertyButton.setVisibility(View.INVISIBLE);
                         }
                     });
                 }

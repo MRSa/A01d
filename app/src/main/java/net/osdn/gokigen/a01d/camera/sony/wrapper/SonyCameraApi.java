@@ -32,8 +32,8 @@ class SonyCameraApi implements ISonyCameraApi
 
     private String findActionListUrl(String service)
     {
-        List<SonyApiService> services = sonyCamera.getApiServices();
-        for (SonyApiService apiService : services)
+        List<ISonyApiService> services = sonyCamera.getApiServices();
+        for (ISonyApiService apiService : services)
         {
             if (apiService.getName().equals(service))
             {

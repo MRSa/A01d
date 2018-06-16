@@ -22,7 +22,7 @@ import net.osdn.gokigen.a01d.camera.olympus.cameraproperty.OlyCameraPropertyList
 import net.osdn.gokigen.a01d.camera.ICameraStatusReceiver;
 import net.osdn.gokigen.a01d.camera.ICameraConnection;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.connection.ble.ICameraPowerOn;
-import net.osdn.gokigen.a01d.camera.sony.cameraproperty.SonyCameraPropertyListFragment;
+import net.osdn.gokigen.a01d.camera.sony.cameraproperty.SonyCameraApiListFragment;
 import net.osdn.gokigen.a01d.liveview.IStatusViewDrawer;
 import net.osdn.gokigen.a01d.liveview.LiveViewFragment;
 import net.osdn.gokigen.a01d.logcat.LogCatFragment;
@@ -42,7 +42,7 @@ public class A01dMain extends AppCompatActivity implements ICameraStatusReceiver
 
     private PreferenceFragmentCompat preferenceFragment = null;
     private OlyCameraPropertyListFragment propertyListFragment = null;
-    private SonyCameraPropertyListFragment propertyListFragmentSony = null;
+    private SonyCameraApiListFragment sonyApiListFragmentSony = null;
     private LogCatFragment logCatFragment = null;
 
     @Override
@@ -220,7 +220,7 @@ public class A01dMain extends AppCompatActivity implements ICameraStatusReceiver
                     {
                         if (propertyListFragmentSony == null)
                         {
-                            propertyListFragmentSony = SonyCameraPropertyListFragment.newInstance(this, interfaceProvider);
+                            propertyListFragmentSony = SonyCameraApiListFragment.newInstance(this, interfaceProvider);
                         }
                         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
                         transaction.replace(R.id.fragment1, propertyListFragmentSony);
@@ -303,6 +303,24 @@ public class A01dMain extends AppCompatActivity implements ICameraStatusReceiver
         }
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.replace(R.id.fragment1, logCatFragment);
+        // backstackに追加
+        transaction.addToBackStack(null);
+        transaction.commit();
+    }
+
+    /**
+     *   SonyのAPI List画面を開く
+     *
+     */
+    @Override
+    public void changeSceneToApiList()
+    {
+        if (sonyApiListFragmentSony == null)
+        {
+            sonyApiListFragmentSony = SonyCameraApiListFragment.newInstance(interfaceProvider);
+        }
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.replace(R.id.fragment1, sonyApiListFragmentSony);
         // backstackに追加
         transaction.addToBackStack(null);
         transaction.commit();
