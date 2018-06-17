@@ -7,6 +7,8 @@ import net.osdn.gokigen.a01d.camera.sony.wrapper.utils.SimpleHttpClient;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+
+import java.util.ArrayList;
 import java.util.List;
 
 class SonyCameraApi implements ISonyCameraApi
@@ -477,6 +479,32 @@ class SonyCameraApi implements ISonyCameraApi
         }
         return (new JSONObject());
 
+    }
+
+    @Override
+    public List<String> getSonyApiServiceList()
+    {
+        try
+        {
+            List<String> serviceList = new ArrayList<>();
+            List<ISonyApiService> services = sonyCamera.getApiServices();
+            for (ISonyApiService apiService : services)
+            {
+                serviceList.add(apiService.getName());
+            }
+            return (serviceList);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        return (null);
+    }
+
+    @Override
+    public JSONObject callGenericSonyApiMethod(@NonNull String service, @NonNull String method, @NonNull JSONArray params, @NonNull String version)
+    {
+        return (communicateJSON(service, method, params, version, -1));
     }
 
     public static boolean isErrorReply(JSONObject replyJson)

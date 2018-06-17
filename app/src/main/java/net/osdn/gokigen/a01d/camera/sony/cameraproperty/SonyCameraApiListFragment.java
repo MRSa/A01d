@@ -1,10 +1,12 @@
 package net.osdn.gokigen.a01d.camera.sony.cameraproperty;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
 import	android.support.v4.app.ListFragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -24,10 +26,11 @@ import net.osdn.gokigen.a01d.R;
 import net.osdn.gokigen.a01d.camera.IInterfaceProvider;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 
-public class SonyCameraApiListFragment extends ListFragment
+public class SonyCameraApiListFragment extends ListFragment implements SendRequestDialog.Callback
 {
     private final String TAG = toString();
     private ArrayAdapter<String> adapter;
@@ -251,12 +254,65 @@ public class SonyCameraApiListFragment extends ListFragment
         try
         {
             ListAdapter listAdapter = l.getAdapter();
-            String apiName = (String) listAdapter.getItem(position);
+            final String apiName = (String) listAdapter.getItem(position);
+            final SendRequestDialog.Callback apiCallback = this;
             Log.v(TAG, "onListItemClick() [" + position + "] " + apiName);
+            Activity activity =  getActivity();
+            if (activity != null)
+            {
+                activity.runOnUiThread(new Runnable()
+                {
+                    @Override
+                    public void run()
+                    {
+                        SendRequestDialog dialog = SendRequestDialog.newInstance(interfaceProvider.getSonyInterface().getCameraApi(), apiName, apiCallback);
+                        FragmentManager manager = getFragmentManager();
+                        String tag = "dialog";
+                        if (manager != null)
+                        {
+                            dialog.show(manager, tag);
+                        }
+                    }
+                });
+            }
         }
         catch (Exception e)
         {
             e.printStackTrace();
         }
+    }
+
+    /**
+     *   API のコマンドを発行する。
+     *
+     *   ※ 注意：パラメータはカンマ区切りで複数個を入力してもらう予定
+     *
+     */
+    @Override
+    public void sendRequest(String service, String apiName, String parameter, String version)
+    {
+        String[] parameterItems = parameter.split(",");
+
+        StringBuilder logBuilder = new StringBuilder();
+        logBuilder.append("sendRequest(");
+        logBuilder.append(service);
+        logBuilder.append(", ");
+        logBuilder.append(apiName);
+        logBuilder.append(", [ ");
+        for (int index = 0; index < parameterItems.length; index++)
+        {
+            logBuilder.append(parameterItems[index]);
+            logBuilder.append(" ");
+        }
+        logBuilder.append("], ");
+        logBuilder.append(version);
+        logBuilder.append(");");
+        Log.v(TAG, logBuilder.toString());
+    }
+
+    @Override
+    public void cancelled()
+    {
+        Log.v(TAG, "cancelled()");
     }
 }

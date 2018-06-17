@@ -168,6 +168,12 @@ public class SonyCameraWrapper implements ISonyCameraHolder, ISonyInterfaceProvi
     }
 
     @Override
+    public ISonyCameraApi getCameraApi()
+    {
+        return (sonyCameraApi);
+    }
+
+    @Override
     public void injectDisplay(@NonNull IAutoFocusFrameDisplay frameDisplayer, @NonNull IIndicatorControl indicator, @NonNull IFocusingModeNotify focusingModeNotify)
     {
         Log.v(TAG, "injectDisplay()");

@@ -5,6 +5,8 @@ import android.support.annotation.NonNull;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.util.List;
+
 public interface ISonyCameraApi
 {
     JSONObject getAvailableApiList();
@@ -53,4 +55,7 @@ public interface ISonyCameraApi
 
     JSONObject startStreaming();
     JSONObject stopStreaming();
+
+    List<String> getSonyApiServiceList();
+    JSONObject callGenericSonyApiMethod(@NonNull String service, @NonNull String method, @NonNull JSONArray params, @NonNull String version);
 }
