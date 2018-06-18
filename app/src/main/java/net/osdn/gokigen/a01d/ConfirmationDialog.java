@@ -1,14 +1,24 @@
+
 package net.osdn.gokigen.a01d;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
 
-public class ConfirmationDialog
+public class ConfirmationDialog extends DialogFragment
 {
-    private final Context context;
+    private Context context = null;
 
-    public ConfirmationDialog(Context context)
+    public static ConfirmationDialog newInstance(Context context)
+    {
+        ConfirmationDialog instance = new ConfirmationDialog();
+        instance.prepare(context);
+
+        return (instance);
+    }
+
+    private void prepare(Context context)
     {
         this.context = context;
     }
@@ -52,6 +62,28 @@ public class ConfirmationDialog
                     public void onClick(DialogInterface dialog, int which)
                     {
                         dialog.cancel();
+                    }
+                });
+
+        // 確認ダイアログを表示する
+        alertDialog.show();
+    }
+
+    public void show(int iconResId, String title, String message)
+    {
+        // 表示イアログの生成
+        final AlertDialog.Builder alertDialog = new AlertDialog.Builder(context);
+        alertDialog.setTitle(title);
+        alertDialog.setIcon(iconResId);
+        alertDialog.setMessage(message);
+        alertDialog.setCancelable(true);
+
+        // ボタンを設定する（実行ボタン）
+        alertDialog.setPositiveButton(context.getString(R.string.dialog_positive_execute),
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which)
+                    {
+                        dialog.dismiss();
                     }
                 });
 

@@ -111,6 +111,7 @@
 
     <string name="dialog_parameter_hint">(parameter)</string>
     <string name="dialog_version_hint">1.0</string>
+    <string name="dialog_title_reply">応答</string>
 
     <string name="only_opc_feature">OPCカメラでのみ有効です。</string>
     <string name="camera_detected">発見 : </string>

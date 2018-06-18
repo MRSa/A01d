@@ -57,7 +57,7 @@ public class CameraPowerOff implements Preference.OnPreferenceClickListener, Con
         {
 
             // 確認ダイアログの生成と表示
-            ConfirmationDialog dialog = new ConfirmationDialog(context);
+            ConfirmationDialog dialog = ConfirmationDialog.newInstance(context);
             dialog.show(R.string.dialog_title_confirmation, R.string.dialog_message_power_off, this);
             return (true);
         }

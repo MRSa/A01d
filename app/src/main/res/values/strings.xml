@@ -116,6 +116,7 @@
 
     <string name="dialog_parameter_hint">(parameter)</string>
     <string name="dialog_version_hint">1.0</string>
+    <string name="dialog_title_reply">Reply</string>
 
     <string name="only_opc_feature">This feature is only available for a OPC Camera.</string>
     <string name="camera_detected">Detected : </string>

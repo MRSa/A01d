@@ -87,13 +87,27 @@ public class SendRequestDialog  extends DialogFragment
         final TextView methodName = alertView.findViewById(R.id.method_name);
         final EditText parameter = alertView.findViewById(R.id.edit_parameter);
         final EditText version = alertView.findViewById(R.id.edit_version);
-        try
-        {
+        try {
             methodName.setText("");
             version.setText(activity.getString(R.string.dialog_version_hint));
             ArrayAdapter<String> adapter = new ArrayAdapter<>(activity, android.R.layout.simple_spinner_item);
             adapter.addAll(cameraApi.getSonyApiServiceList());
+
+            int defaultSelection;
+            for (defaultSelection = (adapter.getCount() - 1); defaultSelection >= 0; defaultSelection--)
+            {
+                String item = adapter.getItem(defaultSelection);
+                if ((item != null) && (item.equals("camera")))
+                {
+                    break;
+                }
+            }
+            if ((defaultSelection < 0) || (defaultSelection >= adapter.getCount()))
+            {
+                defaultSelection = 0;
+            }
             spinner.setAdapter(adapter);
+            spinner.setSelection(defaultSelection);
             spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener()
             {
                 @Override

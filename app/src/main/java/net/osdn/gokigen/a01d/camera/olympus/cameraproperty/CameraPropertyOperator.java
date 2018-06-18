@@ -42,7 +42,7 @@ public class CameraPropertyOperator implements View.OnClickListener
     {
         try
         {
-            final ConfirmationDialog dialog = new ConfirmationDialog(context);
+            final ConfirmationDialog dialog = ConfirmationDialog.newInstance(context);
             dialog.show(R.string.dialog_title_confirmation,
                     R.string.dialog_message_restore_camera_property,
                     new ConfirmationDialog.Callback() {

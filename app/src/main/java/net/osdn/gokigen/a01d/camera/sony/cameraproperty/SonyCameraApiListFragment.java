@@ -1,6 +1,7 @@
 package net.osdn.gokigen.a01d.camera.sony.cameraproperty;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -9,6 +10,7 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import	android.support.v4.app.ListFragment;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -22,8 +24,12 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import net.osdn.gokigen.a01d.ConfirmationDialog;
 import net.osdn.gokigen.a01d.R;
 import net.osdn.gokigen.a01d.camera.IInterfaceProvider;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -289,9 +295,9 @@ public class SonyCameraApiListFragment extends ListFragment implements SendReque
      *
      */
     @Override
-    public void sendRequest(String service, String apiName, String parameter, String version)
+    public void sendRequest(final String service, final String apiName, final String parameter, final String version)
     {
-        String[] parameterItems = parameter.split(",");
+        final String[] parameterItems = parameter.split(",");
 
         StringBuilder logBuilder = new StringBuilder();
         logBuilder.append("sendRequest(");
@@ -308,6 +314,39 @@ public class SonyCameraApiListFragment extends ListFragment implements SendReque
         logBuilder.append(version);
         logBuilder.append(");");
         Log.v(TAG, logBuilder.toString());
+
+        try
+        {
+            Thread thread = new Thread(new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    try
+                    {
+                        // メッセージを送信する
+                        JSONArray params = new JSONArray();
+                        if (parameter.length() != 0)
+                        {
+                            for (int index = 0; index < parameterItems.length; index++)
+                            {
+                                params.put(parameterItems[index]);
+                            }
+                        }
+                        receivedReply(interfaceProvider.getSonyInterface().getCameraApi().callGenericSonyApiMethod(service, apiName, params, version));
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                    }
+                }
+            });
+            thread.start();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -315,4 +354,40 @@ public class SonyCameraApiListFragment extends ListFragment implements SendReque
     {
         Log.v(TAG, "cancelled()");
     }
+
+
+    private void receivedReply(final JSONObject reply)
+    {
+        try
+        {
+            final Activity activity =  getActivity();
+            if (activity != null)
+            {
+                activity.runOnUiThread(new Runnable()
+                {
+                    @Override
+                    public void run()
+                    {
+                        try
+                        {
+                            ConfirmationDialog dialog = ConfirmationDialog.newInstance(getActivity());
+                            dialog.show(android.R.drawable.ic_dialog_info, getString(R.string.dialog_title_reply), reply.getString("result"));
+                        }
+                        catch (Exception e)
+                        {
+                            ConfirmationDialog dialog = ConfirmationDialog.newInstance(getActivity());
+                            dialog.show(android.R.drawable.ic_dialog_alert, getString(R.string.dialog_title_reply), "RECEIVE ERROR");
+                            e.printStackTrace();
+                        }
+                    }
+                });
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+    }
+
 }

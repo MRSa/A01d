@@ -57,7 +57,7 @@ import net.osdn.gokigen.a01d.preference.olympus.IPreferencePropertyAccessor;
         {
 
             // 確認ダイアログの生成と表示
-            ConfirmationDialog dialog = new ConfirmationDialog(context);
+            ConfirmationDialog dialog = ConfirmationDialog.newInstance(context);
             dialog.show(R.string.dialog_title_confirmation, R.string.dialog_message_exit_application, this);
             return (true);
         }
