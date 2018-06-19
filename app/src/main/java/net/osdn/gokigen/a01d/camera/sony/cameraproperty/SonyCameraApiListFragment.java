@@ -153,7 +153,17 @@ public class SonyCameraApiListFragment extends ListFragment implements SendReque
      */
     private void update()
     {
-        dataItems.clear();
+        try
+        {
+            if (dataItems != null)
+            {
+                dataItems.clear();
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
         Thread thread = new Thread(new Runnable()
         {
             @Override
@@ -371,7 +381,16 @@ public class SonyCameraApiListFragment extends ListFragment implements SendReque
                         try
                         {
                             ConfirmationDialog dialog = ConfirmationDialog.newInstance(getActivity());
-                            dialog.show(android.R.drawable.ic_dialog_info, getString(R.string.dialog_title_reply), reply.getString("result"));
+                            String replyString = "";
+                            try
+                            {
+                                replyString = reply.getString("result");
+                            }
+                            catch (Exception ee)
+                            {
+                                replyString = reply.getString("results");
+                            }
+                            dialog.show(android.R.drawable.ic_dialog_info, getString(R.string.dialog_title_reply), replyString);
                         }
                         catch (Exception e)
                         {
