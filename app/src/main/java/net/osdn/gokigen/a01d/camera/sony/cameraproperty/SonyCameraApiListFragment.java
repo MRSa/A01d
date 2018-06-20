@@ -340,7 +340,23 @@ public class SonyCameraApiListFragment extends ListFragment implements SendReque
                         {
                             for (int index = 0; index < parameterItems.length; index++)
                             {
-                                params.put(parameterItems[index]);
+                                String oneItem = parameterItems[index];
+                                if (oneItem.contains(":"))
+                                {
+                                    // key & value と判断
+                                    try
+                                    {
+                                        String[] keyValue = oneItem.split(":");
+                                        params.put(new JSONObject().put(keyValue[0], keyValue[1]));
+                                    }
+                                    catch (Exception e)
+                                    {
+                                        e.printStackTrace();
+                                        params.put(oneItem);
+                                    }
+                                } else {
+                                    params.put(oneItem);
+                                }
                             }
                         }
                         receivedReply(interfaceProvider.getSonyInterface().getCameraApi().callGenericSonyApiMethod(service, apiName, params, version));
