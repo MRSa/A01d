@@ -307,24 +307,8 @@ public class SonyCameraApiListFragment extends ListFragment implements SendReque
     @Override
     public void sendRequest(final String service, final String apiName, final String parameter, final String version)
     {
-        final String[] parameterItems = parameter.split(",");
-
-        StringBuilder logBuilder = new StringBuilder();
-        logBuilder.append("sendRequest(");
-        logBuilder.append(service);
-        logBuilder.append(", ");
-        logBuilder.append(apiName);
-        logBuilder.append(", [ ");
-        for (int index = 0; index < parameterItems.length; index++)
-        {
-            logBuilder.append(parameterItems[index]);
-            logBuilder.append(" ");
-        }
-        logBuilder.append("], ");
-        logBuilder.append(version);
-        logBuilder.append(");");
-        Log.v(TAG, logBuilder.toString());
-
+        String logValue = "sendRequest(" + service + ", " + apiName + ", [ " + parameter + "], " + version + ");";
+        Log.v(TAG, logValue);
         try
         {
             Thread thread = new Thread(new Runnable()
@@ -334,31 +318,8 @@ public class SonyCameraApiListFragment extends ListFragment implements SendReque
                 {
                     try
                     {
-                        // メッセージを送信する
-                        JSONArray params = new JSONArray();
-                        if (parameter.length() != 0)
-                        {
-                            for (int index = 0; index < parameterItems.length; index++)
-                            {
-                                String oneItem = parameterItems[index];
-                                if (oneItem.contains(":"))
-                                {
-                                    // key & value と判断
-                                    try
-                                    {
-                                        String[] keyValue = oneItem.split(":");
-                                        params.put(new JSONObject().put(keyValue[0], keyValue[1]));
-                                    }
-                                    catch (Exception e)
-                                    {
-                                        e.printStackTrace();
-                                        params.put(oneItem);
-                                    }
-                                } else {
-                                    params.put(oneItem);
-                                }
-                            }
-                        }
+                        // parameterを parseして、メッセージを送信する
+                        JSONArray params = parseParams(parameter);
                         receivedReply(interfaceProvider.getSonyInterface().getCameraApi().callGenericSonyApiMethod(service, apiName, params, version));
                     }
                     catch (Exception e)
@@ -373,6 +334,100 @@ public class SonyCameraApiListFragment extends ListFragment implements SendReque
         {
             e.printStackTrace();
         }
+    }
+
+    private JSONArray parseParams(final String parameter)
+    {
+        JSONArray params = new JSONArray();
+        final String[] parameterItems = parameter.split(",");
+        if (parameter.length() != 0)
+        {
+            for (int index = 0; index < parameterItems.length; index++)
+            {
+                String oneItem = parameterItems[index];
+                if (oneItem.contains(":"))
+                {
+                    // key & value と判断
+                    try
+                    {
+                        String[] keyValue = oneItem.split(":");
+                        try
+                        {
+                            String key = keyValue[0];
+                            String value = keyValue[1];
+                            if (value.contains("$T"))
+                            {
+                                params.put(new JSONObject().put(key, true));
+                            }
+                            else if (value.contains("$F"))
+                            {
+                                params.put(new JSONObject().put(key, false));
+                            }
+                            else if (value.contains("#"))
+                            {
+                                if (value.contains("."))
+                                {
+                                    double doubleValue = Double.parseDouble(value.substring(1));
+                                    params.put(new JSONObject().put(key, doubleValue));
+                                }
+                                else
+                                {
+                                    int intValue = Integer.parseInt(value.substring(1));
+                                    params.put(new JSONObject().put(key, intValue));
+                                }
+                            }
+                            else
+                            {
+                                params.put(new JSONObject().put(keyValue[0], keyValue[1]));
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            e.printStackTrace();
+                            params.put(oneItem);
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                        params.put(oneItem);
+                    }
+                } else {
+                    try
+                    {
+                        if (oneItem.contains("$T"))
+                        {
+                            params.put(true);
+                        }
+                        else if (oneItem.contains("$F"))
+                        {
+                            params.put(false);
+                        }
+                        else if (oneItem.contains("#"))
+                        {
+                            if (oneItem.contains("."))
+                            {
+                                double doubleValue = Double.parseDouble(oneItem.substring(1));
+                                params.put(doubleValue);
+                            } else {
+                                int intValue = Integer.parseInt(oneItem.substring(1));
+                                params.put(intValue);
+                            }
+                        }
+                        else
+                        {
+                            params.put(oneItem);
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                        params.put(oneItem);
+                    }
+                }
+            }
+        }
+        return (params);
     }
 
     @Override
