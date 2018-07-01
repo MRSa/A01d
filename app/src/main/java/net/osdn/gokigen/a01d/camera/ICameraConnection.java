@@ -8,6 +8,13 @@ import android.content.Context;
  */
 public interface ICameraConnection
 {
+    enum CameraConnectionMethod
+    {
+        OPC,
+        SONY,
+        RICOH_GR2
+    }
+
     enum CameraConnectionStatus
     {
         UNKNOWN,

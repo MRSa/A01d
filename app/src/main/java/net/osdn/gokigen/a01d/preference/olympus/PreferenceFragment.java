@@ -24,6 +24,7 @@ import net.osdn.gokigen.a01d.camera.olympus.wrapper.property.IOlyCameraProperty;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.property.IOlyCameraPropertyProvider;
 import net.osdn.gokigen.a01d.camera.olympus.operation.CameraPowerOff;
 import net.osdn.gokigen.a01d.logcat.LogCatViewer;
+import net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor;
 
 import java.util.HashMap;
 import java.util.Locale;

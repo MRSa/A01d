@@ -1,4 +1,4 @@
-package net.osdn.gokigen.a01d.camera.sony.wrapper.connection;
+package net.osdn.gokigen.a01d.camera.ricohgr2.wrapper.connection;
 
 import android.app.Activity;
 import android.content.BroadcastReceiver;
@@ -17,52 +17,37 @@ import android.util.Log;
 import net.osdn.gokigen.a01d.R;
 import net.osdn.gokigen.a01d.camera.ICameraConnection;
 import net.osdn.gokigen.a01d.camera.ICameraStatusReceiver;
-import net.osdn.gokigen.a01d.camera.sony.wrapper.ISonyCameraHolder;
 
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
+
 
 /**
  *
  *
  */
-public class SonyCameraConnection implements ICameraConnection
+public class RicohGr2Connection implements ICameraConnection
 {
     private final String TAG = toString();
     private final Activity context;
     private final ICameraStatusReceiver statusReceiver;
     private final BroadcastReceiver connectionReceiver;
-    private final ISonyCameraHolder cameraHolder;
     //private final ConnectivityManager connectivityManager;
     private final Executor cameraExecutor = Executors.newFixedThreadPool(1);
     //private final Handler networkConnectionTimeoutHandler;
     //private static final int MESSAGE_CONNECTIVITY_TIMEOUT = 1;
     private CameraConnectionStatus connectionStatus = CameraConnectionStatus.UNKNOWN;
 
-    public SonyCameraConnection(final Activity context, final ICameraStatusReceiver statusReceiver, @NonNull ISonyCameraHolder cameraHolder)
+
+    /**
+     *
+     *
+     */
+    public RicohGr2Connection(@NonNull final Activity context, @NonNull final ICameraStatusReceiver statusReceiver)
     {
         Log.v(TAG, "SonyCameraConnection()");
         this.context = context;
         this.statusReceiver = statusReceiver;
-        this.cameraHolder = cameraHolder;
-/*
-        ConnectivityManager connectivityManager = (ConnectivityManager) context.getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
-        networkConnectionTimeoutHandler = new Handler()
-        {
-            @Override
-            public void handleMessage(Message msg)
-            {
-                switch (msg.what)
-                {
-                    case MESSAGE_CONNECTIVITY_TIMEOUT:
-                        Log.d(TAG, "Network connection timeout");
-                        alertConnectingFailed(context.getString(R.string.network_connection_timeout));
-                        connectionStatus = CameraConnectionStatus.DISCONNECTED;
-                        break;
-                }
-            }
-        };
-*/
         connectionReceiver = new BroadcastReceiver()
         {
             @Override
@@ -73,6 +58,10 @@ public class SonyCameraConnection implements ICameraConnection
         };
     }
 
+    /**
+     *
+     *
+     */
     private void onReceiveBroadcastOfConnection(Context context, Intent intent)
     {
         statusReceiver.onStatusNotify(context.getString(R.string.connect_check_wifi));
@@ -121,10 +110,9 @@ public class SonyCameraConnection implements ICameraConnection
         }
     }
 
-
     /**
-     * Wifi接続状態の監視
-     * (接続の実処理は onReceiveBroadcastOfConnection() で実施)
+     *
+     *
      */
     @Override
     public void startWatchWifiStatus(Context context)
@@ -139,7 +127,8 @@ public class SonyCameraConnection implements ICameraConnection
     }
 
     /**
-     * Wifi接続状態の監視終了
+     *
+     *
      */
     @Override
     public void stopWatchWifiStatus(Context context)
@@ -150,9 +139,8 @@ public class SonyCameraConnection implements ICameraConnection
     }
 
     /**
-     * 　 カメラとの接続を解除する
      *
-     *   @param powerOff 真ならカメラの電源オフを伴う
+     *
      */
     @Override
     public void disconnect(boolean powerOff)
@@ -163,8 +151,10 @@ public class SonyCameraConnection implements ICameraConnection
         statusReceiver.onCameraDisconnected();
     }
 
+
     /**
-     * カメラとの再接続を指示する
+     *
+     *
      */
     @Override
     public void connect()
@@ -173,10 +163,10 @@ public class SonyCameraConnection implements ICameraConnection
         connectToCamera();
     }
 
+
     /**
-     *   接続リトライのダイアログを出す
      *
-     * @param message 表示用のメッセージ
+     *
      */
     @Override
     public void alertConnectingFailed(String message)
@@ -232,6 +222,10 @@ public class SonyCameraConnection implements ICameraConnection
         return (connectionStatus);
     }
 
+    /**
+     *
+     *
+     */
     @Override
     public void forceUpdateConnectionStatus(CameraConnectionStatus status)
     {
@@ -247,7 +241,7 @@ public class SonyCameraConnection implements ICameraConnection
         Log.v(TAG, "disconnectFromCamera()");
         try
         {
-            cameraExecutor.execute(new SonyCameraDisconnectSequence(powerOff));
+            cameraExecutor.execute(new RicohGr2CameraDisconnectSequence(powerOff));
         }
         catch (Exception e)
         {
@@ -264,7 +258,7 @@ public class SonyCameraConnection implements ICameraConnection
         connectionStatus = CameraConnectionStatus.CONNECTING;
         try
         {
-            cameraExecutor.execute(new SonyCameraConnectSequence(context,statusReceiver, this, cameraHolder));
+            cameraExecutor.execute(new RicohGr2CameraConnectSequence(context, statusReceiver, this));
         }
         catch (Exception e)
         {

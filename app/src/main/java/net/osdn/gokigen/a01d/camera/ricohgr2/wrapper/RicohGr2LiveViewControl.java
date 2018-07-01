@@ -1,34 +1,45 @@
-package net.osdn.gokigen.a01d.camera.sony.wrapper;
+package net.osdn.gokigen.a01d.camera.ricohgr2.wrapper;
 
 import android.support.annotation.NonNull;
 import android.util.Log;
 
 import net.osdn.gokigen.a01d.camera.ILiveViewControl;
 import net.osdn.gokigen.a01d.camera.utils.SimpleLiveviewSlicer;
-import net.osdn.gokigen.a01d.liveview.liveviewlistener.ILiveViewListener;
 import net.osdn.gokigen.a01d.liveview.liveviewlistener.CameraLiveViewListenerImpl;
+import net.osdn.gokigen.a01d.liveview.liveviewlistener.ILiveViewListener;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
-
-public class SonyLiveViewControl implements ILiveViewControl
+/**
+ *
+ *
+ */
+public class RicohGr2LiveViewControl implements ILiveViewControl
 {
     private final String TAG = toString();
-    private final ISonyCameraApi cameraApi;
-    //private final BlockingQueue<byte[]> mJpegQueue = new ArrayBlockingQueue<>(2);
     private final CameraLiveViewListenerImpl liveViewListener;
+    private String liveViewUrl = "http://192.168.0.1/v1/display";
     private boolean whileFetching = false;
     private static final int FETCH_ERROR_MAX = 30;
 
-    SonyLiveViewControl(@NonNull ISonyCameraApi cameraApi)
+    /**
+     *
+     *
+     */
+    RicohGr2LiveViewControl()
     {
-        this.cameraApi = cameraApi;
         liveViewListener = new CameraLiveViewListenerImpl();
     }
+
+/*
+    public void setLiveViewAddress(@NonNull String address, @NonNull String page)
+    {
+        liveViewUrl = "http://" + address + "/" + page;
+    }
+*/
 
     @Override
     public void changeLiveViewSize(String size)
     {
+        //
 
     }
 
@@ -45,25 +56,7 @@ public class SonyLiveViewControl implements ILiveViewControl
                 {
                     try
                     {
-                        JSONObject replyJson;
-                        replyJson = cameraApi.startLiveview();
-                        if (!SonyCameraApi.isErrorReply(replyJson))
-                        {
-                            try
-                            {
-                                JSONArray resultsObj = replyJson.getJSONArray("result");
-                                if (1 <= resultsObj.length())
-                                {
-                                    // Obtain liveview URL from the result.
-                                    final String liveviewUrl = resultsObj.getString(0);
-                                    start(liveviewUrl);
-                                }
-                            }
-                            catch (Exception e)
-                            {
-                                e.printStackTrace();
-                            }
-                        }
+                        start(liveViewUrl);
                     }
                     catch (Exception e)
                     {
@@ -77,74 +70,18 @@ public class SonyLiveViewControl implements ILiveViewControl
         {
             e.printStackTrace();
         }
+
     }
 
     @Override
     public void stopLiveView()
     {
-        Log.v(TAG, "stopLiveView()");
-        try
-        {
-            Thread thread = new Thread(new Runnable()
-            {
-                @Override
-                public void run()
-                {
-                    try
-                    {
-                        JSONObject resultsObj = cameraApi.stopLiveview();
-                        if (resultsObj == null)
-                        {
-                            Log.v(TAG, "stopLiveview() reply is null.");
-                        }
-                    }
-                    catch (Exception e)
-                    {
-                        e.printStackTrace();
-                    }
-                }
-            });
-            thread.start();
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-    }
-
-    @Override
-    public void updateDigitalZoom()
-    {
 
     }
 
-    @Override
-    public void updateMagnifyingLiveViewScale(boolean isChangeScale)
+
+    private void start(@NonNull final String streamUrl)
     {
-
-    }
-
-    @Override
-    public float getMagnifyingLiveViewScale()
-    {
-        return (1.0f);
-    }
-
-    @Override
-    public float getDigitalZoomScale()
-    {
-        return (1.0f);
-    }
-
-
-
-    public boolean start(final String streamUrl)
-    {
-        if (streamUrl == null)
-        {
-            Log.e(TAG, "start() streamUrl is null.");
-            return (false);
-        }
         if (whileFetching)
         {
             Log.v(TAG, "start() already starting.");
@@ -170,7 +107,7 @@ public class SonyLiveViewControl implements ILiveViewControl
 
                         while (whileFetching)
                         {
-                            final SimpleLiveviewSlicer.Payload payload = slicer.nextPayload();
+                            final SimpleLiveviewSlicer.Payload payload = slicer.nextPayloadForMotionJpeg();
                             if (payload == null)
                             {
                                 //Log.v(TAG, "Liveview Payload is null.");
@@ -225,7 +162,31 @@ public class SonyLiveViewControl implements ILiveViewControl
         {
             e.printStackTrace();
         }
-        return (true);
+    }
+
+
+    @Override
+    public void updateDigitalZoom()
+    {
+
+    }
+
+    @Override
+    public void updateMagnifyingLiveViewScale(boolean isChangeScale)
+    {
+
+    }
+
+    @Override
+    public float getMagnifyingLiveViewScale()
+    {
+        return (1.0f);
+    }
+
+    @Override
+    public float getDigitalZoomScale()
+    {
+        return (1.0f);
     }
 
     public ILiveViewListener getLiveViewListener()

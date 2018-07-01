@@ -1,5 +1,4 @@
-package net.osdn.gokigen.a01d.camera.olympus.operation;
-
+package net.osdn.gokigen.a01d.camera.ricohgr2.operation;
 
 import android.content.Context;
 import android.support.v7.preference.Preference;
@@ -9,12 +8,9 @@ import net.osdn.gokigen.a01d.IChangeScene;
 import net.osdn.gokigen.a01d.R;
 import net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor;
 
-/**
- *  Preferenceがクリックされた時に処理するクラス
- *
- */
-public class CameraPowerOff implements Preference.OnPreferenceClickListener, ConfirmationDialog.Callback
+public class CameraPowerOffRicohGr2 implements Preference.OnPreferenceClickListener, ConfirmationDialog.Callback
 {
+
     private final Context context;
     private final IChangeScene changeScene;
     private String preferenceKey = null;
@@ -23,7 +19,7 @@ public class CameraPowerOff implements Preference.OnPreferenceClickListener, Con
      *   コンストラクタ
      *
      */
-    public CameraPowerOff(Context context, IChangeScene changeScene)
+    public CameraPowerOffRicohGr2(Context context, IChangeScene changeScene)
     {
         this.context = context;
         this.changeScene = changeScene;
@@ -76,5 +72,4 @@ public class CameraPowerOff implements Preference.OnPreferenceClickListener, Con
             // カメラの電源をOFFにしたうえで、アプリケーションを終了する。
             changeScene.exitApplication();
         }
-    }
-}
+    }}

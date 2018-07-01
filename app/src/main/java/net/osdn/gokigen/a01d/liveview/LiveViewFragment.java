@@ -21,19 +21,19 @@ import android.widget.TextView;
 import net.osdn.gokigen.a01d.IChangeScene;
 import net.osdn.gokigen.a01d.R;
 import net.osdn.gokigen.a01d.camera.IInterfaceProvider;
-import net.osdn.gokigen.a01d.camera.sony.wrapper.IDisplayInjector;
+import net.osdn.gokigen.a01d.camera.IDisplayInjector;
 import net.osdn.gokigen.a01d.camera.olympus.myolycameraprops.LoadSaveCameraProperties;
 import net.osdn.gokigen.a01d.camera.olympus.myolycameraprops.LoadSaveMyCameraPropertyDialog;
 import net.osdn.gokigen.a01d.camera.IZoomLensControl;
 import net.osdn.gokigen.a01d.camera.ICameraInformation;
-import net.osdn.gokigen.a01d.camera.olympus.wrapper.IFocusingModeNotify;
+import net.osdn.gokigen.a01d.camera.IFocusingModeNotify;
 import net.osdn.gokigen.a01d.camera.ILiveViewControl;
 import net.osdn.gokigen.a01d.camera.ICameraConnection;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.property.IOlyCameraProperty;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.property.IOlyCameraPropertyProvider;
 import net.osdn.gokigen.a01d.liveview.liveviewlistener.ILiveViewListener;
 import net.osdn.gokigen.a01d.liveview.liveviewlistener.OlympusCameraLiveViewListenerImpl;
-import net.osdn.gokigen.a01d.preference.olympus.IPreferencePropertyAccessor;
+import net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor;
 
 /**
  *  撮影用ライブビュー画面
@@ -155,13 +155,13 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer, IFo
             manualFocus = view.findViewById(R.id.focusing_button);
             changeLiveViewScale = view.findViewById(R.id.live_view_scale_button);
 
-            if (interfaceProvider.useOlympusCamera())
+            if (interfaceProvider.getCammeraConnectionMethod() == ICameraConnection.CameraConnectionMethod.OPC)
             {
                 view.findViewById(R.id.show_favorite_settings_button).setOnClickListener(onClickTouchListener);
             }
             else
             {
-                // お気に入りボタン(とMFボタン)は、SONYモードのときには表示しない
+                // お気に入りボタン(とMFボタン)は、SONYモード, RICOH GR2モードのときには表示しない
                 final View favoriteButton = view.findViewById(R.id.show_favorite_settings_button);
                 final View propertyButton = view.findViewById(R.id.camera_property_settings_button);
                 if ((favoriteButton != null)&&(manualFocus != null))
@@ -225,29 +225,40 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer, IFo
         Log.v(TAG, "prepare()");
 
         IDisplayInjector interfaceInjector;
-        if (interfaceProvider.useOlympusCamera())
+        ICameraConnection.CameraConnectionMethod connectionMethod = interfaceProvider.getCammeraConnectionMethod();
+        if (connectionMethod == ICameraConnection.CameraConnectionMethod.RICOH_GR2)
         {
-            interfaceInjector = interfaceProvider.getOlympusInterface().getDisplayInjector();
+            interfaceInjector = interfaceProvider.getRicohGr2Infterface().getDisplayInjector();
         }
-        else
+        else if (connectionMethod == ICameraConnection.CameraConnectionMethod.SONY)
         {
             interfaceInjector = interfaceProvider.getSonyInterface().getDisplayInjector();
+        }
+        else // if (connectionMethod == ICameraConnection.CameraConnectionMethod.OPC)
+        {
+            interfaceInjector = interfaceProvider.getOlympusInterface().getDisplayInjector();
         }
         this.changeScene = sceneSelector;
         this.interfaceProvider = interfaceProvider;
         this.interfaceInjector = interfaceInjector;
 
-        if (interfaceProvider.useOlympusCamera())
+        if  (connectionMethod == ICameraConnection.CameraConnectionMethod.RICOH_GR2)
         {
-            this.liveViewControl = interfaceProvider.getOlympusInterface().getLiveViewControl();
-            this.zoomLensControl = interfaceProvider.getOlympusInterface().getZoomLensControl();
-            this.cameraInformation = interfaceProvider.getOlympusInterface().getCameraInformation();
+            this.liveViewControl = interfaceProvider.getRicohGr2Infterface().getLiveViewControl();
+            this.zoomLensControl = interfaceProvider.getRicohGr2Infterface().getZoomLensControl();
+            this.cameraInformation = interfaceProvider.getRicohGr2Infterface().getCameraInformation();
         }
-        else
+        else  if (connectionMethod == ICameraConnection.CameraConnectionMethod.SONY)
         {
             this.liveViewControl = interfaceProvider.getSonyInterface().getSonyLiveViewControl();
             this.zoomLensControl = interfaceProvider.getSonyInterface().getZoomLensControl();
             this.cameraInformation = interfaceProvider.getSonyInterface().getCameraInformation();
+        }
+        else //  if (connectionMethod == ICameraConnection.CameraConnectionMethod.OPC)
+        {
+            this.liveViewControl = interfaceProvider.getOlympusInterface().getLiveViewControl();
+            this.zoomLensControl = interfaceProvider.getOlympusInterface().getZoomLensControl();
+            this.cameraInformation = interfaceProvider.getOlympusInterface().getCameraInformation();
         }
     }
 
@@ -496,9 +507,11 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer, IFo
     @Override
     public void startLiveView()
     {
+        ICameraConnection.CameraConnectionMethod connectionMethod = interfaceProvider.getCammeraConnectionMethod();
+
         if (liveViewControl == null)
         {
-            if (interfaceProvider.useOlympusCamera())
+            if (connectionMethod == ICameraConnection.CameraConnectionMethod.OPC)
             {
                 Log.v(TAG, "startLiveView() : liveViewControl is null.");
                 return;
@@ -519,14 +532,18 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer, IFo
                 liveViewControl.changeLiveViewSize(preferences.getString(IPreferencePropertyAccessor.LIVE_VIEW_QUALITY, IPreferencePropertyAccessor.LIVE_VIEW_QUALITY_DEFAULT_VALUE));
             }
             ILiveViewListener lvListener;
-            if (interfaceProvider.useOlympusCamera())
+            if (connectionMethod == ICameraConnection.CameraConnectionMethod.RICOH_GR2)
+            {
+                lvListener = interfaceProvider.getRicohGr2Infterface().getLiveViewListener();
+            }
+            else if (connectionMethod == ICameraConnection.CameraConnectionMethod.SONY)
+            {
+                lvListener = interfaceProvider.getSonyInterface().getLiveViewListener();
+            }
+            else  // if (connectionMethod == ICameraConnection.CameraConnectionMethod.OPC)
             {
                 interfaceProvider.getOlympusLiveViewListener().setOlympusLiveViewListener(liveViewListener);
                 lvListener = liveViewListener;
-            }
-            else
-            {
-                lvListener = interfaceProvider.getSonyInterface().getSonyLiveViewListener();
             }
             lvListener.setCameraLiveImageView(imageView);
             liveViewControl.startLiveView();
@@ -557,8 +574,11 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer, IFo
                 zoomLensControl.moveInitialZoomPosition();
             }
 
-            // 測光モードをスポットに切り替える
-            setAEtoSpot();
+            // 測光モードをスポットに切り替える (OPCのみ)
+            if (connectionMethod == ICameraConnection.CameraConnectionMethod.OPC)
+            {
+                setAEtoSpot();
+            }
 
             // ライブビューの倍率設定
             updateLiveViewScale(false);

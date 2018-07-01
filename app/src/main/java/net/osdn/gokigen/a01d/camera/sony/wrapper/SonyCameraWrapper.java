@@ -9,10 +9,11 @@ import net.osdn.gokigen.a01d.camera.ICameraConnection;
 import net.osdn.gokigen.a01d.camera.ICameraInformation;
 import net.osdn.gokigen.a01d.camera.ICameraStatusReceiver;
 import net.osdn.gokigen.a01d.camera.ICaptureControl;
+import net.osdn.gokigen.a01d.camera.IDisplayInjector;
 import net.osdn.gokigen.a01d.camera.IFocusingControl;
 import net.osdn.gokigen.a01d.camera.ILiveViewControl;
 import net.osdn.gokigen.a01d.camera.IZoomLensControl;
-import net.osdn.gokigen.a01d.camera.olympus.wrapper.IFocusingModeNotify;
+import net.osdn.gokigen.a01d.camera.IFocusingModeNotify;
 import net.osdn.gokigen.a01d.camera.sony.ISonyInterfaceProvider;
 import net.osdn.gokigen.a01d.camera.sony.operation.SonyCameraCaptureControl;
 import net.osdn.gokigen.a01d.camera.sony.operation.SonyCameraFocusControl;
@@ -25,9 +26,6 @@ import net.osdn.gokigen.a01d.camera.sony.wrapper.eventlistener.ICameraStatusHold
 import net.osdn.gokigen.a01d.liveview.IAutoFocusFrameDisplay;
 import net.osdn.gokigen.a01d.liveview.IIndicatorControl;
 import net.osdn.gokigen.a01d.liveview.liveviewlistener.ILiveViewListener;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -114,9 +112,9 @@ public class SonyCameraWrapper implements ISonyCameraHolder, ISonyInterfaceProvi
     }
 
     @Override
-    public ILiveViewListener getSonyLiveViewListener()
+    public ILiveViewListener getLiveViewListener()
     {
-        return (liveViewControl.getSonyLiveViewListener());
+        return (liveViewControl.getLiveViewListener());
     }
 
     @Override

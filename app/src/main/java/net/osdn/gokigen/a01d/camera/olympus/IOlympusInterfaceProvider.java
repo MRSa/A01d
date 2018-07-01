@@ -11,7 +11,7 @@ import net.osdn.gokigen.a01d.camera.olympus.wrapper.IOlympusLiveViewListener;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.connection.ble.ICameraPowerOn;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.property.IOlyCameraPropertyProvider;
 import net.osdn.gokigen.a01d.camera.ICameraConnection;
-import net.osdn.gokigen.a01d.camera.sony.wrapper.IDisplayInjector;
+import net.osdn.gokigen.a01d.camera.IDisplayInjector;
 
 /**
  *

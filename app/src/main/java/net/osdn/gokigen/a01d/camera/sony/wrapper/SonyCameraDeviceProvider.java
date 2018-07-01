@@ -3,8 +3,8 @@ package net.osdn.gokigen.a01d.camera.sony.wrapper;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
-import net.osdn.gokigen.a01d.camera.sony.wrapper.utils.SimpleHttpClient;
-import net.osdn.gokigen.a01d.camera.sony.wrapper.utils.XmlElement;
+import net.osdn.gokigen.a01d.camera.utils.SimpleHttpClient;
+import net.osdn.gokigen.a01d.camera.utils.XmlElement;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,4 +1,5 @@
-package net.osdn.gokigen.a01d.preference.sony;
+package net.osdn.gokigen.a01d.preference.ricohgr2;
+
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -15,33 +16,26 @@ import android.util.Log;
 
 import net.osdn.gokigen.a01d.IChangeScene;
 import net.osdn.gokigen.a01d.R;
-import net.osdn.gokigen.a01d.camera.sony.cameraproperty.SonyCameraApiListViewer;
-import net.osdn.gokigen.a01d.camera.sony.operation.CameraPowerOffSony;
+import net.osdn.gokigen.a01d.camera.ricohgr2.operation.CameraPowerOffRicohGr2;
 import net.osdn.gokigen.a01d.logcat.LogCatViewer;
 import net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor;
 
 import java.util.Map;
 
-/**
- *
- *
- */
-public class SonyPreferenceFragment  extends PreferenceFragmentCompat implements SharedPreferences.OnSharedPreferenceChangeListener
+public class RicohGr2PreferenceFragment  extends PreferenceFragmentCompat implements SharedPreferences.OnSharedPreferenceChangeListener
 {
     private final String TAG = toString();
     private SharedPreferences preferences = null;
-    private CameraPowerOffSony powerOffController = null;
+    private CameraPowerOffRicohGr2 powerOffController = null;
     private LogCatViewer logCatViewer = null;
-    private SonyCameraApiListViewer cameraApiListViewer = null;
 
     /**
      *
      *
      */
-    //public static SonyPreferenceFragment newInstance(@NonNull AppCompatActivity context, @NonNull IInterfaceProvider factory, @NonNull IChangeScene changeScene)
-    public static SonyPreferenceFragment newInstance(@NonNull AppCompatActivity context, @NonNull IChangeScene changeScene)
+    public static RicohGr2PreferenceFragment newInstance(@NonNull AppCompatActivity context, @NonNull IChangeScene changeScene)
     {
-        SonyPreferenceFragment instance = new SonyPreferenceFragment();
+        RicohGr2PreferenceFragment instance = new RicohGr2PreferenceFragment();
         instance.prepare(context, changeScene);
 
         // パラメータはBundleにまとめておく
@@ -61,14 +55,11 @@ public class SonyPreferenceFragment  extends PreferenceFragmentCompat implements
     {
         try
         {
-            powerOffController = new CameraPowerOffSony(context, changeScene);
+            powerOffController = new CameraPowerOffRicohGr2(context, changeScene);
             powerOffController.prepare();
 
             logCatViewer = new LogCatViewer(changeScene);
             logCatViewer.prepare();
-
-            cameraApiListViewer = new SonyCameraApiListViewer(changeScene);
-            cameraApiListViewer.prepare();
         }
         catch (Exception e)
         {
@@ -172,7 +163,7 @@ public class SonyPreferenceFragment  extends PreferenceFragmentCompat implements
         try
         {
             //super.onCreate(savedInstanceState);
-            addPreferencesFromResource(R.xml.preferences_sony);
+            addPreferencesFromResource(R.xml.preferences_ricoh_gr2);
 
             ListPreference connectionMethod = (ListPreference) findPreference(IPreferencePropertyAccessor.CONNECTION_METHOD);
             connectionMethod.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
@@ -186,7 +177,6 @@ public class SonyPreferenceFragment  extends PreferenceFragmentCompat implements
 
             findPreference("exit_application").setOnPreferenceClickListener(powerOffController);
             findPreference("debug_info").setOnPreferenceClickListener(logCatViewer);
-            findPreference("sony_api_list").setOnPreferenceClickListener(cameraApiListViewer);
         }
         catch (Exception e)
         {

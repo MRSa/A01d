@@ -5,7 +5,7 @@ import android.util.Log;
 
 import net.osdn.gokigen.a01d.ConfirmationDialog;
 import net.osdn.gokigen.a01d.R;
-import net.osdn.gokigen.a01d.preference.olympus.IPreferencePropertyAccessor;
+import net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor;
 
 /**
  *   Olympus AIR の Bluetooth設定を記録する

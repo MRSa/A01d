@@ -3,8 +3,9 @@ package net.osdn.gokigen.a01d.camera.olympus.wrapper;
 import android.app.Activity;
 
 import net.osdn.gokigen.a01d.camera.ICameraInformation;
+import net.osdn.gokigen.a01d.camera.IFocusingModeNotify;
 import net.osdn.gokigen.a01d.camera.ILiveViewControl;
-import net.osdn.gokigen.a01d.camera.sony.wrapper.IDisplayInjector;
+import net.osdn.gokigen.a01d.camera.IDisplayInjector;
 import net.osdn.gokigen.a01d.camera.olympus.IOlympusInterfaceProvider;
 import net.osdn.gokigen.a01d.camera.ICaptureControl;
 import net.osdn.gokigen.a01d.camera.IFocusingControl;

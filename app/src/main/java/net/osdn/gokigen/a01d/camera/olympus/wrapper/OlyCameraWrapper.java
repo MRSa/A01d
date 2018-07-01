@@ -8,7 +8,7 @@ import android.util.Log;
 
 import net.osdn.gokigen.a01d.camera.ILiveViewControl;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.property.CameraPropertyUtilities;
-import net.osdn.gokigen.a01d.preference.olympus.IPreferencePropertyAccessor;
+import net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor;
 
 import java.util.Map;
 

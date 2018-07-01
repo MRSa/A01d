@@ -6,13 +6,14 @@ import android.support.v7.preference.Preference;
 import net.osdn.gokigen.a01d.ConfirmationDialog;
 import net.osdn.gokigen.a01d.IChangeScene;
 import net.osdn.gokigen.a01d.R;
-import net.osdn.gokigen.a01d.preference.olympus.IPreferencePropertyAccessor;
+import net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor;
 
 
 /**
  *  Preferenceがクリックされた時に処理するクラス
  *
- */public class CameraPowerOffSony implements Preference.OnPreferenceClickListener, ConfirmationDialog.Callback
+ */
+public class CameraPowerOffSony implements Preference.OnPreferenceClickListener, ConfirmationDialog.Callback
 {
 
     private final Context context;

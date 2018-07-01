@@ -1,4 +1,4 @@
-package net.osdn.gokigen.a01d.camera.sony.wrapper.utils;
+package net.osdn.gokigen.a01d.camera.utils;
 
 import android.util.Log;
 
@@ -96,7 +96,6 @@ public class SimpleLiveviewSlicer
         Payload payload = null;
         try
         {
-
             while ((mInputStream != null)&&(payload == null))
             {
                 // Common Header
@@ -228,5 +227,90 @@ public class SimpleLiveviewSlicer
             ret = null;
         }
         return (ret);
+    }
+
+    /**
+     *   先頭のjpegマーカーが出てくるまで読み飛ばす
+     *
+     */
+    private void skipJpegMarkStart(InputStream stream)
+    {
+        int searchIndex = 0;
+        int[] startmarker = { 0x0d, 0x0a, 0x0d, 0x0a, 0xff, 0xd8 };
+        while (true)
+        {
+            try
+            {
+                int data = stream.read();
+                if (data == startmarker[searchIndex])
+                {
+                    searchIndex++;
+                    if (searchIndex >= startmarker.length)
+                    {
+                        break;
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+                return;
+            }
+        }
+    }
+
+    /**
+     *
+     *
+     */
+    public Payload nextPayloadForMotionJpeg()
+    {
+        int searchIndex = 0;
+        int[] endmarker = { 0xff, 0xd9, 0x0d, 0x0a, 0x0d, 0x0a };
+        Payload payload = null;
+        try
+        {
+            while ((mInputStream != null)&&(payload == null))
+            {
+                skipJpegMarkStart(mInputStream);
+                ByteArrayOutputStream tmpByteArray = new ByteArrayOutputStream();
+                // 先頭にJPEGのマークを詰める
+                tmpByteArray.write(0xff);
+                tmpByteArray.write(0xd8);
+                while (true)
+                {
+                    try
+                    {
+                        // 1byteづつの読み込み... 本当は複数バイト読み出しで処理したい
+                        int data = mInputStream.read();
+                        tmpByteArray.write(data);
+                        if (data == endmarker[searchIndex])
+                        {
+                            searchIndex++;
+                            if (searchIndex >= endmarker.length)
+                            {
+                                break;
+                            }
+                        }
+                        else
+                        {
+                            searchIndex = 0;
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        Log.v(TAG, "INPUT STREAM EXCEPTION : " + e.getLocalizedMessage());
+                        // e.printStackTrace();
+                        return (null);
+                    }
+                }
+                payload = new Payload(tmpByteArray.toByteArray(), null);
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        return (payload);
     }
 }

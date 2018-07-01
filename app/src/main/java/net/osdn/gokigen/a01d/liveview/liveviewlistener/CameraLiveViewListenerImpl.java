@@ -1,20 +1,17 @@
 package net.osdn.gokigen.a01d.liveview.liveviewlistener;
 
-import android.util.Log;
-
-import net.osdn.gokigen.a01d.camera.sony.wrapper.ISonyCameraLiveViewListener;
+import net.osdn.gokigen.a01d.camera.ICameraLiveViewListener;
 
 import java.util.Map;
 
-public class SonyCameraLiveViewListenerImpl implements ILiveViewListener, ISonyCameraLiveViewListener
+public class CameraLiveViewListenerImpl implements ILiveViewListener, ICameraLiveViewListener
 {
-    private final String TAG = toString();
     private IImageDataReceiver imageView = null;
 
     /**
      * コンストラクタ
      */
-    public SonyCameraLiveViewListenerImpl()
+    public CameraLiveViewListenerImpl()
     {
 
     }
@@ -38,7 +35,6 @@ public class SonyCameraLiveViewListenerImpl implements ILiveViewListener, ISonyC
     {
         if (imageView != null)
         {
-            //Log.v(TAG, "onUpdateLiveView() " + data.length);
             imageView.setImageData(data, metadata);
         }
     }

@@ -3,6 +3,7 @@ package net.osdn.gokigen.a01d.camera.olympus.wrapper;
 import android.util.Log;
 
 import net.osdn.gokigen.a01d.camera.ICameraInformation;
+import net.osdn.gokigen.a01d.camera.IFocusingModeNotify;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.property.IOlyCameraProperty;
 
 import jp.co.olympus.camerakit.OLYCamera;
@@ -22,7 +23,7 @@ public class OLYCameraPropertyListenerImpl implements OLYCameraPropertyListener,
      *
      *
      */
-    public OLYCameraPropertyListenerImpl(OLYCamera olyCamera)
+    OLYCameraPropertyListenerImpl(OLYCamera olyCamera)
     {
         olyCamera.setCameraPropertyListener(this);
         this.camera = olyCamera;

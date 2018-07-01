@@ -1,6 +1,5 @@
-package net.osdn.gokigen.a01d.camera.sony.wrapper;
+package net.osdn.gokigen.a01d.camera;
 
-import net.osdn.gokigen.a01d.camera.olympus.wrapper.IFocusingModeNotify;
 import net.osdn.gokigen.a01d.liveview.IAutoFocusFrameDisplay;
 import net.osdn.gokigen.a01d.liveview.IIndicatorControl;
 

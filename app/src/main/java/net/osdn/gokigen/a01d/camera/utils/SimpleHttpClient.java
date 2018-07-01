@@ -1,4 +1,4 @@
-package net.osdn.gokigen.a01d.camera.sony.wrapper.utils;
+package net.osdn.gokigen.a01d.camera.utils;
 
 import android.util.Log;
 

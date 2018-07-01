@@ -10,7 +10,7 @@ import android.graphics.Paint;
 import android.graphics.PointF;
 import android.graphics.Rect;
 import android.graphics.RectF;
-import android.media.ExifInterface;
+import android.support.media.ExifInterface;
 import android.os.Looper;
 import android.preference.PreferenceManager;
 import android.util.AttributeSet;
@@ -30,7 +30,7 @@ import net.osdn.gokigen.a01d.liveview.liveviewlistener.IImageDataReceiver;
 import net.osdn.gokigen.a01d.liveview.message.IMessageDrawer;
 import net.osdn.gokigen.a01d.liveview.message.IMessageHolder;
 import net.osdn.gokigen.a01d.liveview.message.ShowMessageHolder;
-import net.osdn.gokigen.a01d.preference.olympus.IPreferencePropertyAccessor;
+import net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor;
 
 import java.util.Map;
 import java.util.Timer;

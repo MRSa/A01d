@@ -18,7 +18,7 @@ import net.osdn.gokigen.a01d.camera.ICameraConnection;
 import net.osdn.gokigen.a01d.camera.IZoomLensControl;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.property.IOlyCameraProperty;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.property.IOlyCameraPropertyProvider;
-import net.osdn.gokigen.a01d.preference.olympus.IPreferencePropertyAccessor;
+import net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor;
 
 /**
  *
@@ -48,16 +48,17 @@ class LiveViewClickTouchListener implements View.OnClickListener, View.OnTouchLi
         this.changeScene = changeScene;
         this.interfaceProvider = interfaceProvider;
 
-        if (interfaceProvider.useOlympusCamera())
+        ICameraConnection.CameraConnectionMethod connectionMethod = interfaceProvider.getCammeraConnectionMethod();
+        if (connectionMethod == ICameraConnection.CameraConnectionMethod.RICOH_GR2)
         {
-            this.focusingControl = interfaceProvider.getOlympusInterface().getFocusingControl();
-            this.captureControl = interfaceProvider.getOlympusInterface().getCaptureControl();
-            this.propertyProvider = interfaceProvider.getOlympusInterface().getCameraPropertyProvider();
-            this.cameraInformation = interfaceProvider.getOlympusInterface().getCameraInformation();
-            this.cameraConnection = interfaceProvider.getOlympusInterface().getOlyCameraConnection();
-            this.zoomLensControl = interfaceProvider.getOlympusInterface().getZoomLensControl();
+            this.focusingControl = interfaceProvider.getRicohGr2Infterface().getFocusingControl();
+            this.captureControl = interfaceProvider.getRicohGr2Infterface().getCaptureControl();
+            this.propertyProvider = interfaceProvider.getOlympusInterface().getCameraPropertyProvider();  // 要変更
+            this.cameraInformation = interfaceProvider.getRicohGr2Infterface().getCameraInformation();
+            this.cameraConnection = interfaceProvider.getRicohGr2Infterface().getRicohGr2CameraConnection();
+            this.zoomLensControl = interfaceProvider.getRicohGr2Infterface().getZoomLensControl();
         }
-        else
+        else if (connectionMethod == ICameraConnection.CameraConnectionMethod.SONY)
         {
             this.focusingControl = interfaceProvider.getSonyInterface().getFocusingControl();
             this.captureControl = interfaceProvider.getSonyInterface().getCaptureControl();
@@ -66,6 +67,16 @@ class LiveViewClickTouchListener implements View.OnClickListener, View.OnTouchLi
             this.cameraConnection = interfaceProvider.getSonyInterface().getSonyCameraConnection();
             this.zoomLensControl = interfaceProvider.getSonyInterface().getZoomLensControl();
         }
+        else  // if (connectionMethod == ICameraConnection.CameraConnectionMethod.OPC)
+        {
+            this.focusingControl = interfaceProvider.getOlympusInterface().getFocusingControl();
+            this.captureControl = interfaceProvider.getOlympusInterface().getCaptureControl();
+            this.propertyProvider = interfaceProvider.getOlympusInterface().getCameraPropertyProvider();
+            this.cameraInformation = interfaceProvider.getOlympusInterface().getCameraInformation();
+            this.cameraConnection = interfaceProvider.getOlympusInterface().getOlyCameraConnection();
+            this.zoomLensControl = interfaceProvider.getOlympusInterface().getZoomLensControl();
+        }
+
         this.dialogKicker = dialogKicker;
     }
 
@@ -243,7 +254,7 @@ class LiveViewClickTouchListener implements View.OnClickListener, View.OnTouchLi
         Log.v(TAG, "showFavoriteDialog()");
         try
         {
-            if (!interfaceProvider.useOlympusCamera())
+            if (interfaceProvider.getCammeraConnectionMethod() != ICameraConnection.CameraConnectionMethod.OPC)
             {
                 // OPCカメラでない場合には、「OPCカメラのみ有効です」表示をして画面遷移させない
                 Toast.makeText(context, context.getText(R.string.only_opc_feature), Toast.LENGTH_SHORT).show();
