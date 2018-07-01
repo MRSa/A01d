@@ -1,6 +1,7 @@
 package net.osdn.gokigen.a01d.camera.olympus.myolycameraprops;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,9 +12,9 @@ import java.util.List;
 
 class MyCameraPropertyLoadArrayAdapter extends ArrayAdapter<MyCameraPropertySetItems>
 {
-    private LayoutInflater inflater = null;
+    private LayoutInflater inflater;
     private final int textViewResourceId;
-    private List<MyCameraPropertySetItems> listItems = null;
+    private List<MyCameraPropertySetItems> listItems;
 
     MyCameraPropertyLoadArrayAdapter(Context context, int resource, List<MyCameraPropertySetItems> objects)
     {
@@ -28,7 +29,7 @@ class MyCameraPropertyLoadArrayAdapter extends ArrayAdapter<MyCameraPropertySetI
      *
      */
     @Override
-    public View getView(int position, View convertView, ViewGroup parent)
+    public @NonNull View getView(int position, View convertView, @NonNull ViewGroup parent)
     {
         View view;
         if(convertView != null)
@@ -42,13 +43,13 @@ class MyCameraPropertyLoadArrayAdapter extends ArrayAdapter<MyCameraPropertySetI
         MyCameraPropertySetItems item = listItems.get(position);
         try
         {
-            TextView idView = (TextView) view.findViewWithTag("id");
+            TextView idView = view.findViewWithTag("id");
             idView.setText(item.getItemId());
 
-            TextView titleView = (TextView)view.findViewWithTag("title");
+            TextView titleView = view.findViewWithTag("title");
             titleView.setText(item.getItemName());
 
-            TextView infoView = (TextView) view.findViewWithTag("info");
+            TextView infoView = view.findViewWithTag("info");
             infoView.setText(item.getItemInfo());
 
         }

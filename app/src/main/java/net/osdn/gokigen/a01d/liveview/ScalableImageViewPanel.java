@@ -18,8 +18,8 @@ import android.view.View;
  */
 public class ScalableImageViewPanel extends AppCompatImageView
 {
-
-    private static enum GestureMode {
+    private enum GestureMode
+    {
         None,
         Move,
         Zoom,
@@ -70,13 +70,13 @@ public class ScalableImageViewPanel extends AppCompatImageView
     public void setImageDrawable(Drawable drawable) {
         super.setImageDrawable(drawable);
         reset();
-    };
+    }
 
     @Override
     public void setImageBitmap(Bitmap bm) {
         super.setImageBitmap(bm);
         reset();
-    };
+    }
 
     @Override
     public void setImageURI(Uri uri) {
@@ -97,7 +97,7 @@ public class ScalableImageViewPanel extends AppCompatImageView
     /**
      * Constructs a new CapturedImageView.
      *
-     * @param context
+     *
      */
     public ScalableImageViewPanel(Context context) {
         super(context);
@@ -108,8 +108,8 @@ public class ScalableImageViewPanel extends AppCompatImageView
     /**
      * Constructs a new CapturedImageView.
      *
-     * @param context
-     * @param attrs
+     *
+     *
      */
     public ScalableImageViewPanel(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -120,9 +120,9 @@ public class ScalableImageViewPanel extends AppCompatImageView
     /**
      * Constructs a new CapturedImageView.
      *
-     * @param context
-     * @param attrs
-     * @param defStyle
+     *
+     *
+     *
      */
     public ScalableImageViewPanel(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
@@ -342,8 +342,7 @@ public class ScalableImageViewPanel extends AppCompatImageView
                 if (touchCount >= 2) {
                     // Starts zooming and takes in the center point.
                     mGestureMode = GestureMode.Zoom;
-                    float distance = (float)Math.hypot(event.getX(0) - event.getX(1), event.getY(0) - event.getY(1));
-                    mScalingBaseDistance = distance;
+                    mScalingBaseDistance = (float)Math.hypot(event.getX(0) - event.getX(1), event.getY(0) - event.getY(1));
                     mScalingCenterX = (event.getX(0) + event.getX(1)) / 2;
                     mScalingCenterY = (event.getY(0) + event.getY(1)) / 2;
                 }

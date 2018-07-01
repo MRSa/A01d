@@ -12,7 +12,7 @@ public class OlyCameraCaptureControl implements ICaptureControl
     private final String TAG = toString();
     private final SingleShotControl singleShotControl;
 
-    public OlyCameraCaptureControl(OlyCameraWrapper wrapper, IAutoFocusFrameDisplay frameDisplayer, IIndicatorControl indicator)
+    OlyCameraCaptureControl(OlyCameraWrapper wrapper, IAutoFocusFrameDisplay frameDisplayer, IIndicatorControl indicator)
     {
         singleShotControl = new SingleShotControl(wrapper.getOLYCamera(), frameDisplayer, indicator);
     }

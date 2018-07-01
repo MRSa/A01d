@@ -101,31 +101,27 @@ public class OlyCameraConnection implements ICameraConnection, OLYCameraConnecti
         Log.v(TAG,context.getString(R.string.connect_check_wifi));
 
         String action = intent.getAction();
-        try {
-            if (action.equals(ConnectivityManager.CONNECTIVITY_ACTION))
+        try
+        {
+            if ((action != null)&&(action.equals(ConnectivityManager.CONNECTIVITY_ACTION)))
             {
                 Log.v(TAG, "onReceiveBroadcastOfConnection() : CONNECTIVITY_ACTION");
 
                 WifiManager wifiManager = (WifiManager) context.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-                WifiInfo info = wifiManager.getConnectionInfo();
-                if (wifiManager.isWifiEnabled() && info != null )
-                {
-                    if (info.getNetworkId() != -1)
-                    {
-                        Log.v(TAG, "Network ID is -1, there is no currently connected network.");
-                    }
-                    // 自動接続が指示されていた場合は、カメラとの接続処理を行う
-                    connectToCamera();
-                }
-                else
-                {
-                    if (info == null)
-                    {
-                        Log.v(TAG, "NETWORK INFO IS NULL.");
-                    }
-                    else
-                    {
-                        Log.v(TAG, "isWifiEnabled : " + wifiManager.isWifiEnabled() + " NetworkId : " + info.getNetworkId());
+                if (wifiManager != null) {
+                    WifiInfo info = wifiManager.getConnectionInfo();
+                    if (wifiManager.isWifiEnabled() && info != null) {
+                        if (info.getNetworkId() != -1) {
+                            Log.v(TAG, "Network ID is -1, there is no currently connected network.");
+                        }
+                        // 自動接続が指示されていた場合は、カメラとの接続処理を行う
+                        connectToCamera();
+                    } else {
+                        if (info == null) {
+                            Log.v(TAG, "NETWORK INFO IS NULL.");
+                        } else {
+                            Log.v(TAG, "isWifiEnabled : " + wifiManager.isWifiEnabled() + " NetworkId : " + info.getNetworkId());
+                        }
                     }
                 }
             }

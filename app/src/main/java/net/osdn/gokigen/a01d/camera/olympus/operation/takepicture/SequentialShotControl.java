@@ -22,7 +22,7 @@ public class SequentialShotControl implements OLYCamera.TakePictureCallback
     private final Context context;
     private final OLYCamera camera;
     private final IIndicatorControl indicator;
-    private IAutoFocusFrameDisplay frameDisplayer = null;
+    private IAutoFocusFrameDisplay frameDisplayer;
 
     private IIndicatorControl.shootingStatus currentStatus = IIndicatorControl.shootingStatus.Unknown;
 

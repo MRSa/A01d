@@ -21,10 +21,10 @@ public class OlyCameraSetArrayAdapter extends ArrayAdapter<OlyCameraSetArrayItem
 {
     private final String TAG = toString();
     private final Context context;
-    private LayoutInflater inflater = null;
+    private LayoutInflater inflater;
     private final int textViewResourceId;
     private final IOlyCameraSetDialogDismiss dialogDismiss;
-    private List<OlyCameraSetArrayItem> listItems = null;
+    private List<OlyCameraSetArrayItem> listItems;
 
     OlyCameraSetArrayAdapter(Context context, int textId, List<OlyCameraSetArrayItem> items, IOlyCameraSetDialogDismiss dialogDismiss)
     {

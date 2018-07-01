@@ -14,11 +14,10 @@ import net.osdn.gokigen.a01d.liveview.IIndicatorControl;
  */
 public class OlyCameraFocusControl implements IFocusingControl
 {
-    private final String TAG = toString();
     private final OlympusAutoFocusControl afControl;
     private final IAutoFocusFrameDisplay frameDisplay;
 
-    public OlyCameraFocusControl(OlyCameraWrapper wrapper, IAutoFocusFrameDisplay frameDisplayer, IIndicatorControl indicator)
+    OlyCameraFocusControl(OlyCameraWrapper wrapper, IAutoFocusFrameDisplay frameDisplayer, IIndicatorControl indicator)
     {
         this.frameDisplay = frameDisplayer;
         afControl = new OlympusAutoFocusControl(wrapper.getOLYCamera(), frameDisplayer, indicator);

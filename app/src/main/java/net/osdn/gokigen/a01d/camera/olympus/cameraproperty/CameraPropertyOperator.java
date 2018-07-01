@@ -16,7 +16,7 @@ public class CameraPropertyOperator implements View.OnClickListener
     private final CameraPropertyLoader loader;
 
 
-    public CameraPropertyOperator(Context context, CameraPropertyLoader loader)
+    CameraPropertyOperator(Context context, CameraPropertyLoader loader)
     {
         this.context = context;
         this.loader = loader;

@@ -6,7 +6,6 @@ import android.util.Log;
 import android.view.MotionEvent;
 
 import net.osdn.gokigen.a01d.camera.IFocusingControl;
-import net.osdn.gokigen.a01d.camera.olympus.operation.takepicture.OlympusAutoFocusControl;
 import net.osdn.gokigen.a01d.camera.sony.operation.takepicture.SonyAutoFocusControl;
 import net.osdn.gokigen.a01d.camera.sony.wrapper.ISonyCameraApi;
 import net.osdn.gokigen.a01d.liveview.IAutoFocusFrameDisplay;

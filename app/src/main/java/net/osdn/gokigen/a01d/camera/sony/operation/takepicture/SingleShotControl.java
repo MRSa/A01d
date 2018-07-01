@@ -1,6 +1,5 @@
 package net.osdn.gokigen.a01d.camera.sony.operation.takepicture;
 
-import android.graphics.RectF;
 import android.support.annotation.NonNull;
 import android.util.Log;
 

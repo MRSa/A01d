@@ -1,7 +1,6 @@
 package net.osdn.gokigen.a01d.camera.sony.wrapper.connection;
 
 import android.app.Activity;
-import android.content.Context;
 import android.support.annotation.NonNull;
 import android.util.Log;
 

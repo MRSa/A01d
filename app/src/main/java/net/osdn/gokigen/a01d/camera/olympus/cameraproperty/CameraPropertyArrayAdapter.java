@@ -13,9 +13,9 @@ import java.util.List;
 
 public class CameraPropertyArrayAdapter extends ArrayAdapter<CameraPropertyArrayItem>
 {
-    private LayoutInflater inflater = null;
+    private LayoutInflater inflater;
     private final int textViewResourceId;
-    private List<CameraPropertyArrayItem> listItems = null;
+    private List<CameraPropertyArrayItem> listItems;
 
     CameraPropertyArrayAdapter(Context context, int textId, List<CameraPropertyArrayItem> items)
     {

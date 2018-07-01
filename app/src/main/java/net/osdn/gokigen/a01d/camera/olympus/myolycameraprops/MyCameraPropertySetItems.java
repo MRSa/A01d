@@ -3,9 +3,9 @@ package net.osdn.gokigen.a01d.camera.olympus.myolycameraprops;
 class MyCameraPropertySetItems
 {
     private final String itemId;
-    private String itemName = "";
-    private String itemInfo = "";
-    private int iconResource = 0;
+    private String itemName;
+    private String itemInfo;
+    private int iconResource;
 
     MyCameraPropertySetItems(int iconResource, String itemId, String itemName, String itemInfo)
     {

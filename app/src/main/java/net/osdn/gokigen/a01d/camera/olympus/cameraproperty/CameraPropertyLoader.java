@@ -18,7 +18,7 @@ public class CameraPropertyLoader implements Runnable
     private final IPropertyLoaderCallback callback;
     private ArrayList<CameraPropertyArrayItem> propertyItems = null;
 
-    public CameraPropertyLoader(IOlyCameraPropertyProvider propertyInterface, IPropertyLoaderCallback callback)
+    CameraPropertyLoader(IOlyCameraPropertyProvider propertyInterface, IPropertyLoaderCallback callback)
     {
         this.propertyInterface = propertyInterface;
         this.callback = callback;

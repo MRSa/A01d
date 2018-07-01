@@ -3,16 +3,16 @@ package net.osdn.gokigen.a01d.camera.olympus.cameraproperty;
 
 public class CameraPropertyArrayItem
 {
-    private int iconResource = 0;
+    private int iconResource;
     private final String propertyName;
     private final String propertyTitle;
     private final String initialValue;
     private final String initialValueTitle;
     private final int    initialIconResource;
-    private String propertyValue = "";
-    private String propertyValueTitle = "";
+    private String propertyValue;
+    private String propertyValueTitle;
 
-    public CameraPropertyArrayItem(String name, String title, String valueTitle, String value, int iconId1)
+    CameraPropertyArrayItem(String name, String title, String valueTitle, String value, int iconId1)
     {
         iconResource = iconId1;
         propertyName = name;

@@ -1,7 +1,6 @@
 package net.osdn.gokigen.a01d.liveview.message;
 
 import android.graphics.Color;
-import android.view.ViewDebug;
 
 /**
  *

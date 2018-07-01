@@ -30,7 +30,7 @@ public class CameraPropertyValueSelector implements ListView.OnItemClickListener
      *
      *
      */
-    public CameraPropertyValueSelector(Context context, IOlyCameraPropertyProvider propertyInterface, ICametaPropertyUpdateNotify updater)
+    CameraPropertyValueSelector(Context context, IOlyCameraPropertyProvider propertyInterface, ICametaPropertyUpdateNotify updater)
     {
         this.context = context;
         this.propertyInterface = propertyInterface;

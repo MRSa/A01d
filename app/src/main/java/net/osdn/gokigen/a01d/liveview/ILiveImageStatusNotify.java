@@ -1,7 +1,5 @@
 package net.osdn.gokigen.a01d.liveview;
 
-import android.graphics.Bitmap;
-
 import net.osdn.gokigen.a01d.liveview.message.IMessageDrawer;
 
 /**

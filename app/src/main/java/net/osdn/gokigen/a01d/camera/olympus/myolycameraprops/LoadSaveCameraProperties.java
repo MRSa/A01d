@@ -160,7 +160,7 @@ public class LoadSaveCameraProperties implements ILoadSaveCameraProperties
     private boolean saveCameraSettingsImpl(String idHeader, String dataName)
     {
         boolean ret = false;
-        Map<String, String> values = null;
+        Map<String, String> values;
         try
         {
             values = propertyProvider.getCameraPropertyValues(propertyProvider.getCameraPropertyNames());
@@ -268,7 +268,7 @@ public class LoadSaveCameraProperties implements ILoadSaveCameraProperties
         {
 
             //  現在の設定値を全部とってくる
-            Map<String, String> propertyValues = null;
+            Map<String, String> propertyValues;
             try
             {
                 propertyValues = propertyProvider.getCameraPropertyValues(propertyProvider.getCameraPropertyNames());

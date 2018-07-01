@@ -34,7 +34,7 @@ public class LoadSaveMyCameraPropertyDialog extends DialogFragment implements Ta
         try
         {
             View view = inflater.inflate(R.layout.dialog_my_camera_properties, container);
-            tabHost = (FragmentTabHost) view.findViewById(R.id.tabHost01);
+            tabHost = view.findViewById(R.id.tabHost01);
             tabHost.setup(getActivity(), getChildFragmentManager());
             tabHost.addTab(tabHost.newTabSpec("Load").setIndicator(getString(R.string.title_tab_title_load)), Fragment.class, null);
             tabHost.addTab(tabHost.newTabSpec("Save").setIndicator(getString(R.string.title_tab_title_save)), Fragment.class, null);
@@ -44,7 +44,7 @@ public class LoadSaveMyCameraPropertyDialog extends DialogFragment implements Ta
             LoadSaveMyCameraPropertyPagerAdapter adapter = new LoadSaveMyCameraPropertyPagerAdapter(getChildFragmentManager(), this);
             adapter.setTitles(new String[]{getString(R.string.title_tab_title_load), getString(R.string.title_tab_title_save)});
 
-            viewPager = (ViewPager) view.findViewById(R.id.pager);
+            viewPager = view.findViewById(R.id.pager);
             viewPager.setAdapter(adapter);
             //viewPager.setOnPageChangeListener(this);
             viewPager.addOnPageChangeListener(this);

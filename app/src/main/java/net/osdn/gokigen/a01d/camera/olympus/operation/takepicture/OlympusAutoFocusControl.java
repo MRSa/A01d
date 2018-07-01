@@ -24,7 +24,7 @@ public class OlympusAutoFocusControl implements OLYCamera.TakePictureCallback
     private final OLYCamera camera;
     private final IIndicatorControl indicator;
 
-    private IAutoFocusFrameDisplay frameDisplayer = null;
+    private IAutoFocusFrameDisplay frameDisplayer;
     private RectF focusFrameRect = null;
 
     /**

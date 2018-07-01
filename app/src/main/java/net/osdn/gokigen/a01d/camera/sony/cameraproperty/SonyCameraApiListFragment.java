@@ -1,7 +1,6 @@
 package net.osdn.gokigen.a01d.camera.sony.cameraproperty;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -10,7 +9,6 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import	android.support.v4.app.ListFragment;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -32,7 +30,6 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 
@@ -452,7 +449,7 @@ public class SonyCameraApiListFragment extends ListFragment implements SendReque
                         try
                         {
                             ConfirmationDialog dialog = ConfirmationDialog.newInstance(getActivity());
-                            String replyString = "";
+                            String replyString;
                             try
                             {
                                 replyString = reply.getString("result");

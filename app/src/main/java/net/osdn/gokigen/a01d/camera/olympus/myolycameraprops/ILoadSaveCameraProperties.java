@@ -2,9 +2,9 @@ package net.osdn.gokigen.a01d.camera.olympus.myolycameraprops;
 
 interface ILoadSaveCameraProperties
 {
-    static final int MAX_STORE_PROPERTIES = 256;   // お気に入り設定の最大記憶数...
-    static final String TITLE_KEY = "CameraPropTitleKey";
-    static final String DATE_KEY = "CameraPropDateTime";
+    int MAX_STORE_PROPERTIES = 256;   // お気に入り設定の最大記憶数...
+    String TITLE_KEY = "CameraPropTitleKey";
+    String DATE_KEY = "CameraPropDateTime";
 
     void loadCameraSettings(final String id, final String dataName);
     void saveCameraSettings(final String id, final String dataName);

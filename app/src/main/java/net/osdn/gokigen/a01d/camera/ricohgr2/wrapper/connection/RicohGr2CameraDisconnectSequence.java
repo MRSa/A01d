@@ -2,7 +2,6 @@ package net.osdn.gokigen.a01d.camera.ricohgr2.wrapper.connection;
 
 import android.util.Log;
 
-import net.osdn.gokigen.a01d.R;
 import net.osdn.gokigen.a01d.camera.utils.SimpleHttpClient;
 
 public class RicohGr2CameraDisconnectSequence  implements Runnable

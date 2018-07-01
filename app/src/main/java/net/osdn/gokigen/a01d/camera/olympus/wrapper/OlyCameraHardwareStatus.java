@@ -17,7 +17,7 @@ public class OlyCameraHardwareStatus implements ICameraHardwareStatus
     /**
      *
      */
-    public OlyCameraHardwareStatus(OLYCamera camera)
+    OlyCameraHardwareStatus(OLYCamera camera)
     {
         this.camera = camera;
     }

@@ -4,9 +4,9 @@ package net.osdn.gokigen.a01d.camera.olympus.wrapper.connection.ble;
 class OlyCameraSetArrayItem
 {
     private final String dataId;
-    private String btName = "";
-    private String btPassCode = "";
-    private String information = "";
+    private String btName;
+    private String btPassCode;
+    private String information;
 /*
     private final String initialBtName;
     private final String initialBtPassCode;

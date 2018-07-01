@@ -16,7 +16,6 @@ public class ImageConvertFactory
 
     public static IPreviewImageConverter getImageConverter(int id)
     {
-        IPreviewImageConverter drawer = new ConvertNothing();
-        return (drawer);
+        return (new ConvertNothing());
     }
 }
