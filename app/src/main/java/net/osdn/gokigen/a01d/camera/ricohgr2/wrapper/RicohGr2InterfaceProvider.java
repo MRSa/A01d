@@ -49,7 +49,6 @@ public class RicohGr2InterfaceProvider implements IRicohGr2InterfaceProvider, ID
         liveViewControl = new RicohGr2LiveViewControl();
         captureControl = new RicohGr2CameraCaptureControl();
         zoomControl = new RicohGr2CameraZoomLensControl();
-        focusControl = new RicohGr2CameraFocusControl();
 
     }
 
@@ -70,6 +69,7 @@ public class RicohGr2InterfaceProvider implements IRicohGr2InterfaceProvider, ID
     public void injectDisplay(IAutoFocusFrameDisplay frameDisplayer, IIndicatorControl indicator, IFocusingModeNotify focusingModeNotify)
     {
         Log.v(TAG, "injectDisplay()");
+        focusControl = new RicohGr2CameraFocusControl(frameDisplayer, indicator);
 
     }
 
