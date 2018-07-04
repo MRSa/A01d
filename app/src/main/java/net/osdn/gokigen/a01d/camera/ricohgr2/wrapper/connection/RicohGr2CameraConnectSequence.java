@@ -1,6 +1,8 @@
 package net.osdn.gokigen.a01d.camera.ricohgr2.wrapper.connection;
 
 import android.app.Activity;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
@@ -8,6 +10,7 @@ import net.osdn.gokigen.a01d.R;
 import net.osdn.gokigen.a01d.camera.ICameraConnection;
 import net.osdn.gokigen.a01d.camera.ICameraStatusReceiver;
 import net.osdn.gokigen.a01d.camera.utils.SimpleHttpClient;
+import net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor;
 
 class RicohGr2CameraConnectSequence implements Runnable
 {
@@ -28,6 +31,7 @@ class RicohGr2CameraConnectSequence implements Runnable
     public void run()
     {
         final String areYouThereUrl = "http://192.168.0.1/v1/ping";
+        final String grCommandUrl = "http://192.168.0.1/_gr";
         final int TIMEOUT_MS = 5000;
         try
         {
@@ -35,6 +39,43 @@ class RicohGr2CameraConnectSequence implements Runnable
             Log.v(TAG, areYouThereUrl + " " + response);
             if (response.length() > 0)
             {
+                SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+
+                // 接続時、カメラの画面を消す
+                if (preferences.getBoolean(IPreferencePropertyAccessor.GR2_LCD_SLEEP, false))
+                {
+                    final String postData = "cmd=lcd sleep on";
+                    String response0 = SimpleHttpClient.httpPost(grCommandUrl, postData, TIMEOUT_MS);
+                    Log.v(TAG, grCommandUrl + " " + response0);
+                }
+
+                // 表示するディスプレイモードを切り替える
+                String dispMode = preferences.getString(IPreferencePropertyAccessor.GR2_DISPLAY_MODE,  IPreferencePropertyAccessor.GR2_DISPLAY_MODE_DEFAULT_VALUE);
+                if (dispMode.contains("1"))
+                {
+                    // Disp. ボタンを 1回 押す
+                    final String postData = "cmd=bdisp";
+                    String response0 = SimpleHttpClient.httpPost(grCommandUrl, postData, TIMEOUT_MS);
+                    Log.v(TAG, grCommandUrl + " " + response0);
+
+                }
+                else if (dispMode.contains("2"))
+                {
+                    // Disp. ボタンを 2回 押す
+                    final String postData = "cmd=bdisp";
+                    String response0 = SimpleHttpClient.httpPost(grCommandUrl, postData, TIMEOUT_MS);
+                    String response1 = SimpleHttpClient.httpPost(grCommandUrl, postData, TIMEOUT_MS);
+                    Log.v(TAG, grCommandUrl + " " + response0 + " " + response1);
+                }
+                else if (dispMode.contains("3"))
+                {
+                    // Disp. ボタンを 3回 押す
+                    final String postData = "cmd=bdisp";
+                    String response0 = SimpleHttpClient.httpPost(grCommandUrl, postData, TIMEOUT_MS);
+                    String response1 = SimpleHttpClient.httpPost(grCommandUrl, postData, TIMEOUT_MS);
+                    String response2 = SimpleHttpClient.httpPost(grCommandUrl, postData, TIMEOUT_MS);
+                    Log.v(TAG, grCommandUrl + " " + response0 + " " + response1 + response2);
+                }
                 onConnectNotify();
             }
             else

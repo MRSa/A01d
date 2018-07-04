@@ -113,6 +113,12 @@ public class RicohGr2PreferenceFragment  extends PreferenceFragmentCompat implem
             if (!items.containsKey(IPreferencePropertyAccessor.CONNECTION_METHOD)) {
                 editor.putString(IPreferencePropertyAccessor.CONNECTION_METHOD, IPreferencePropertyAccessor.CONNECTION_METHOD_DEFAULT_VALUE);
             }
+            if (!items.containsKey(IPreferencePropertyAccessor.GR2_LCD_SLEEP)) {
+                editor.putBoolean(IPreferencePropertyAccessor.GR2_LCD_SLEEP, false);
+            }
+            if (!items.containsKey(IPreferencePropertyAccessor.GR2_DISPLAY_MODE)) {
+                editor.putString(IPreferencePropertyAccessor.GR2_DISPLAY_MODE, IPreferencePropertyAccessor.GR2_DISPLAY_MODE_DEFAULT_VALUE);
+            }
             editor.apply();
         }
         catch (Exception e)
@@ -141,6 +147,11 @@ public class RicohGr2PreferenceFragment  extends PreferenceFragmentCompat implem
 
                 case IPreferencePropertyAccessor.CAPTURE_BOTH_CAMERA_AND_LIVE_VIEW:
                     value = preferences.getBoolean(key, true);
+                    Log.v(TAG, " " + key + " , " + value);
+                    break;
+
+                case IPreferencePropertyAccessor.GR2_LCD_SLEEP:
+                    value = preferences.getBoolean(key, false);
                     Log.v(TAG, " " + key + " , " + value);
                     break;
 
@@ -174,6 +185,16 @@ public class RicohGr2PreferenceFragment  extends PreferenceFragmentCompat implem
                 }
             });
             connectionMethod.setSummary(connectionMethod.getValue() + " ");
+
+            ListPreference displayMode = (ListPreference) findPreference(IPreferencePropertyAccessor.GR2_DISPLAY_MODE);
+            displayMode.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+                @Override
+                public boolean onPreferenceChange(Preference preference, Object newValue) {
+                    preference.setSummary(newValue + " ");
+                    return (true);
+                }
+            });
+            displayMode.setSummary(displayMode.getValue() + " ");
 
             findPreference("exit_application").setOnPreferenceClickListener(powerOffController);
             findPreference("debug_info").setOnPreferenceClickListener(logCatViewer);
@@ -297,6 +318,8 @@ public class RicohGr2PreferenceFragment  extends PreferenceFragmentCompat implem
                         // Preferenceの画面に反映させる
                         setBooleanPreference(IPreferencePropertyAccessor.AUTO_CONNECT_TO_CAMERA, IPreferencePropertyAccessor.AUTO_CONNECT_TO_CAMERA, defaultValue);
                         setBooleanPreference(IPreferencePropertyAccessor.CAPTURE_BOTH_CAMERA_AND_LIVE_VIEW, IPreferencePropertyAccessor.CAPTURE_BOTH_CAMERA_AND_LIVE_VIEW, defaultValue);
+                        setBooleanPreference(IPreferencePropertyAccessor.GR2_LCD_SLEEP, IPreferencePropertyAccessor.GR2_LCD_SLEEP, defaultValue);
+
                     }
                     catch (Exception e)
                     {
@@ -306,5 +329,4 @@ public class RicohGr2PreferenceFragment  extends PreferenceFragmentCompat implem
             });
         }
     }
-
 }

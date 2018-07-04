@@ -43,8 +43,12 @@ public interface IPreferencePropertyAccessor
     String CONNECTION_METHOD = "connection_method";
     String CONNECTION_METHOD_DEFAULT_VALUE = "OPC";
 
+    String GR2_DISPLAY_MODE = "gr2_display_mode";
+    String GR2_DISPLAY_MODE_DEFAULT_VALUE = "0";
 
-/*
+    String GR2_LCD_SLEEP = "gr2_lcd_sleep";
+
+    /*
     int CHOICE_SPLASH_SCREEN = 10;
 
     int SELECT_SAMPLE_IMAGE_CODE = 110;

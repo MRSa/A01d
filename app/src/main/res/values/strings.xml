@@ -126,4 +126,7 @@
     <string name="camera_not_found">Not Found&#8230;</string>
     <string name="camera_received_reply">Received.</string>
     <string name="pref_connection_method">Connection Method</string>
+    <string name="pref_gr2_display_mode">Display Mode</string>
+    <string name="pref_gr2_lcd_sleep">Screen off during connected</string>
+
 </resources>

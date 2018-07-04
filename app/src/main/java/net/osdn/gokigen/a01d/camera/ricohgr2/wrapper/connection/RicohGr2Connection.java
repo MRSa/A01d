@@ -241,7 +241,7 @@ public class RicohGr2Connection implements ICameraConnection
         Log.v(TAG, "disconnectFromCamera()");
         try
         {
-            cameraExecutor.execute(new RicohGr2CameraDisconnectSequence(powerOff));
+            cameraExecutor.execute(new RicohGr2CameraDisconnectSequence(context, powerOff));
         }
         catch (Exception e)
         {

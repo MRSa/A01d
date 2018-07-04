@@ -135,6 +135,7 @@ public class SimpleLiveviewSlicer
         catch (Exception e)
         {
             e.printStackTrace();
+            System.gc();
         }
         return (payload);
     }
@@ -297,7 +298,7 @@ public class SimpleLiveviewSlicer
                             searchIndex = 0;
                         }
                     }
-                    catch (Exception e)
+                    catch (Throwable e)
                     {
                         Log.v(TAG, "INPUT STREAM EXCEPTION : " + e.getLocalizedMessage());
                         // e.printStackTrace();
