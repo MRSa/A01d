@@ -181,7 +181,6 @@ public class RicohGr2AutoFocusControl
         boolean afResult = false;
         try
         {
-            int indexOfTouchAFPositionResult = 1;
             JSONObject resultObject = new JSONObject(replyString);
             String result = resultObject.getString("errMsg");
             boolean focused = resultObject.getBoolean("focused");
