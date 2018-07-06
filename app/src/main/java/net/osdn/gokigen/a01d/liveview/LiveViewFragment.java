@@ -155,7 +155,9 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer, IFo
             manualFocus = view.findViewById(R.id.focusing_button);
             changeLiveViewScale = view.findViewById(R.id.live_view_scale_button);
 
-            if (interfaceProvider.getCammeraConnectionMethod() == ICameraConnection.CameraConnectionMethod.OPC)
+            ICameraConnection.CameraConnectionMethod connectionMethod = interfaceProvider.getCammeraConnectionMethod();
+
+            if (connectionMethod == ICameraConnection.CameraConnectionMethod.OPC)
             {
                 view.findViewById(R.id.show_favorite_settings_button).setOnClickListener(onClickTouchListener);
             }
@@ -176,13 +178,23 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer, IFo
                             {
                                 manualFocus.setVisibility(View.INVISIBLE);
                             }
-                            if (changeLiveViewScale != null)
-                            {
-                                changeLiveViewScale.setVisibility(View.INVISIBLE);
-                            }
                             propertyButton.setVisibility(View.INVISIBLE);
                         }
                     });
+                }
+                if (connectionMethod == ICameraConnection.CameraConnectionMethod.SONY)
+                {
+                    if (changeLiveViewScale != null)
+                    {
+                        changeLiveViewScale.setVisibility(View.INVISIBLE);
+                    }
+                }
+                else // if (connectionMethod == ICameraConnection.CameraConnectionMethod.RICOH_GR2)
+                {
+                    if (changeLiveViewScale != null)
+                    {
+                        changeLiveViewScale.setVisibility(View.VISIBLE);
+                    }
                 }
             }
 

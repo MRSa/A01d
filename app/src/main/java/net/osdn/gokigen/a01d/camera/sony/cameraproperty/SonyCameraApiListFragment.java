@@ -298,8 +298,12 @@ public class SonyCameraApiListFragment extends ListFragment implements SendReque
     /**
      *   API のコマンドを発行する。
      *
-     *   ※ 注意：パラメータはカンマ区切りで複数個を入力してもらう予定
-     *
+     *   ※ 注意： 引数パラメータはカンマ区切りで複数個を入力してもらう
+     *      key & Value  値 keyとvalueのあいだを : で区切る (key:value みたいな感じ)
+     *      $T           Boolean値の True
+     *      $F           Boolean値の False
+     *      #xx          数値(integer)
+     *      #xx.xx       数値(double)
      */
     @Override
     public void sendRequest(final String service, final String apiName, final String parameter, final String version)
@@ -463,7 +467,16 @@ public class SonyCameraApiListFragment extends ListFragment implements SendReque
                         catch (Exception e)
                         {
                             ConfirmationDialog dialog = ConfirmationDialog.newInstance(getActivity());
-                            dialog.show(android.R.drawable.ic_dialog_alert, getString(R.string.dialog_title_reply), "RECEIVE ERROR");
+                            String replyString = "";
+                            try
+                            {
+                                replyString = reply.toString(4);
+                            }
+                            catch (Exception ee)
+                            {
+                                ee.printStackTrace();
+                            }
+                            dialog.show(android.R.drawable.ic_dialog_alert, getString(R.string.dialog_title_reply), "RECEIVE ERROR \r\n" + replyString);
                             e.printStackTrace();
                         }
                     }

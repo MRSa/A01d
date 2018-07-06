@@ -5,12 +5,14 @@ import net.osdn.gokigen.a01d.camera.IZoomLensControl;
 public class RicohGr2CameraZoomLensControl implements IZoomLensControl
 {
     @Override
-    public boolean canZoom() {
-        return false;
+    public boolean canZoom()
+    {
+        return (false);
     }
 
     @Override
-    public void updateStatus() {
+    public void updateStatus()
+    {
 
     }
 
@@ -30,22 +32,26 @@ public class RicohGr2CameraZoomLensControl implements IZoomLensControl
     }
 
     @Override
-    public void driveZoomLens(float targetLength) {
+    public void driveZoomLens(float targetLength)
+    {
 
     }
 
     @Override
-    public void driveZoomLens(boolean isZoomIn) {
+    public void driveZoomLens(boolean isZoomIn)
+    {
 
     }
 
     @Override
-    public void moveInitialZoomPosition() {
+    public void moveInitialZoomPosition()
+    {
 
     }
 
     @Override
-    public boolean isDrivingZoomLens() {
-        return false;
+    public boolean isDrivingZoomLens()
+    {
+        return (false);
     }
 }

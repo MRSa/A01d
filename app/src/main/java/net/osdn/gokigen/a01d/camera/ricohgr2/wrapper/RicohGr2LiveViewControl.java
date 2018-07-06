@@ -4,6 +4,7 @@ import android.support.annotation.NonNull;
 import android.util.Log;
 
 import net.osdn.gokigen.a01d.camera.ILiveViewControl;
+import net.osdn.gokigen.a01d.camera.utils.SimpleHttpClient;
 import net.osdn.gokigen.a01d.camera.utils.SimpleLiveviewSlicer;
 import net.osdn.gokigen.a01d.liveview.liveviewlistener.CameraLiveViewListenerImpl;
 import net.osdn.gokigen.a01d.liveview.liveviewlistener.ILiveViewListener;
@@ -17,6 +18,7 @@ public class RicohGr2LiveViewControl implements ILiveViewControl
     private final String TAG = toString();
     private final CameraLiveViewListenerImpl liveViewListener;
     private String liveViewUrl = "http://192.168.0.1/v1/display";
+    private float cropScale = 1.0f;
     private boolean whileFetching = false;
     private static final int FETCH_ERROR_MAX = 30;
 
@@ -171,22 +173,102 @@ public class RicohGr2LiveViewControl implements ILiveViewControl
 
     }
 
-    @Override
-    public void updateMagnifyingLiveViewScale(boolean isChangeScale)
-    {
-
-    }
-
-    @Override
-    public float getMagnifyingLiveViewScale()
-    {
-        return (1.0f);
-    }
-
+    /**
+     *   デジタルズーム倍率の設定値を応答する
+     *
+     */
     @Override
     public float getDigitalZoomScale()
     {
         return (1.0f);
+    }
+
+    /**
+     *   クロップサイズを変更する
+     *
+     */
+    @Override
+    public void updateMagnifyingLiveViewScale(final boolean isChangeScale)
+    {
+        //
+        try
+        {
+            if (isChangeScale)
+            {
+                if (cropScale == 1.0f)
+                {
+                    cropScale = 1.25f;
+                }
+                else if (cropScale == 1.25f)
+                {
+                    cropScale = 1.68f;
+                }
+                else
+                {
+                    cropScale = 1.0f;
+                }
+            }
+            Thread thread = new Thread(new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    try
+                    {
+                        String cropSize = "CROP_SIZE_ORIGINAL";
+                        int timeoutMs = 5000;
+                        String grCmdUrl = "http://192.168.0.1/_gr";
+                        String postData;
+                        String result;
+                        if (isChangeScale)
+                        {
+                            postData = "mpget=CROP_SHOOTING";
+                            result = SimpleHttpClient.httpPost(grCmdUrl, postData, timeoutMs);
+                            if ((result == null) || (result.length() < 1))
+                            {
+                                Log.v(TAG, "reply is null.");
+                                cropScale = 1.0f;
+                            } else if (result.contains("SIZE_M")) {
+                                cropSize = "CROP_SIZE_S";
+                                cropScale = 1.68f;
+                            } else if (result.contains("SIZE_S")) {
+                                cropSize = "CROP_SIZE_ORIGINAL";
+                                cropScale = 1.0f;
+                            } else {
+                                cropSize = "CROP_SIZE_M";
+                                cropScale = 1.25f;
+                            }
+                        }
+                        postData = "mpset=CROP_SHOOTING " + cropSize;
+                        result = SimpleHttpClient.httpPost(grCmdUrl, postData, timeoutMs);
+                        Log.v(TAG, "RESULT1 : " + result);
+
+                        postData = "cmd=mode refresh";
+                        result = SimpleHttpClient.httpPost(grCmdUrl, postData, timeoutMs);
+                        Log.v(TAG, "RESULT2 : " + result);
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                    }
+                }
+            });
+            thread.start();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     *   ライブビュー拡大倍率の設定値を応答する
+     *
+     */
+    @Override
+    public float getMagnifyingLiveViewScale()
+    {
+        return (cropScale);
     }
 
     public ILiveViewListener getLiveViewListener()
