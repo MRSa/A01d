@@ -14,7 +14,7 @@ import org.json.JSONObject;
 
 public class RicohGr2AutoFocusControl
 {
-    private static final String TAG = SonyAutoFocusControl.class.getSimpleName();
+    private static final String TAG = RicohGr2AutoFocusControl.class.getSimpleName();
     private final IIndicatorControl indicator;
     private final IAutoFocusFrameDisplay frameDisplayer;
     private String lockAutoFocusUrl = "http://192.168.0.1/v1/lens/focus/lock";

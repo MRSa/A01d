@@ -41,6 +41,13 @@ class RicohGr2CameraConnectSequence implements Runnable
             {
                 SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
 
+                // 接続時、レンズロックOFF
+                {
+                    final String postData = "cmd=acclock off";
+                    String response0 = SimpleHttpClient.httpPost(grCommandUrl, postData, TIMEOUT_MS);
+                    Log.v(TAG, grCommandUrl + " " + response0);
+                }
+
                 // 接続時、カメラの画面を消す
                 if (preferences.getBoolean(IPreferencePropertyAccessor.GR2_LCD_SLEEP, false))
                 {

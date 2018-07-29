@@ -36,8 +36,6 @@ import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import jp.co.olympus.camerakit.OLYCamera;
-
 /**
  *   CameraLiveImageView :
  *    (OLYMPUS の ImageCaptureSample そのまま)
@@ -251,7 +249,7 @@ public class CameraLiveImageView extends View implements IImageDataReceiver, IAu
             imageWidth = imageBitmap.getHeight();
             imageHeight = imageBitmap.getWidth();
          }
-        return (OLYCamera.convertPointOnLiveImageIntoViewfinder(pointOnImage, imageWidth, imageHeight, imageRotationDegrees));
+        return (convertPointOnLiveImageIntoViewfinder(pointOnImage, imageWidth, imageHeight, imageRotationDegrees));
     }
 
     /**
@@ -467,7 +465,7 @@ public class CameraLiveImageView extends View implements IImageDataReceiver, IAu
         //Log.v(TAG, "drawFocusFrame() :" + focusFrameStatus);
 
         //  Calculate the rectangle of focus.
-        RectF focusRectOnImage = OLYCamera.convertRectOnViewfinderIntoLiveImage(focusFrameRect, imageWidth, imageHeight, imageRotationDegrees);
+        RectF focusRectOnImage = convertRectOnViewfinderIntoLiveImage(focusFrameRect, imageWidth, imageHeight, imageRotationDegrees);
         RectF focusRectOnView = convertRectFromImageArea(focusRectOnImage);
 
         // Draw a rectangle to the canvas.
@@ -862,6 +860,65 @@ public class CameraLiveImageView extends View implements IImageDataReceiver, IAu
 
         return new PointF(imagePointX, imagePointY);
     }
+
+    /**
+     *　　ライブビュー座標系の点座標をビューファインダー座標系の点座標に変換
+     *
+     *
+     */
+    private PointF convertPointOnLiveImageIntoViewfinder(PointF point, float width, float height, int rotatedDegrees)
+    {
+        float viewFinderPointX = 0.5f;
+        float viewFinderPointY = 0.5f;
+        try
+        {
+            if (rotatedDegrees == 0 || rotatedDegrees == 180) {
+                viewFinderPointX = point.x / width;
+                viewFinderPointY = point.y / height;
+            } else {
+                viewFinderPointX = point.y / width;
+                viewFinderPointY = point.x / height;
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        return (new PointF(viewFinderPointX, viewFinderPointY));
+    }
+
+    /**
+     *　　ビューファインダー座標系の矩形座標をライブビュー座標系のの矩形座標に変換
+     *
+     *
+     */
+    private RectF convertRectOnViewfinderIntoLiveImage(RectF rect, float width, float height, int rotatedDegrees)
+    {
+        float top = 0.0f;
+        float bottom = 1.0f;
+        float left = 0.0f;
+        float right = 1.0f;
+        try
+        {
+            if (rotatedDegrees == 0 || rotatedDegrees == 180) {
+                top = rect.top * height;
+                bottom = rect.bottom * height;
+                left = rect.left * width;
+                right = rect.right * width;
+            } else {
+                left = rect.top * height;
+                right = rect.bottom * height;
+                top = rect.left * width;
+                bottom = rect.right * width;
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        return (new RectF(left, top, right, bottom));
+    }
+
 
     /**
      * Converts a rectangle on image area to a rectangle on view area.
