@@ -69,4 +69,39 @@ public class OlyCameraFocusControl implements IFocusingControl
         }
     }
 
+    @Override
+    public void halfPressShutter(boolean isPressed)
+    {
+        if (isPressed)
+        {
+            // 中心にフォーカスを合わせる
+            if (frameDisplay != null)
+            {
+                Thread thread = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        PointF point = new PointF(0.5f, 0.5f);
+                        if (frameDisplay.isContainsPoint(point))
+                        {
+                            afControl.lockAutoFocus(point);
+                        }
+                    }
+                });
+                try
+                {
+                    thread.start();
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+            }
+        }
+        else
+        {
+            // フォーカスを解除する
+            unlockAutoFocus();
+        }
+    }
+
 }

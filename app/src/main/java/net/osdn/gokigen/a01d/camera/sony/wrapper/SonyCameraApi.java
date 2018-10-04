@@ -209,6 +209,34 @@ class SonyCameraApi implements ISonyCameraApi
     }
 
     @Override
+    public JSONObject actHalfPressShutter()
+    {
+        try
+        {
+            return (communicateJSON("camera", "actHalfPressShutter", new JSONArray(), "1.0", -1));
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        return (new JSONObject());
+    }
+
+    @Override
+    public JSONObject cancelHalfPressShutter()
+    {
+        try
+        {
+            return (communicateJSON("camera", "cancelHalfPressShutter", new JSONArray(), "1.0", -1));
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        return (new JSONObject());
+    }
+
+    @Override
     public JSONObject setFocusMode(String focusMode)
     {
         try

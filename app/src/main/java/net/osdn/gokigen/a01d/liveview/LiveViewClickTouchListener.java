@@ -143,6 +143,11 @@ class LiveViewClickTouchListener implements View.OnClickListener, View.OnTouchLi
                     actionZoomout();
                     break;
 
+                case R.id.focus_indicator:
+                    // フォーカスインジケータをクリックした
+                    actionFocusButton();
+                    break;
+
                 default:
                     Log.v(TAG, "onClick() : " + id);
                     break;
@@ -243,6 +248,17 @@ class LiveViewClickTouchListener implements View.OnClickListener, View.OnTouchLi
         {
             e.printStackTrace();
         }
+    }
+
+    /**
+     *   フォーカスボタンが押されたとき...
+     *
+     */
+    private void actionFocusButton()
+    {
+
+
+
     }
 
     /**

@@ -5,7 +5,6 @@ import android.graphics.RectF;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
-import net.osdn.gokigen.a01d.camera.sony.operation.takepicture.SonyAutoFocusControl;
 import net.osdn.gokigen.a01d.camera.utils.SimpleHttpClient;
 import net.osdn.gokigen.a01d.liveview.IAutoFocusFrameDisplay;
 import net.osdn.gokigen.a01d.liveview.IIndicatorControl;
@@ -17,8 +16,9 @@ public class RicohGr2AutoFocusControl
     private static final String TAG = RicohGr2AutoFocusControl.class.getSimpleName();
     private final IIndicatorControl indicator;
     private final IAutoFocusFrameDisplay frameDisplayer;
-    private String lockAutoFocusUrl = "http://192.168.0.1/v1/lens/focus/lock";
+    private String lockAutoFocusUrl = "http://192.168.0.1/v1/lens/focus/lock";    // Pentax機の場合は /v1/lens/focus
     private String unlockAutoFocusUrl = "http://192.168.0.1/v1/lens/focus/unlock";
+    private String halfPressShutterUrl = "http://192.168.0.1/_gr";
     private int timeoutMs = 6000;
 
 
@@ -113,6 +113,43 @@ public class RicohGr2AutoFocusControl
                             Log.v(TAG, "cancelTouchAFPosition() reply is null.");
                         }
                         hideFocusFrame();
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                    }
+                }
+            });
+            thread.start();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     *
+     *
+     */
+    public void halfPressShutter(final boolean isPressed)
+    {
+        Log.v(TAG, "halfPressShutter() " + isPressed);
+        try
+        {
+            Thread thread = new Thread(new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    try
+                    {
+                        String postData = (isPressed) ? "cmd=baf 1" : "cmd=baf 0";
+                        String result = SimpleHttpClient.httpPost(halfPressShutterUrl, postData, timeoutMs);
+                        if ((result == null)||(result.length() < 1))
+                        {
+                            Log.v(TAG, "halfPressShutter() [" + isPressed + "] reply is null.");
+                        }
                     }
                     catch (Exception e)
                     {

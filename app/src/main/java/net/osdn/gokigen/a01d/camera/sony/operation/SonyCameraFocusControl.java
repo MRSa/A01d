@@ -65,4 +65,18 @@ public class SonyCameraFocusControl  implements IFocusingControl
             e.printStackTrace();
         }
     }
+
+    @Override
+    public void halfPressShutter(boolean isPressed)
+    {
+        Log.v(TAG, "halfPressShutter() " + isPressed);
+        try
+        {
+            afControl.halfPressShutter(isPressed);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
 }

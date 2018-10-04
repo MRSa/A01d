@@ -151,6 +151,7 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer, IFo
             view.findViewById(R.id.shutter_button).setOnClickListener(onClickTouchListener);
             view.findViewById(R.id.btn_zoomin).setOnClickListener(onClickTouchListener);
             view.findViewById(R.id.btn_zoomout).setOnClickListener(onClickTouchListener);
+            view.findViewById(R.id.focus_indicator).setOnClickListener(onClickTouchListener);
 
             manualFocus = view.findViewById(R.id.focusing_button);
             changeLiveViewScale = view.findViewById(R.id.live_view_scale_button);

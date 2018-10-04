@@ -111,6 +111,47 @@ public class SonyAutoFocusControl
     }
 
     /**
+     *   シャッター半押し処理
+     *
+     */
+    public void halfPressShutter(final boolean isPressed)
+    {
+        Log.v(TAG, "halfPressShutter() : " + isPressed);
+        if (cameraApi == null)
+        {
+            Log.v(TAG, "ISonyCameraApi is null...");
+            return;
+        }
+        try
+        {
+            Thread thread = new Thread(new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    try
+                    {
+                        JSONObject resultsObj = (isPressed) ? cameraApi.actHalfPressShutter() : cameraApi.cancelHalfPressShutter();
+                        if (resultsObj == null)
+                        {
+                            Log.v(TAG, "lockAutoFocus() [" + isPressed + "] reply is null.");
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                    }
+                }
+            });
+            thread.start();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    /**
      *
      *
      */
