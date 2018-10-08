@@ -22,7 +22,7 @@ public class CameraEventObserver implements ICameraEventObserver
 
     private final ISonyCameraApi remoteApi;
     private final ReplyJsonParser replyParser;
-    private final String eventVersion = "1.0";
+    private String eventVersion = "1.1";  // 初期値を "1.0" から "1.1" に更新
 
     public static ICameraEventObserver newInstance(@NonNull Context context, @NonNull ISonyCameraApi apiClient)
     {
@@ -81,6 +81,12 @@ public class CameraEventObserver implements ICameraEventObserver
                                     break;
                                 case 1: // "Any" error
                                 case 12: // "No such method" error
+                                    if (eventVersion.equals("1.1"))
+                                    {
+                                        // "1.1" でエラーが発生した時には "1.0" にダウングレードして再実行
+                                        eventVersion = "1.0";
+                                        continue MONITORLOOP;
+                                    }
                                     replyParser.fireResponseErrorListener();
                                     break MONITORLOOP; // end monitoring.
 

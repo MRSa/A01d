@@ -256,9 +256,20 @@ class LiveViewClickTouchListener implements View.OnClickListener, View.OnTouchLi
      */
     private void actionFocusButton()
     {
-
-
-
+        try
+        {
+            //　シャッターを半押しする
+            if (focusingControl != null)
+            {
+                boolean isHalfPress = !statusViewDrawer.isFocusLocked();
+                focusingControl.halfPressShutter(isHalfPress);
+                Log.v(TAG, " actionFocusButton() : isHalfPress " + isHalfPress);
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
     }
 
     /**

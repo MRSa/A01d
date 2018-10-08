@@ -18,6 +18,7 @@ import net.osdn.gokigen.a01d.R;
 import net.osdn.gokigen.a01d.camera.ICameraConnection;
 import net.osdn.gokigen.a01d.camera.ICameraStatusReceiver;
 import net.osdn.gokigen.a01d.camera.sony.wrapper.ISonyCameraHolder;
+import net.osdn.gokigen.a01d.camera.sony.wrapper.eventlistener.ICameraChangeListener;
 
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -35,16 +36,18 @@ public class SonyCameraConnection implements ICameraConnection
     private final ISonyCameraHolder cameraHolder;
     //private final ConnectivityManager connectivityManager;
     private final Executor cameraExecutor = Executors.newFixedThreadPool(1);
+    private final ICameraChangeListener listener;
     //private final Handler networkConnectionTimeoutHandler;
     //private static final int MESSAGE_CONNECTIVITY_TIMEOUT = 1;
     private CameraConnectionStatus connectionStatus = CameraConnectionStatus.UNKNOWN;
 
-    public SonyCameraConnection(final Activity context, final ICameraStatusReceiver statusReceiver, @NonNull ISonyCameraHolder cameraHolder)
+    public SonyCameraConnection(final Activity context, final ICameraStatusReceiver statusReceiver, @NonNull ISonyCameraHolder cameraHolder, final @NonNull ICameraChangeListener listener)
     {
         Log.v(TAG, "SonyCameraConnection()");
         this.context = context;
         this.statusReceiver = statusReceiver;
         this.cameraHolder = cameraHolder;
+        this.listener = listener;
 /*
         ConnectivityManager connectivityManager = (ConnectivityManager) context.getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
         networkConnectionTimeoutHandler = new Handler()
@@ -264,7 +267,7 @@ public class SonyCameraConnection implements ICameraConnection
         connectionStatus = CameraConnectionStatus.CONNECTING;
         try
         {
-            cameraExecutor.execute(new SonyCameraConnectSequence(context,statusReceiver, this, cameraHolder));
+            cameraExecutor.execute(new SonyCameraConnectSequence(context,statusReceiver, this, cameraHolder, listener));
         }
         catch (Exception e)
         {

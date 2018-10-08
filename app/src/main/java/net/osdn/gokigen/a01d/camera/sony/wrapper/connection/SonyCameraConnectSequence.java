@@ -10,6 +10,7 @@ import net.osdn.gokigen.a01d.camera.ICameraStatusReceiver;
 import net.osdn.gokigen.a01d.camera.sony.wrapper.ISonyCamera;
 import net.osdn.gokigen.a01d.camera.sony.wrapper.ISonyCameraHolder;
 import net.osdn.gokigen.a01d.camera.sony.wrapper.eventlistener.CameraChangeListerTemplate;
+import net.osdn.gokigen.a01d.camera.sony.wrapper.eventlistener.ICameraChangeListener;
 
 
 /**
@@ -23,15 +24,17 @@ public class SonyCameraConnectSequence implements Runnable, SonySsdpClient.ISear
     private final ICameraConnection cameraConnection;
     private final ISonyCameraHolder cameraHolder;
     private final ICameraStatusReceiver cameraStatusReceiver;
+    private final ICameraChangeListener listener;
     private final SonySsdpClient client;
 
-    SonyCameraConnectSequence(Activity context, ICameraStatusReceiver statusReceiver, final ICameraConnection cameraConnection, final @NonNull ISonyCameraHolder cameraHolder)
+    SonyCameraConnectSequence(Activity context, ICameraStatusReceiver statusReceiver, final ICameraConnection cameraConnection, final @NonNull ISonyCameraHolder cameraHolder, final @NonNull ICameraChangeListener listener)
     {
         Log.v(TAG, "SonyCameraConnectSequence");
         this.context = context;
         this.cameraConnection = cameraConnection;
         this.cameraStatusReceiver = statusReceiver;
         this.cameraHolder = cameraHolder;
+        this.listener = listener;
         client = new SonySsdpClient(context, this, statusReceiver, 1);
     }
 
@@ -78,7 +81,7 @@ public class SonyCameraConnectSequence implements Runnable, SonySsdpClient.ISear
                     try
                     {
                         cameraHolder.prepare();
-                        cameraHolder.startEventWatch(new CameraChangeListerTemplate());
+                        cameraHolder.startEventWatch(listener);
                     }
                     catch (Exception e)
                     {

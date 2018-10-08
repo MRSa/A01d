@@ -51,6 +51,12 @@ public class CameraChangeListerTemplate implements ICameraChangeListener
     }
 
     @Override
+    public void onFocusStatusChanged(String focusStatus)
+    {
+        Log.v(TAG, "onFocusStatusChanged() : " + focusStatus);
+    }
+
+    @Override
     public void onResponseError()
     {
         Log.v(TAG, "onResponseError() ");

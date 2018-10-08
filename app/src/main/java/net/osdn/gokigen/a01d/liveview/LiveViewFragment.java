@@ -3,11 +3,14 @@ package net.osdn.gokigen.a01d.liveview;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.content.res.ResourcesCompat;
+import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v7.preference.PreferenceManager;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -39,7 +42,7 @@ import net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor;
  *  撮影用ライブビュー画面
  *
  */
-public class LiveViewFragment extends Fragment implements IStatusViewDrawer, IFocusingModeNotify, IFavoriteSettingDialogKicker
+public class LiveViewFragment extends Fragment implements IStatusViewDrawer, IFocusingModeNotify, IFavoriteSettingDialogKicker, ICameraStatusUpdateNotify, IFocusLockIndicator
 {
     private final String TAG = this.toString();
     private static final int COMMAND_MY_PROPERTY = 0x00000100;
@@ -58,6 +61,7 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer, IFo
     private CameraLiveImageView imageView = null;
 
     private ImageView manualFocus = null;
+    private ImageView focusIndicator = null;
     private ImageButton showGrid = null;
     private ImageButton connectStatus = null;
     private Button changeLiveViewScale = null;
@@ -65,6 +69,7 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer, IFo
     private boolean imageViewCreated = false;
     private View myView = null;
     private String messageValue = "";
+    private boolean focusLocked = false;
 
     private ICameraConnection.CameraConnectionStatus currentConnectionStatus =  ICameraConnection.CameraConnectionStatus.UNKNOWN;
 
@@ -145,14 +150,19 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer, IFo
             }
             imageView.setOnClickListener(onClickTouchListener);
             imageView.setOnTouchListener(onClickTouchListener);
+            imageView.setFocuslockIndicator(this);
 
             view.findViewById(R.id.show_preference_button).setOnClickListener(onClickTouchListener);
             view.findViewById(R.id.camera_property_settings_button).setOnClickListener(onClickTouchListener);
             view.findViewById(R.id.shutter_button).setOnClickListener(onClickTouchListener);
             view.findViewById(R.id.btn_zoomin).setOnClickListener(onClickTouchListener);
             view.findViewById(R.id.btn_zoomout).setOnClickListener(onClickTouchListener);
-            view.findViewById(R.id.focus_indicator).setOnClickListener(onClickTouchListener);
 
+            focusIndicator =  view.findViewById(R.id.focus_indicator);
+            if (focusIndicator != null)
+            {
+                focusIndicator.setOnClickListener(onClickTouchListener);
+            }
             manualFocus = view.findViewById(R.id.focusing_button);
             changeLiveViewScale = view.findViewById(R.id.live_view_scale_button);
 
@@ -161,6 +171,12 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer, IFo
             if (connectionMethod == ICameraConnection.CameraConnectionMethod.OPC)
             {
                 view.findViewById(R.id.show_favorite_settings_button).setOnClickListener(onClickTouchListener);
+
+                // OPCのときには、フォーカスインジケータのマークを消す。
+                if (focusIndicator != null)
+                {
+                    focusIndicator.setVisibility(View.INVISIBLE);
+                }
             }
             else
             {
@@ -189,12 +205,20 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer, IFo
                     {
                         changeLiveViewScale.setVisibility(View.INVISIBLE);
                     }
+                    if (focusIndicator != null)
+                    {
+                        focusIndicator.setVisibility(View.VISIBLE);
+                    }
                 }
-                else // if (connectionMethod == ICameraConnection.CameraConnectionMethod.RICOH_GR2)
+                else if (connectionMethod == ICameraConnection.CameraConnectionMethod.RICOH_GR2)
                 {
                     if (changeLiveViewScale != null)
                     {
                         changeLiveViewScale.setVisibility(View.VISIBLE);
+                    }
+                    if (focusIndicator != null)
+                    {
+                        focusIndicator.setVisibility(View.INVISIBLE);
                     }
                 }
             }
@@ -273,6 +297,7 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer, IFo
             this.zoomLensControl = interfaceProvider.getOlympusInterface().getZoomLensControl();
             this.cameraInformation = interfaceProvider.getOlympusInterface().getCameraInformation();
         }
+        interfaceProvider.setUpdateReceiver(this);
     }
 
     /**
@@ -602,6 +627,17 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer, IFo
         }
     }
 
+
+    /**
+     *   フォーカスロック中かどうか
+     *
+     */
+    @Override
+    public boolean isFocusLocked()
+    {
+        return (this.focusLocked);
+    }
+
     /**
      *    測光モードをスポットに切り替える
      *
@@ -653,5 +689,145 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer, IFo
             return;
         }
         activity.runOnUiThread(action);
+    }
+
+    @Override
+    public void updateDriveMode(String driveMode)
+    {
+        Log.v(TAG, "updateDriveMode() : " + driveMode);
+    }
+
+    @Override
+    public void updateAeLockState(boolean isAeLocked)
+    {
+        Log.v(TAG, "updateAeLockState() : " + isAeLocked);
+    }
+
+    @Override
+    public void updateCameraStatus(String message)
+    {
+        Log.v(TAG, "updateCameraStatus() : " + message);
+    }
+
+    @Override
+    public void updateLevelGauge(String orientation, float roll, float pitch)
+    {
+        Log.v(TAG, "updateLevelGauge() : " + orientation + " roll : " + roll + "  pitch : " + pitch);
+    }
+
+    @Override
+    public void updatedTakeMode(String mode)
+    {
+        Log.v(TAG, "updatedTakeMode() : " + mode);
+    }
+
+    @Override
+    public void updatedShutterSpeed(String tv)
+    {
+        Log.v(TAG, "updatedShutterSpeed() : " + tv);
+    }
+
+    @Override
+    public void updatedAperture(String av)
+    {
+        Log.v(TAG, "updatedAperture() : " + av);
+    }
+
+    @Override
+    public void updatedExposureCompensation(String xv)
+    {
+        Log.v(TAG, "updatedExposureCompensation() : " + xv);
+    }
+
+    @Override
+    public void updatedMeteringMode(String meteringMode)
+    {
+        Log.v(TAG, "updatedExposureCompensation() : " + meteringMode);
+    }
+
+    @Override
+    public void updatedWBMode(String wbMode)
+    {
+        Log.v(TAG, "updatedWBMode() : " + wbMode);
+    }
+
+    @Override
+    public void updateRemainBattery(int percentage)
+    {
+        Log.v(TAG, "updateRemainBattery() : " + percentage);
+    }
+
+    @Override
+    public void updateFocusedStatus(final boolean focused, final boolean focusLocked)
+    {
+        Log.v(TAG, "updateFocusedStatus() : f: " + focused + " fl: " + focusLocked);
+        this.focusLocked = focusLocked;
+        Activity activity = getActivity();
+        if ((activity == null)||(focusIndicator == null)|| (focusIndicator.getVisibility() != View.VISIBLE))
+        {
+            Log.v(TAG, "updateFocusedStatus() : INVISIBLE");
+            return;
+        }
+
+        try
+        {
+            activity.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    if (focused)
+                    {
+                        Drawable icon = ResourcesCompat.getDrawable(getResources(), R.drawable.ic_center_focus_strong_black_24dp, null);
+                        if (icon != null)
+                        {
+                            DrawableCompat.setTint(icon, Color.GREEN);
+                            focusIndicator.setImageDrawable(icon);
+                        }
+                    }
+                    else
+                    {
+                        Drawable icon = ResourcesCompat.getDrawable(getResources(), R.drawable.ic_crop_free_black_24dp, null);
+                        if (icon != null)
+                        {
+                            int color = Color.BLACK;
+                            if (focusLocked)
+                            {
+                                color = Color.RED;
+                            }
+                            DrawableCompat.setTint(icon, color);
+                            focusIndicator.setImageDrawable(icon);
+                        }
+                    }
+                    focusIndicator.invalidate();
+                }
+            });
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void updateIsoSensitivity(String sv)
+    {
+        Log.v(TAG, "updateIsoSensitivity() : " + sv);
+    }
+
+    @Override
+    public void updateWarning(String warning)
+    {
+        Log.v(TAG, "updateWarning() : " + warning);
+    }
+
+    @Override
+    public void updateStorageStatus(String status)
+    {
+        Log.v(TAG, "updateStorageStatus() : " + status);
+    }
+
+    @Override
+    public void updateFocusLockIndicator(final boolean focused, final boolean focusLocked)
+    {
+        updateFocusedStatus(focused, focusLocked);
     }
 }

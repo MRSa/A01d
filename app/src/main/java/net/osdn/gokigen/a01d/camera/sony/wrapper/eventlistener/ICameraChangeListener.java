@@ -14,5 +14,6 @@ public interface ICameraChangeListener
     void onShootModeChanged(String shootMode);
     void onZoomPositionChanged(int zoomPosition);
     void onStorageIdChanged(String storageId);
+    void onFocusStatusChanged(String focusStatus);
     void onResponseError();
 }

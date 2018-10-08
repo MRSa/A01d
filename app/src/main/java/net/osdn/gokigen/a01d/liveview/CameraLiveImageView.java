@@ -61,6 +61,7 @@ public class CameraLiveImageView extends View implements IImageDataReceiver, IAu
     private IPreviewImageConverter bitmapConverter = null;
     private IMessageHolder messageHolder;
     private IStoreImage storeImage = null;
+    private IFocusLockIndicator focusLockIndicator = null;
 
     public CameraLiveImageView(Context context)
     {
@@ -151,6 +152,10 @@ public class CameraLiveImageView extends View implements IImageDataReceiver, IAu
         return getIntrinsicContentSizeHeight();
     }
 
+    public void setFocuslockIndicator(IFocusLockIndicator focuslockIndicator)
+    {
+        focusLockIndicator = focuslockIndicator;
+    }
 
     private float getIntrinsicContentSizeWidth()
     {
@@ -996,7 +1001,11 @@ public class CameraLiveImageView extends View implements IImageDataReceiver, IAu
     @Override
     public void onAfLockUpdate(boolean isAfLocked)
     {
-        //Log.v(TAG, "onAfLockUpdate() : " + isAfLocked);
+        Log.v(TAG, "onAfLockUpdate() : " + isAfLocked);
+        if (focusLockIndicator != null)
+        {
+            focusLockIndicator.updateFocusLockIndicator(isAfLocked, isAfLocked);
+        }
     }
 
     @Override

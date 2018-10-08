@@ -134,7 +134,11 @@ public class SonyAutoFocusControl
                         JSONObject resultsObj = (isPressed) ? cameraApi.actHalfPressShutter() : cameraApi.cancelHalfPressShutter();
                         if (resultsObj == null)
                         {
-                            Log.v(TAG, "lockAutoFocus() [" + isPressed + "] reply is null.");
+                            Log.v(TAG, "halfPressShutter() [" + isPressed + "] reply is null.");
+                        }
+                        else
+                        {
+                            indicator.onAfLockUpdate(isPressed);
                         }
                     }
                     catch (Exception e)

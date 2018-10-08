@@ -23,6 +23,7 @@ public class ReplyJsonParser implements ICameraStatusHolder
     private List<String> currentAvailableShootModes = Collections.unmodifiableList(new ArrayList<String>());
     private int currentZoomPosition;
     private String currentStorageId;
+    private String currentFocusStatus;
 
     ReplyJsonParser(final @NonNull Handler uiHandler)
     {
@@ -81,6 +82,13 @@ public class ReplyJsonParser implements ICameraStatusHolder
             fireStorageIdChangeListener(storageId);
         }
 
+        // focusStatus (v1.1)
+        String focusStatus = findFocusStatus(replyJson);
+        Log.d(TAG, "getEvent focusStatus:" + focusStatus);
+        if (focusStatus != null && !focusStatus.equals(currentFocusStatus)) {
+            currentFocusStatus = focusStatus;
+            fireFocusStatusChangeListener(focusStatus);
+        }
     }
 
     void setEventChangeListener(ICameraChangeListener listener)
@@ -179,6 +187,17 @@ public class ReplyJsonParser implements ICameraStatusHolder
             public void run() {
                 if (listener != null) {
                     listener.onStorageIdChanged(storageId);
+                }
+            }
+        });
+    }
+
+    private void fireFocusStatusChangeListener(final String focusStatus) {
+        uiHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                if (listener != null) {
+                    listener.onFocusStatusChanged(focusStatus);
                 }
             }
         });
@@ -343,6 +362,26 @@ public class ReplyJsonParser implements ICameraStatusHolder
         return (storageId);
     }
 
+    private static String findFocusStatus(JSONObject replyJson)
+    {
+        String focusStatus = null;
+        try {
+            int indexOfFocusStatus= 35;
+            JSONArray resultsObj = replyJson.getJSONArray("result");
+            if (!resultsObj.isNull(indexOfFocusStatus)) {
+                JSONObject focustatusObj = resultsObj.getJSONObject(indexOfFocusStatus);
+                String type = focustatusObj.getString("type");
+                if ("focusStatus".equals(type)) {
+                    focusStatus = focustatusObj.getString("focusStatus");
+                } else {
+                    Log.w(TAG, "Event reply: Illegal Index (21: ShootMode) " + type);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return (focusStatus);
+    }
 
     @Override
     public String getCameraStatus()

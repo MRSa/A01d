@@ -12,6 +12,7 @@ import net.osdn.gokigen.a01d.camera.ricohgr2.IRicohGr2InterfaceProvider;
 import net.osdn.gokigen.a01d.camera.ricohgr2.wrapper.RicohGr2InterfaceProvider;
 import net.osdn.gokigen.a01d.camera.sony.ISonyInterfaceProvider;
 import net.osdn.gokigen.a01d.camera.sony.wrapper.SonyCameraWrapper;
+import net.osdn.gokigen.a01d.liveview.ICameraStatusUpdateNotify;
 import net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor;
 
 public class CameraInterfaceProvider implements IInterfaceProvider
@@ -20,13 +21,28 @@ public class CameraInterfaceProvider implements IInterfaceProvider
     private final OlympusInterfaceProvider olympus;
     private final SonyCameraWrapper sony;
     private final RicohGr2InterfaceProvider ricohGr2;
+    private final CameraStatusListener statusListener;
 
     public CameraInterfaceProvider(@NonNull Activity context, @NonNull ICameraStatusReceiver provider)
     {
         this.context = context;
+        this.statusListener = new CameraStatusListener();
         olympus = new OlympusInterfaceProvider(context, provider);
-        sony = new SonyCameraWrapper(context, provider);
+        sony = new SonyCameraWrapper(context, provider, statusListener);
         ricohGr2 = new RicohGr2InterfaceProvider(context, provider);
+    }
+
+    @Override
+    public void setUpdateReceiver(@NonNull ICameraStatusUpdateNotify receiver)
+    {
+        try
+        {
+            statusListener.setUpdateReceiver(receiver);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
     }
 
     @Override

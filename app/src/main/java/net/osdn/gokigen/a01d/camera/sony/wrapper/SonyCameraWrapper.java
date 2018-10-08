@@ -36,6 +36,7 @@ public class SonyCameraWrapper implements ISonyCameraHolder, ISonyInterfaceProvi
     private final String TAG = toString();
     private final Activity context;
     private final ICameraStatusReceiver provider;
+    private final ICameraChangeListener listener;
     private ISonyCamera sonyCamera = null;
     private ISonyCameraApi sonyCameraApi = null;
     private ICameraEventObserver eventObserver = null;
@@ -44,10 +45,11 @@ public class SonyCameraWrapper implements ISonyCameraHolder, ISonyInterfaceProvi
     private SonyCameraCaptureControl captureControl = null;
     private SonyCameraZoomLensControl zoomControl = null;
 
-    public SonyCameraWrapper(final Activity context, final ICameraStatusReceiver statusReceiver)
+    public SonyCameraWrapper(final Activity context, final ICameraStatusReceiver statusReceiver , final @NonNull ICameraChangeListener listener)
     {
         this.context = context;
         this.provider = statusReceiver;
+        this.listener = listener;
     }
 
     @Override
@@ -102,7 +104,7 @@ public class SonyCameraWrapper implements ISonyCameraHolder, ISonyInterfaceProvi
     @Override
     public ICameraConnection getSonyCameraConnection()
     {
-        return (new SonyCameraConnection(context, provider, this));
+        return (new SonyCameraConnection(context, provider, this, listener));
     }
 
     @Override
