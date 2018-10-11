@@ -73,6 +73,12 @@ public class SonyCameraFocusControl  implements IFocusingControl
         try
         {
             afControl.halfPressShutter(isPressed);
+            if (!isPressed)
+            {
+                // フォーカスを外す
+                frameDisplay.hideFocusFrame();
+                afControl.unlockAutoFocus();
+            }
         }
         catch (Exception e)
         {
