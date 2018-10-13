@@ -1,6 +1,5 @@
 package net.osdn.gokigen.a01d.logcat;
 
-
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.ArrayList;

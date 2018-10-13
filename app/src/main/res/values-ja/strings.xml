@@ -124,4 +124,6 @@
     <string name="pref_gr2_display_mode">ディスプレイモード</string>
     <string name="pref_gr2_lcd_sleep">接続中はカメラ画面OFF</string>
 
+    <string name="dialog_confirm_title_output_log">ログの共有</string>
+    <string name="dialog_confirm_message_output_log">デバッグログを共有します。</string>
 </resources>
