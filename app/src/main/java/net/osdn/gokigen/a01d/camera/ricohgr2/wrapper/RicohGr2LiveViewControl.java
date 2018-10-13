@@ -1,5 +1,8 @@
 package net.osdn.gokigen.a01d.camera.ricohgr2.wrapper;
 
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
@@ -8,6 +11,7 @@ import net.osdn.gokigen.a01d.camera.utils.SimpleHttpClient;
 import net.osdn.gokigen.a01d.camera.utils.SimpleLiveviewSlicer;
 import net.osdn.gokigen.a01d.liveview.liveviewlistener.CameraLiveViewListenerImpl;
 import net.osdn.gokigen.a01d.liveview.liveviewlistener.ILiveViewListener;
+import net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor;
 
 /**
  *
@@ -16,8 +20,9 @@ import net.osdn.gokigen.a01d.liveview.liveviewlistener.ILiveViewListener;
 public class RicohGr2LiveViewControl implements ILiveViewControl
 {
     private final String TAG = toString();
+    private final Context context;
     private final CameraLiveViewListenerImpl liveViewListener;
-    private String liveViewUrl = "http://192.168.0.1/v1/display";
+    private String liveViewUrl = "http://192.168.0.1/v1/display";  // "http://192.168.0.1/v1/liveview";
     private float cropScale = 1.0f;
     private boolean whileFetching = false;
     private static final int FETCH_ERROR_MAX = 30;
@@ -26,10 +31,35 @@ public class RicohGr2LiveViewControl implements ILiveViewControl
      *
      *
      */
-    RicohGr2LiveViewControl()
+    RicohGr2LiveViewControl(final Context context)
     {
+        this.context = context;
+        prepare();
         liveViewListener = new CameraLiveViewListenerImpl();
     }
+
+    /**
+     *
+     *
+     */
+    private void prepare()
+    {
+        liveViewUrl = "http://192.168.0.1/v1/display";
+        try
+        {
+            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+            if (!(preferences.getBoolean(IPreferencePropertyAccessor.GR2_LIVE_VIEW, true)))
+            {
+                liveViewUrl = "http://192.168.0.1/v1/liveview";
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        Log.v(TAG, "LIVE VIEW URL : " + liveViewUrl);
+    }
+
 
 /*
     public void setLiveViewAddress(@NonNull String address, @NonNull String page)
@@ -49,6 +79,7 @@ public class RicohGr2LiveViewControl implements ILiveViewControl
     public void startLiveView()
     {
         Log.v(TAG, "startLiveView()");
+        //prepare();
         try
         {
             Thread thread = new Thread(new Runnable()
@@ -80,7 +111,6 @@ public class RicohGr2LiveViewControl implements ILiveViewControl
     {
 
     }
-
 
     private void start(@NonNull final String streamUrl)
     {

@@ -1,5 +1,6 @@
 package net.osdn.gokigen.a01d.camera.ricohgr2.operation;
 
+import android.content.Context;
 import android.graphics.PointF;
 import android.support.annotation.NonNull;
 import android.util.Log;
@@ -16,10 +17,10 @@ public class RicohGr2CameraFocusControl implements IFocusingControl
     private final RicohGr2AutoFocusControl afControl;
     private final IAutoFocusFrameDisplay frameDisplay;
 
-    public RicohGr2CameraFocusControl(@NonNull final IAutoFocusFrameDisplay frameDisplayer, @NonNull final IIndicatorControl indicator)
+    public RicohGr2CameraFocusControl(@NonNull Context context, @NonNull final IAutoFocusFrameDisplay frameDisplayer, @NonNull final IIndicatorControl indicator)
     {
         this.frameDisplay = frameDisplayer;
-        this.afControl = new RicohGr2AutoFocusControl(frameDisplayer, indicator);
+        this.afControl = new RicohGr2AutoFocusControl(context, frameDisplayer, indicator);
     }
 
     @Override

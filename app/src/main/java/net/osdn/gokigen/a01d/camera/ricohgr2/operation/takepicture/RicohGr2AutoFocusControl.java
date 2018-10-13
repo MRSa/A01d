@@ -1,16 +1,24 @@
 package net.osdn.gokigen.a01d.camera.ricohgr2.operation.takepicture;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.PointF;
 import android.graphics.RectF;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
 import net.osdn.gokigen.a01d.camera.utils.SimpleHttpClient;
 import net.osdn.gokigen.a01d.liveview.IAutoFocusFrameDisplay;
 import net.osdn.gokigen.a01d.liveview.IIndicatorControl;
+import net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor;
 
 import org.json.JSONObject;
 
+/**
+ *
+ *
+ */
 public class RicohGr2AutoFocusControl
 {
     private static final String TAG = RicohGr2AutoFocusControl.class.getSimpleName();
@@ -22,10 +30,38 @@ public class RicohGr2AutoFocusControl
     private int timeoutMs = 6000;
 
 
-    public RicohGr2AutoFocusControl(@NonNull final IAutoFocusFrameDisplay frameDisplayer, final IIndicatorControl indicator)
+    /**
+     *
+     *
+     */
+    public RicohGr2AutoFocusControl(@NonNull Context context, @NonNull final IAutoFocusFrameDisplay frameDisplayer, final IIndicatorControl indicator)
     {
         this.frameDisplayer = frameDisplayer;
         this.indicator = indicator;
+
+        prepare(context);
+    }
+
+    /**
+     *
+     *
+     */
+    private void prepare(@NonNull Context context)
+    {
+        lockAutoFocusUrl = "http://192.168.0.1/v1/lens/focus/lock";
+        try
+        {
+            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+            if (preferences.getBoolean(IPreferencePropertyAccessor.USE_PENTAX_AUTOFOCUS, false))
+            {
+                lockAutoFocusUrl = "http://192.168.0.1/v1/lens/focus";
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        Log.v(TAG, "FOCUS LOCK URL : " + lockAutoFocusUrl);
     }
 
     /**

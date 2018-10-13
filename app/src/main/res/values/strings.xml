@@ -131,4 +131,11 @@
 
     <string name="dialog_confirm_title_output_log">Share debug log</string>
     <string name="dialog_confirm_message_output_log">Share the debug log, OK?</string>
+
+    <string name="pref_gr2_display_camera_view">Mirror Camera Screen</string>
+    <string name="pref_gr2_display_camera_view_summary">Use same camera screen.</string>
+
+    <string name="pref_use_pentax_autofocus">PENTAX DSLR Touch focus control.</string>
+    <string name="pref_use_pentax_autofocus_summary">Do use a PENTAX DSLR Control for touch focus command.</string>
+
 </resources>

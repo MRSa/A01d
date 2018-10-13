@@ -47,6 +47,8 @@ public interface IPreferencePropertyAccessor
     String GR2_DISPLAY_MODE_DEFAULT_VALUE = "0";
 
     String GR2_LCD_SLEEP = "gr2_lcd_sleep";
+    String GR2_LIVE_VIEW = "gr2_display_camera_view";
+    String USE_PENTAX_AUTOFOCUS = "use_pentax_autofocus_mode";
 
     /*
     int CHOICE_SPLASH_SCREEN = 10;

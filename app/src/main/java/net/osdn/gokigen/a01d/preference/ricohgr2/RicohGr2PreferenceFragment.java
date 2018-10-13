@@ -116,6 +116,12 @@ public class RicohGr2PreferenceFragment  extends PreferenceFragmentCompat implem
             if (!items.containsKey(IPreferencePropertyAccessor.GR2_LCD_SLEEP)) {
                 editor.putBoolean(IPreferencePropertyAccessor.GR2_LCD_SLEEP, false);
             }
+            if (!items.containsKey(IPreferencePropertyAccessor.GR2_LIVE_VIEW)) {
+                editor.putBoolean(IPreferencePropertyAccessor.GR2_LIVE_VIEW, true);
+            }
+            if (!items.containsKey(IPreferencePropertyAccessor.USE_PENTAX_AUTOFOCUS)) {
+                editor.putBoolean(IPreferencePropertyAccessor.USE_PENTAX_AUTOFOCUS, false);
+            }
             if (!items.containsKey(IPreferencePropertyAccessor.GR2_DISPLAY_MODE)) {
                 editor.putString(IPreferencePropertyAccessor.GR2_DISPLAY_MODE, IPreferencePropertyAccessor.GR2_DISPLAY_MODE_DEFAULT_VALUE);
             }
@@ -151,6 +157,16 @@ public class RicohGr2PreferenceFragment  extends PreferenceFragmentCompat implem
                     break;
 
                 case IPreferencePropertyAccessor.GR2_LCD_SLEEP:
+                    value = preferences.getBoolean(key, false);
+                    Log.v(TAG, " " + key + " , " + value);
+                    break;
+
+                case IPreferencePropertyAccessor.GR2_LIVE_VIEW:
+                    value = preferences.getBoolean(key, true);
+                    Log.v(TAG, " " + key + " , " + value);
+                    break;
+
+                case IPreferencePropertyAccessor.USE_PENTAX_AUTOFOCUS:
                     value = preferences.getBoolean(key, false);
                     Log.v(TAG, " " + key + " , " + value);
                     break;
@@ -319,7 +335,8 @@ public class RicohGr2PreferenceFragment  extends PreferenceFragmentCompat implem
                         setBooleanPreference(IPreferencePropertyAccessor.AUTO_CONNECT_TO_CAMERA, IPreferencePropertyAccessor.AUTO_CONNECT_TO_CAMERA, defaultValue);
                         setBooleanPreference(IPreferencePropertyAccessor.CAPTURE_BOTH_CAMERA_AND_LIVE_VIEW, IPreferencePropertyAccessor.CAPTURE_BOTH_CAMERA_AND_LIVE_VIEW, defaultValue);
                         setBooleanPreference(IPreferencePropertyAccessor.GR2_LCD_SLEEP, IPreferencePropertyAccessor.GR2_LCD_SLEEP, defaultValue);
-
+                        setBooleanPreference(IPreferencePropertyAccessor.GR2_LIVE_VIEW, IPreferencePropertyAccessor.GR2_LIVE_VIEW, defaultValue);
+                        setBooleanPreference(IPreferencePropertyAccessor.USE_PENTAX_AUTOFOCUS, IPreferencePropertyAccessor.USE_PENTAX_AUTOFOCUS, false);
                     }
                     catch (Exception e)
                     {
