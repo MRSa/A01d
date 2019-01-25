@@ -30,7 +30,7 @@ public class RicohGr2InterfaceProvider implements IRicohGr2InterfaceProvider, ID
 {
     private final String TAG = toString();
     private final Activity activity;
-    private final ICameraStatusReceiver provider;
+    //private final ICameraStatusReceiver provider;
     private final RicohGr2Connection gr2Connection;
     private RicohGr2LiveViewControl liveViewControl;
     private RicohGr2CameraCaptureControl captureControl;
@@ -44,11 +44,10 @@ public class RicohGr2InterfaceProvider implements IRicohGr2InterfaceProvider, ID
     public RicohGr2InterfaceProvider(@NonNull Activity context, @NonNull ICameraStatusReceiver provider)
     {
         this.activity = context;
-        this.provider = provider;
+        //this.provider = provider;
         gr2Connection = new RicohGr2Connection(context, provider);
         liveViewControl = new RicohGr2LiveViewControl(context);
         zoomControl = new RicohGr2CameraZoomLensControl();
-
     }
 
     /**
@@ -69,7 +68,7 @@ public class RicohGr2InterfaceProvider implements IRicohGr2InterfaceProvider, ID
     {
         Log.v(TAG, "injectDisplay()");
         focusControl = new RicohGr2CameraFocusControl(activity, frameDisplayer, indicator);
-        captureControl = new RicohGr2CameraCaptureControl(frameDisplayer);
+        captureControl = new RicohGr2CameraCaptureControl(activity, frameDisplayer);
     }
 
     /**

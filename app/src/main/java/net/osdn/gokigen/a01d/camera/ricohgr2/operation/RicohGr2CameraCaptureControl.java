@@ -1,5 +1,6 @@
 package net.osdn.gokigen.a01d.camera.ricohgr2.operation;
 
+import android.content.Context;
 import android.support.annotation.NonNull;
 
 import net.osdn.gokigen.a01d.camera.ICaptureControl;
@@ -10,9 +11,9 @@ public class RicohGr2CameraCaptureControl implements ICaptureControl
 {
     private final RicohGr2SingleShotControl singleShotControl;
 
-    public RicohGr2CameraCaptureControl(@NonNull IAutoFocusFrameDisplay frameDisplayer)
+    public RicohGr2CameraCaptureControl(@NonNull Context context, @NonNull IAutoFocusFrameDisplay frameDisplayer)
     {
-        singleShotControl = new RicohGr2SingleShotControl(frameDisplayer);
+        singleShotControl = new RicohGr2SingleShotControl(context, frameDisplayer);
     }
 
     @Override

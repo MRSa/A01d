@@ -130,7 +130,7 @@
     <string name="dialog_confirm_title_output_log">ログの共有</string>
     <string name="dialog_confirm_message_output_log">デバッグログを共有します。</string>
 
-    <string name="pref_use_pentax_autofocus">PENTAX一眼タッチフォーカス</string>
-    <string name="pref_use_pentax_autofocus_summary">タッチフォーカスでPENTAX一眼命令を使います。</string>
+    <string name="pref_use_pentax_autofocus">PENTAX一眼カメラの制御</string>
+    <string name="pref_use_pentax_autofocus_summary">PENTAX一眼カメラ用の命令を使って制御します。</string>
 
 </resources>
