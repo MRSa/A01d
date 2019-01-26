@@ -48,7 +48,9 @@ public class RicohGr2LiveViewControl implements ILiveViewControl
         try
         {
             SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-            if (!(preferences.getBoolean(IPreferencePropertyAccessor.GR2_LIVE_VIEW, true)))
+            boolean mirrorMode = preferences.getBoolean(IPreferencePropertyAccessor.GR2_LIVE_VIEW, true);
+            boolean pentaxMode = preferences.getBoolean(IPreferencePropertyAccessor.USE_PENTAX_AUTOFOCUS, false);
+            if ((pentaxMode)||(!mirrorMode))
             {
                 liveViewUrl = "http://192.168.0.1/v1/liveview";
             }
