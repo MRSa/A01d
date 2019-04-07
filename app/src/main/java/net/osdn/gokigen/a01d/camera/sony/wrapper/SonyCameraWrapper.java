@@ -74,6 +74,27 @@ public class SonyCameraWrapper implements ISonyCameraHolder, ISonyInterfaceProvi
     }
 
     @Override
+    public void startRecMode()
+    {
+        try {
+            List<String> apiCommands = getApiCommands();
+            int index = apiCommands.indexOf("startRecMode");
+            if (index > 0)
+            {
+                // startRecMode発行
+                Log.v(TAG, "----- THIS CAMERA NEEDS COMMAND 'startRecMode'.");
+                sonyCameraApi.startRecMode();
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+
+    }
+
+    @Override
     public void startEventWatch(@Nullable ICameraChangeListener listener)
     {
         try

@@ -82,6 +82,7 @@ public class SonyCameraConnectSequence implements Runnable, SonySsdpClient.ISear
                     try
                     {
                         cameraHolder.prepare();
+                        cameraHolder.startRecMode();
                         cameraHolder.startEventWatch(listener);
                     }
                     catch (Exception e)
