@@ -3,7 +3,6 @@ package net.osdn.gokigen.a01d.camera.ricohgr2.wrapper.connection;
 import android.app.Activity;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
-import android.support.annotation.NonNull;
 import android.util.Log;
 
 import net.osdn.gokigen.a01d.R;
@@ -11,6 +10,8 @@ import net.osdn.gokigen.a01d.camera.ICameraConnection;
 import net.osdn.gokigen.a01d.camera.ICameraStatusReceiver;
 import net.osdn.gokigen.a01d.camera.utils.SimpleHttpClient;
 import net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor;
+
+import androidx.annotation.NonNull;
 
 class RicohGr2CameraConnectSequence implements Runnable
 {

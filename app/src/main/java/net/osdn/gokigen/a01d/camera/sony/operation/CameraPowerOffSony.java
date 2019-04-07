@@ -1,12 +1,12 @@
 package net.osdn.gokigen.a01d.camera.sony.operation;
 
 import android.content.Context;
-import android.support.v7.preference.Preference;
-
 import net.osdn.gokigen.a01d.ConfirmationDialog;
 import net.osdn.gokigen.a01d.IChangeScene;
 import net.osdn.gokigen.a01d.R;
 import net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor;
+
+import androidx.preference.Preference;
 
 
 /**

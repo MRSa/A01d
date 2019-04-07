@@ -1,10 +1,11 @@
 package net.osdn.gokigen.a01d.camera;
 
-import android.support.annotation.NonNull;
 import android.util.Log;
 
 import net.osdn.gokigen.a01d.camera.sony.wrapper.eventlistener.CameraChangeListerTemplate;
 import net.osdn.gokigen.a01d.liveview.ICameraStatusUpdateNotify;
+
+import androidx.annotation.NonNull;
 
 public class CameraStatusListener extends CameraChangeListerTemplate implements ICameraStatusUpdateNotify
 {

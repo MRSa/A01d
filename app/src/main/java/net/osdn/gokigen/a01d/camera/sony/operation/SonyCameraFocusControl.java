@@ -1,7 +1,6 @@
 package net.osdn.gokigen.a01d.camera.sony.operation;
 
 import android.graphics.PointF;
-import android.support.annotation.NonNull;
 import android.util.Log;
 import android.view.MotionEvent;
 
@@ -10,6 +9,8 @@ import net.osdn.gokigen.a01d.camera.sony.operation.takepicture.SonyAutoFocusCont
 import net.osdn.gokigen.a01d.camera.sony.wrapper.ISonyCameraApi;
 import net.osdn.gokigen.a01d.liveview.IAutoFocusFrameDisplay;
 import net.osdn.gokigen.a01d.liveview.IIndicatorControl;
+
+import androidx.annotation.NonNull;
 
 public class SonyCameraFocusControl  implements IFocusingControl
 {

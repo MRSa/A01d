@@ -2,8 +2,6 @@ package net.osdn.gokigen.a01d.camera;
 
 import android.app.Activity;
 import android.content.SharedPreferences;
-import android.support.annotation.NonNull;
-import android.support.v7.preference.PreferenceManager;
 
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.IOlympusLiveViewListener;
 import net.osdn.gokigen.a01d.camera.olympus.IOlympusInterfaceProvider;
@@ -14,6 +12,9 @@ import net.osdn.gokigen.a01d.camera.sony.ISonyInterfaceProvider;
 import net.osdn.gokigen.a01d.camera.sony.wrapper.SonyCameraWrapper;
 import net.osdn.gokigen.a01d.liveview.ICameraStatusUpdateNotify;
 import net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor;
+
+import androidx.annotation.NonNull;
+import androidx.preference.PreferenceManager;
 
 public class CameraInterfaceProvider implements IInterfaceProvider
 {

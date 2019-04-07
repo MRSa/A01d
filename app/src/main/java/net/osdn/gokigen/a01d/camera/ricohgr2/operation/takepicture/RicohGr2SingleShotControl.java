@@ -3,12 +3,13 @@ package net.osdn.gokigen.a01d.camera.ricohgr2.operation.takepicture;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
-import android.support.annotation.NonNull;
 import android.util.Log;
 
 import net.osdn.gokigen.a01d.camera.utils.SimpleHttpClient;
 import net.osdn.gokigen.a01d.liveview.IAutoFocusFrameDisplay;
 import net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor;
+
+import androidx.annotation.NonNull;
 
 /**
  *

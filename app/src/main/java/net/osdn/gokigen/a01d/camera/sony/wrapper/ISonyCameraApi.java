@@ -1,11 +1,12 @@
 package net.osdn.gokigen.a01d.camera.sony.wrapper;
 
-import android.support.annotation.NonNull;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.List;
+
+import androidx.annotation.NonNull;
 
 public interface ISonyCameraApi
 {

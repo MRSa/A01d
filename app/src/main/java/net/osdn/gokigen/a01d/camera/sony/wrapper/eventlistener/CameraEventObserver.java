@@ -2,13 +2,14 @@ package net.osdn.gokigen.a01d.camera.sony.wrapper.eventlistener;
 
 import android.content.Context;
 import android.os.Handler;
-import android.support.annotation.NonNull;
 import android.util.Log;
 
 import net.osdn.gokigen.a01d.camera.sony.wrapper.ISonyCameraApi;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+
+import androidx.annotation.NonNull;
 
 /**
  *

@@ -1,18 +1,20 @@
 package net.osdn.gokigen.a01d.camera.olympus.wrapper.connection.ble;
 
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
 import net.osdn.gokigen.a01d.ConfirmationDialog;
 import net.osdn.gokigen.a01d.R;
 import net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.preference.Preference;
+
 /**
  *   Olympus AIR の Bluetooth設定を記録する
  *
  *
  */
-public class OlyCameraPowerOnSelector implements android.support.v7.preference.Preference.OnPreferenceClickListener, ConfirmationDialog.Callback
+public class OlyCameraPowerOnSelector implements Preference.OnPreferenceClickListener, ConfirmationDialog.Callback
 {
     private final String TAG = toString();
     private final AppCompatActivity context;
@@ -43,7 +45,7 @@ public class OlyCameraPowerOnSelector implements android.support.v7.preference.P
      * @return false : ハンドルしない / true : ハンドルした
      */
     @Override
-    public boolean onPreferenceClick(android.support.v7.preference.Preference preference)
+    public boolean onPreferenceClick(Preference preference)
     {
         Log.v(TAG, "onPreferenceClick() : ");
         if (!preference.hasKey())

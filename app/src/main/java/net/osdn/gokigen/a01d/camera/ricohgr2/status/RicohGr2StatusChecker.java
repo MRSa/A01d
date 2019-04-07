@@ -1,6 +1,5 @@
 package net.osdn.gokigen.a01d.camera.ricohgr2.status;
 
-import android.support.annotation.NonNull;
 import android.util.Log;
 
 import net.osdn.gokigen.a01d.camera.ICameraStatus;
@@ -10,6 +9,8 @@ import net.osdn.gokigen.a01d.liveview.ICameraStatusUpdateNotify;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import androidx.annotation.NonNull;
 
 public class RicohGr2StatusChecker implements ICameraStatusWatcher, ICameraStatus
 {

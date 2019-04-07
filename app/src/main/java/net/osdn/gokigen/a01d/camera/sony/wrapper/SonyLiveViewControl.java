@@ -1,6 +1,6 @@
 package net.osdn.gokigen.a01d.camera.sony.wrapper;
 
-import android.support.annotation.NonNull;
+
 import android.util.Log;
 
 import net.osdn.gokigen.a01d.camera.ILiveViewControl;
@@ -10,6 +10,8 @@ import net.osdn.gokigen.a01d.liveview.liveviewlistener.CameraLiveViewListenerImp
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+
+import androidx.annotation.NonNull;
 
 public class SonyLiveViewControl implements ILiveViewControl
 {

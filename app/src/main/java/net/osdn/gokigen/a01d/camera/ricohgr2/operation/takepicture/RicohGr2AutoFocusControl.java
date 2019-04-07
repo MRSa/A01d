@@ -5,7 +5,6 @@ import android.content.SharedPreferences;
 import android.graphics.PointF;
 import android.graphics.RectF;
 import android.preference.PreferenceManager;
-import android.support.annotation.NonNull;
 import android.util.Log;
 
 import net.osdn.gokigen.a01d.camera.utils.SimpleHttpClient;
@@ -14,6 +13,8 @@ import net.osdn.gokigen.a01d.liveview.IIndicatorControl;
 import net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor;
 
 import org.json.JSONObject;
+
+import androidx.annotation.NonNull;
 
 /**
  *

@@ -2,8 +2,6 @@ package net.osdn.gokigen.a01d.camera.olympus.wrapper.connection.ble;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.v4.app.ListFragment;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -15,6 +13,9 @@ import net.osdn.gokigen.a01d.R;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+
+import androidx.annotation.NonNull;
+import androidx.fragment.app.ListFragment;
 
 public class OlyCameraEntryListFragment extends ListFragment
 {

@@ -1,7 +1,6 @@
 package net.osdn.gokigen.a01d.camera.ricohgr2.wrapper;
 
 import android.app.Activity;
-import android.support.annotation.NonNull;
 import android.util.Log;
 
 import net.osdn.gokigen.a01d.camera.ICameraConnection;
@@ -21,6 +20,8 @@ import net.osdn.gokigen.a01d.camera.IDisplayInjector;
 import net.osdn.gokigen.a01d.liveview.IAutoFocusFrameDisplay;
 import net.osdn.gokigen.a01d.liveview.IIndicatorControl;
 import net.osdn.gokigen.a01d.liveview.liveviewlistener.ILiveViewListener;
+
+import androidx.annotation.NonNull;
 
 /**
  *

@@ -1,15 +1,16 @@
 package net.osdn.gokigen.a01d.camera.sony.cameraproperty;
 
-import android.support.v7.preference.Preference;
 import android.util.Log;
 
 import net.osdn.gokigen.a01d.IChangeScene;
+
+import androidx.preference.Preference;
 
 /**
  *
  *
  */
-public class SonyCameraApiListViewer implements android.support.v7.preference.Preference.OnPreferenceClickListener
+public class SonyCameraApiListViewer implements Preference.OnPreferenceClickListener
 {
     private final String TAG = toString();
     private final IChangeScene changeScene;

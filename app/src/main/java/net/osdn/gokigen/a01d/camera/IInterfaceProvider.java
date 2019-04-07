@@ -1,12 +1,12 @@
 package net.osdn.gokigen.a01d.camera;
 
-import android.support.annotation.NonNull;
-
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.IOlympusLiveViewListener;
 import net.osdn.gokigen.a01d.camera.olympus.IOlympusInterfaceProvider;
 import net.osdn.gokigen.a01d.camera.ricohgr2.IRicohGr2InterfaceProvider;
 import net.osdn.gokigen.a01d.camera.sony.ISonyInterfaceProvider;
 import net.osdn.gokigen.a01d.liveview.ICameraStatusUpdateNotify;
+
+import androidx.annotation.NonNull;
 
 /**
  *

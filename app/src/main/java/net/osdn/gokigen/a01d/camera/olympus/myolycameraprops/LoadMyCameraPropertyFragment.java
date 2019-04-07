@@ -3,7 +3,6 @@ package net.osdn.gokigen.a01d.camera.olympus.myolycameraprops;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.v4.app.ListFragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,6 +15,8 @@ import net.osdn.gokigen.a01d.R;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+
+import androidx.fragment.app.ListFragment;
 
 public class LoadMyCameraPropertyFragment extends ListFragment implements ListView.OnItemClickListener
 {

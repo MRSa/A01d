@@ -1,6 +1,5 @@
 package net.osdn.gokigen.a01d.camera.sony.operation.takepicture;
 
-import android.support.annotation.NonNull;
 import android.util.Log;
 
 import net.osdn.gokigen.a01d.camera.sony.wrapper.ISonyCameraApi;
@@ -8,6 +7,8 @@ import net.osdn.gokigen.a01d.liveview.IAutoFocusFrameDisplay;
 import net.osdn.gokigen.a01d.liveview.IIndicatorControl;
 
 import org.json.JSONObject;
+
+import androidx.annotation.NonNull;
 
 public class SingleShotControl
 {

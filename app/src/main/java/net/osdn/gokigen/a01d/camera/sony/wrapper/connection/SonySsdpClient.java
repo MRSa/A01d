@@ -1,7 +1,6 @@
 package net.osdn.gokigen.a01d.camera.sony.wrapper.connection;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
 import android.util.Log;
 
 import net.osdn.gokigen.a01d.R;
@@ -15,6 +14,8 @@ import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+
+import androidx.annotation.NonNull;
 
 /**
  *  Sony SSDP Client : SonyのCameraRemoteSampleApp にある SimpleSsdpClient を参考にインプリメントした

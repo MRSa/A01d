@@ -1,7 +1,6 @@
 package net.osdn.gokigen.a01d.camera.sony.wrapper.eventlistener;
 
 import android.os.Handler;
-import android.support.annotation.NonNull;
 import android.util.Log;
 
 import org.json.JSONArray;
@@ -10,6 +9,8 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import androidx.annotation.NonNull;
 
 public class ReplyJsonParser implements ICameraStatusHolder
 {

@@ -3,7 +3,6 @@ package net.osdn.gokigen.a01d.camera.olympus.wrapper;
 import android.app.Activity;
 import android.content.SharedPreferences;
 import android.graphics.PointF;
-import android.support.v7.preference.PreferenceManager;
 import android.util.Log;
 
 import net.osdn.gokigen.a01d.camera.ILiveViewControl;
@@ -12,6 +11,7 @@ import net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor;
 
 import java.util.Map;
 
+import androidx.preference.PreferenceManager;
 import jp.co.olympus.camerakit.OLYCamera;
 import jp.co.olympus.camerakit.OLYCameraLiveViewListener;
 

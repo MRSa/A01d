@@ -1,14 +1,12 @@
 package net.osdn.gokigen.a01d.camera;
 
-import android.support.annotation.NonNull;
-
 import java.util.List;
 
 public interface ICameraStatus
 {
-    @NonNull List<String> getStatusList(@NonNull final String key);
-    String getStatus(@NonNull final String key);
-    void setStatus(@NonNull final String key, @NonNull final String value);
+    List<String> getStatusList(final String key);
+    String getStatus(final String key);
+    void setStatus(final String key, final String value);
 
     String BATTERY = "battery";
     String STATE = "state";

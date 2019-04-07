@@ -1,8 +1,6 @@
 package net.osdn.gokigen.a01d.camera.sony.wrapper;
 
 import android.app.Activity;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.util.Log;
 
 import net.osdn.gokigen.a01d.camera.ICameraConnection;
@@ -30,6 +28,9 @@ import net.osdn.gokigen.a01d.liveview.liveviewlistener.ILiveViewListener;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 public class SonyCameraWrapper implements ISonyCameraHolder, ISonyInterfaceProvider, IDisplayInjector
 {

@@ -3,11 +3,8 @@ package net.osdn.gokigen.a01d.camera.sony.cameraproperty;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.support.v4.app.DialogFragment;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,6 +16,10 @@ import android.widget.TextView;
 
 import net.osdn.gokigen.a01d.R;
 import net.osdn.gokigen.a01d.camera.sony.wrapper.ISonyCameraApi;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.DialogFragment;
 
 
 /**

@@ -1,6 +1,5 @@
 package net.osdn.gokigen.a01d.camera.sony.operation;
 
-import android.support.annotation.NonNull;
 import android.util.Log;
 
 import net.osdn.gokigen.a01d.camera.ICaptureControl;
@@ -8,6 +7,8 @@ import net.osdn.gokigen.a01d.camera.sony.operation.takepicture.SingleShotControl
 import net.osdn.gokigen.a01d.camera.sony.wrapper.ISonyCameraApi;
 import net.osdn.gokigen.a01d.liveview.IAutoFocusFrameDisplay;
 import net.osdn.gokigen.a01d.liveview.IIndicatorControl;
+
+import androidx.annotation.NonNull;
 
 public class SonyCameraCaptureControl implements ICaptureControl
 {

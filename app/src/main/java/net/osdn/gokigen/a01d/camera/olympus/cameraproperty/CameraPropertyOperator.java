@@ -1,6 +1,5 @@
 package net.osdn.gokigen.a01d.camera.olympus.cameraproperty;
 
-
 import android.content.Context;
 import android.util.Log;
 import android.view.View;

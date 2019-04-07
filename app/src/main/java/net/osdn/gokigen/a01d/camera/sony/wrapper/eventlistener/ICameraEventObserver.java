@@ -1,6 +1,6 @@
 package net.osdn.gokigen.a01d.camera.sony.wrapper.eventlistener;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 public interface ICameraEventObserver
 {

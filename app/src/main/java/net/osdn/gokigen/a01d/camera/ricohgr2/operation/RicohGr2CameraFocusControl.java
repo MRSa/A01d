@@ -2,7 +2,6 @@ package net.osdn.gokigen.a01d.camera.ricohgr2.operation;
 
 import android.content.Context;
 import android.graphics.PointF;
-import android.support.annotation.NonNull;
 import android.util.Log;
 import android.view.MotionEvent;
 
@@ -10,6 +9,8 @@ import net.osdn.gokigen.a01d.camera.IFocusingControl;
 import net.osdn.gokigen.a01d.camera.ricohgr2.operation.takepicture.RicohGr2AutoFocusControl;
 import net.osdn.gokigen.a01d.liveview.IAutoFocusFrameDisplay;
 import net.osdn.gokigen.a01d.liveview.IIndicatorControl;
+
+import androidx.annotation.NonNull;
 
 public class RicohGr2CameraFocusControl implements IFocusingControl
 {

@@ -1,7 +1,6 @@
 package net.osdn.gokigen.a01d.camera.sony.wrapper.connection;
 
 import android.app.Activity;
-import android.support.annotation.NonNull;
 import android.util.Log;
 
 import net.osdn.gokigen.a01d.R;
@@ -11,6 +10,8 @@ import net.osdn.gokigen.a01d.camera.sony.wrapper.ISonyCamera;
 import net.osdn.gokigen.a01d.camera.sony.wrapper.ISonyCameraHolder;
 import net.osdn.gokigen.a01d.camera.sony.wrapper.eventlistener.CameraChangeListerTemplate;
 import net.osdn.gokigen.a01d.camera.sony.wrapper.eventlistener.ICameraChangeListener;
+
+import androidx.annotation.NonNull;
 
 
 /**

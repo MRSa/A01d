@@ -3,10 +3,6 @@ package net.osdn.gokigen.a01d.camera.olympus.wrapper.connection.ble;
 import android.app.Dialog;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
-import android.support.annotation.NonNull;
-import android.support.v4.app.DialogFragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -17,6 +13,11 @@ import net.osdn.gokigen.a01d.R;
 
 import java.text.DateFormat;
 import java.util.Date;
+
+import androidx.annotation.NonNull;
+import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 public class OlyCameraEntryListDialog extends DialogFragment implements IOlyCameraSetDialogDismiss
 {

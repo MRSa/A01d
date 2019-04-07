@@ -6,12 +6,6 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.content.res.ResourcesCompat;
-import android.support.v4.graphics.drawable.DrawableCompat;
-import android.support.v7.preference.PreferenceManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -37,6 +31,13 @@ import net.osdn.gokigen.a01d.camera.olympus.wrapper.property.IOlyCameraPropertyP
 import net.osdn.gokigen.a01d.liveview.liveviewlistener.ILiveViewListener;
 import net.osdn.gokigen.a01d.liveview.liveviewlistener.OlympusCameraLiveViewListenerImpl;
 import net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor;
+
+import androidx.annotation.NonNull;
+import androidx.core.content.res.ResourcesCompat;
+import androidx.core.graphics.drawable.DrawableCompat;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.preference.PreferenceManager;
 
 /**
  *  撮影用ライブビュー画面
@@ -664,7 +665,6 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer, IFo
         try
         {
             Log.v(TAG, "showFavoriteSettingDialog()");
-
 
             LoadSaveMyCameraPropertyDialog dialog = new LoadSaveMyCameraPropertyDialog();
             dialog.setTargetFragment(this, COMMAND_MY_PROPERTY);

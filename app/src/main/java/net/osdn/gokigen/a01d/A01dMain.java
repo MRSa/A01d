@@ -3,15 +3,7 @@ package net.osdn.gokigen.a01d;
 import android.Manifest;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.preference.PreferenceFragmentCompat;
-import android.support.v7.preference.PreferenceManager;
 import android.util.Log;
 import android.view.WindowManager;
 import android.widget.Toast;
@@ -30,6 +22,15 @@ import net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor;
 import net.osdn.gokigen.a01d.preference.olympus.PreferenceFragment;
 import net.osdn.gokigen.a01d.preference.ricohgr2.RicohGr2PreferenceFragment;
 import net.osdn.gokigen.a01d.preference.sony.SonyPreferenceFragment;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.FragmentTransaction;
+import androidx.preference.PreferenceFragmentCompat;
+import androidx.preference.PreferenceManager;
 
 /**
  *   A01d ;

@@ -1,11 +1,11 @@
 package net.osdn.gokigen.a01d.camera.ricohgr2.operation;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
-
 import net.osdn.gokigen.a01d.camera.ICaptureControl;
 import net.osdn.gokigen.a01d.camera.ricohgr2.operation.takepicture.RicohGr2SingleShotControl;
 import net.osdn.gokigen.a01d.liveview.IAutoFocusFrameDisplay;
+
+import androidx.annotation.NonNull;
 
 public class RicohGr2CameraCaptureControl implements ICaptureControl
 {

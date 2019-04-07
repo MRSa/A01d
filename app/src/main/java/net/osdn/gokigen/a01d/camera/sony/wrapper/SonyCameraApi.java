@@ -1,6 +1,5 @@
 package net.osdn.gokigen.a01d.camera.sony.wrapper;
 
-import android.support.annotation.NonNull;
 import android.util.Log;
 
 import net.osdn.gokigen.a01d.camera.utils.SimpleHttpClient;
@@ -10,6 +9,8 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import androidx.annotation.NonNull;
 
 class SonyCameraApi implements ISonyCameraApi
 {
