@@ -50,6 +50,17 @@ public interface IPreferencePropertyAccessor
     String GR2_LIVE_VIEW = "gr2_display_camera_view";
     String USE_PENTAX_AUTOFOCUS = "use_pentax_autofocus_mode";
 
+    String FUJIX_DISPLAY_CAMERA_VIEW = "fujix_display_camera_view";
+
+    String FUJIX_FOCUS_XY = "fujix_focus_xy";
+    String FUJIX_FOCUS_XY_DEFAULT_VALUE = "7,7";
+
+    String FUJIX_LIVEVIEW_WAIT = "fujix_liveview_wait";
+    String FUJIX_LIVEVIEW_WAIT_DEFAULT_VALUE = "80";
+
+    String FUJIX_COMMAND_POLLING_WAIT = "fujix_liveview_wait";
+    String FUJIX_COMMAND_POLLING_WAIT_DEFAULT_VALUE = "50";
+
     /*
     int CHOICE_SPLASH_SCREEN = 10;
 

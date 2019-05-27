@@ -90,6 +90,10 @@ public class CameraInterfaceProvider implements IInterfaceProvider
             {
                 ret = ICameraConnection.CameraConnectionMethod.RICOH_GR2;
             }
+            else if (connectionMethod.contains("FUJI_X"))
+            {
+                ret = ICameraConnection.CameraConnectionMethod.FUJI_X;
+            }
         }
         catch (Exception e)
         {

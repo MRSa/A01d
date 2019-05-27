@@ -28,6 +28,15 @@
     <string name="pref_exit_power_off">Exit Application(and Camera OFF)</string>
     <string name="pref_exit_power_off_sony">Exit Application</string>
 
+    <string name="pref_exit_power_off_fujix">Exit Application</string>
+    <string name="pref_fujix_display_camera_view">Use Camera Display</string>
+    <string name="pref_fujix_display_camera_view_summary">EXPERIMENTAL: Shows liveview screen both camera and smartphone.</string>
+    <string name="pref_fujix_focus_xy">Number of Focus Point X,Y (default: 7,7)</string>
+    <string name="pref_summary_fujix_focus_xy"> </string>
+    <string name="pref_fujix_liveview_wait">Liveview receive wait (default: 80)</string>
+    <string name="pref_summary_fujix_liveview_wait"> </string>
+    <string name="pref_fujix_command_polling_wait">Command polling wait (default: 50)</string>
+    <string name="pref_summary_fujix_command_polling_wait"> </string>
 
     <string name="pref_cat_initialize">App. Startup</string>
     <string name="pref_auto_connect_camera">Auto Connect To Camera</string>
@@ -49,6 +58,9 @@
     <string name="pref_media_status">SD Card Status</string>
     <string name="pref_camera_version">Camera Version</string>
     <string name="pref_camerakit_version">Camera kit Version</string>
+
+    <string name="pref_cat_others">Other</string>
+    <string name="pref_special_thanks">Special Thanks to</string>
 
     <string name="pref_cat_gokigen">GOKIGEN</string>
     <string name="pref_instruction_manual">A01d Instructions</string>

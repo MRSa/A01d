@@ -19,6 +19,7 @@ import net.osdn.gokigen.a01d.liveview.IStatusViewDrawer;
 import net.osdn.gokigen.a01d.liveview.LiveViewFragment;
 import net.osdn.gokigen.a01d.logcat.LogCatFragment;
 import net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor;
+import net.osdn.gokigen.a01d.preference.fujix.FujiXPreferenceFragment;
 import net.osdn.gokigen.a01d.preference.olympus.PreferenceFragment;
 import net.osdn.gokigen.a01d.preference.ricohgr2.RicohGr2PreferenceFragment;
 import net.osdn.gokigen.a01d.preference.sony.SonyPreferenceFragment;
@@ -221,6 +222,11 @@ public class A01dMain extends AppCompatActivity implements ICameraStatusReceiver
                 // OPCカメラでない場合には、「OPCカメラのみ有効です」表示をして画面遷移させない
                 Toast.makeText(getApplicationContext(), getText(R.string.only_opc_feature), Toast.LENGTH_SHORT).show();
             }
+            else if (method == ICameraConnection.CameraConnectionMethod.FUJI_X)
+            {
+                // OPCカメラでない場合には、「OPCカメラのみ有効です」表示をして画面遷移させない
+                Toast.makeText(getApplicationContext(), getText(R.string.only_opc_feature), Toast.LENGTH_SHORT).show();
+            }
             else
             {
                 // OPC カメラの場合...
@@ -266,6 +272,8 @@ public class A01dMain extends AppCompatActivity implements ICameraStatusReceiver
                         preferenceFragment = RicohGr2PreferenceFragment.newInstance(this, this);
                     } else if (connectionMethod == ICameraConnection.CameraConnectionMethod.SONY) {
                         preferenceFragment = SonyPreferenceFragment.newInstance(this, this);
+                    } else if (connectionMethod == ICameraConnection.CameraConnectionMethod.FUJI_X) {
+                        preferenceFragment = FujiXPreferenceFragment.newInstance(this, this);
                     } else //  if (connectionMethod == ICameraConnection.CameraConnectionMethod.OPC)
                     {
                         preferenceFragment = PreferenceFragment.newInstance(this, interfaceProvider, this);
@@ -541,6 +549,11 @@ public class A01dMain extends AppCompatActivity implements ICameraStatusReceiver
         }
         else if  (connectionMethod == ICameraConnection.CameraConnectionMethod.SONY)
         {
+            connection = interfaceProvider.getSonyInterface().getSonyCameraConnection();
+        }
+        else if  (connectionMethod == ICameraConnection.CameraConnectionMethod.FUJI_X)
+        {
+            // TODO: FUJI_X に切り替える
             connection = interfaceProvider.getSonyInterface().getSonyCameraConnection();
         }
         else // if (connectionMethod == ICameraConnection.CameraConnectionMethod.OPC)

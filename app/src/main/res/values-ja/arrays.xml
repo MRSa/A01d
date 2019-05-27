@@ -102,12 +102,14 @@
         <item >OPC (Olympus Air)</item>
         <item >Sony</item>
         <item>Ricoh GR II / PENTAX DSLR</item>
+        <item >Fuji X Series</item>
     </string-array>
 
     <string-array name="connection_method_value">
         <item >OPC</item>
         <item >SONY</item>
         <item >RICOH_GR2</item>
+        <item >FUJI_X</item>
     </string-array>
 
 

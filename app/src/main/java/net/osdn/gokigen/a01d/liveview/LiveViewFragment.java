@@ -222,6 +222,17 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer, IFo
                         focusIndicator.setVisibility(View.INVISIBLE);
                     }
                 }
+                else if (connectionMethod == ICameraConnection.CameraConnectionMethod.FUJI_X)
+                {
+                    if (changeLiveViewScale != null)
+                    {
+                        changeLiveViewScale.setVisibility(View.INVISIBLE);
+                    }
+                    if (focusIndicator != null)
+                    {
+                        focusIndicator.setVisibility(View.VISIBLE);
+                    }
+                }
             }
 
             if (manualFocus != null)
@@ -272,6 +283,11 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer, IFo
         {
             interfaceInjector = interfaceProvider.getSonyInterface().getDisplayInjector();
         }
+        else if (connectionMethod == ICameraConnection.CameraConnectionMethod.FUJI_X)
+        {
+            // TODO: FUJI_X に変更
+            interfaceInjector = interfaceProvider.getSonyInterface().getDisplayInjector();
+        }
         else // if (connectionMethod == ICameraConnection.CameraConnectionMethod.OPC)
         {
             interfaceInjector = interfaceProvider.getOlympusInterface().getDisplayInjector();
@@ -288,6 +304,13 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer, IFo
         }
         else  if (connectionMethod == ICameraConnection.CameraConnectionMethod.SONY)
         {
+            this.liveViewControl = interfaceProvider.getSonyInterface().getSonyLiveViewControl();
+            this.zoomLensControl = interfaceProvider.getSonyInterface().getZoomLensControl();
+            this.cameraInformation = interfaceProvider.getSonyInterface().getCameraInformation();
+        }
+        else  if (connectionMethod == ICameraConnection.CameraConnectionMethod.FUJI_X)
+        {
+            // TODO: FUJI_X に変更
             this.liveViewControl = interfaceProvider.getSonyInterface().getSonyLiveViewControl();
             this.zoomLensControl = interfaceProvider.getSonyInterface().getZoomLensControl();
             this.cameraInformation = interfaceProvider.getSonyInterface().getCameraInformation();
@@ -577,6 +600,11 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer, IFo
             }
             else if (connectionMethod == ICameraConnection.CameraConnectionMethod.SONY)
             {
+                lvListener = interfaceProvider.getSonyInterface().getLiveViewListener();
+            }
+            else if (connectionMethod == ICameraConnection.CameraConnectionMethod.FUJI_X)
+            {
+                // TODO: FUJI_X に変更
                 lvListener = interfaceProvider.getSonyInterface().getLiveViewListener();
             }
             else  // if (connectionMethod == ICameraConnection.CameraConnectionMethod.OPC)
