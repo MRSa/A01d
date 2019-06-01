@@ -3,6 +3,8 @@ package net.osdn.gokigen.a01d.camera;
 import android.app.Activity;
 import android.content.SharedPreferences;
 
+import net.osdn.gokigen.a01d.camera.fujix.IFujiXInterfaceProvider;
+import net.osdn.gokigen.a01d.camera.fujix.wrapper.FujiXInterfaceProvider;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.IOlympusLiveViewListener;
 import net.osdn.gokigen.a01d.camera.olympus.IOlympusInterfaceProvider;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.OlympusInterfaceProvider;
@@ -22,6 +24,7 @@ public class CameraInterfaceProvider implements IInterfaceProvider
     private final OlympusInterfaceProvider olympus;
     private final SonyCameraWrapper sony;
     private final RicohGr2InterfaceProvider ricohGr2;
+    private final FujiXInterfaceProvider fujiX;
     private final CameraStatusListener statusListener;
 
     public CameraInterfaceProvider(@NonNull Activity context, @NonNull ICameraStatusReceiver provider)
@@ -30,6 +33,7 @@ public class CameraInterfaceProvider implements IInterfaceProvider
         this.statusListener = new CameraStatusListener();
         olympus = new OlympusInterfaceProvider(context, provider);
         sony = new SonyCameraWrapper(context, provider, statusListener);
+        fujiX = new FujiXInterfaceProvider(context, provider);
         ricohGr2 = new RicohGr2InterfaceProvider(context, provider);
     }
 
@@ -68,6 +72,12 @@ public class CameraInterfaceProvider implements IInterfaceProvider
     public IRicohGr2InterfaceProvider getRicohGr2Infterface()
     {
         return (ricohGr2);
+    }
+
+    @Override
+    public IFujiXInterfaceProvider getFujiXInterface()
+    {
+        return (fujiX);
     }
 
     /**

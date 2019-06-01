@@ -195,7 +195,7 @@ public class CameraLiveImageView extends View implements IImageDataReceiver, IAu
             {
                 bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
             }
-            catch (OutOfMemoryError e)
+            catch (Throwable e)
             {
                 e.printStackTrace();
                 return;
@@ -205,7 +205,11 @@ public class CameraLiveImageView extends View implements IImageDataReceiver, IAu
             int orientation = ExifInterface.ORIENTATION_UNDEFINED;
             if ((metadata != null)&&(metadata.containsKey(EXIF_ORIENTATION)))
             {
-                orientation = Integer.parseInt((String) metadata.get(EXIF_ORIENTATION));
+                String value = (String) metadata.get(EXIF_ORIENTATION);
+                if (value != null)
+                {
+                    orientation = Integer.parseInt(value);
+                }
             }
             switch (orientation)
             {

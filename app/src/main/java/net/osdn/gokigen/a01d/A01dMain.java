@@ -553,8 +553,7 @@ public class A01dMain extends AppCompatActivity implements ICameraStatusReceiver
         }
         else if  (connectionMethod == ICameraConnection.CameraConnectionMethod.FUJI_X)
         {
-            // TODO: FUJI_X に切り替える
-            connection = interfaceProvider.getSonyInterface().getSonyCameraConnection();
+            connection = interfaceProvider.getFujiXInterface().getFujiXCameraConnection();
         }
         else // if (connectionMethod == ICameraConnection.CameraConnectionMethod.OPC)
         {
