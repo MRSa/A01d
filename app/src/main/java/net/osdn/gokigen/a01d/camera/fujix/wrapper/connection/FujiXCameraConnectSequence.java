@@ -102,6 +102,7 @@ public class FujiXCameraConnectSequence implements Runnable, IFujiXCommandCallba
     @Override
     public void receivedMessage(int id, byte[] rx_body)
     {
+        Log.v(TAG, "receivedMessage : " + id + "[" + rx_body.length + " bytes]");
         switch (id)
         {
             case SEQ_REGISTRATION:
@@ -119,7 +120,9 @@ public class FujiXCameraConnectSequence implements Runnable, IFujiXCommandCallba
                 if (rx_body.length == (int)rx_body[0])
                 {
                     // なぜかもうちょっとデータが飛んでくるので待つ
-                    commandIssuer.enqueueCommand(new StartReceiveOnly(this));
+                    //commandIssuer.enqueueCommand(new StartReceiveOnly(this));
+
+                    commandIssuer.enqueueCommand(new StartMessage3rd(this));
                 }
                 else
                 {

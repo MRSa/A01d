@@ -265,7 +265,15 @@ public class FujiXCommandIssuer implements IFujiXCommandIssuer, IFujiXCommunicat
             if (is != null)
             {
                 int read_bytes = is.read(byte_array, 0, BUFFER_SIZE);
-                byte[] receive_body = Arrays.copyOfRange(byte_array, 0, read_bytes);
+                byte[] receive_body;
+                if (read_bytes > 4)
+                {
+                    receive_body = Arrays.copyOfRange(byte_array, 0, read_bytes);
+                }
+                else
+                {
+                    receive_body = new byte[1];
+                }
                 if (isDumpReceiveLog)
                 {
                     // ログに受信メッセージを出力する

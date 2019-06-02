@@ -27,7 +27,7 @@ public class FujiXCommandBase implements IFujiXCommand
     @Override
     public int receiveDelayMs()
     {
-        return (50);
+        return (100);
     }
 
     @Override
