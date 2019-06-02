@@ -103,6 +103,7 @@
     <string name="connect_connected">接続済</string>
     <string name="connect_restore_camera_settings">カメラ設定を展開</string>
     <string name="connect_start">接続開始</string>
+    <string name="connect_receive_unknown_message">不明な応答を受信しました。</string>
     <string name="dialog_start_load_property_message">しばらくお待ち下さい&#8230;</string>
     <string name="dialog_start_save_property_message">しばらくお待ち下さい&#8230;</string>
     <string name="dialog_start_save_property_title">カメラプロパティ保存中</string>

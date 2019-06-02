@@ -7,6 +7,7 @@ import androidx.annotation.NonNull;
 import androidx.preference.PreferenceManager;
 
 import net.osdn.gokigen.a01d.camera.ILiveViewControl;
+import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.IFujiXCommunication;
 import net.osdn.gokigen.a01d.liveview.liveviewlistener.CameraLiveViewListenerImpl;
 import net.osdn.gokigen.a01d.liveview.liveviewlistener.ILiveViewListener;
 
@@ -18,7 +19,7 @@ import static net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor.FUJIX
 import static net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor.FUJIX_LIVEVIEW_WAIT_DEFAULT_VALUE;
 
 
-public class FujiXLiveViewControl implements ILiveViewControl
+public class FujiXLiveViewControl implements ILiveViewControl, IFujiXCommunication
 {
     private final String TAG = toString();
     private final String ipAddress;
@@ -135,6 +136,7 @@ public class FujiXLiveViewControl implements ILiveViewControl
         try
         {
             isr.close();
+            socket.close();
         }
         catch (Exception e)
         {
@@ -176,5 +178,17 @@ public class FujiXLiveViewControl implements ILiveViewControl
     public ILiveViewListener getLiveViewListener()
     {
         return (liveViewListener);
+    }
+
+    @Override
+    public boolean connect()
+    {
+        return (true);
+    }
+
+    @Override
+    public void disconnect()
+    {
+        isStart = false;
     }
 }

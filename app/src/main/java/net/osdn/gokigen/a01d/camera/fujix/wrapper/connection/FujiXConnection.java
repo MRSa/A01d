@@ -1,4 +1,4 @@
-package net.osdn.gokigen.a01d.camera.ricohgr2.wrapper.connection;
+package net.osdn.gokigen.a01d.camera.fujix.wrapper.connection;
 
 import android.app.Activity;
 import android.content.BroadcastReceiver;
@@ -12,43 +12,33 @@ import android.net.wifi.WifiManager;
 import android.provider.Settings;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+
 import net.osdn.gokigen.a01d.R;
 import net.osdn.gokigen.a01d.camera.ICameraConnection;
 import net.osdn.gokigen.a01d.camera.ICameraStatusReceiver;
+import net.osdn.gokigen.a01d.camera.fujix.IFujiXInterfaceProvider;
 
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
-
-
-/**
- *
- *
- */
-public class RicohGr2Connection implements ICameraConnection
+public class FujiXConnection implements ICameraConnection
 {
     private final String TAG = toString();
     private final Activity context;
     private final ICameraStatusReceiver statusReceiver;
+    private final IFujiXInterfaceProvider interfaceProvider;
     private final BroadcastReceiver connectionReceiver;
-    //private final ConnectivityManager connectivityManager;
     private final Executor cameraExecutor = Executors.newFixedThreadPool(1);
-    //private final Handler networkConnectionTimeoutHandler;
-    //private static final int MESSAGE_CONNECTIVITY_TIMEOUT = 1;
     private CameraConnectionStatus connectionStatus = CameraConnectionStatus.UNKNOWN;
 
-
-    /**
-     *
-     *
-     */
-    public RicohGr2Connection(@NonNull final Activity context, @NonNull final ICameraStatusReceiver statusReceiver)
+    public FujiXConnection(@NonNull final Activity context, @NonNull final ICameraStatusReceiver statusReceiver, @NonNull IFujiXInterfaceProvider interfaceProvider)
     {
-        Log.v(TAG, "RicohGr2Connection()");
+        Log.v(TAG, "FujiXConnection()");
         this.context = context;
         this.statusReceiver = statusReceiver;
+        this.interfaceProvider = interfaceProvider;
         connectionReceiver = new BroadcastReceiver()
         {
             @Override
@@ -66,12 +56,11 @@ public class RicohGr2Connection implements ICameraConnection
     private void onReceiveBroadcastOfConnection(Context context, Intent intent)
     {
         statusReceiver.onStatusNotify(context.getString(R.string.connect_check_wifi));
-        Log.v(TAG,context.getString(R.string.connect_check_wifi));
+        Log.v(TAG, context.getString(R.string.connect_check_wifi));
 
         String action = intent.getAction();
         if (action == null)
         {
-            //
             Log.v(TAG, "intent.getAction() : null");
             return;
         }
@@ -85,17 +74,14 @@ public class RicohGr2Connection implements ICameraConnection
                 WifiManager wifiManager = (WifiManager) context.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
                 if (wifiManager != null) {
                     WifiInfo info = wifiManager.getConnectionInfo();
-                    if (wifiManager.isWifiEnabled() && info != null)
-                    {
-                        if (info.getNetworkId() != -1)
-                        {
+                    if (wifiManager.isWifiEnabled() && info != null) {
+                        if (info.getNetworkId() != -1) {
                             Log.v(TAG, "Network ID is -1, there is no currently connected network.");
                         }
                         // 自動接続が指示されていた場合は、カメラとの接続処理を行う
                         connectToCamera();
                     } else {
-                        if (info == null)
-                        {
+                        if (info == null) {
                             Log.v(TAG, "NETWORK INFO IS NULL.");
                         } else {
                             Log.v(TAG, "isWifiEnabled : " + wifiManager.isWifiEnabled() + " NetworkId : " + info.getNetworkId());
@@ -103,18 +89,12 @@ public class RicohGr2Connection implements ICameraConnection
                     }
                 }
             }
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             Log.w(TAG, "onReceiveBroadcastOfConnection() EXCEPTION" + e.getMessage());
             e.printStackTrace();
         }
     }
 
-    /**
-     *
-     *
-     */
     @Override
     public void startWatchWifiStatus(Context context)
     {
@@ -127,10 +107,6 @@ public class RicohGr2Connection implements ICameraConnection
         context.registerReceiver(connectionReceiver, filter);
     }
 
-    /**
-     *
-     *
-     */
     @Override
     public void stopWatchWifiStatus(Context context)
     {
@@ -139,10 +115,6 @@ public class RicohGr2Connection implements ICameraConnection
         disconnect(false);
     }
 
-    /**
-     *
-     *
-     */
     @Override
     public void disconnect(boolean powerOff)
     {
@@ -152,11 +124,6 @@ public class RicohGr2Connection implements ICameraConnection
         statusReceiver.onCameraDisconnected();
     }
 
-
-    /**
-     *
-     *
-     */
     @Override
     public void connect()
     {
@@ -164,11 +131,6 @@ public class RicohGr2Connection implements ICameraConnection
         connectToCamera();
     }
 
-
-    /**
-     *
-     *
-     */
     @Override
     public void alertConnectingFailed(String message)
     {
@@ -223,10 +185,6 @@ public class RicohGr2Connection implements ICameraConnection
         return (connectionStatus);
     }
 
-    /**
-     *
-     *
-     */
     @Override
     public void forceUpdateConnectionStatus(CameraConnectionStatus status)
     {
@@ -242,7 +200,7 @@ public class RicohGr2Connection implements ICameraConnection
         Log.v(TAG, "disconnectFromCamera()");
         try
         {
-            cameraExecutor.execute(new RicohGr2CameraDisconnectSequence(context, powerOff));
+            cameraExecutor.execute(new FujiXCameraDisconnectSequence(context, interfaceProvider));
         }
         catch (Exception e)
         {
@@ -259,7 +217,8 @@ public class RicohGr2Connection implements ICameraConnection
         connectionStatus = CameraConnectionStatus.CONNECTING;
         try
         {
-            cameraExecutor.execute(new RicohGr2CameraConnectSequence(context, statusReceiver, this));
+            interfaceProvider.getCommandIssuer();
+            cameraExecutor.execute(new FujiXCameraConnectSequence(context, statusReceiver, this, interfaceProvider));
         }
         catch (Exception e)
         {

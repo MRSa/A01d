@@ -2,10 +2,12 @@ package net.osdn.gokigen.a01d.camera.fujix.wrapper.command;
 
 import android.util.Log;
 
-import java.io.InputStreamReader;
+import androidx.annotation.NonNull;
+
+import java.io.InputStream;
 import java.net.Socket;
 
-public class FujiAsyncResponseReceiver
+public class FujiXAsyncResponseReceiver implements IFujiXCommunication
 {
     private final String TAG = toString();
     private final String ipAddress;
@@ -13,12 +15,31 @@ public class FujiAsyncResponseReceiver
     private static final int BUFFER_SIZE = 1280 + 8;
     private static final int WAIT_MS = 250;   // 250ms
     private static final int ERROR_LIMIT = 30;
+    private IFujiXCommandCallback receiver = null;
     private boolean isStart = false;
 
-    public FujiAsyncResponseReceiver(String ip, int portNumber)
+    public FujiXAsyncResponseReceiver(@NonNull String ip, int portNumber)
     {
         this.ipAddress = ip;
         this.portNumber = portNumber;
+    }
+
+    public void setEventSubscriber(@NonNull IFujiXCommandCallback receiver)
+    {
+        this.receiver = receiver;
+    }
+
+    @Override
+    public boolean connect()
+    {
+        start();
+        return (true);
+    }
+
+    @Override
+    public void disconnect()
+    {
+        isStart = false;
     }
 
     public void start()
@@ -64,12 +85,12 @@ public class FujiAsyncResponseReceiver
     private void startReceive(Socket socket)
     {
         int errorCount = 0;
-        InputStreamReader isr;
-        char[] char_array;
+        InputStream isr;
+        byte[] byte_array;
         try
         {
-            isr = new InputStreamReader(socket.getInputStream());
-            char_array = new char[BUFFER_SIZE];
+            isr = socket.getInputStream();
+            byte_array = new byte[BUFFER_SIZE];
 
         }
         catch (Exception e)
@@ -83,10 +104,19 @@ public class FujiAsyncResponseReceiver
         {
             try
             {
-                int read_bytes = isr.read(char_array, 0, BUFFER_SIZE);
+                int read_bytes = isr.read(byte_array, 0, BUFFER_SIZE);
                 Log.v(TAG, "RECEIVE ASYNC  : " + read_bytes + " bytes.");
-                //return (new ReceivedDataHolder(char_array, read_bytes));
-
+                if (receiver != null)
+                {
+                    try
+                    {
+                        receiver.receivedMessage(0, byte_array);
+                    }
+                    catch (Exception ee)
+                    {
+                        ee.printStackTrace();
+                    }
+                }
                 Thread.sleep(WAIT_MS);
                 errorCount = 0;
             }
@@ -104,6 +134,7 @@ public class FujiAsyncResponseReceiver
         try
         {
             isr.close();
+            socket.close();
         }
         catch (Exception e)
         {

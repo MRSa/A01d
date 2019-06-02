@@ -106,6 +106,8 @@
     <string name="connect_change_run_mode">changeRunMode</string>
     <string name="connect_restore_camera_settings">restoreCameraSettings</string>
 
+    <string name="connect_receive_unknown_message">RECEIVED UNKNOWN ID MESSAGE</string>
+
     <string name="fatal_cannot_use_camera">The CameraKit SDK can not work because the running mode of camera is UNKNOWN.   So please long press the power button of camera more than 8 seconds. (This is the camera reset operation.) After that turn on the camera power again.</string>
     <string name="camera_reset_required">The camera reset operation is required.</string>
     <string name="camera_disconnected">Disconnected</string>
