@@ -102,6 +102,7 @@
     <string name="connect_start">start</string>
     <string name="connect_check_wifi">check WIFI</string>
     <string name="connect_connect">connecting</string>
+    <string name="connect_connecting">connecting&#8230;</string>
     <string name="connect_connected">connected</string>
     <string name="connect_change_run_mode">changeRunMode</string>
     <string name="connect_restore_camera_settings">restoreCameraSettings</string>

@@ -100,6 +100,7 @@
     <string name="connect_check_wifi">Wifi(OS)待ち</string>
     <string name="connect_change_run_mode">動作モード変更</string>
     <string name="connect_connect">接続開始</string>
+    <string name="connect_connecting">接続中</string>
     <string name="connect_connected">接続済</string>
     <string name="connect_restore_camera_settings">カメラ設定を展開</string>
     <string name="connect_start">接続開始</string>

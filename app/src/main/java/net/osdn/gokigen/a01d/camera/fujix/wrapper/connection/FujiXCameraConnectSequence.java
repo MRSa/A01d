@@ -14,12 +14,16 @@ import net.osdn.gokigen.a01d.camera.fujix.IFujiXInterfaceProvider;
 import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.IFujiXCommandCallback;
 import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.IFujiXCommandIssuer;
 import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.messages.CameraRemoteMessage;
+import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.messages.QueryCameraCapabilities;
 import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.messages.RegistrationMessage;
 import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.messages.StartMessage;
 import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.messages.StartMessage2nd;
 import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.messages.StartMessage3rd;
 import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.messages.StartMessage4th;
+import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.messages.StartMessage5th;
 import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.messages.StartReceiveOnly;
+import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.messages.StatusRequestMessage;
+import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.messages.StatusRequestReceive;
 import net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor;
 
 public class FujiXCameraConnectSequence implements Runnable, IFujiXCommandCallback
@@ -34,6 +38,10 @@ public class FujiXCameraConnectSequence implements Runnable, IFujiXCommandCallba
     public static final int SEQ_START_3RD = 5;
     public static final int SEQ_START_4TH = 6;
     public static final int SEQ_CAMERA_REMOTE = 7;
+    public static final int SEQ_START_5TH = 8;
+    public static final int SEQ_STATUS_REQUEST = 9;
+    public static final int SEQ_STATUS_REQUEST_RECEIVE = 10;
+    public static final int SEQ_QUERY_CAMERA_CAPABILITIES = 11;
 
 
     private final Activity context;
@@ -102,7 +110,7 @@ public class FujiXCameraConnectSequence implements Runnable, IFujiXCommandCallba
     @Override
     public void receivedMessage(int id, byte[] rx_body)
     {
-        Log.v(TAG, "receivedMessage : " + id + "[" + rx_body.length + " bytes]");
+        //Log.v(TAG, "receivedMessage : " + id + "[" + rx_body.length + " bytes]");
         switch (id)
         {
             case SEQ_REGISTRATION:
@@ -117,6 +125,7 @@ public class FujiXCameraConnectSequence implements Runnable, IFujiXCommandCallba
                 break;
 
             case SEQ_START_2ND:
+                cameraStatusReceiver.onStatusNotify(context.getString(R.string.connect_connecting));
                 if (rx_body.length == (int)rx_body[0])
                 {
                     // なぜかもうちょっとデータが飛んでくるので待つ
@@ -139,6 +148,37 @@ public class FujiXCameraConnectSequence implements Runnable, IFujiXCommandCallba
                 break;
 
             case SEQ_START_4TH:
+                if (isBothLiveView)
+                {
+                    // カメラのLCDと遠隔のライブビューを同時に表示する場合...
+                    commandIssuer.enqueueCommand(new CameraRemoteMessage(this));
+                }
+                else
+                {
+                    commandIssuer.enqueueCommand(new StartMessage5th(this));
+                }
+                break;
+            case SEQ_START_5TH:
+                commandIssuer.enqueueCommand(new StatusRequestMessage(this));
+                break;
+
+            case SEQ_STATUS_REQUEST:
+                if ((rx_body[4] == (byte) 0x02)&&((int) rx_body[0] == rx_body.length))
+                {
+                    //// 受信データが分割されている場合、、もう一度受信する
+                    commandIssuer.enqueueCommand(new StatusRequestReceive(this));
+                }
+                else
+                {
+                    commandIssuer.enqueueCommand(new QueryCameraCapabilities(this));
+                }
+                break;
+
+            case SEQ_STATUS_REQUEST_RECEIVE:
+                commandIssuer.enqueueCommand(new QueryCameraCapabilities(this));
+                break;
+
+            case SEQ_QUERY_CAMERA_CAPABILITIES:
                 commandIssuer.enqueueCommand(new CameraRemoteMessage(this));
                 break;
 

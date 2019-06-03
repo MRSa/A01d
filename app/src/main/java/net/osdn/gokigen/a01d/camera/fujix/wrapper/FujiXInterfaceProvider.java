@@ -14,6 +14,7 @@ import net.osdn.gokigen.a01d.camera.IFocusingModeNotify;
 import net.osdn.gokigen.a01d.camera.ILiveViewControl;
 import net.osdn.gokigen.a01d.camera.IZoomLensControl;
 import net.osdn.gokigen.a01d.camera.fujix.IFujiXInterfaceProvider;
+import net.osdn.gokigen.a01d.camera.fujix.operation.FujiXZoomControl;
 import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.FujiXAsyncResponseReceiver;
 import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.FujiXCommandIssuer;
 import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.IFujiXCommandCallback;
@@ -39,6 +40,7 @@ public class FujiXInterfaceProvider implements IFujiXInterfaceProvider, IDisplay
     private FujiXCommandIssuer commandIssuer;
     private FujiXLiveViewControl liveViewControl;
     private FujiXAsyncResponseReceiver asyncReceiver;
+    private FujiXZoomControl zoomControl;
 
 
     public FujiXInterfaceProvider(@NonNull Activity context, @NonNull ICameraStatusReceiver provider)
@@ -48,6 +50,7 @@ public class FujiXInterfaceProvider implements IFujiXInterfaceProvider, IDisplay
         liveViewControl = new FujiXLiveViewControl(context, CAMERA_IP, STREAM_PORT);
         asyncReceiver = new FujiXAsyncResponseReceiver(CAMERA_IP, ASYNC_RESPONSE_PORT);
         fujiXConnection = new FujiXConnection(context, provider, this);
+        zoomControl = new FujiXZoomControl();
     }
 
     @Override
@@ -89,7 +92,7 @@ public class FujiXInterfaceProvider implements IFujiXInterfaceProvider, IDisplay
     @Override
     public IZoomLensControl getZoomLensControl()
     {
-        return null;
+        return (zoomControl);
     }
 
     @Override
