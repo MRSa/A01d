@@ -1,6 +1,7 @@
 package net.osdn.gokigen.a01d.camera.fujix.wrapper;
 
 import android.app.Activity;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 
@@ -14,6 +15,8 @@ import net.osdn.gokigen.a01d.camera.IFocusingModeNotify;
 import net.osdn.gokigen.a01d.camera.ILiveViewControl;
 import net.osdn.gokigen.a01d.camera.IZoomLensControl;
 import net.osdn.gokigen.a01d.camera.fujix.IFujiXInterfaceProvider;
+import net.osdn.gokigen.a01d.camera.fujix.operation.FujiXCaptureControl;
+import net.osdn.gokigen.a01d.camera.fujix.operation.FujiXFocusingControl;
 import net.osdn.gokigen.a01d.camera.fujix.operation.FujiXZoomControl;
 import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.FujiXAsyncResponseReceiver;
 import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.FujiXCommandIssuer;
@@ -22,6 +25,8 @@ import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.IFujiXCommandIssuer;
 import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.IFujiXCommunication;
 import net.osdn.gokigen.a01d.camera.fujix.wrapper.connection.FujiXConnection;
 import net.osdn.gokigen.a01d.camera.fujix.wrapper.liveview.FujiXLiveViewControl;
+import net.osdn.gokigen.a01d.camera.ricohgr2.operation.RicohGr2CameraCaptureControl;
+import net.osdn.gokigen.a01d.camera.ricohgr2.operation.RicohGr2CameraFocusControl;
 import net.osdn.gokigen.a01d.liveview.IAutoFocusFrameDisplay;
 import net.osdn.gokigen.a01d.liveview.IIndicatorControl;
 import net.osdn.gokigen.a01d.liveview.liveviewlistener.ILiveViewListener;
@@ -41,6 +46,8 @@ public class FujiXInterfaceProvider implements IFujiXInterfaceProvider, IDisplay
     private FujiXLiveViewControl liveViewControl;
     private FujiXAsyncResponseReceiver asyncReceiver;
     private FujiXZoomControl zoomControl;
+    private FujiXCaptureControl captureControl;
+    private FujiXFocusingControl focusingControl;
 
 
     public FujiXInterfaceProvider(@NonNull Activity context, @NonNull ICameraStatusReceiver provider)
@@ -56,7 +63,9 @@ public class FujiXInterfaceProvider implements IFujiXInterfaceProvider, IDisplay
     @Override
     public void injectDisplay(IAutoFocusFrameDisplay frameDisplayer, IIndicatorControl indicator, IFocusingModeNotify focusingModeNotify)
     {
-
+        Log.v(TAG, "injectDisplay()");
+        captureControl = new FujiXCaptureControl(commandIssuer, frameDisplayer);
+        focusingControl = new FujiXFocusingControl(activity, commandIssuer, frameDisplayer, indicator);
     }
 
     @Override
@@ -80,7 +89,7 @@ public class FujiXInterfaceProvider implements IFujiXInterfaceProvider, IDisplay
     @Override
     public IFocusingControl getFocusingControl()
     {
-        return null;
+        return (focusingControl);
     }
 
     @Override
@@ -98,13 +107,13 @@ public class FujiXInterfaceProvider implements IFujiXInterfaceProvider, IDisplay
     @Override
     public ICaptureControl getCaptureControl()
     {
-        return null;
+        return (captureControl);
     }
 
     @Override
     public IDisplayInjector getDisplayInjector()
     {
-        return null;
+        return (this);
     }
 
     @Override
