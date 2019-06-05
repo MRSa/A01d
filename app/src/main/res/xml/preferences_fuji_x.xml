@@ -40,7 +40,7 @@
         <EditTextPreference
             android:key="fujix_command_polling_wait"
             android:title="@string/pref_fujix_command_polling_wait"
-            android:defaultValue="50"
+            android:defaultValue="500"
             android:summary="@string/pref_summary_fujix_command_polling_wait" />
 
         <CheckBoxPreference

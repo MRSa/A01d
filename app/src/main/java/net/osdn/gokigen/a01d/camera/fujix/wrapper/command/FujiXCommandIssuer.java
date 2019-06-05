@@ -20,7 +20,7 @@ public class FujiXCommandIssuer implements IFujiXCommandIssuer, IFujiXCommunicat
     private static final int BUFFER_SIZE = 1024 * 1024 + 8;
     private static final int COMMAND_SEND_RECEIVE_DURATION_MS = 50;
     private static final int COMMAND_SEND_RECEIVE_DURATION_MAX = 1000;
-    private static final int COMMAND_POLL_QUEUE_MS = 250;
+    private static final int COMMAND_POLL_QUEUE_MS = 150;
 
     private final String ipAddress;
     private final int portNumber;
@@ -162,6 +162,7 @@ public class FujiXCommandIssuer implements IFujiXCommandIssuer, IFujiXCommunicat
     {
         try
         {
+            //Log.v(TAG, "Enqueue : "  + command.getId());
             return (commandQueue.offer(command));
         }
         catch (Exception e)
@@ -175,6 +176,7 @@ public class FujiXCommandIssuer implements IFujiXCommandIssuer, IFujiXCommunicat
     {
         try
         {
+            //Log.v(TAG, "issueCommand : " + command.getId());
             byte[] commandBody = command.commandBody();
             if (commandBody != null)
             {

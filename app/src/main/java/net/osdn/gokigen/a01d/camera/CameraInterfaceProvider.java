@@ -33,7 +33,7 @@ public class CameraInterfaceProvider implements IInterfaceProvider
         this.statusListener = new CameraStatusListener();
         olympus = new OlympusInterfaceProvider(context, provider);
         sony = new SonyCameraWrapper(context, provider, statusListener);
-        fujiX = new FujiXInterfaceProvider(context, provider);
+        fujiX = new FujiXInterfaceProvider(context, provider, statusListener);
         ricohGr2 = new RicohGr2InterfaceProvider(context, provider);
     }
 

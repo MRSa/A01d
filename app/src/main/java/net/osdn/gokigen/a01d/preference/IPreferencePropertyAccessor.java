@@ -58,8 +58,8 @@ public interface IPreferencePropertyAccessor
     String FUJIX_LIVEVIEW_WAIT = "fujix_liveview_wait";
     String FUJIX_LIVEVIEW_WAIT_DEFAULT_VALUE = "80";
 
-    String FUJIX_COMMAND_POLLING_WAIT = "fujix_liveview_wait";
-    String FUJIX_COMMAND_POLLING_WAIT_DEFAULT_VALUE = "50";
+    String FUJIX_COMMAND_POLLING_WAIT = "fujix_command_polling_wait";
+    String FUJIX_COMMAND_POLLING_WAIT_DEFAULT_VALUE = "500";
 
     /*
     int CHOICE_SPLASH_SCREEN = 10;

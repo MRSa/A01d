@@ -35,7 +35,7 @@
     <string name="pref_summary_fujix_focus_xy"> </string>
     <string name="pref_fujix_liveview_wait">Liveview receive wait (default: 80)</string>
     <string name="pref_summary_fujix_liveview_wait"> </string>
-    <string name="pref_fujix_command_polling_wait">Command polling wait (default: 50)</string>
+    <string name="pref_fujix_command_polling_wait">Status polling wait (default: 500)</string>
     <string name="pref_summary_fujix_command_polling_wait"> </string>
 
     <string name="pref_cat_initialize">App. Startup</string>

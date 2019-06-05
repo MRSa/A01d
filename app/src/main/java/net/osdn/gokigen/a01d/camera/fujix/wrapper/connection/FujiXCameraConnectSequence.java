@@ -22,6 +22,7 @@ import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.messages.StartMessage3
 import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.messages.StartMessage4th;
 import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.messages.StartMessage5th;
 import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.messages.StartReceiveOnly;
+import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.messages.StartReceiveOnly2;
 import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.messages.StatusRequestMessage;
 import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.messages.StatusRequestReceive;
 import net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor;
@@ -42,6 +43,8 @@ public class FujiXCameraConnectSequence implements Runnable, IFujiXCommandCallba
     public static final int SEQ_STATUS_REQUEST = 9;
     public static final int SEQ_STATUS_REQUEST_RECEIVE = 10;
     public static final int SEQ_QUERY_CAMERA_CAPABILITIES = 11;
+    public static final int SEQ_START_RECEIVE2 = 12;
+
 
 
     private final Activity context;
@@ -179,9 +182,22 @@ public class FujiXCameraConnectSequence implements Runnable, IFujiXCommandCallba
                 break;
 
             case SEQ_QUERY_CAMERA_CAPABILITIES:
-                commandIssuer.enqueueCommand(new CameraRemoteMessage(this));
+                int bodyLength = ((((int) rx_body[3]) & 0xff) << 24) + ((((int) rx_body[2]) & 0xff) << 16) + ((((int) rx_body[1]) & 0xff) << 8) + (((int) rx_body[0]) & 0xff);
+                if (bodyLength > rx_body.length)
+                {
+                    Log.v(TAG, "> BODY : " + rx_body.length + "  BodyLength : " + bodyLength);
+                    commandIssuer.enqueueCommand(new StartReceiveOnly2(this));
+                }
+                else
+                {
+                    Log.v(TAG, "> BODY : " + rx_body.length + "  BodyLength : " + bodyLength);
+                    commandIssuer.enqueueCommand(new CameraRemoteMessage(this));
+                }
                 break;
 
+            case SEQ_START_RECEIVE2:
+                commandIssuer.enqueueCommand(new CameraRemoteMessage(this));
+                break;
             case SEQ_CAMERA_REMOTE:
                 connectFinished(rx_body);
                 break;
@@ -221,6 +237,7 @@ public class FujiXCameraConnectSequence implements Runnable, IFujiXCommandCallba
             // ちょっと待つ
             Thread.sleep(1000);
             interfaceProvider.getAsyncEventCommunication().connect();
+            interfaceProvider.getStatusWatcher().startStatusWatch(interfaceProvider.getStatusListener());
             onConnectNotify();
         }
         catch (Exception e)
@@ -228,7 +245,6 @@ public class FujiXCameraConnectSequence implements Runnable, IFujiXCommandCallba
             e.printStackTrace();
         }
     }
-
 
     private void onConnectNotify()
     {

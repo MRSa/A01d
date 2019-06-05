@@ -25,9 +25,9 @@ public class FujiXLiveViewControl implements ILiveViewControl, IFujiXCommunicati
     private final String ipAddress;
     private final int portNumber;
     private final CameraLiveViewListenerImpl liveViewListener;
-    private int waitMs = 100;
+    private int waitMs = 0;
     private static final int DATA_HEADER_OFFSET = 18;
-    private static final int BUFFER_SIZE = 1280 * 1024 + 8;
+    private static final int BUFFER_SIZE = 1920 * 1024 + 8;
     private static final int ERROR_LIMIT = 30;
     private boolean isStart = false;
 
@@ -41,6 +41,7 @@ public class FujiXLiveViewControl implements ILiveViewControl, IFujiXCommunicati
         {
             SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(activity);
             String waitMsStr = preferences.getString(FUJIX_LIVEVIEW_WAIT, FUJIX_LIVEVIEW_WAIT_DEFAULT_VALUE);
+            Log.v(TAG, "waitMS : " + waitMsStr);
             int wait = Integer.parseInt(waitMsStr);
             if ((wait >= 20)&&(wait <= 800))
             {
@@ -118,6 +119,7 @@ public class FujiXLiveViewControl implements ILiveViewControl, IFujiXCommunicati
             try
             {
                 int read_bytes = isr.read(byteArray, 0, BUFFER_SIZE);
+                Log.v(TAG, "READ BYTES : " + read_bytes + "  (" + waitMs + "ms)");
                 liveViewListener.onUpdateLiveView(Arrays.copyOfRange(byteArray, DATA_HEADER_OFFSET, read_bytes - DATA_HEADER_OFFSET), null);
                 //liveViewListener.onUpdateLiveView(Arrays.copyOfRange(byteArray, 0, read_bytes), null);
                 Thread.sleep(waitMs);

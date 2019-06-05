@@ -5,9 +5,11 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
+import net.osdn.gokigen.a01d.camera.CameraStatusListener;
 import net.osdn.gokigen.a01d.camera.ICameraConnection;
 import net.osdn.gokigen.a01d.camera.ICameraInformation;
 import net.osdn.gokigen.a01d.camera.ICameraStatusReceiver;
+import net.osdn.gokigen.a01d.camera.ICameraStatusWatcher;
 import net.osdn.gokigen.a01d.camera.ICaptureControl;
 import net.osdn.gokigen.a01d.camera.IDisplayInjector;
 import net.osdn.gokigen.a01d.camera.IFocusingControl;
@@ -25,9 +27,11 @@ import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.IFujiXCommandIssuer;
 import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.IFujiXCommunication;
 import net.osdn.gokigen.a01d.camera.fujix.wrapper.connection.FujiXConnection;
 import net.osdn.gokigen.a01d.camera.fujix.wrapper.liveview.FujiXLiveViewControl;
+import net.osdn.gokigen.a01d.camera.fujix.wrapper.status.FujiXStatusChecker;
 import net.osdn.gokigen.a01d.camera.ricohgr2.operation.RicohGr2CameraCaptureControl;
 import net.osdn.gokigen.a01d.camera.ricohgr2.operation.RicohGr2CameraFocusControl;
 import net.osdn.gokigen.a01d.liveview.IAutoFocusFrameDisplay;
+import net.osdn.gokigen.a01d.liveview.ICameraStatusUpdateNotify;
 import net.osdn.gokigen.a01d.liveview.IIndicatorControl;
 import net.osdn.gokigen.a01d.liveview.liveviewlistener.ILiveViewListener;
 
@@ -48,9 +52,10 @@ public class FujiXInterfaceProvider implements IFujiXInterfaceProvider, IDisplay
     private FujiXZoomControl zoomControl;
     private FujiXCaptureControl captureControl;
     private FujiXFocusingControl focusingControl;
+    private FujiXStatusChecker statusChecker;
+    private ICameraStatusUpdateNotify statusListener;
 
-
-    public FujiXInterfaceProvider(@NonNull Activity context, @NonNull ICameraStatusReceiver provider)
+    public FujiXInterfaceProvider(@NonNull Activity context, @NonNull ICameraStatusReceiver provider, @NonNull ICameraStatusUpdateNotify statusListener)
     {
         this.activity = context;
         commandIssuer = new FujiXCommandIssuer(CAMERA_IP, CONTROL_PORT);
@@ -58,6 +63,8 @@ public class FujiXInterfaceProvider implements IFujiXInterfaceProvider, IDisplay
         asyncReceiver = new FujiXAsyncResponseReceiver(CAMERA_IP, ASYNC_RESPONSE_PORT);
         fujiXConnection = new FujiXConnection(context, provider, this);
         zoomControl = new FujiXZoomControl();
+        statusChecker = new FujiXStatusChecker(activity, commandIssuer);
+        this.statusListener = statusListener;
     }
 
     @Override
@@ -138,6 +145,18 @@ public class FujiXInterfaceProvider implements IFujiXInterfaceProvider, IDisplay
     public IFujiXCommunication getCommandCommunication()
     {
         return (commandIssuer);
+    }
+
+    @Override
+    public ICameraStatusWatcher getStatusWatcher()
+    {
+        return (statusChecker);
+    }
+
+    @Override
+    public ICameraStatusUpdateNotify getStatusListener()
+    {
+        return (statusListener);
     }
 
     @Override

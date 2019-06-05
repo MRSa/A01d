@@ -1,16 +1,19 @@
 package net.osdn.gokigen.a01d.camera.fujix.wrapper.status;
 
+import android.app.Activity;
+import android.content.SharedPreferences;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
+import androidx.preference.PreferenceManager;
 
 import net.osdn.gokigen.a01d.camera.ICameraStatus;
 import net.osdn.gokigen.a01d.camera.ICameraStatusWatcher;
-import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.IFujiXCommand;
 import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.IFujiXCommandCallback;
 import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.IFujiXCommandIssuer;
-import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.messages.StatusRequestReceive;
+import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.messages.StatusRequestMessage;
 import net.osdn.gokigen.a01d.liveview.ICameraStatusUpdateNotify;
+import net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,17 +22,28 @@ public class FujiXStatusChecker implements IFujiXCommandCallback, ICameraStatusW
 {
     private final String TAG = toString();
     private static final int STATUS_MESSAGE_HEADER_SIZE = 14;
-    private final int sleepMs;
+    private int sleepMs;
     private final IFujiXCommandIssuer issuer;
     private ICameraStatusUpdateNotify notifier = null;
     private FujiXStatusHolder statusHolder;
     private boolean whileFetching = false;
 
-    public FujiXStatusChecker(@NonNull IFujiXCommandIssuer issuer, int sleepMs)
+    public FujiXStatusChecker(@NonNull Activity activity, @NonNull IFujiXCommandIssuer issuer)
     {
         this.issuer = issuer;
         this.statusHolder = new FujiXStatusHolder();
-        this.sleepMs = sleepMs;
+        try
+        {
+            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(activity);
+            String pollingWait = preferences.getString(IPreferencePropertyAccessor.FUJIX_COMMAND_POLLING_WAIT, IPreferencePropertyAccessor.FUJIX_COMMAND_POLLING_WAIT_DEFAULT_VALUE);
+            this.sleepMs = Integer.parseInt(pollingWait);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            this.sleepMs = 500;
+        }
+        Log.v(TAG, "POLLING WAIT : " + sleepMs);
     }
 
     @Override
@@ -37,6 +51,7 @@ public class FujiXStatusChecker implements IFujiXCommandCallback, ICameraStatusW
     {
         try
         {
+            Log.v(TAG, "receivedMessage : " + id + ", length: " + data.length);
             if (data.length < STATUS_MESSAGE_HEADER_SIZE)
             {
                 Log.v(TAG, "received status length is short. (" + data.length + " bytes.)");
@@ -69,7 +84,6 @@ public class FujiXStatusChecker implements IFujiXCommandCallback, ICameraStatusW
             {
                 return (new ArrayList<>());
             }
-            String listKey = key + "List";
             return (statusHolder.getAvailableItemList(key));
         }
         catch (Exception e)
@@ -115,7 +129,7 @@ public class FujiXStatusChecker implements IFujiXCommandCallback, ICameraStatusW
     @Override
     public void startStatusWatch(@NonNull ICameraStatusUpdateNotify notifier)
     {
-        Log.v(TAG, "startStatusWatch()");
+        //Log.v(TAG, "startStatusWatch()");
         if (whileFetching)
         {
             Log.v(TAG, "startStatusWatch() already starting.");
@@ -123,20 +137,20 @@ public class FujiXStatusChecker implements IFujiXCommandCallback, ICameraStatusW
         }
         try
         {
+            final IFujiXCommandCallback callback = this;
             this.notifier = notifier;
             whileFetching = true;
-            final IFujiXCommand command = new StatusRequestReceive(this);
             Thread thread = new Thread(new Runnable()
             {
                 @Override
                 public void run()
                 {
-                    Log.d(TAG, "Start status watch.");
+                    Log.d(TAG, "Start status watch. : " + sleepMs + "ms");
                     while (whileFetching)
                     {
                         try
                         {
-                            issuer.enqueueCommand(command);
+                            issuer.enqueueCommand(new StatusRequestMessage(callback));
                             Thread.sleep(sleepMs);
                         }
                         catch (Exception e)
