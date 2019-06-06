@@ -27,7 +27,7 @@ public class FujiXLiveViewControl implements ILiveViewControl, IFujiXCommunicati
     private final CameraLiveViewListenerImpl liveViewListener;
     private int waitMs = 0;
     private static final int DATA_HEADER_OFFSET = 18;
-    private static final int BUFFER_SIZE = 1920 * 1024 + 8;
+    private static final int BUFFER_SIZE = 2048 * 1280 + 8;
     private static final int ERROR_LIMIT = 30;
     private boolean isStart = false;
 
@@ -118,12 +118,45 @@ public class FujiXLiveViewControl implements ILiveViewControl, IFujiXCommunicati
         {
             try
             {
+                boolean findJpeg = false;
+                int length_bytes;
                 int read_bytes = isr.read(byteArray, 0, BUFFER_SIZE);
-                Log.v(TAG, "READ BYTES : " + read_bytes + "  (" + waitMs + "ms)");
-                liveViewListener.onUpdateLiveView(Arrays.copyOfRange(byteArray, DATA_HEADER_OFFSET, read_bytes - DATA_HEADER_OFFSET), null);
-                //liveViewListener.onUpdateLiveView(Arrays.copyOfRange(byteArray, 0, read_bytes), null);
+                if (read_bytes > DATA_HEADER_OFFSET)
+                {
+                    // メッセージボディの先頭にあるメッセージ長分は読み込む
+                    length_bytes = ((((int) byteArray[3]) & 0xff) << 24) + ((((int) byteArray[2]) & 0xff) << 16) + ((((int) byteArray[1]) & 0xff) << 8) + (((int) byteArray[0]) & 0xff);
+                    if ((byteArray[18] == (byte)0xff)&&(byteArray[19] == (byte)0xd8))
+                    {
+                        findJpeg = true;
+                        while ((read_bytes < length_bytes) && (read_bytes < BUFFER_SIZE) && (length_bytes <= BUFFER_SIZE))
+                        {
+                            int append_bytes = isr.read(byteArray, read_bytes, length_bytes - read_bytes);
+                            Log.v(TAG, "READ AGAIN : " + append_bytes + " [" + read_bytes + "]");
+                            if (append_bytes < 0)
+                            {
+                                break;
+                            }
+                            read_bytes = read_bytes + append_bytes;
+                        }
+                        Log.v(TAG, "READ BYTES : " + read_bytes + "  (" + length_bytes + " bytes, " + waitMs + "ms)");
+                    }
+                    else
+                    {
+                        // ウェイトを短めに入れてマーカーを拾うまで待つ
+                        Thread.sleep(waitMs/4);
+                        continue;
+                    }
+                }
+
+                // お試し： 先頭データ(24バイト分)をダンプしてみる。
+                //dump_bytes("[LV]", byteArray, 24);
+
+                if (findJpeg)
+                {
+                    liveViewListener.onUpdateLiveView(Arrays.copyOfRange(byteArray, DATA_HEADER_OFFSET, read_bytes - DATA_HEADER_OFFSET), null);
+                    errorCount = 0;
+                }
                 Thread.sleep(waitMs);
-                errorCount = 0;
             }
             catch (Exception e)
             {
@@ -194,4 +227,38 @@ public class FujiXLiveViewControl implements ILiveViewControl, IFujiXCommunicati
     {
         isStart = false;
     }
+
+    /**
+     *   デバッグ用：ログにバイト列を出力する
+     *
+     */
+    private void dump_bytes(String header, byte[] data, int dumpBytes)
+    {
+        int index = 0;
+        StringBuffer message;
+        if (dumpBytes <= 0)
+        {
+            dumpBytes = 24;
+        }
+        message = new StringBuffer();
+        for (int point = 0; point < dumpBytes; point++)
+        {
+            byte item = data[point];
+            index++;
+            message.append(String.format("%02x ", item));
+            if (index >= 8)
+            {
+                Log.v(TAG, header + " " + message);
+                index = 0;
+                message = new StringBuffer();
+            }
+        }
+        if (index != 0)
+        {
+            Log.v(TAG, header + " " + message);
+        }
+        System.gc();
+    }
+
+
 }

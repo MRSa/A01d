@@ -38,9 +38,7 @@ public class FujiXCameraConnectSequence implements Runnable, IFujiXCommandCallba
     public static final int SEQ_CAMERA_REMOTE = 7;
     public static final int SEQ_START_5TH = 8;
     public static final int SEQ_STATUS_REQUEST = 9;
-    public static final int SEQ_STATUS_REQUEST_RECEIVE = 10;
     public static final int SEQ_QUERY_CAMERA_CAPABILITIES = 11;
-    public static final int SEQ_START_RECEIVE2 = 12;
 
     private final Activity context;
     private final ICameraConnection cameraConnection;
@@ -128,7 +126,7 @@ public class FujiXCameraConnectSequence implements Runnable, IFujiXCommandCallba
                 if (rx_body.length == (int)rx_body[0])
                 {
                     // なぜかもうちょっとデータが飛んでくるので待つ
-                    //commandIssuer.enqueueCommand(new StartReceiveOnly(this));
+                    //commandIssuer.enqueueCommand(new ReceiveOnly(this));
 
                     commandIssuer.enqueueCommand(new StartMessage3rd(this));
                 }
@@ -165,17 +163,10 @@ public class FujiXCameraConnectSequence implements Runnable, IFujiXCommandCallba
                 commandIssuer.enqueueCommand(new QueryCameraCapabilities(this));
                 break;
 
-            case SEQ_STATUS_REQUEST_RECEIVE:
-                commandIssuer.enqueueCommand(new QueryCameraCapabilities(this));
-                break;
-
             case SEQ_QUERY_CAMERA_CAPABILITIES:
                 commandIssuer.enqueueCommand(new CameraRemoteMessage(this));
                 break;
 
-            case SEQ_START_RECEIVE2:
-                commandIssuer.enqueueCommand(new CameraRemoteMessage(this));
-                break;
             case SEQ_CAMERA_REMOTE:
                 connectFinished();
                 break;

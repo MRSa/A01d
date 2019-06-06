@@ -39,7 +39,7 @@ public class FocusUnlock extends FujiXCommandBase
                 // message_header.type : focus_unlock (0x9027)
                 (byte)0x27, (byte)0x90,
 
-                // message_id (0～1づつ繰り上がる...
+                // sequence number
                 (byte)0x00, (byte)0x00, (byte)0x00, (byte)0x00,
         });
     }

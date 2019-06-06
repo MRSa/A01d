@@ -130,8 +130,8 @@ public class FujiXFocusingControl implements IFocusingControl, IFujiXCommandCall
     {
         try
         {
-            byte x = (byte) (0x000000ff & ((int)(Math.round(point.x) * maxPointLimitWidth) + 1));
-            byte y = (byte) (0x000000ff & ((int)(Math.round(point.y) * maxPointLimitHeight) + 1));
+            byte x = (byte) (0x000000ff & (Math.round(point.x * maxPointLimitWidth) + 1));
+            byte y = (byte) (0x000000ff & (Math.round(point.y * maxPointLimitHeight) + 1));
             Log.v(TAG, "Lock AF: [" + x + ","+ y + "]");
             issuer.enqueueCommand(new FocusLock(x, y, this));
         }

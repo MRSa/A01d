@@ -6,6 +6,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.EOFException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
+import java.net.Socket;
 import java.net.URL;
 
 public class SimpleLiveviewSlicer
@@ -36,6 +37,11 @@ public class SimpleLiveviewSlicer
     private static final int CONNECTION_TIMEOUT = 2000; // [msec]
     private HttpURLConnection mHttpConn;
     private InputStream mInputStream;
+
+    public void open(InputStream inputStream)
+    {
+            mInputStream = inputStream;
+    }
 
     public void open(String liveviewUrl)
     {

@@ -5,11 +5,11 @@ import androidx.annotation.NonNull;
 import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.IFujiXCommandCallback;
 import net.osdn.gokigen.a01d.camera.fujix.wrapper.connection.FujiXCameraConnectSequence;
 
-public class StartReceiveOnly extends FujiXCommandBase
+public class ReceiveOnly extends FujiXCommandBase
 {
     private final IFujiXCommandCallback callback;
 
-    public StartReceiveOnly(@NonNull IFujiXCommandCallback callback)
+    public ReceiveOnly(@NonNull IFujiXCommandCallback callback)
     {
         this.callback = callback;
     }
