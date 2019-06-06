@@ -41,7 +41,7 @@ public class FujiXStatusChecker implements IFujiXCommandCallback, ICameraStatusW
         catch (Exception e)
         {
             e.printStackTrace();
-            this.sleepMs = 500;
+            this.sleepMs = 400;
         }
         Log.v(TAG, "POLLING WAIT : " + sleepMs);
     }

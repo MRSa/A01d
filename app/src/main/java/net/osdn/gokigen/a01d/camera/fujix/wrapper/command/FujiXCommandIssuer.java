@@ -199,8 +199,7 @@ public class FujiXCommandIssuer implements IFujiXCommandIssuer, IFujiXCommunicat
             {
                 delayMs = COMMAND_SEND_RECEIVE_DURATION_MS;
             }
-            Thread.sleep(delayMs);
-            receive_from_camera(command.dumpLog(), command.getId(), command.responseCallback());
+            receive_from_camera(command.dumpLog(), command.getId(), command.responseCallback(), command.receiveAgainShortLengthMessage(), delayMs);
         }
         catch (Exception e)
         {
@@ -253,15 +252,27 @@ public class FujiXCommandIssuer implements IFujiXCommandIssuer, IFujiXCommunicat
         }
     }
 
+    private void sleep(int delayMs)
+    {
+        try
+        {
+            Thread.sleep(delayMs);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+
     /**
      *    カメラからにコマンドの結果を受信する（メイン部分）
      *
      */
-    private void receive_from_camera(boolean isDumpReceiveLog, int id, IFujiXCommandCallback callback)
+    private void receive_from_camera(boolean isDumpReceiveLog, int id, IFujiXCommandCallback callback, boolean receiveAgain, int delayMs)
     {
         try
         {
-
+            sleep(delayMs);
             byte[] byte_array = new byte[BUFFER_SIZE];
             InputStream is = socket.getInputStream();
             if (is != null)
@@ -270,6 +281,21 @@ public class FujiXCommandIssuer implements IFujiXCommandIssuer, IFujiXCommunicat
                 byte[] receive_body;
                 if (read_bytes > 4)
                 {
+                    if (receiveAgain)
+                    {
+                        int length = ((((int) byte_array[3]) & 0xff) << 24) + ((((int) byte_array[2]) & 0xff) << 16) + ((((int) byte_array[1]) & 0xff) << 8) + (((int) byte_array[0]) & 0xff);
+                        if ((length > read_bytes)||((length == read_bytes)&&((int) byte_array[4] == 0x02)))
+                        {
+                            // データについて、もう一回受信が必要な場合...
+                            Log.v(TAG, "--- RECEIVE AGAIN --- [" + length + "(" + read_bytes + ") " + byte_array[4]+ "] ");
+                            sleep(delayMs);
+                            int read_bytes2 = is.read(byte_array, read_bytes, BUFFER_SIZE - read_bytes);
+                            if (read_bytes2 > 0)
+                            {
+                                read_bytes = read_bytes + read_bytes2;
+                            }
+                        }
+                    }
                     receive_body = Arrays.copyOfRange(byte_array, 0, read_bytes);
                 }
                 else
@@ -282,7 +308,7 @@ public class FujiXCommandIssuer implements IFujiXCommandIssuer, IFujiXCommunicat
                     Log.v(TAG, "receive_from_camera() : " + read_bytes + " bytes.");
                     dump_bytes(isDumpReceiveLog, "RECV[" + receive_body.length + "] ", receive_body);
                 }
-                if (callback != null)
+               if (callback != null)
                 {
                     callback.receivedMessage(id, receive_body);
                 }

@@ -114,6 +114,7 @@ public class FujiXCameraConnectSequence implements Runnable, IFujiXCommandCallba
     public void receivedMessage(int id, byte[] rx_body)
     {
         //Log.v(TAG, "receivedMessage : " + id + "[" + rx_body.length + " bytes]");
+        int bodyLength = 0;
         switch (id)
         {
             case SEQ_REGISTRATION:
@@ -166,13 +167,18 @@ public class FujiXCameraConnectSequence implements Runnable, IFujiXCommandCallba
                 break;
 
             case SEQ_STATUS_REQUEST:
-                if ((rx_body[4] == (byte) 0x02)&&((int) rx_body[0] == rx_body.length))
+                bodyLength = ((((int) rx_body[3]) & 0xff) << 24) + ((((int) rx_body[2]) & 0xff) << 16) + ((((int) rx_body[1]) & 0xff) << 8) + (((int) rx_body[0]) & 0xff);
+/*
+                if ((rx_body[4] == (byte) 0x02)&&(bodyLength == rx_body.length))
                 {
                     //// 受信データが分割されている場合、、もう一度受信する
+                    Log.v(TAG, "] BODY : " + rx_body.length + "  BodyLength : " + bodyLength + " [");
                     commandIssuer.enqueueCommand(new StatusRequestReceive(this));
                 }
                 else
+*/
                 {
+                    Log.v(TAG, "[ BODY : " + rx_body.length + "  BodyLength : " + bodyLength + " ]");
                     commandIssuer.enqueueCommand(new QueryCameraCapabilities(this));
                 }
                 break;
@@ -182,15 +188,18 @@ public class FujiXCameraConnectSequence implements Runnable, IFujiXCommandCallba
                 break;
 
             case SEQ_QUERY_CAMERA_CAPABILITIES:
-                int bodyLength = ((((int) rx_body[3]) & 0xff) << 24) + ((((int) rx_body[2]) & 0xff) << 16) + ((((int) rx_body[1]) & 0xff) << 8) + (((int) rx_body[0]) & 0xff);
-                if (bodyLength > rx_body.length)
+                bodyLength = ((((int) rx_body[3]) & 0xff) << 24) + ((((int) rx_body[2]) & 0xff) << 16) + ((((int) rx_body[1]) & 0xff) << 8) + (((int) rx_body[0]) & 0xff);
+/*
+                if ((rx_body[4] == (byte) 0x02)&&(bodyLength == rx_body.length))
                 {
-                    Log.v(TAG, "> BODY : " + rx_body.length + "  BodyLength : " + bodyLength);
+                    //// 受信データが分割されている場合、、もう一度受信する
+                    Log.v(TAG, "> BODY : " + rx_body.length + "  BodyLength : " + bodyLength + " <");
                     commandIssuer.enqueueCommand(new StartReceiveOnly2(this));
                 }
                 else
+*/
                 {
-                    Log.v(TAG, "> BODY : " + rx_body.length + "  BodyLength : " + bodyLength);
+                    Log.v(TAG, "< BODY : " + rx_body.length + "  BodyLength : " + bodyLength + " >");
                     commandIssuer.enqueueCommand(new CameraRemoteMessage(this));
                 }
                 break;

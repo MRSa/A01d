@@ -27,6 +27,12 @@ public class RegistrationMessage extends FujiXCommandBase
     }
 
     @Override
+    public boolean receiveAgainShortLengthMessage()
+    {
+        return (false);
+    }
+
+    @Override
     public boolean useSequenceNumber()
     {
         return (false);

@@ -5,6 +5,9 @@ public interface IFujiXCommand
     // メッセージの識別子
     int getId();
 
+    // 短い長さのメッセージを受け取ったときに再度受信するか
+    boolean receiveAgainShortLengthMessage();
+
     // シーケンス番号を埋め込むかどうか
     boolean useSequenceNumber();
 

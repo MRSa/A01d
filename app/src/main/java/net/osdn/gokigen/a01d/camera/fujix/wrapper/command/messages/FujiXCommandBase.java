@@ -13,6 +13,12 @@ public class FujiXCommandBase implements IFujiXCommand
     }
 
     @Override
+    public boolean receiveAgainShortLengthMessage()
+    {
+        return (true);
+    }
+
+    @Override
     public boolean useSequenceNumber()
     {
         return (true);
