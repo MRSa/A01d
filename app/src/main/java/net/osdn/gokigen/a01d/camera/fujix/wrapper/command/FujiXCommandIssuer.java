@@ -239,8 +239,11 @@ public class FujiXCommandIssuer implements IFujiXCommandIssuer, IFujiXCommunicat
                 }
             }
 
-            // ログに送信メッセージを出力する
-            dump_bytes(isDumpReceiveLog,"SEND[" + sendData.length + "] ", sendData);
+            if (isDumpReceiveLog)
+            {
+                // ログに送信メッセージを出力する
+                dump_bytes("SEND[" + sendData.length + "] ", sendData);
+            }
 
             // (データを)送信
             dos.write(sendData);
@@ -306,7 +309,7 @@ public class FujiXCommandIssuer implements IFujiXCommandIssuer, IFujiXCommunicat
                 {
                     // ログに受信メッセージを出力する
                     Log.v(TAG, "receive_from_camera() : " + read_bytes + " bytes.");
-                    dump_bytes(isDumpReceiveLog, "RECV[" + receive_body.length + "] ", receive_body);
+                    dump_bytes("RECV[" + receive_body.length + "] ", receive_body);
                 }
                if (callback != null)
                 {
@@ -324,14 +327,8 @@ public class FujiXCommandIssuer implements IFujiXCommandIssuer, IFujiXCommunicat
      *   デバッグ用：ログにバイト列を出力する
      *
      */
-    private void dump_bytes(boolean isDumpReceiveLog, String header, byte[] data)
+    private void dump_bytes(String header, byte[] data)
     {
-        if (!isDumpReceiveLog)
-        {
-            // 受信ログを出さない
-            return;
-        }
-
         int index = 0;
         StringBuffer message;
         message = new StringBuffer();

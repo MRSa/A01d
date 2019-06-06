@@ -21,10 +21,7 @@ import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.messages.StartMessage2
 import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.messages.StartMessage3rd;
 import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.messages.StartMessage4th;
 import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.messages.StartMessage5th;
-import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.messages.StartReceiveOnly;
-import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.messages.StartReceiveOnly2;
 import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.messages.StatusRequestMessage;
-import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.messages.StatusRequestReceive;
 import net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor;
 
 public class FujiXCameraConnectSequence implements Runnable, IFujiXCommandCallback
@@ -44,8 +41,6 @@ public class FujiXCameraConnectSequence implements Runnable, IFujiXCommandCallba
     public static final int SEQ_STATUS_REQUEST_RECEIVE = 10;
     public static final int SEQ_QUERY_CAMERA_CAPABILITIES = 11;
     public static final int SEQ_START_RECEIVE2 = 12;
-
-
 
     private final Activity context;
     private final ICameraConnection cameraConnection;
@@ -114,7 +109,7 @@ public class FujiXCameraConnectSequence implements Runnable, IFujiXCommandCallba
     public void receivedMessage(int id, byte[] rx_body)
     {
         //Log.v(TAG, "receivedMessage : " + id + "[" + rx_body.length + " bytes]");
-        int bodyLength = 0;
+        //int bodyLength = 0;
         switch (id)
         {
             case SEQ_REGISTRATION:
@@ -167,20 +162,7 @@ public class FujiXCameraConnectSequence implements Runnable, IFujiXCommandCallba
                 break;
 
             case SEQ_STATUS_REQUEST:
-                bodyLength = ((((int) rx_body[3]) & 0xff) << 24) + ((((int) rx_body[2]) & 0xff) << 16) + ((((int) rx_body[1]) & 0xff) << 8) + (((int) rx_body[0]) & 0xff);
-/*
-                if ((rx_body[4] == (byte) 0x02)&&(bodyLength == rx_body.length))
-                {
-                    //// 受信データが分割されている場合、、もう一度受信する
-                    Log.v(TAG, "] BODY : " + rx_body.length + "  BodyLength : " + bodyLength + " [");
-                    commandIssuer.enqueueCommand(new StatusRequestReceive(this));
-                }
-                else
-*/
-                {
-                    Log.v(TAG, "[ BODY : " + rx_body.length + "  BodyLength : " + bodyLength + " ]");
-                    commandIssuer.enqueueCommand(new QueryCameraCapabilities(this));
-                }
+                commandIssuer.enqueueCommand(new QueryCameraCapabilities(this));
                 break;
 
             case SEQ_STATUS_REQUEST_RECEIVE:
@@ -188,27 +170,14 @@ public class FujiXCameraConnectSequence implements Runnable, IFujiXCommandCallba
                 break;
 
             case SEQ_QUERY_CAMERA_CAPABILITIES:
-                bodyLength = ((((int) rx_body[3]) & 0xff) << 24) + ((((int) rx_body[2]) & 0xff) << 16) + ((((int) rx_body[1]) & 0xff) << 8) + (((int) rx_body[0]) & 0xff);
-/*
-                if ((rx_body[4] == (byte) 0x02)&&(bodyLength == rx_body.length))
-                {
-                    //// 受信データが分割されている場合、、もう一度受信する
-                    Log.v(TAG, "> BODY : " + rx_body.length + "  BodyLength : " + bodyLength + " <");
-                    commandIssuer.enqueueCommand(new StartReceiveOnly2(this));
-                }
-                else
-*/
-                {
-                    Log.v(TAG, "< BODY : " + rx_body.length + "  BodyLength : " + bodyLength + " >");
-                    commandIssuer.enqueueCommand(new CameraRemoteMessage(this));
-                }
+                commandIssuer.enqueueCommand(new CameraRemoteMessage(this));
                 break;
 
             case SEQ_START_RECEIVE2:
                 commandIssuer.enqueueCommand(new CameraRemoteMessage(this));
                 break;
             case SEQ_CAMERA_REMOTE:
-                connectFinished(rx_body);
+                connectFinished();
                 break;
 
             default:
@@ -239,7 +208,8 @@ public class FujiXCameraConnectSequence implements Runnable, IFujiXCommandCallba
         return (true);
     }
 
-    private void connectFinished(byte[] rx_body)
+
+    private void connectFinished()
     {
         try
         {
@@ -277,5 +247,4 @@ public class FujiXCameraConnectSequence implements Runnable, IFujiXCommandCallba
             e.printStackTrace();
         }
     }
-
 }
