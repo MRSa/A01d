@@ -10,6 +10,7 @@ import android.widget.Toast;
 
 import net.osdn.gokigen.a01d.camera.CameraInterfaceProvider;
 import net.osdn.gokigen.a01d.camera.IInterfaceProvider;
+import net.osdn.gokigen.a01d.camera.fujix.cameraproperty.FujiXCameraStatusDialog;
 import net.osdn.gokigen.a01d.camera.olympus.cameraproperty.OlyCameraPropertyListFragment;
 import net.osdn.gokigen.a01d.camera.ICameraStatusReceiver;
 import net.osdn.gokigen.a01d.camera.ICameraConnection;
@@ -109,7 +110,7 @@ public class A01dMain extends AppCompatActivity implements ICameraStatusReceiver
      *
      */
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String  permissions[], @NonNull int[] grantResults)
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[]  permissions, @NonNull int[] grantResults)
     {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         onReadyClass();
@@ -224,8 +225,15 @@ public class A01dMain extends AppCompatActivity implements ICameraStatusReceiver
             }
             else if (method == ICameraConnection.CameraConnectionMethod.FUJI_X)
             {
-                // OPCカメラでない場合には、「OPCカメラのみ有効です」表示をして画面遷移させない
-                Toast.makeText(getApplicationContext(), getText(R.string.only_opc_feature), Toast.LENGTH_SHORT).show();
+                try
+                {
+                    // FUJI X Seriesの場合は、ステータス表示ダイアログを表示する
+                    FujiXCameraStatusDialog.newInstance(interfaceProvider.getFujiXInterface()).show(getSupportFragmentManager(), "statusDialog");
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
             }
             else
             {

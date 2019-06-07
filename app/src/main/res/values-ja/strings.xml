@@ -74,6 +74,9 @@
     <string name="data_saving">保存中、お待ちください&#8230;</string>
     <string name="save_image_failure">画像保存に失敗しました。</string>
 
+    <string name="camera_status_title">カメラ状態</string>
+    <string name="update_status">更新</string>
+
     <string name="live_view_scale_default">LV : </string>
     <string name="focal_length_with_digital_zoom_view_default"> </string>
 

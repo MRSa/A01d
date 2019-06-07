@@ -184,24 +184,24 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer, IFo
                 // お気に入りボタン(とMFボタン)は、SONYモード, RICOH GR2モードのときには表示しない
                 final View favoriteButton = view.findViewById(R.id.show_favorite_settings_button);
                 final View propertyButton = view.findViewById(R.id.camera_property_settings_button);
-                if ((favoriteButton != null)&&(manualFocus != null))
-                {
-                    runOnUiThread(new Runnable()
-                    {
-                        @Override
-                        public void run()
-                        {
-                            favoriteButton.setVisibility(View.INVISIBLE);
-                            if (manualFocus != null)
-                            {
-                                manualFocus.setVisibility(View.INVISIBLE);
-                            }
-                            propertyButton.setVisibility(View.INVISIBLE);
-                        }
-                    });
-                }
                 if (connectionMethod == ICameraConnection.CameraConnectionMethod.SONY)
                 {
+                    if ((favoriteButton != null)&&(manualFocus != null))
+                    {
+                        runOnUiThread(new Runnable()
+                        {
+                            @Override
+                            public void run()
+                            {
+                                favoriteButton.setVisibility(View.INVISIBLE);
+                                if (manualFocus != null)
+                                {
+                                    manualFocus.setVisibility(View.INVISIBLE);
+                                }
+                                propertyButton.setVisibility(View.INVISIBLE);
+                            }
+                        });
+                    }
                     if (changeLiveViewScale != null)
                     {
                         changeLiveViewScale.setVisibility(View.INVISIBLE);
@@ -213,6 +213,22 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer, IFo
                 }
                 else if (connectionMethod == ICameraConnection.CameraConnectionMethod.RICOH_GR2)
                 {
+                    if ((favoriteButton != null)&&(manualFocus != null))
+                    {
+                        runOnUiThread(new Runnable()
+                        {
+                            @Override
+                            public void run()
+                            {
+                                favoriteButton.setVisibility(View.INVISIBLE);
+                                if (manualFocus != null)
+                                {
+                                    manualFocus.setVisibility(View.INVISIBLE);
+                                }
+                                propertyButton.setVisibility(View.INVISIBLE);
+                            }
+                        });
+                    }
                     if (changeLiveViewScale != null)
                     {
                         changeLiveViewScale.setVisibility(View.VISIBLE);
@@ -224,6 +240,14 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer, IFo
                 }
                 else if (connectionMethod == ICameraConnection.CameraConnectionMethod.FUJI_X)
                 {
+                    if (favoriteButton != null)
+                    {
+                        favoriteButton.setVisibility(View.INVISIBLE);
+                    }
+                    if (manualFocus != null)
+                    {
+                        manualFocus.setVisibility(View.INVISIBLE);
+                    }
                     if (changeLiveViewScale != null)
                     {
                         changeLiveViewScale.setVisibility(View.INVISIBLE);
@@ -232,9 +256,12 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer, IFo
                     {
                         focusIndicator.setVisibility(View.VISIBLE);
                     }
+                    if (propertyButton != null)
+                    {
+                        propertyButton.setOnClickListener(onClickTouchListener);
+                    }
                 }
             }
-
             if (manualFocus != null)
             {
                 manualFocus.setOnClickListener(onClickTouchListener);

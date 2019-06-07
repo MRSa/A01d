@@ -5,6 +5,7 @@ import androidx.annotation.NonNull;
 import net.osdn.gokigen.a01d.camera.CameraStatusListener;
 import net.osdn.gokigen.a01d.camera.ICameraConnection;
 import net.osdn.gokigen.a01d.camera.ICameraInformation;
+import net.osdn.gokigen.a01d.camera.ICameraStatus;
 import net.osdn.gokigen.a01d.camera.ICameraStatusWatcher;
 import net.osdn.gokigen.a01d.camera.ICaptureControl;
 import net.osdn.gokigen.a01d.camera.IDisplayInjector;
@@ -35,5 +36,6 @@ public interface IFujiXInterfaceProvider
     IFujiXCommunication getCommandCommunication();
     ICameraStatusWatcher getStatusWatcher();
     ICameraStatusUpdateNotify getStatusListener();
+    ICameraStatus getCameraStatus();
     void setAsyncEventReceiver(@NonNull IFujiXCommandCallback receiver);
 }

@@ -10,6 +10,7 @@ import net.osdn.gokigen.a01d.liveview.ICameraStatusUpdateNotify;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 class FujiXStatusHolder implements IFujiXCameraProperties
 {
@@ -104,12 +105,40 @@ class FujiXStatusHolder implements IFujiXCameraProperties
         }
     }
 
+    /**
+     *   認識したカメラのステータス名称のリストを応答する
+     *
+     */
+    private List<String> getAvailableStatusNameList()
+    {
+        ArrayList<String> selection = new ArrayList<>();
+        try
+        {
+            for (int index = 0; index < statusHolder.size(); index++)
+            {
+                int key = statusHolder.keyAt(index);
+                selection.add(statusNameArray.get(key));
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        return (selection);
+
+    }
+
+
 
     List<String> getAvailableItemList(String listKey)
     {
-        ArrayList<String> selection = new ArrayList<>();
+        if (listKey == null)
+        {
+            // アイテム名の一覧を応答する
+            return (getAvailableStatusNameList());
+        }
 
-        // これ違う...これだと認識したステータスの一覧だ...
+        ArrayList<String> selection = new ArrayList<>();
         try
         {
             for (int index = 0; index < statusHolder.size(); index++)
@@ -135,7 +164,8 @@ class FujiXStatusHolder implements IFujiXCameraProperties
                 String strKey = statusNameArray.valueAt(index);
                 if (key.contentEquals(strKey))
                 {
-                    return (statusHolder.get(id) + "");
+                    int value = statusHolder.get(id);
+                    return (String.format(Locale.US,"0x%08x (%d)", value, value));
                 }
             }
         }

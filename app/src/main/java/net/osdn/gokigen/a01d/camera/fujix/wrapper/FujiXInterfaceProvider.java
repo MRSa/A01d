@@ -8,6 +8,7 @@ import androidx.annotation.NonNull;
 import net.osdn.gokigen.a01d.camera.CameraStatusListener;
 import net.osdn.gokigen.a01d.camera.ICameraConnection;
 import net.osdn.gokigen.a01d.camera.ICameraInformation;
+import net.osdn.gokigen.a01d.camera.ICameraStatus;
 import net.osdn.gokigen.a01d.camera.ICameraStatusReceiver;
 import net.osdn.gokigen.a01d.camera.ICameraStatusWatcher;
 import net.osdn.gokigen.a01d.camera.ICaptureControl;
@@ -157,6 +158,12 @@ public class FujiXInterfaceProvider implements IFujiXInterfaceProvider, IDisplay
     public ICameraStatusUpdateNotify getStatusListener()
     {
         return (statusListener);
+    }
+
+    @Override
+    public ICameraStatus getCameraStatus()
+    {
+        return (statusChecker);
     }
 
     @Override

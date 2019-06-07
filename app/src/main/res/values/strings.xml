@@ -79,6 +79,9 @@
     <string name="data_saving">Saving&#8230;</string>
     <string name="save_image_failure">Save image is failed.</string>
 
+    <string name="camera_status_title">Camera Status</string>
+    <string name="update_status">Update</string>
+
     <string name="live_view_scale_default">LV : </string>
     <string name="focal_length_with_digital_zoom_view_default"> </string>
 
