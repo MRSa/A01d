@@ -19,6 +19,7 @@ import net.osdn.gokigen.a01d.IChangeScene;
 import net.osdn.gokigen.a01d.R;
 import net.osdn.gokigen.a01d.camera.IInterfaceProvider;
 import net.osdn.gokigen.a01d.camera.IDisplayInjector;
+import net.osdn.gokigen.a01d.camera.fujix.cameraproperty.FujiXCameraStatusDialog;
 import net.osdn.gokigen.a01d.camera.olympus.myolycameraprops.LoadSaveCameraProperties;
 import net.osdn.gokigen.a01d.camera.olympus.myolycameraprops.LoadSaveMyCameraPropertyDialog;
 import net.osdn.gokigen.a01d.camera.IZoomLensControl;
@@ -43,7 +44,7 @@ import androidx.preference.PreferenceManager;
  *  撮影用ライブビュー画面
  *
  */
-public class LiveViewFragment extends Fragment implements IStatusViewDrawer, IFocusingModeNotify, IFavoriteSettingDialogKicker, ICameraStatusUpdateNotify, IFocusLockIndicator
+public class LiveViewFragment extends Fragment implements IStatusViewDrawer, IFocusingModeNotify, IDialogKicker, ICameraStatusUpdateNotify, IFocusLockIndicator
 {
     private final String TAG = this.toString();
     private static final int COMMAND_MY_PROPERTY = 0x00000100;
@@ -242,7 +243,8 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer, IFo
                 {
                     if (favoriteButton != null)
                     {
-                        favoriteButton.setVisibility(View.INVISIBLE);
+                        favoriteButton.setVisibility(View.VISIBLE);
+                        favoriteButton.setOnClickListener(onClickTouchListener);
                     }
                     if (manualFocus != null)
                     {
@@ -725,6 +727,24 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer, IFo
             if (manager != null)
             {
                 dialog.show(manager, "my_dialog");
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void showCameraStatusDialog()
+    {
+        try
+        {
+            // FUJI X用のステータス表示ダイアログを表示する
+            FragmentManager manager = getFragmentManager();
+            if (manager != null)
+            {
+                FujiXCameraStatusDialog.newInstance(interfaceProvider.getFujiXInterface()).show(manager, "statusDialog");
             }
         }
         catch (Exception e)

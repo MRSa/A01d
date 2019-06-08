@@ -217,7 +217,7 @@ public class FujiXConnection implements ICameraConnection
         connectionStatus = CameraConnectionStatus.CONNECTING;
         try
         {
-            interfaceProvider.getCommandIssuer();
+            interfaceProvider.getCommandPublisher();
             cameraExecutor.execute(new FujiXCameraConnectSequence(context, statusReceiver, this, interfaceProvider));
         }
         catch (Exception e)

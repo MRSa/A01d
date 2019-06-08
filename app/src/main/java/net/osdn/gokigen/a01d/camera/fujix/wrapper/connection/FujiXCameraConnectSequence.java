@@ -12,7 +12,7 @@ import net.osdn.gokigen.a01d.camera.ICameraConnection;
 import net.osdn.gokigen.a01d.camera.ICameraStatusReceiver;
 import net.osdn.gokigen.a01d.camera.fujix.IFujiXInterfaceProvider;
 import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.IFujiXCommandCallback;
-import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.IFujiXCommandIssuer;
+import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.IFujiXCommandPublisher;
 import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.messages.CameraRemoteMessage;
 import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.messages.QueryCameraCapabilities;
 import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.messages.RegistrationMessage;
@@ -44,7 +44,7 @@ public class FujiXCameraConnectSequence implements Runnable, IFujiXCommandCallba
     private final ICameraConnection cameraConnection;
     private final ICameraStatusReceiver cameraStatusReceiver;
     private final IFujiXInterfaceProvider interfaceProvider;
-    private final IFujiXCommandIssuer commandIssuer;
+    private final IFujiXCommandPublisher commandIssuer;
     private boolean isBothLiveView = false;
 
     FujiXCameraConnectSequence(@NonNull Activity context, @NonNull ICameraStatusReceiver statusReceiver, @NonNull final ICameraConnection cameraConnection, @NonNull IFujiXInterfaceProvider interfaceProvider)
@@ -54,7 +54,7 @@ public class FujiXCameraConnectSequence implements Runnable, IFujiXCommandCallba
         this.cameraConnection = cameraConnection;
         this.cameraStatusReceiver = statusReceiver;
         this.interfaceProvider = interfaceProvider;
-        this.commandIssuer = interfaceProvider.getCommandIssuer();
+        this.commandIssuer = interfaceProvider.getCommandPublisher();
     }
 
     @Override
@@ -74,7 +74,7 @@ public class FujiXCameraConnectSequence implements Runnable, IFujiXCommandCallba
             }
 
             // カメラとTCP接続
-            IFujiXCommandIssuer issuer = interfaceProvider.getCommandIssuer();
+            IFujiXCommandPublisher issuer = interfaceProvider.getCommandPublisher();
             if (!issuer.isConnected())
             {
                 if (!interfaceProvider.getCommandCommunication().connect())

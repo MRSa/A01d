@@ -10,7 +10,7 @@ import androidx.preference.PreferenceManager;
 import net.osdn.gokigen.a01d.camera.ICameraStatus;
 import net.osdn.gokigen.a01d.camera.ICameraStatusWatcher;
 import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.IFujiXCommandCallback;
-import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.IFujiXCommandIssuer;
+import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.IFujiXCommandPublisher;
 import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.messages.StatusRequestMessage;
 import net.osdn.gokigen.a01d.liveview.ICameraStatusUpdateNotify;
 import net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor;
@@ -23,12 +23,14 @@ public class FujiXStatusChecker implements IFujiXCommandCallback, ICameraStatusW
     private final String TAG = toString();
     private static final int STATUS_MESSAGE_HEADER_SIZE = 14;
     private int sleepMs;
-    private final IFujiXCommandIssuer issuer;
+    private final IFujiXCommandPublisher issuer;
     private ICameraStatusUpdateNotify notifier = null;
     private FujiXStatusHolder statusHolder;
     private boolean whileFetching = false;
+    private boolean logcat = false;
 
-    public FujiXStatusChecker(@NonNull Activity activity, @NonNull IFujiXCommandIssuer issuer)
+
+    public FujiXStatusChecker(@NonNull Activity activity, @NonNull IFujiXCommandPublisher issuer)
     {
         this.issuer = issuer;
         this.statusHolder = new FujiXStatusHolder();
@@ -51,7 +53,7 @@ public class FujiXStatusChecker implements IFujiXCommandCallback, ICameraStatusW
     {
         try
         {
-            Log.v(TAG, "receivedMessage : " + id + ", length: " + data.length);
+            logcat("receivedMessage : " + id + ", length: " + data.length);
             if (data.length < STATUS_MESSAGE_HEADER_SIZE)
             {
                 Log.v(TAG, "received status length is short. (" + data.length + " bytes.)");
@@ -116,7 +118,10 @@ public class FujiXStatusChecker implements IFujiXCommandCallback, ICameraStatusW
     {
         try
         {
-            Log.v(TAG, "setStatus(" + key + ", " + value + ")");
+            if (logcat)
+            {
+                Log.v(TAG, "setStatus(" + key + ", " + value + ")");
+            }
 
             // ここで設定を行う。
         }
@@ -129,7 +134,6 @@ public class FujiXStatusChecker implements IFujiXCommandCallback, ICameraStatusW
     @Override
     public void startStatusWatch(@NonNull ICameraStatusUpdateNotify notifier)
     {
-        //Log.v(TAG, "startStatusWatch()");
         if (whileFetching)
         {
             Log.v(TAG, "startStatusWatch() already starting.");
@@ -145,7 +149,7 @@ public class FujiXStatusChecker implements IFujiXCommandCallback, ICameraStatusW
                 @Override
                 public void run()
                 {
-                    Log.d(TAG, "Start status watch. : " + sleepMs + "ms");
+                    logcat("Start status watch. : " + sleepMs + "ms");
                     while (whileFetching)
                     {
                         try
@@ -158,7 +162,7 @@ public class FujiXStatusChecker implements IFujiXCommandCallback, ICameraStatusW
                             e.printStackTrace();
                         }
                     }
-                    Log.v(TAG, "STATUS WATCH STOPPED.");
+                    logcat("STATUS WATCH STOPPED.");
                 }
             });
             thread.start();
@@ -175,5 +179,13 @@ public class FujiXStatusChecker implements IFujiXCommandCallback, ICameraStatusW
         Log.v(TAG, "stoptStatusWatch()");
         whileFetching = false;
         this.notifier = null;
+    }
+
+    private void logcat(String message)
+    {
+        if (logcat)
+        {
+            Log.v(TAG, message);
+        }
     }
 }

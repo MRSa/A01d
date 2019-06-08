@@ -10,6 +10,7 @@ import android.widget.Toast;
 
 import net.osdn.gokigen.a01d.camera.CameraInterfaceProvider;
 import net.osdn.gokigen.a01d.camera.IInterfaceProvider;
+import net.osdn.gokigen.a01d.camera.fujix.cameraproperty.FujiXCameraCommandSendDialog;
 import net.osdn.gokigen.a01d.camera.fujix.cameraproperty.FujiXCameraStatusDialog;
 import net.osdn.gokigen.a01d.camera.olympus.cameraproperty.OlyCameraPropertyListFragment;
 import net.osdn.gokigen.a01d.camera.ICameraStatusReceiver;
@@ -227,8 +228,9 @@ public class A01dMain extends AppCompatActivity implements ICameraStatusReceiver
             {
                 try
                 {
-                    // FUJI X Seriesの場合は、ステータス表示ダイアログを表示する
-                    FujiXCameraStatusDialog.newInstance(interfaceProvider.getFujiXInterface()).show(getSupportFragmentManager(), "statusDialog");
+                    // FUJI X Seriesの場合は、コマンド送信ダイアログを表示する
+                    FujiXCameraCommandSendDialog.newInstance(interfaceProvider.getFujiXInterface()).show(getSupportFragmentManager(), "sendCommandDialog");
+
                 }
                 catch (Exception e)
                 {

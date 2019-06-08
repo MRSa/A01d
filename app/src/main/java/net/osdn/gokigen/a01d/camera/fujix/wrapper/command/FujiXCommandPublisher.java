@@ -12,7 +12,7 @@ import java.util.ArrayDeque;
 import java.util.Arrays;
 import java.util.Queue;
 
-public class FujiXCommandIssuer implements IFujiXCommandIssuer, IFujiXCommunication
+public class FujiXCommandPublisher implements IFujiXCommandPublisher, IFujiXCommunication
 {
     private final String TAG = toString();
 
@@ -33,7 +33,7 @@ public class FujiXCommandIssuer implements IFujiXCommandIssuer, IFujiXCommunicat
     private Queue<IFujiXCommand> commandQueue;
 
 
-    public FujiXCommandIssuer(@NonNull String ip, int portNumber)
+    public FujiXCommandPublisher(@NonNull String ip, int portNumber)
     {
         this.ipAddress = ip;
         this.portNumber = portNumber;
@@ -290,7 +290,10 @@ public class FujiXCommandIssuer implements IFujiXCommandIssuer, IFujiXCommunicat
                         if ((length > read_bytes)||((length == read_bytes)&&((int) byte_array[4] == 0x02)))
                         {
                             // データについて、もう一回受信が必要な場合...
-                            Log.v(TAG, "--- RECEIVE AGAIN --- [" + length + "(" + read_bytes + ") " + byte_array[4]+ "] ");
+                            if (isDumpReceiveLog)
+                            {
+                                Log.v(TAG, "--- RECEIVE AGAIN --- [" + length + "(" + read_bytes + ") " + byte_array[4]+ "] ");
+                            }
                             sleep(delayMs);
                             int read_bytes2 = is.read(byte_array, read_bytes, BUFFER_SIZE - read_bytes);
                             if (read_bytes2 > 0)

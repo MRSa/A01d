@@ -65,7 +65,7 @@ class FujiXStatusHolder implements IFujiXCameraProperties
             statusHolder.put(id, value);
             if (currentValue != value)
             {
-                Log.v(TAG, "STATUS  ID: " + id + " value : " + currentValue + " -> " + value);
+                //Log.v(TAG, "STATUS  ID: " + id + " value : " + currentValue + " -> " + value);
                 if (notifier != null)
                 {
                     updateDetected(notifier, id, currentValue, value);
@@ -83,7 +83,8 @@ class FujiXStatusHolder implements IFujiXCameraProperties
         try
         {
             String idName = statusNameArray.get(id, "Unknown");
-            Log.v(TAG, "updateDetected(" + id + " [" + idName + "] " + previous + " -> " + current + " )");
+            Log.v(TAG, String.format(Locale.US,"<< UPDATE STATUS >> id: 0x%04x[%s] 0x%08x(%d) -> 0x%08x(%d)", id, idName, previous, previous, current, current));
+            //Log.v(TAG, "updateDetected(ID: " + id + " [" + idName + "] " + previous + " -> " + current + " )");
 
             if (id == FOCUS_LOCK)
             {
@@ -127,8 +128,6 @@ class FujiXStatusHolder implements IFujiXCameraProperties
         return (selection);
 
     }
-
-
 
     List<String> getAvailableItemList(String listKey)
     {

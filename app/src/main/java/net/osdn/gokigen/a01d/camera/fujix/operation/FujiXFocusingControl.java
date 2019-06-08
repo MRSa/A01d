@@ -12,7 +12,7 @@ import androidx.preference.PreferenceManager;
 
 import net.osdn.gokigen.a01d.camera.IFocusingControl;
 import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.IFujiXCommandCallback;
-import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.IFujiXCommandIssuer;
+import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.IFujiXCommandPublisher;
 import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.messages.FocusLock;
 import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.messages.FocusUnlock;
 import net.osdn.gokigen.a01d.liveview.IAutoFocusFrameDisplay;
@@ -29,13 +29,13 @@ public class FujiXFocusingControl implements IFocusingControl, IFujiXCommandCall
     private float maxPointLimitWidth;
     private float maxPointLimitHeight;
 
-    private final IFujiXCommandIssuer issuer;
+    private final IFujiXCommandPublisher issuer;
     private final IAutoFocusFrameDisplay frameDisplayer;
     private final IIndicatorControl indicator;
     private RectF preFocusFrameRect = null;
 
 
-    public FujiXFocusingControl(@NonNull Activity activity, @NonNull IFujiXCommandIssuer issuer, @NonNull final IAutoFocusFrameDisplay frameDisplayer, @NonNull final IIndicatorControl indicator)
+    public FujiXFocusingControl(@NonNull Activity activity, @NonNull IFujiXCommandPublisher issuer, @NonNull final IAutoFocusFrameDisplay frameDisplayer, @NonNull final IIndicatorControl indicator)
     {
         this.issuer = issuer;
         this.frameDisplayer = frameDisplayer;

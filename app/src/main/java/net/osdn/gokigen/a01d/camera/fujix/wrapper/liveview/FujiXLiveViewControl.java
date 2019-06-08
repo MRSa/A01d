@@ -27,9 +27,10 @@ public class FujiXLiveViewControl implements ILiveViewControl, IFujiXCommunicati
     private final CameraLiveViewListenerImpl liveViewListener;
     private int waitMs = 0;
     private static final int DATA_HEADER_OFFSET = 18;
-    private static final int BUFFER_SIZE = 2048 * 1280 + 8;
+    private static final int BUFFER_SIZE = 2048 * 1280;
     private static final int ERROR_LIMIT = 30;
     private boolean isStart = false;
+    private boolean logcat = false;
 
     public FujiXLiveViewControl(@NonNull Activity activity, String ip, int portNumber)
     {
@@ -41,7 +42,7 @@ public class FujiXLiveViewControl implements ILiveViewControl, IFujiXCommunicati
         {
             SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(activity);
             String waitMsStr = preferences.getString(FUJIX_LIVEVIEW_WAIT, FUJIX_LIVEVIEW_WAIT_DEFAULT_VALUE);
-            Log.v(TAG, "waitMS : " + waitMsStr);
+            logcat("waitMS : " + waitMsStr);
             int wait = Integer.parseInt(waitMsStr);
             if ((wait >= 20)&&(wait <= 800))
             {
@@ -100,13 +101,16 @@ public class FujiXLiveViewControl implements ILiveViewControl, IFujiXCommunicati
 
     private void startReceive(Socket socket)
     {
+        String lvHeader = "[LV]";
+        int lvHeaderDumpBytes = 24;
+
         int errorCount = 0;
         InputStream isr;
         byte[] byteArray;
         try
         {
             isr = socket.getInputStream();
-            byteArray = new byte[BUFFER_SIZE];
+            byteArray = new byte[BUFFER_SIZE + 32];
         }
         catch (Exception e)
         {
@@ -131,14 +135,14 @@ public class FujiXLiveViewControl implements ILiveViewControl, IFujiXCommunicati
                         while ((read_bytes < length_bytes) && (read_bytes < BUFFER_SIZE) && (length_bytes <= BUFFER_SIZE))
                         {
                             int append_bytes = isr.read(byteArray, read_bytes, length_bytes - read_bytes);
-                            Log.v(TAG, "READ AGAIN : " + append_bytes + " [" + read_bytes + "]");
+                            logcat("READ AGAIN : " + append_bytes + " [" + read_bytes + "]");
                             if (append_bytes < 0)
                             {
                                 break;
                             }
                             read_bytes = read_bytes + append_bytes;
                         }
-                        Log.v(TAG, "READ BYTES : " + read_bytes + "  (" + length_bytes + " bytes, " + waitMs + "ms)");
+                        logcat("READ BYTES : " + read_bytes + "  (" + length_bytes + " bytes, " + waitMs + "ms)");
                     }
                     else
                     {
@@ -148,8 +152,8 @@ public class FujiXLiveViewControl implements ILiveViewControl, IFujiXCommunicati
                     }
                 }
 
-                // お試し： 先頭データ(24バイト分)をダンプしてみる。
-                //dump_bytes("[LV]", byteArray, 24);
+                // 先頭データ(24バイト分)をダンプ
+                dump_bytes(lvHeader, byteArray, lvHeaderDumpBytes);
 
                 if (findJpeg)
                 {
@@ -234,6 +238,12 @@ public class FujiXLiveViewControl implements ILiveViewControl, IFujiXCommunicati
      */
     private void dump_bytes(String header, byte[] data, int dumpBytes)
     {
+        if (!logcat)
+        {
+            // ログ出力しないモードだった
+            return;
+        }
+
         int index = 0;
         StringBuffer message;
         if (dumpBytes <= 0)
@@ -260,5 +270,11 @@ public class FujiXLiveViewControl implements ILiveViewControl, IFujiXCommunicati
         System.gc();
     }
 
-
+    private void logcat(String message)
+    {
+        if (logcat)
+        {
+            Log.v(TAG, message);
+        }
+    }
 }

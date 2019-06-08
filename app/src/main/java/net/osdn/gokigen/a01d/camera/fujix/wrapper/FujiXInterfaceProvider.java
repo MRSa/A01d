@@ -5,7 +5,6 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
-import net.osdn.gokigen.a01d.camera.CameraStatusListener;
 import net.osdn.gokigen.a01d.camera.ICameraConnection;
 import net.osdn.gokigen.a01d.camera.ICameraInformation;
 import net.osdn.gokigen.a01d.camera.ICameraStatus;
@@ -22,15 +21,13 @@ import net.osdn.gokigen.a01d.camera.fujix.operation.FujiXCaptureControl;
 import net.osdn.gokigen.a01d.camera.fujix.operation.FujiXFocusingControl;
 import net.osdn.gokigen.a01d.camera.fujix.operation.FujiXZoomControl;
 import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.FujiXAsyncResponseReceiver;
-import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.FujiXCommandIssuer;
+import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.FujiXCommandPublisher;
 import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.IFujiXCommandCallback;
-import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.IFujiXCommandIssuer;
+import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.IFujiXCommandPublisher;
 import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.IFujiXCommunication;
 import net.osdn.gokigen.a01d.camera.fujix.wrapper.connection.FujiXConnection;
 import net.osdn.gokigen.a01d.camera.fujix.wrapper.liveview.FujiXLiveViewControl;
 import net.osdn.gokigen.a01d.camera.fujix.wrapper.status.FujiXStatusChecker;
-import net.osdn.gokigen.a01d.camera.ricohgr2.operation.RicohGr2CameraCaptureControl;
-import net.osdn.gokigen.a01d.camera.ricohgr2.operation.RicohGr2CameraFocusControl;
 import net.osdn.gokigen.a01d.liveview.IAutoFocusFrameDisplay;
 import net.osdn.gokigen.a01d.liveview.ICameraStatusUpdateNotify;
 import net.osdn.gokigen.a01d.liveview.IIndicatorControl;
@@ -47,7 +44,7 @@ public class FujiXInterfaceProvider implements IFujiXInterfaceProvider, IDisplay
 
     private final Activity activity;
     private FujiXConnection fujiXConnection;
-    private FujiXCommandIssuer commandIssuer;
+    private FujiXCommandPublisher commandPublisher;
     private FujiXLiveViewControl liveViewControl;
     private FujiXAsyncResponseReceiver asyncReceiver;
     private FujiXZoomControl zoomControl;
@@ -59,12 +56,12 @@ public class FujiXInterfaceProvider implements IFujiXInterfaceProvider, IDisplay
     public FujiXInterfaceProvider(@NonNull Activity context, @NonNull ICameraStatusReceiver provider, @NonNull ICameraStatusUpdateNotify statusListener)
     {
         this.activity = context;
-        commandIssuer = new FujiXCommandIssuer(CAMERA_IP, CONTROL_PORT);
+        commandPublisher = new FujiXCommandPublisher(CAMERA_IP, CONTROL_PORT);
         liveViewControl = new FujiXLiveViewControl(context, CAMERA_IP, STREAM_PORT);
         asyncReceiver = new FujiXAsyncResponseReceiver(CAMERA_IP, ASYNC_RESPONSE_PORT);
         fujiXConnection = new FujiXConnection(context, provider, this);
         zoomControl = new FujiXZoomControl();
-        statusChecker = new FujiXStatusChecker(activity, commandIssuer);
+        statusChecker = new FujiXStatusChecker(activity, commandPublisher);
         this.statusListener = statusListener;
     }
 
@@ -72,8 +69,8 @@ public class FujiXInterfaceProvider implements IFujiXInterfaceProvider, IDisplay
     public void injectDisplay(IAutoFocusFrameDisplay frameDisplayer, IIndicatorControl indicator, IFocusingModeNotify focusingModeNotify)
     {
         Log.v(TAG, "injectDisplay()");
-        captureControl = new FujiXCaptureControl(commandIssuer, frameDisplayer);
-        focusingControl = new FujiXFocusingControl(activity, commandIssuer, frameDisplayer, indicator);
+        captureControl = new FujiXCaptureControl(commandPublisher, frameDisplayer);
+        focusingControl = new FujiXFocusingControl(activity, commandPublisher, frameDisplayer, indicator);
     }
 
     @Override
@@ -125,9 +122,9 @@ public class FujiXInterfaceProvider implements IFujiXInterfaceProvider, IDisplay
     }
 
     @Override
-    public IFujiXCommandIssuer getCommandIssuer()
+    public IFujiXCommandPublisher getCommandPublisher()
     {
-        return (commandIssuer);
+        return (commandPublisher);
     }
 
     @Override
@@ -145,7 +142,7 @@ public class FujiXInterfaceProvider implements IFujiXInterfaceProvider, IDisplay
     @Override
     public IFujiXCommunication getCommandCommunication()
     {
-        return (commandIssuer);
+        return (commandPublisher);
     }
 
     @Override

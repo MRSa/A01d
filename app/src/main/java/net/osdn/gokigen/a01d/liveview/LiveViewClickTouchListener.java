@@ -38,10 +38,10 @@ class LiveViewClickTouchListener implements View.OnClickListener, View.OnTouchLi
     private final IOlyCameraPropertyProvider propertyProvider;
     private final ICameraInformation cameraInformation;
     private final ICameraConnection cameraConnection;
-    private final IFavoriteSettingDialogKicker dialogKicker;
+    private final IDialogKicker dialogKicker;
     private final IZoomLensControl zoomLensControl;
 
-    LiveViewClickTouchListener(Context context, ILiveImageStatusNotify imageStatusNotify, IStatusViewDrawer statusView, IChangeScene changeScene, IInterfaceProvider interfaceProvider, IFavoriteSettingDialogKicker dialogKicker)
+    LiveViewClickTouchListener(Context context, ILiveImageStatusNotify imageStatusNotify, IStatusViewDrawer statusView, IChangeScene changeScene, IInterfaceProvider interfaceProvider, IDialogKicker dialogKicker)
     {
         this.context = context;
         this.statusNotify = imageStatusNotify;
@@ -291,7 +291,16 @@ class LiveViewClickTouchListener implements View.OnClickListener, View.OnTouchLi
         Log.v(TAG, "showFavoriteDialog()");
         try
         {
-            if (interfaceProvider.getCammeraConnectionMethod() != ICameraConnection.CameraConnectionMethod.OPC)
+            if (interfaceProvider.getCammeraConnectionMethod() == ICameraConnection.CameraConnectionMethod.FUJI_X)
+            {
+                // FUJI X Seriesの場合は、カメラ状態を表示するダイアログを表示する
+                if (cameraConnection.getConnectionStatus() == ICameraConnection.CameraConnectionStatus.CONNECTED)
+                {
+                    dialogKicker.showCameraStatusDialog();
+                }
+                return;
+            }
+            else if (interfaceProvider.getCammeraConnectionMethod() != ICameraConnection.CameraConnectionMethod.OPC)
             {
                 // OPCカメラでない場合には、「OPCカメラのみ有効です」表示をして画面遷移させない
                 Toast.makeText(context, context.getText(R.string.only_opc_feature), Toast.LENGTH_SHORT).show();
