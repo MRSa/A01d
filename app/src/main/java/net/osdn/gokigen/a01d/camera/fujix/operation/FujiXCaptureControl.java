@@ -29,7 +29,11 @@ public class FujiXCaptureControl implements ICaptureControl, IFujiXCommandCallba
     {
         try
         {
-            issuer.enqueueCommand(new CaptureCommand(this));
+            boolean ret = issuer.enqueueCommand(new CaptureCommand(this));
+            if (!ret)
+            {
+                Log.v(TAG, "enqueue ERROR");
+            }
         }
         catch (Exception e)
         {

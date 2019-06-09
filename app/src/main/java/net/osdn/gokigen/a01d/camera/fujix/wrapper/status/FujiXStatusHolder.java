@@ -30,28 +30,28 @@ class FujiXStatusHolder implements IFujiXCameraProperties
     private void prepareStatusNameArray()
     {
         statusNameArray.clear();
-        statusNameArray.append(BATTERY_LEVEL, "Battery");
-        statusNameArray.append(WHITE_BALANCE, "WhiteBalance");
-        statusNameArray.append(APERTURE, "Aperture");
-        statusNameArray.append(FOCUS_MODE, "FocusMode");
-        statusNameArray.append(SHOOTING_MODE, "ShootingMode");
-        statusNameArray.append(FLASH, "FlashMode");
-        statusNameArray.append(EXPOSURE_COMPENSATION, "ExposureCompensation");
-        statusNameArray.append(SELF_TIMER, "SelfTimer");
-        statusNameArray.append(FILM_SIMULATION, "FilmSimulation");
-        statusNameArray.append(IMAGE_FORMAT, "ImageFormat");
-        statusNameArray.append(RECMODE_ENABLE, "RecModeEnable");
-        statusNameArray.append(F_SS_CONTROL, "F_SS_Control");
-        statusNameArray.append(ISO, "Iso");
-        statusNameArray.append(MOVIE_ISO, "MovieIso");
-        statusNameArray.append(FOCUS_POINT, "FocusPoint");
-        statusNameArray.append(DEVICE_ERROR, "DeviceError");
-        statusNameArray.append(SDCARD_REMAIN_SIZE, "ImageRemainCount");
-        statusNameArray.append(FOCUS_LOCK, "FocusLock");
-        statusNameArray.append(MOVIE_REMAINING_TIME, "MovieRemainTime");
-        statusNameArray.append(SHUTTER_SPEED, "ShutterSpeed");
-        statusNameArray.append(IMAGE_ASPECT, "ImageAspect");
-        statusNameArray.append(BATTERY_LEVEL_2, "BattLevel");
+        statusNameArray.append(BATTERY_LEVEL, BATTERY_LEVEL_STR);
+        statusNameArray.append(WHITE_BALANCE, WHITE_BALANCE_STR);
+        statusNameArray.append(APERTURE, APERTURE_STR);
+        statusNameArray.append(FOCUS_MODE, FOCUS_MODE_STR);
+        statusNameArray.append(SHOOTING_MODE, SHOOTING_MODE_STR);
+        statusNameArray.append(FLASH, FLASH_STR);
+        statusNameArray.append(EXPOSURE_COMPENSATION, EXPOSURE_COMPENSATION_STR);
+        statusNameArray.append(SELF_TIMER, SELF_TIMER_STR);
+        statusNameArray.append(FILM_SIMULATION, FILM_SIMULATION_STR);
+        statusNameArray.append(IMAGE_FORMAT, IMAGE_FORMAT_STR);
+        statusNameArray.append(RECMODE_ENABLE, RECMODE_ENABLE_STR);
+        statusNameArray.append(F_SS_CONTROL, F_SS_CONTROL_STR);
+        statusNameArray.append(ISO, ISO_STR);
+        statusNameArray.append(MOVIE_ISO, MOVIE_ISO_STR);
+        statusNameArray.append(FOCUS_POINT, FOCUS_POINT_STR);
+        statusNameArray.append(DEVICE_ERROR, DEVICE_ERROR_STR);
+        statusNameArray.append(SDCARD_REMAIN_SIZE, SDCARD_REMAIN_SIZE_STR);
+        statusNameArray.append(FOCUS_LOCK, FOCUS_LOCK_STR);
+        statusNameArray.append(MOVIE_REMAINING_TIME, MOVIE_REMAINING_TIME_STR);
+        statusNameArray.append(SHUTTER_SPEED, SHUTTER_SPEED_STR);
+        statusNameArray.append(IMAGE_ASPECT,IMAGE_ASPECT_STR);
+        statusNameArray.append(BATTERY_LEVEL_2, BATTERY_LEVEL_2_STR);
     }
 
 
@@ -118,7 +118,7 @@ class FujiXStatusHolder implements IFujiXCameraProperties
             for (int index = 0; index < statusHolder.size(); index++)
             {
                 int key = statusHolder.keyAt(index);
-                selection.add(statusNameArray.get(key));
+                selection.add(statusNameArray.get(key, String.format(Locale.US, "0x%04x", key)));
             }
         }
         catch (Exception e)
@@ -137,6 +137,7 @@ class FujiXStatusHolder implements IFujiXCameraProperties
             return (getAvailableStatusNameList());
         }
 
+        /////  選択可能なステータスの一覧を取得する : でも以下はアイテム名の一覧... /////
         ArrayList<String> selection = new ArrayList<>();
         try
         {
@@ -157,6 +158,22 @@ class FujiXStatusHolder implements IFujiXCameraProperties
     {
         try
         {
+            int strIndex = key.indexOf("x");
+            if (strIndex > 1)
+            {
+                key = key.substring(strIndex + 1);
+                try
+                {
+                    int id = Integer.parseInt(key, 16);
+                    int value = statusHolder.get(id);
+                    return (String.format(Locale.US,"0x%08x (%d)", value, value));
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+            }
+
             for (int index = 0; index < statusNameArray.size(); index++)
             {
                 int id = statusNameArray.keyAt(index);

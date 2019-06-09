@@ -16,15 +16,16 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
+import androidx.collection.SparseArrayCompat;
 import androidx.fragment.app.DialogFragment;
 
 import net.osdn.gokigen.a01d.R;
 import net.osdn.gokigen.a01d.camera.fujix.IFujiXInterfaceProvider;
+import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.IFujiXCameraCommands;
 import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.IFujiXCommandPublisher;
 import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.messages.CommandGeneric;
 import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.messages.SetPropertyValue;
-
-import java.util.Locale;
+import net.osdn.gokigen.a01d.camera.fujix.wrapper.status.IFujiXCameraProperties;
 
 public class FujiXCameraCommandSendDialog  extends DialogFragment
 {
@@ -32,6 +33,7 @@ public class FujiXCameraCommandSendDialog  extends DialogFragment
     private Dialog myDialog = null;
     private IFujiXCommandPublisher commandPublisher = null;
     private FujiXCameraCommandResponse responseReceiver = null;
+    private SparseArrayCompat<String> commandNameIndexArray;
 
     private int selectedCommandIdPosition = 0;
     private int selectedMessageTypePosition = 0;
@@ -54,6 +56,7 @@ public class FujiXCameraCommandSendDialog  extends DialogFragment
     private void prepare(@NonNull IFujiXInterfaceProvider interfaceProvider)
     {
         this.commandPublisher = interfaceProvider.getCommandPublisher();
+        this.commandNameIndexArray = new SparseArrayCompat<>();
     }
 
     @Override
@@ -203,9 +206,10 @@ public class FujiXCameraCommandSendDialog  extends DialogFragment
                 // 未入力のときには０を返す
                 return (0);
             }
-            int convertValue = (int)Long.parseLong(value, 16);
-            Log.v(TAG, String.format(Locale.US, "PARSED VALUE : 0x%08x (%d)", convertValue, convertValue));
-            return (convertValue);
+            //int convertValue = (int)Long.parseLong(value, 16);
+            //Log.v(TAG, String.format(Locale.US, "PARSED VALUE : 0x%08x (%d)", convertValue, convertValue));
+            //return (convertValue);
+            return ((int)Long.parseLong(value, 16));
         }
         catch (Exception e)
         {
@@ -218,8 +222,119 @@ public class FujiXCameraCommandSendDialog  extends DialogFragment
 
     private ArrayAdapter<String> prepareCommandAdapter(@NonNull final Activity activity)
     {
+        int position = 0;
         ArrayAdapter<String> adapter = new ArrayAdapter<>(activity, android.R.layout.simple_spinner_item);
+        commandNameIndexArray.clear();
+
+        // せっせとコマンドを入れていく...
         adapter.add("(Direct Input)");
+        commandNameIndexArray.append(position++, "");
+
+        adapter.add(IFujiXCameraCommands.SHUTTER_STR + " (" + IFujiXCameraCommands.SHUTTER_STR_ID + ")");
+        commandNameIndexArray.append(position++, IFujiXCameraCommands.SHUTTER_STR_ID);
+
+        adapter.add(IFujiXCameraCommands.FOCUS_POINT_STR + " (" + IFujiXCameraCommands.FOCUS_POINT_STR_ID + ")");
+        commandNameIndexArray.append(position++, IFujiXCameraCommands.FOCUS_POINT_STR_ID);
+
+        adapter.add(IFujiXCameraCommands.FOCUS_UNLOCK_STR + " (" + IFujiXCameraCommands.FOCUS_UNLOCK_STR_ID + ")");
+        commandNameIndexArray.append(position++, IFujiXCameraCommands.FOCUS_UNLOCK_STR_ID);
+
+        adapter.add(IFujiXCameraCommands.SHUTTER_SPEED_STR + " (" + IFujiXCameraCommands.SHUTTER_SPEED_STR_ID + ")");
+        commandNameIndexArray.append(position++, IFujiXCameraCommands.SHUTTER_SPEED_STR_ID);
+
+        adapter.add(IFujiXCameraCommands.APERTURE_STR + " (" + IFujiXCameraCommands.APERTURE_STR_ID + ")");
+        commandNameIndexArray.append(position++, IFujiXCameraCommands.APERTURE_STR_ID);
+
+        adapter.add(IFujiXCameraCommands.EXPREV_STR + " (" + IFujiXCameraCommands.EXPREV_STR_ID + ")");
+        commandNameIndexArray.append(position++, IFujiXCameraCommands.EXPREV_STR_ID);
+
+        adapter.add(IFujiXCameraProperties.WHITE_BALANCE_STR + " (" + IFujiXCameraProperties.WHITE_BALANCE_STR_ID + ")");
+        commandNameIndexArray.append(position++, IFujiXCameraProperties.WHITE_BALANCE_STR_ID);
+
+        adapter.add(IFujiXCameraProperties.EXPOSURE_COMPENSATION_STR + " (" + IFujiXCameraProperties.EXPOSURE_COMPENSATION_STR_ID + ")");
+        commandNameIndexArray.append(position++, IFujiXCameraProperties.EXPOSURE_COMPENSATION_STR_ID);
+
+        adapter.add(IFujiXCameraProperties.APERTURE_STR + " (" + IFujiXCameraProperties.APERTURE_STR_ID + ")");
+        commandNameIndexArray.append(position++, IFujiXCameraProperties.APERTURE_STR_ID);
+
+        adapter.add(IFujiXCameraProperties.SHUTTER_SPEED_STR + " (" + IFujiXCameraProperties.SHUTTER_SPEED_STR_ID + ")");
+        commandNameIndexArray.append(position++, IFujiXCameraProperties.SHUTTER_SPEED_STR_ID);
+
+        adapter.add(IFujiXCameraProperties.SELF_TIMER_STR + " (" + IFujiXCameraProperties.SELF_TIMER_STR_ID + ")");
+        commandNameIndexArray.append(position++, IFujiXCameraProperties.SELF_TIMER_STR_ID);
+
+        adapter.add(IFujiXCameraProperties.FILM_SIMULATION_STR + " (" + IFujiXCameraProperties.FILM_SIMULATION_STR_ID + ")");
+        commandNameIndexArray.append(position++, IFujiXCameraProperties.FILM_SIMULATION_STR_ID);
+
+        adapter.add(IFujiXCameraProperties.ISO_STR + " (" + IFujiXCameraProperties.ISO_STR_ID + ")");
+        commandNameIndexArray.append(position++, IFujiXCameraProperties.ISO_STR_ID);
+
+        adapter.add(IFujiXCameraProperties.MOVIE_ISO_STR + " (" + IFujiXCameraProperties.MOVIE_ISO_STR_ID + ")");
+        commandNameIndexArray.append(position++, IFujiXCameraProperties.MOVIE_ISO_STR_ID);
+
+        adapter.add(IFujiXCameraProperties.IMAGE_FORMAT_STR + " (" + IFujiXCameraProperties.IMAGE_FORMAT_STR_ID + ")");
+        commandNameIndexArray.append(position++, IFujiXCameraProperties.IMAGE_FORMAT_STR_ID);
+
+        adapter.add(IFujiXCameraProperties.IMAGE_ASPECT_STR + " (" + IFujiXCameraProperties.IMAGE_ASPECT_STR_ID + ")");
+        commandNameIndexArray.append(position++, IFujiXCameraProperties.IMAGE_ASPECT_STR_ID);
+
+        adapter.add(IFujiXCameraProperties.FLASH_STR + " (" + IFujiXCameraProperties.FLASH_STR_ID + ")");
+        commandNameIndexArray.append(position++, IFujiXCameraProperties.FLASH_STR_ID);
+
+        adapter.add(IFujiXCameraProperties.F_SS_CONTROL_STR + " (" + IFujiXCameraProperties.F_SS_CONTROL_STR_ID + ")");
+        commandNameIndexArray.append(position++, IFujiXCameraProperties.F_SS_CONTROL_STR_ID);
+
+        adapter.add(IFujiXCameraProperties.RECMODE_ENABLE_STR + " (" + IFujiXCameraProperties.RECMODE_ENABLE_STR_ID + ")");
+        commandNameIndexArray.append(position++, IFujiXCameraProperties.RECMODE_ENABLE_STR_ID);
+
+        adapter.add(IFujiXCameraProperties.BATTERY_LEVEL_STR + " (" + IFujiXCameraProperties.BATTERY_LEVEL_STR_ID + ")");
+        commandNameIndexArray.append(position++, IFujiXCameraProperties.BATTERY_LEVEL_STR_ID);
+
+        adapter.add(IFujiXCameraProperties.BATTERY_LEVEL_2_STR + " (" + IFujiXCameraProperties.BATTERY_LEVEL_2_STR_ID + ")");
+        commandNameIndexArray.append(position++, IFujiXCameraProperties.BATTERY_LEVEL_2_STR_ID);
+
+        adapter.add(IFujiXCameraProperties.FOCUS_MODE_STR + " (" + IFujiXCameraProperties.FOCUS_MODE_STR_ID + ")");
+        commandNameIndexArray.append(position++, IFujiXCameraProperties.FOCUS_MODE_STR_ID);
+
+        adapter.add(IFujiXCameraProperties.SHOOTING_MODE_STR + " (" + IFujiXCameraProperties.SHOOTING_MODE_STR_ID + ")");
+        commandNameIndexArray.append(position++, IFujiXCameraProperties.SHOOTING_MODE_STR_ID);
+
+        adapter.add(IFujiXCameraProperties.FOCUS_POINT_STR + " (" + IFujiXCameraProperties.FOCUS_POINT_STR_ID + ")");
+        commandNameIndexArray.append(position++, IFujiXCameraProperties.FOCUS_POINT_STR_ID);
+
+        adapter.add(IFujiXCameraProperties.FOCUS_LOCK_STR + " (" + IFujiXCameraProperties.FOCUS_LOCK_STR_ID + ")");
+        commandNameIndexArray.append(position++, IFujiXCameraProperties.FOCUS_LOCK_STR_ID);
+
+        adapter.add(IFujiXCameraProperties.SDCARD_REMAIN_SIZE_STR + " (" + IFujiXCameraProperties.SDCARD_REMAIN_SIZE_STR_ID + ")");
+        commandNameIndexArray.append(position++, IFujiXCameraProperties.SDCARD_REMAIN_SIZE_STR_ID);
+
+        adapter.add(IFujiXCameraProperties.MOVIE_REMAINING_TIME_STR + " (" + IFujiXCameraProperties.MOVIE_REMAINING_TIME_STR_ID + ")");
+        commandNameIndexArray.append(position++, IFujiXCameraProperties.MOVIE_REMAINING_TIME_STR_ID);
+
+        adapter.add(IFujiXCameraProperties.DEVICE_ERROR_STR + " (" + IFujiXCameraProperties.DEVICE_ERROR_STR_ID + ")");
+        commandNameIndexArray.append(position++, IFujiXCameraProperties.DEVICE_ERROR_STR_ID);
+
+        adapter.add(IFujiXCameraCommands.CAMERA_CAPABILITIES_STR + " (" + IFujiXCameraCommands.CAMERA_CAPABILITIES_STR_ID + ")");
+        commandNameIndexArray.append(position++, IFujiXCameraCommands.CAMERA_CAPABILITIES_STR_ID);
+
+        adapter.add(IFujiXCameraCommands.SINGLE_REQUEST_STR + " (" + IFujiXCameraCommands.SINGLE_REQUEST_STR_ID + ")");
+        commandNameIndexArray.append(position++, IFujiXCameraCommands.SINGLE_REQUEST_STR_ID);
+
+        adapter.add(IFujiXCameraCommands.STOP_STR + " (" + IFujiXCameraCommands.STOP_STR_ID + ")");
+        commandNameIndexArray.append(position++, IFujiXCameraCommands.STOP_STR_ID);
+
+        adapter.add(IFujiXCameraCommands.IMAGE_INFO_STR + " (" + IFujiXCameraCommands.IMAGE_INFO_STR_ID + ")");
+        commandNameIndexArray.append(position++, IFujiXCameraCommands.IMAGE_INFO_STR_ID);
+
+        adapter.add(IFujiXCameraCommands.THUMBNAIL_INDEX_STR + " (" + IFujiXCameraCommands.THUMBNAIL_INDEX_STR_ID + ")");
+        commandNameIndexArray.append(position++, IFujiXCameraCommands.THUMBNAIL_INDEX_STR_ID);
+
+        adapter.add(IFujiXCameraCommands.FULL_IMAGE_STR + " (" + IFujiXCameraCommands.FULL_IMAGE_STR_ID + ")");
+        commandNameIndexArray.append(position++, IFujiXCameraCommands.FULL_IMAGE_STR_ID);
+
+        adapter.add(IFujiXCameraCommands.LAST_IMAGE_CAMERA_STR + " (" + IFujiXCameraCommands.LAST_IMAGE_CAMERA_STR_ID + ")");
+        commandNameIndexArray.append(position, IFujiXCameraCommands.LAST_IMAGE_CAMERA_STR_ID);
+
         return (adapter);
     }
 
@@ -237,17 +352,14 @@ public class FujiXCameraCommandSendDialog  extends DialogFragment
                 public void onItemSelected(AdapterView<?> parent, View view, int position, long id)
                 {
                     Log.v(TAG, "onItemSelected : " + position + " (" + id + ")");
-                    selectedCommandIdPosition = position;
-                    if (selectedCommandIdPosition == 0)
+                    try
                     {
-                        try
-                        {
-                            commandIdArea.setText("");
-                        }
-                        catch (Exception e)
-                        {
-                            e.printStackTrace();
-                        }
+                        selectedCommandIdPosition = position;
+                        commandIdArea.setText(commandNameIndexArray.get(position, ""));
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
                     }
                 }
 
