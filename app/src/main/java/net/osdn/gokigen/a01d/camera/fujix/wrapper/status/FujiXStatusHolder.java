@@ -189,6 +189,6 @@ class FujiXStatusHolder implements IFujiXCameraProperties
         {
             e.printStackTrace();
         }
-        return ("?");
+        return ("? [" + key + "]");
     }
 }
