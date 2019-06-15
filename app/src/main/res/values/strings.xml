@@ -37,6 +37,8 @@
     <string name="pref_summary_fujix_liveview_wait"> </string>
     <string name="pref_fujix_command_polling_wait">Status polling wait (default: 500)</string>
     <string name="pref_summary_fujix_command_polling_wait"> </string>
+    <string name="pref_fujix_connection_for_read">Connect for transfer connection mode.</string>
+    <string name="pref_fujix_connection_for_read_summary">Test: for picture transfer connection.</string>
 
     <string name="pref_cat_initialize">App. Startup</string>
     <string name="pref_auto_connect_camera">Auto Connect To Camera</string>

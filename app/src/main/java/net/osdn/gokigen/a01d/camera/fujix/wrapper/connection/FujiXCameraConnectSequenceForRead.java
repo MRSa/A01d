@@ -18,28 +18,28 @@ import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.messages.QueryCameraCa
 import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.messages.RegistrationMessage;
 import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.messages.StartMessage;
 import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.messages.StartMessage2nd;
+import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.messages.StartMessage2ndRead;
 import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.messages.StartMessage3rd;
 import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.messages.StartMessage4th;
 import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.messages.StartMessage5th;
 import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.messages.StatusRequestMessage;
 import net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor;
 
-public class FujiXCameraConnectSequence implements Runnable, IFujiXCommandCallback
+import static net.osdn.gokigen.a01d.camera.fujix.wrapper.connection.FujiXCameraConnectSequence.SEQ_CAMERA_REMOTE;
+import static net.osdn.gokigen.a01d.camera.fujix.wrapper.connection.FujiXCameraConnectSequence.SEQ_QUERY_CAMERA_CAPABILITIES;
+import static net.osdn.gokigen.a01d.camera.fujix.wrapper.connection.FujiXCameraConnectSequence.SEQ_REGISTRATION;
+import static net.osdn.gokigen.a01d.camera.fujix.wrapper.connection.FujiXCameraConnectSequence.SEQ_START;
+import static net.osdn.gokigen.a01d.camera.fujix.wrapper.connection.FujiXCameraConnectSequence.SEQ_START_2ND;
+import static net.osdn.gokigen.a01d.camera.fujix.wrapper.connection.FujiXCameraConnectSequence.SEQ_START_2ND_READ;
+import static net.osdn.gokigen.a01d.camera.fujix.wrapper.connection.FujiXCameraConnectSequence.SEQ_START_2ND_RECEIVE;
+import static net.osdn.gokigen.a01d.camera.fujix.wrapper.connection.FujiXCameraConnectSequence.SEQ_START_3RD;
+import static net.osdn.gokigen.a01d.camera.fujix.wrapper.connection.FujiXCameraConnectSequence.SEQ_START_4TH;
+import static net.osdn.gokigen.a01d.camera.fujix.wrapper.connection.FujiXCameraConnectSequence.SEQ_START_5TH;
+import static net.osdn.gokigen.a01d.camera.fujix.wrapper.connection.FujiXCameraConnectSequence.SEQ_STATUS_REQUEST;
+
+public class FujiXCameraConnectSequenceForRead implements Runnable, IFujiXCommandCallback
 {
     private final String TAG = this.toString();
-
-    public static final int SEQ_DUMMY = 0;
-    public static final int SEQ_REGISTRATION = 1;
-    public static final int SEQ_START = 2;
-    public static final int SEQ_START_2ND = 3;
-    public static final int SEQ_START_2ND_READ = 10;
-    public static final int SEQ_START_2ND_RECEIVE = 4;
-    public static final int SEQ_START_3RD = 5;
-    public static final int SEQ_START_4TH = 6;
-    public static final int SEQ_CAMERA_REMOTE = 7;
-    public static final int SEQ_START_5TH = 8;
-    public static final int SEQ_STATUS_REQUEST = 9;
-    public static final int SEQ_QUERY_CAMERA_CAPABILITIES = 11;
 
     private final Activity context;
     private final ICameraConnection cameraConnection;
@@ -48,9 +48,9 @@ public class FujiXCameraConnectSequence implements Runnable, IFujiXCommandCallba
     private final IFujiXCommandPublisher commandIssuer;
     private boolean isBothLiveView = false;
 
-    FujiXCameraConnectSequence(@NonNull Activity context, @NonNull ICameraStatusReceiver statusReceiver, @NonNull final ICameraConnection cameraConnection, @NonNull IFujiXInterfaceProvider interfaceProvider)
+    FujiXCameraConnectSequenceForRead(@NonNull Activity context, @NonNull ICameraStatusReceiver statusReceiver, @NonNull final ICameraConnection cameraConnection, @NonNull IFujiXInterfaceProvider interfaceProvider)
     {
-        Log.v(TAG, "FujiXCameraConnectSequence");
+        Log.v(TAG, " FujiXCameraConnectSequenceForRead");
         this.context = context;
         this.cameraConnection = cameraConnection;
         this.cameraStatusReceiver = statusReceiver;
@@ -119,10 +119,10 @@ public class FujiXCameraConnectSequence implements Runnable, IFujiXCommandCallba
                 break;
 
             case SEQ_START:
-                commandIssuer.enqueueCommand(new StartMessage2nd(this));
+                commandIssuer.enqueueCommand(new StartMessage2ndRead(this));
                 break;
 
-            case SEQ_START_2ND:
+            case SEQ_START_2ND_READ:
                 cameraStatusReceiver.onStatusNotify(context.getString(R.string.connect_connecting));
                 if (rx_body.length == (int)rx_body[0])
                 {
@@ -208,7 +208,7 @@ public class FujiXCameraConnectSequence implements Runnable, IFujiXCommandCallba
             // ちょっと待つ
             Thread.sleep(1000);
             interfaceProvider.getAsyncEventCommunication().connect();
-            interfaceProvider.getStatusWatcher().startStatusWatch(interfaceProvider.getStatusListener());
+            //interfaceProvider.getStatusWatcher().startStatusWatch(interfaceProvider.getStatusListener());  ステータスの定期確認は実施しない
             onConnectNotify();
         }
         catch (Exception e)

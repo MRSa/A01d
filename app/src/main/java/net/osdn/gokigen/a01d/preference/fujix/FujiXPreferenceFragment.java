@@ -129,6 +129,9 @@ public class FujiXPreferenceFragment  extends PreferenceFragmentCompat implement
             if (!items.containsKey(IPreferencePropertyAccessor.CONNECTION_METHOD)) {
                 editor.putString(IPreferencePropertyAccessor.CONNECTION_METHOD, IPreferencePropertyAccessor.CONNECTION_METHOD_DEFAULT_VALUE);
             }
+            if (!items.containsKey(IPreferencePropertyAccessor.FUJIX_CONNECTION_FOR_READ)) {
+                editor.putBoolean(IPreferencePropertyAccessor.FUJIX_CONNECTION_FOR_READ, false);
+            }
             editor.apply();
         }
         catch (Exception e)
@@ -161,6 +164,11 @@ public class FujiXPreferenceFragment  extends PreferenceFragmentCompat implement
                     break;
 
                 case IPreferencePropertyAccessor.FUJIX_DISPLAY_CAMERA_VIEW:
+                    value = preferences.getBoolean(key, false);
+                    Log.v(TAG, " " + key + " , " + value);
+                    break;
+
+                case IPreferencePropertyAccessor.FUJIX_CONNECTION_FOR_READ:
                     value = preferences.getBoolean(key, false);
                     Log.v(TAG, " " + key + " , " + value);
                     break;
@@ -318,6 +326,7 @@ public class FujiXPreferenceFragment  extends PreferenceFragmentCompat implement
                         setBooleanPreference(IPreferencePropertyAccessor.AUTO_CONNECT_TO_CAMERA, IPreferencePropertyAccessor.AUTO_CONNECT_TO_CAMERA, true);
                         setBooleanPreference(IPreferencePropertyAccessor.CAPTURE_BOTH_CAMERA_AND_LIVE_VIEW, IPreferencePropertyAccessor.CAPTURE_BOTH_CAMERA_AND_LIVE_VIEW, true);
                         setBooleanPreference(IPreferencePropertyAccessor.FUJIX_DISPLAY_CAMERA_VIEW, IPreferencePropertyAccessor.FUJIX_DISPLAY_CAMERA_VIEW, false);
+                        setBooleanPreference(IPreferencePropertyAccessor.FUJIX_CONNECTION_FOR_READ, IPreferencePropertyAccessor.FUJIX_CONNECTION_FOR_READ, false);
                     }
                     catch (Exception e)
                     {

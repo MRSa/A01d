@@ -47,6 +47,12 @@
             android:key="capture_both_camera_and_live_view"
             android:title="@string/pref_capture_both_camera_and_live_view" />
 
+        <CheckBoxPreference
+            android:key="fujix_connection_for_read"
+            android:title="@string/pref_fujix_connection_for_read"
+            android:summary="@string/pref_fujix_connection_for_read_summary"/>
+
+
     </PreferenceCategory>
 
 

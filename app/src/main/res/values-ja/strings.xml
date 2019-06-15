@@ -36,6 +36,8 @@
     <string name="pref_summary_fujix_liveview_wait">ライブビュー画像受信間隔を指定します</string>
     <string name="pref_fujix_command_polling_wait">コマンド間隔(default: 500)</string>
     <string name="pref_summary_fujix_command_polling_wait">カメラ状態の確認間隔を調整します</string>
+    <string name="pref_fujix_connection_for_read">画像転送用の接続シーケンス</string>
+    <string name="pref_fujix_connection_for_read_summary">テスト用です</string>
 
 
     <string name="pref_cat_initialize">起動時設定</string>

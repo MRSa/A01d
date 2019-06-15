@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
@@ -14,11 +15,13 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
+import androidx.preference.PreferenceManager;
 
 import net.osdn.gokigen.a01d.R;
 import net.osdn.gokigen.a01d.camera.ICameraConnection;
 import net.osdn.gokigen.a01d.camera.ICameraStatusReceiver;
 import net.osdn.gokigen.a01d.camera.fujix.IFujiXInterfaceProvider;
+import net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor;
 
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -217,8 +220,18 @@ public class FujiXConnection implements ICameraConnection
         connectionStatus = CameraConnectionStatus.CONNECTING;
         try
         {
+            boolean isReadOnly = false;
             interfaceProvider.getCommandPublisher();
-            cameraExecutor.execute(new FujiXCameraConnectSequence(context, statusReceiver, this, interfaceProvider));
+            try
+            {
+                SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+                isReadOnly = preferences.getBoolean(IPreferencePropertyAccessor.FUJIX_CONNECTION_FOR_READ, false);
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+            cameraExecutor.execute((!isReadOnly)? new FujiXCameraConnectSequence(context, statusReceiver, this, interfaceProvider) : new FujiXCameraConnectSequenceForRead(context, statusReceiver, this, interfaceProvider));
         }
         catch (Exception e)
         {

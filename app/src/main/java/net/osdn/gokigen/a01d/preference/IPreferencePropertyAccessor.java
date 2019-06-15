@@ -61,6 +61,8 @@ public interface IPreferencePropertyAccessor
     String FUJIX_COMMAND_POLLING_WAIT = "fujix_command_polling_wait";
     String FUJIX_COMMAND_POLLING_WAIT_DEFAULT_VALUE = "500";
 
+    String FUJIX_CONNECTION_FOR_READ = "fujix_connection_for_read";
+
     /*
     int CHOICE_SPLASH_SCREEN = 10;
 
