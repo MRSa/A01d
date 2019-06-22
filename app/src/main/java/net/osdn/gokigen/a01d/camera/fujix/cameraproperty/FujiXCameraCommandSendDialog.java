@@ -323,8 +323,8 @@ public class FujiXCameraCommandSendDialog  extends DialogFragment
         adapter.add(IFujiXCameraProperties.DEVICE_ERROR_STR + " (" + IFujiXCameraProperties.DEVICE_ERROR_STR_ID + ")");
         commandNameIndexArray.append(position++, IFujiXCameraProperties.DEVICE_ERROR_STR_ID);
 
-        adapter.add(IFujiXCameraProperties.PICTURE_COUNT_STR + " (" + IFujiXCameraProperties.PICTURE_COUNT_STR_ID + ")");
-        commandNameIndexArray.append(position++, IFujiXCameraProperties.PICTURE_COUNT_STR_ID);
+        adapter.add(IFujiXCameraProperties.IMAGE_FILE_COUNT_STR + " (" + IFujiXCameraProperties.IMAGE_FILE_COUNT_STR_ID + ")");
+        commandNameIndexArray.append(position++, IFujiXCameraProperties.IMAGE_FILE_COUNT_STR_ID);
 
         adapter.add(IFujiXCameraCommands.CAMERA_CAPABILITIES_STR + " (" + IFujiXCameraCommands.CAMERA_CAPABILITIES_STR_ID + ")");
         commandNameIndexArray.append(position++, IFujiXCameraCommands.CAMERA_CAPABILITIES_STR_ID);

@@ -46,7 +46,7 @@ class FujiXStatusHolder implements IFujiXCameraProperties
         statusNameArray.append(MOVIE_ISO, MOVIE_ISO_STR);
         statusNameArray.append(FOCUS_POINT, FOCUS_POINT_STR);
         statusNameArray.append(DEVICE_ERROR, DEVICE_ERROR_STR);
-        statusNameArray.append(PICTURE_COUNT, PICTURE_COUNT_STR);
+        statusNameArray.append(IMAGE_FILE_COUNT, IMAGE_FILE_COUNT_STR);
         statusNameArray.append(SDCARD_REMAIN_SIZE, SDCARD_REMAIN_SIZE_STR);
         statusNameArray.append(FOCUS_LOCK, FOCUS_LOCK_STR);
         statusNameArray.append(MOVIE_REMAINING_TIME, MOVIE_REMAINING_TIME_STR);
@@ -55,7 +55,7 @@ class FujiXStatusHolder implements IFujiXCameraProperties
         statusNameArray.append(BATTERY_LEVEL_2, BATTERY_LEVEL_2_STR);
 
         statusNameArray.append(UNKNOWN_DF00, UNKNOWN_DF00_STR);
-        statusNameArray.append(UNKNOWN_D220, UNKNOWN_D220_STR);
+        statusNameArray.append(PICTURE_JPEG_COUNT, PICTURE_JPEG_COUNT_STR);
         statusNameArray.append(UNKNOWN_D400, UNKNOWN_D400_STR);
         statusNameArray.append(UNKNOWN_D401, UNKNOWN_D401_STR);
         statusNameArray.append(UNKNOWN_D52F, UNKNOWN_D52F_STR);

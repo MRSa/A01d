@@ -19,14 +19,14 @@ public interface IFujiXCameraProperties
     int FOCUS_POINT           = 0xd17c;
     int FOCUS_LOCK            = 0xd209;
     int DEVICE_ERROR          = 0xd21b;
-    int PICTURE_COUNT           = 0xd222;
+    int IMAGE_FILE_COUNT = 0xd222;
     int SDCARD_REMAIN_SIZE    = 0xd229;
     int MOVIE_REMAINING_TIME  = 0xd22a;
     int SHUTTER_SPEED         = 0xd240;
     int IMAGE_ASPECT          = 0xd241;
     int BATTERY_LEVEL_2       = 0xd242;
     int UNKNOWN_DF00             = 0xdf00;
-    int UNKNOWN_D220             = 0xd220;
+    int PICTURE_JPEG_COUNT = 0xd220;
     int UNKNOWN_D400             = 0xd400;
     int UNKNOWN_D401             = 0xd401;
     int UNKNOWN_D52F             = 0xd52f;
@@ -50,7 +50,7 @@ public interface IFujiXCameraProperties
     String FOCUS_POINT_STR           = "FocusPoint";
     String FOCUS_LOCK_STR            = "FocusLock";
     String DEVICE_ERROR_STR          = "DeviceError";
-    String PICTURE_COUNT_STR            = "PictureCount";
+    String IMAGE_FILE_COUNT_STR = "ImageFileCount";
     String SDCARD_REMAIN_SIZE_STR    = "ImageRemainCount";
     String MOVIE_REMAINING_TIME_STR  = "MovieRemainTime";
     String SHUTTER_SPEED_STR         = "ShutterSpeed";
@@ -58,7 +58,7 @@ public interface IFujiXCameraProperties
     String BATTERY_LEVEL_2_STR       = "BatteryLevel";
 
     String UNKNOWN_DF00_STR             = "0xdf00";
-    String UNKNOWN_D220_STR             = "0xd220";
+    String PICTURE_JPEG_COUNT_STR = "PictureCount";
     String UNKNOWN_D400_STR             = "0xd400";
     String UNKNOWN_D401_STR             = "0xd401";
     String UNKNOWN_D52F_STR             = "0xd52f";
@@ -81,7 +81,7 @@ public interface IFujiXCameraProperties
     String FOCUS_POINT_STR_ID           = "0xd17c";
     String FOCUS_LOCK_STR_ID            = "0xd209";
     String DEVICE_ERROR_STR_ID          = "0xd21b";
-    String PICTURE_COUNT_STR_ID            = "0xd222";
+    String IMAGE_FILE_COUNT_STR_ID = "0xd222";
     String SDCARD_REMAIN_SIZE_STR_ID    = "0xd229";
     String MOVIE_REMAINING_TIME_STR_ID  = "0xd22a";
     String SHUTTER_SPEED_STR_ID         = "0xd240";
@@ -89,7 +89,7 @@ public interface IFujiXCameraProperties
     String BATTERY_LEVEL_2_STR_ID       = "0xd242";
 
     String UNKNOWN_DF00_STR_ID             = "0xdf00";
-    String UNKNOWN_D220_STR_ID             = "0xd220";
+    String PICTURE_JPEG_COUNT_STR_ID = "0xd220";
     String UNKNOWN_D400_STR_ID             = "0xd400";
     String UNKNOWN_D401_STR_ID             = "0xd401";
     String UNKNOWN_D52F_STR_ID             = "0xd52f";
