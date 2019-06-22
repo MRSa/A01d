@@ -13,33 +13,22 @@ import net.osdn.gokigen.a01d.camera.ICameraStatusReceiver;
 import net.osdn.gokigen.a01d.camera.fujix.IFujiXInterfaceProvider;
 import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.IFujiXCommandCallback;
 import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.IFujiXCommandPublisher;
-import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.messages.CameraRemoteMessage;
+import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.IFujiXMessages;
+import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.messages.start.CameraRemoteMessage;
 import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.messages.QueryCameraCapabilities;
-import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.messages.RegistrationMessage;
-import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.messages.StartMessage;
-import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.messages.StartMessage2nd;
-import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.messages.StartMessage3rd;
-import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.messages.StartMessage4th;
-import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.messages.StartMessage5th;
+import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.messages.start.RegistrationMessage;
+import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.messages.start.StartMessage;
+import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.messages.start.StartMessage2nd;
+import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.messages.start.StartMessage3rd;
+import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.messages.start.StartMessage4th;
+import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.messages.start.StartMessage5th;
 import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.messages.StatusRequestMessage;
 import net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor;
 
-public class FujiXCameraConnectSequence implements Runnable, IFujiXCommandCallback
+public class FujiXCameraConnectSequence implements Runnable, IFujiXCommandCallback, IFujiXMessages
 {
     private final String TAG = this.toString();
 
-    public static final int SEQ_DUMMY = 0;
-    public static final int SEQ_REGISTRATION = 1;
-    public static final int SEQ_START = 2;
-    public static final int SEQ_START_2ND = 3;
-    public static final int SEQ_START_2ND_READ = 10;
-    public static final int SEQ_START_2ND_RECEIVE = 4;
-    public static final int SEQ_START_3RD = 5;
-    public static final int SEQ_START_4TH = 6;
-    public static final int SEQ_CAMERA_REMOTE = 7;
-    public static final int SEQ_START_5TH = 8;
-    public static final int SEQ_STATUS_REQUEST = 9;
-    public static final int SEQ_QUERY_CAMERA_CAPABILITIES = 11;
 
     private final Activity context;
     private final ICameraConnection cameraConnection;

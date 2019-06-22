@@ -46,6 +46,7 @@ class FujiXStatusHolder implements IFujiXCameraProperties
         statusNameArray.append(MOVIE_ISO, MOVIE_ISO_STR);
         statusNameArray.append(FOCUS_POINT, FOCUS_POINT_STR);
         statusNameArray.append(DEVICE_ERROR, DEVICE_ERROR_STR);
+        statusNameArray.append(PICTURE_COUNT, PICTURE_COUNT_STR);
         statusNameArray.append(SDCARD_REMAIN_SIZE, SDCARD_REMAIN_SIZE_STR);
         statusNameArray.append(FOCUS_LOCK, FOCUS_LOCK_STR);
         statusNameArray.append(MOVIE_REMAINING_TIME, MOVIE_REMAINING_TIME_STR);

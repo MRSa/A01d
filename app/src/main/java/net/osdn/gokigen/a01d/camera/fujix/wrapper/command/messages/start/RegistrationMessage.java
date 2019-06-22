@@ -1,8 +1,9 @@
-package net.osdn.gokigen.a01d.camera.fujix.wrapper.command.messages;
+package net.osdn.gokigen.a01d.camera.fujix.wrapper.command.messages.start;
 
 import androidx.annotation.NonNull;
 
 import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.IFujiXCommandCallback;
+import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.messages.FujiXCommandBase;
 import net.osdn.gokigen.a01d.camera.fujix.wrapper.connection.FujiXCameraConnectSequence;
 
 public class RegistrationMessage extends FujiXCommandBase

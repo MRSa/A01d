@@ -15,6 +15,37 @@
             android:padding="6dp"
             >
             <LinearLayout
+                android:id="@+id/mode_change_button_area"
+                android:orientation="horizontal"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:padding="6dp"
+                >
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:tag="button"
+                    android:id="@+id/change_to_liveview"
+                    android:text="@string/dialog_button_liveview"
+                    android:layout_gravity="center"
+                    android:textSize="6pt" />
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:tag="button"
+                    android:id="@+id/change_to_playback"
+                    android:text="@string/dialog_button_playback"
+                    android:layout_gravity="center"
+                    android:textSize="6pt" />
+            </LinearLayout>
+
+            <View
+                android:layout_width="fill_parent"
+                android:layout_height="2dp"
+                android:background="@android:color/darker_gray"/>
+
+            <LinearLayout
                 android:id="@+id/command_select_area"
                 android:orientation="horizontal"
                 android:layout_width="fill_parent"

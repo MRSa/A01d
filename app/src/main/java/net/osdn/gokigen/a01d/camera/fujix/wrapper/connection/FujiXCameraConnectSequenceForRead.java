@@ -13,31 +13,19 @@ import net.osdn.gokigen.a01d.camera.ICameraStatusReceiver;
 import net.osdn.gokigen.a01d.camera.fujix.IFujiXInterfaceProvider;
 import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.IFujiXCommandCallback;
 import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.IFujiXCommandPublisher;
-import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.messages.CameraRemoteMessage;
+import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.IFujiXMessages;
+import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.messages.start.CameraRemoteMessage;
 import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.messages.QueryCameraCapabilities;
-import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.messages.RegistrationMessage;
-import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.messages.StartMessage;
-import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.messages.StartMessage2nd;
-import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.messages.StartMessage2ndRead;
-import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.messages.StartMessage3rd;
-import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.messages.StartMessage4th;
-import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.messages.StartMessage5th;
+import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.messages.start.RegistrationMessage;
+import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.messages.start.StartMessage;
+import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.messages.start.StartMessage2ndRead;
+import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.messages.start.StartMessage3rd;
+import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.messages.start.StartMessage4th;
+import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.messages.start.StartMessage5th;
 import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.messages.StatusRequestMessage;
 import net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor;
 
-import static net.osdn.gokigen.a01d.camera.fujix.wrapper.connection.FujiXCameraConnectSequence.SEQ_CAMERA_REMOTE;
-import static net.osdn.gokigen.a01d.camera.fujix.wrapper.connection.FujiXCameraConnectSequence.SEQ_QUERY_CAMERA_CAPABILITIES;
-import static net.osdn.gokigen.a01d.camera.fujix.wrapper.connection.FujiXCameraConnectSequence.SEQ_REGISTRATION;
-import static net.osdn.gokigen.a01d.camera.fujix.wrapper.connection.FujiXCameraConnectSequence.SEQ_START;
-import static net.osdn.gokigen.a01d.camera.fujix.wrapper.connection.FujiXCameraConnectSequence.SEQ_START_2ND;
-import static net.osdn.gokigen.a01d.camera.fujix.wrapper.connection.FujiXCameraConnectSequence.SEQ_START_2ND_READ;
-import static net.osdn.gokigen.a01d.camera.fujix.wrapper.connection.FujiXCameraConnectSequence.SEQ_START_2ND_RECEIVE;
-import static net.osdn.gokigen.a01d.camera.fujix.wrapper.connection.FujiXCameraConnectSequence.SEQ_START_3RD;
-import static net.osdn.gokigen.a01d.camera.fujix.wrapper.connection.FujiXCameraConnectSequence.SEQ_START_4TH;
-import static net.osdn.gokigen.a01d.camera.fujix.wrapper.connection.FujiXCameraConnectSequence.SEQ_START_5TH;
-import static net.osdn.gokigen.a01d.camera.fujix.wrapper.connection.FujiXCameraConnectSequence.SEQ_STATUS_REQUEST;
-
-public class FujiXCameraConnectSequenceForRead implements Runnable, IFujiXCommandCallback
+public class FujiXCameraConnectSequenceForRead implements Runnable, IFujiXCommandCallback, IFujiXMessages
 {
     private final String TAG = this.toString();
 

@@ -1,15 +1,16 @@
-package net.osdn.gokigen.a01d.camera.fujix.wrapper.command.messages;
+package net.osdn.gokigen.a01d.camera.fujix.wrapper.command.messages.changemode;
 
 import androidx.annotation.NonNull;
 
 import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.IFujiXCommandCallback;
+import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.messages.FujiXCommandBase;
 import net.osdn.gokigen.a01d.camera.fujix.wrapper.connection.FujiXCameraConnectSequence;
 
-public class StartMessage3rd extends FujiXCommandBase
+public class ChangeToPlayback4th  extends FujiXCommandBase
 {
     private final IFujiXCommandCallback callback;
 
-    public StartMessage3rd(@NonNull IFujiXCommandCallback callback)
+    public ChangeToPlayback4th(@NonNull IFujiXCommandCallback callback)
     {
         this.callback = callback;
     }
@@ -23,7 +24,7 @@ public class StartMessage3rd extends FujiXCommandBase
     @Override
     public int getId()
     {
-        return (FujiXCameraConnectSequence.SEQ_START_3RD);
+        return (FujiXCameraConnectSequence.SEQ_CHANGE_TO_PLAYBACK_4TH);
     }
 
     @Override
@@ -37,10 +38,10 @@ public class StartMessage3rd extends FujiXCommandBase
                 (byte)0x16, (byte)0x10,
 
                 // sequence number
-                (byte)0x03, (byte)0x00, (byte)0x00, (byte)0x00,
+                (byte)0x00, (byte)0x00, (byte)0x00, (byte)0x00,
 
                 // data ...
-                (byte)0x01, (byte)0xdf, (byte)0x00, (byte)0x00,
+                (byte)0x25, (byte)0xdf, (byte)0x00, (byte)0x00,
         });
     }
 
@@ -55,11 +56,12 @@ public class StartMessage3rd extends FujiXCommandBase
                 (byte)0x16, (byte)0x10,
 
                 // sequence number
-                (byte)0x03, (byte)0x00, (byte)0x00, (byte)0x00,
+                (byte)0x00, (byte)0x00, (byte)0x00, (byte)0x00,
 
                 // data ...
-                (byte)0x05, (byte)0x00,
+                (byte)0x02, (byte)0x00,
 
         });
     }
+
 }

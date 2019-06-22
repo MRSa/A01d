@@ -25,6 +25,8 @@ import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.IFujiXCameraCommands;
 import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.IFujiXCommandPublisher;
 import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.messages.CommandGeneric;
 import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.messages.SetPropertyValue;
+import net.osdn.gokigen.a01d.camera.fujix.wrapper.connection.FujiXCameraModeChangeToLiveview;
+import net.osdn.gokigen.a01d.camera.fujix.wrapper.connection.FujiXCameraModeChangeToPlayback;
 import net.osdn.gokigen.a01d.camera.fujix.wrapper.status.IFujiXCameraProperties;
 
 public class FujiXCameraCommandSendDialog  extends DialogFragment
@@ -82,6 +84,8 @@ public class FujiXCameraCommandSendDialog  extends DialogFragment
             final Spinner selection_message_type = alertView.findViewById(R.id.spinner_selection_message_type);
             final Spinner selection_message_body_length = alertView.findViewById(R.id.spinner_selection_message_body_length);
             final Button sendButton = alertView.findViewById(R.id.send_message_button);
+            final Button liveViewButton = alertView.findViewById(R.id.change_to_liveview);
+            final Button playbackButton = alertView.findViewById(R.id.change_to_playback);
 
             responseReceiver = new FujiXCameraCommandResponse(activity, commandResponse);
 
@@ -151,6 +155,11 @@ public class FujiXCameraCommandSendDialog  extends DialogFragment
                     }
                 }
             });
+            if ((responseReceiver != null)&&(commandPublisher != null))
+            {
+                liveViewButton.setOnClickListener(new FujiXCameraModeChangeToLiveview(commandPublisher, responseReceiver));
+                playbackButton.setOnClickListener(new FujiXCameraModeChangeToPlayback(commandPublisher, responseReceiver));
+            }
         }
         catch (Exception e)
         {
@@ -313,6 +322,9 @@ public class FujiXCameraCommandSendDialog  extends DialogFragment
 
         adapter.add(IFujiXCameraProperties.DEVICE_ERROR_STR + " (" + IFujiXCameraProperties.DEVICE_ERROR_STR_ID + ")");
         commandNameIndexArray.append(position++, IFujiXCameraProperties.DEVICE_ERROR_STR_ID);
+
+        adapter.add(IFujiXCameraProperties.PICTURE_COUNT_STR + " (" + IFujiXCameraProperties.PICTURE_COUNT_STR_ID + ")");
+        commandNameIndexArray.append(position++, IFujiXCameraProperties.PICTURE_COUNT_STR_ID);
 
         adapter.add(IFujiXCameraCommands.CAMERA_CAPABILITIES_STR + " (" + IFujiXCameraCommands.CAMERA_CAPABILITIES_STR_ID + ")");
         commandNameIndexArray.append(position++, IFujiXCameraCommands.CAMERA_CAPABILITIES_STR_ID);

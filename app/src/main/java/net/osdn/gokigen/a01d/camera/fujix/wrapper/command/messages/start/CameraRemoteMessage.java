@@ -1,15 +1,16 @@
-package net.osdn.gokigen.a01d.camera.fujix.wrapper.command.messages;
+package net.osdn.gokigen.a01d.camera.fujix.wrapper.command.messages.start;
 
 import androidx.annotation.NonNull;
 
 import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.IFujiXCommandCallback;
+import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.messages.FujiXCommandBase;
 import net.osdn.gokigen.a01d.camera.fujix.wrapper.connection.FujiXCameraConnectSequence;
 
-public class StartMessage4th extends FujiXCommandBase
+public class CameraRemoteMessage extends FujiXCommandBase
 {
     private final IFujiXCommandCallback callback;
 
-    public StartMessage4th(@NonNull IFujiXCommandCallback callback)
+    public CameraRemoteMessage(@NonNull IFujiXCommandCallback callback)
     {
         this.callback = callback;
     }
@@ -23,7 +24,7 @@ public class StartMessage4th extends FujiXCommandBase
     @Override
     public int getId()
     {
-        return (FujiXCameraConnectSequence.SEQ_START_4TH);
+        return (FujiXCameraConnectSequence.SEQ_CAMERA_REMOTE);
     }
 
     @Override
@@ -33,14 +34,15 @@ public class StartMessage4th extends FujiXCommandBase
                 // message_header.index : uint16 (0: terminate, 2: two_part_message, 1: other)
                 (byte)0x01, (byte)0x00,
 
-                // message_header.type : single_part (0x1015)  : 0xdf24
-                (byte)0x15, (byte)0x10,
+                // message_header.type : camera_remote (0x101c)
+                (byte)0x1c, (byte)0x10,
 
                 // sequence number
-                (byte)0x04, (byte)0x00, (byte)0x00, (byte)0x00,
+                (byte)0x09, (byte)0x00, (byte)0x00, (byte)0x00,
 
                 // data ...
-                (byte)0x24, (byte)0xdf, (byte)0x00, (byte)0x00,
+                (byte)0x00, (byte)0x00, (byte)0x00, (byte)0x00,
+                (byte)0x00, (byte)0x00, (byte)0x00, (byte)0x00,
 
         });
     }

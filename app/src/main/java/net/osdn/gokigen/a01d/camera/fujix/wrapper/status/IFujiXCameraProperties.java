@@ -19,6 +19,7 @@ public interface IFujiXCameraProperties
     int FOCUS_POINT           = 0xd17c;
     int FOCUS_LOCK            = 0xd209;
     int DEVICE_ERROR          = 0xd21b;
+    int PICTURE_COUNT           = 0xd222;
     int SDCARD_REMAIN_SIZE    = 0xd229;
     int MOVIE_REMAINING_TIME  = 0xd22a;
     int SHUTTER_SPEED         = 0xd240;
@@ -42,6 +43,7 @@ public interface IFujiXCameraProperties
     String FOCUS_POINT_STR           = "FocusPoint";
     String FOCUS_LOCK_STR            = "FocusLock";
     String DEVICE_ERROR_STR          = "DeviceError";
+    String PICTURE_COUNT_STR            = "PictureCount";
     String SDCARD_REMAIN_SIZE_STR    = "ImageRemainCount";
     String MOVIE_REMAINING_TIME_STR  = "MovieRemainTime";
     String SHUTTER_SPEED_STR         = "ShutterSpeed";
@@ -65,6 +67,7 @@ public interface IFujiXCameraProperties
     String FOCUS_POINT_STR_ID           = "0xd17c";
     String FOCUS_LOCK_STR_ID            = "0xd209";
     String DEVICE_ERROR_STR_ID          = "0xd21b";
+    String PICTURE_COUNT_STR_ID            = "0xd222";
     String SDCARD_REMAIN_SIZE_STR_ID    = "0xd229";
     String MOVIE_REMAINING_TIME_STR_ID  = "0xd22a";
     String SHUTTER_SPEED_STR_ID         = "0xd240";

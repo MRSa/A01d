@@ -1,15 +1,16 @@
-package net.osdn.gokigen.a01d.camera.fujix.wrapper.command.messages;
+package net.osdn.gokigen.a01d.camera.fujix.wrapper.command.messages.start;
 
 import androidx.annotation.NonNull;
 
 import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.IFujiXCommandCallback;
+import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.messages.FujiXCommandBase;
 import net.osdn.gokigen.a01d.camera.fujix.wrapper.connection.FujiXCameraConnectSequence;
 
-public class StartMessage2nd extends FujiXCommandBase
+public class StartMessage extends FujiXCommandBase
 {
     private final IFujiXCommandCallback callback;
 
-    public StartMessage2nd(@NonNull IFujiXCommandCallback callback)
+    public StartMessage(@NonNull IFujiXCommandCallback callback)
     {
         this.callback = callback;
     }
@@ -23,7 +24,7 @@ public class StartMessage2nd extends FujiXCommandBase
     @Override
     public int getId()
     {
-        return (FujiXCameraConnectSequence.SEQ_START_2ND);
+        return (FujiXCameraConnectSequence.SEQ_START);
     }
 
     @Override
