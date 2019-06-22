@@ -25,6 +25,13 @@ public interface IFujiXCameraProperties
     int SHUTTER_SPEED         = 0xd240;
     int IMAGE_ASPECT          = 0xd241;
     int BATTERY_LEVEL_2       = 0xd242;
+    int UNKNOWN_DF00             = 0xdf00;
+    int UNKNOWN_D220             = 0xd220;
+    int UNKNOWN_D400             = 0xd400;
+    int UNKNOWN_D401             = 0xd401;
+    int UNKNOWN_D52F             = 0xd52f;
+
+
 
     String BATTERY_LEVEL_STR         = "Battery";
     String WHITE_BALANCE_STR         = "WhiteBalance";
@@ -50,6 +57,13 @@ public interface IFujiXCameraProperties
     String IMAGE_ASPECT_STR          = "ImageAspect";
     String BATTERY_LEVEL_2_STR       = "BatteryLevel";
 
+    String UNKNOWN_DF00_STR             = "0xdf00";
+    String UNKNOWN_D220_STR             = "0xd220";
+    String UNKNOWN_D400_STR             = "0xd400";
+    String UNKNOWN_D401_STR             = "0xd401";
+    String UNKNOWN_D52F_STR             = "0xd52f";
+
+
     String BATTERY_LEVEL_STR_ID         = "0x5001";
     String WHITE_BALANCE_STR_ID         = "0x5005";
     String APERTURE_STR_ID               = "0x5007";
@@ -73,4 +87,11 @@ public interface IFujiXCameraProperties
     String SHUTTER_SPEED_STR_ID         = "0xd240";
     String IMAGE_ASPECT_STR_ID          = "0xd241";
     String BATTERY_LEVEL_2_STR_ID       = "0xd242";
+
+    String UNKNOWN_DF00_STR_ID             = "0xdf00";
+    String UNKNOWN_D220_STR_ID             = "0xd220";
+    String UNKNOWN_D400_STR_ID             = "0xd400";
+    String UNKNOWN_D401_STR_ID             = "0xd401";
+    String UNKNOWN_D52F_STR_ID             = "0xd52f";
+
 }

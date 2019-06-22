@@ -53,6 +53,14 @@ class FujiXStatusHolder implements IFujiXCameraProperties
         statusNameArray.append(SHUTTER_SPEED, SHUTTER_SPEED_STR);
         statusNameArray.append(IMAGE_ASPECT,IMAGE_ASPECT_STR);
         statusNameArray.append(BATTERY_LEVEL_2, BATTERY_LEVEL_2_STR);
+
+        statusNameArray.append(UNKNOWN_DF00, UNKNOWN_DF00_STR);
+        statusNameArray.append(UNKNOWN_D220, UNKNOWN_D220_STR);
+        statusNameArray.append(UNKNOWN_D400, UNKNOWN_D400_STR);
+        statusNameArray.append(UNKNOWN_D401, UNKNOWN_D401_STR);
+        statusNameArray.append(UNKNOWN_D52F, UNKNOWN_D52F_STR);
+
+
     }
 
 
