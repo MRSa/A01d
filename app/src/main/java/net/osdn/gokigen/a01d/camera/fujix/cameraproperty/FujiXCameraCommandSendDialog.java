@@ -25,7 +25,7 @@ import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.IFujiXCameraCommands;
 import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.IFujiXCommandPublisher;
 import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.messages.CommandGeneric;
 import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.messages.SetPropertyValue;
-import net.osdn.gokigen.a01d.camera.fujix.wrapper.connection.FujiXCameraModeChangeToLiveview;
+import net.osdn.gokigen.a01d.camera.fujix.wrapper.connection.FujiXCameraModeChangeToLiveView;
 import net.osdn.gokigen.a01d.camera.fujix.wrapper.connection.FujiXCameraModeChangeToPlayback;
 import net.osdn.gokigen.a01d.camera.fujix.wrapper.status.IFujiXCameraProperties;
 
@@ -157,7 +157,7 @@ public class FujiXCameraCommandSendDialog  extends DialogFragment
             });
             if ((responseReceiver != null)&&(commandPublisher != null))
             {
-                liveViewButton.setOnClickListener(new FujiXCameraModeChangeToLiveview(commandPublisher, responseReceiver));
+                liveViewButton.setOnClickListener(new FujiXCameraModeChangeToLiveView(commandPublisher, responseReceiver));
                 playbackButton.setOnClickListener(new FujiXCameraModeChangeToPlayback(commandPublisher, responseReceiver));
             }
         }

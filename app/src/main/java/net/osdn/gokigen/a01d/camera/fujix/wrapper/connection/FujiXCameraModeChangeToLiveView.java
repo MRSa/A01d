@@ -10,18 +10,20 @@ import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.IFujiXCommandCallback;
 import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.IFujiXCommandPublisher;
 import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.IFujiXMessages;
 import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.messages.StatusRequestMessage;
-import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.messages.changemode.ChangeToPlayback1st;
-import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.messages.changemode.ChangeToPlayback2nd;
-import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.messages.changemode.ChangeToPlayback3rd;
-import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.messages.changemode.ChangeToPlayback4th;
+import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.messages.changemode.ChangeToLiveView1st;
+import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.messages.changemode.ChangeToLiveView2nd;
+import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.messages.changemode.ChangeToLiveView3rd;
+import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.messages.changemode.ChangeToLiveView4th;
+import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.messages.changemode.ChangeToLiveView5th;
 
-public class FujiXCameraModeChangeToPlayback implements View.OnClickListener, IFujiXCommandCallback, IFujiXMessages
+
+public class FujiXCameraModeChangeToLiveView implements View.OnClickListener, IFujiXCommandCallback, IFujiXMessages
 {
     private final String TAG = toString();
     private final IFujiXCommandPublisher publisher;
     private final IFujiXCommandCallback callback;
 
-    public FujiXCameraModeChangeToPlayback(@NonNull IFujiXCommandPublisher publisher, @Nullable IFujiXCommandCallback callback)
+    public FujiXCameraModeChangeToLiveView(@NonNull IFujiXCommandPublisher publisher, @Nullable IFujiXCommandCallback callback)
     {
         this.publisher = publisher;
         this.callback = callback;
@@ -33,7 +35,7 @@ public class FujiXCameraModeChangeToPlayback implements View.OnClickListener, IF
         Log.v(TAG, "onClick");
         try
         {
-            publisher.enqueueCommand(new ChangeToPlayback1st(this));
+            publisher.enqueueCommand(new ChangeToLiveView1st(this));
         }
         catch (Exception e)
         {
@@ -50,19 +52,22 @@ public class FujiXCameraModeChangeToPlayback implements View.OnClickListener, IF
         {
             switch (id)
             {
-                case SEQ_CHANGE_TO_PLAYBACK_1ST:
-                    publisher.enqueueCommand(new ChangeToPlayback2nd(this));
+                case SEQ_CHANGE_TO_LIVEVIEW_1ST:
+                    publisher.enqueueCommand(new ChangeToLiveView2nd(this));
                     break;
 
-                case SEQ_CHANGE_TO_PLAYBACK_2ND:
-                    publisher.enqueueCommand(new ChangeToPlayback3rd(this));
+                case SEQ_CHANGE_TO_LIVEVIEW_2ND:
+                    publisher.enqueueCommand(new ChangeToLiveView3rd(this));
                     break;
 
-                case SEQ_CHANGE_TO_PLAYBACK_3RD:
-                    publisher.enqueueCommand(new ChangeToPlayback4th(this));
+                case SEQ_CHANGE_TO_LIVEVIEW_3RD:
+                    publisher.enqueueCommand(new ChangeToLiveView4th(this));
+                    break;
+                case SEQ_CHANGE_TO_LIVEVIEW_4TH:
+                    publisher.enqueueCommand(new ChangeToLiveView5th(this));
                     break;
 
-                case SEQ_CHANGE_TO_PLAYBACK_4TH:
+                case SEQ_CHANGE_TO_LIVEVIEW_5TH:
                     publisher.enqueueCommand(new StatusRequestMessage(this));
                     break;
 
@@ -71,7 +76,7 @@ public class FujiXCameraModeChangeToPlayback implements View.OnClickListener, IF
                     {
                         callback.receivedMessage(id, rx_body);
                     }
-                    Log.v(TAG, "CHANGED PLAYBACK MODE : DONE.");
+                    Log.v(TAG, "CHANGED LIVEVIEW MODE : DONE.");
                     break;
 
                 default:
