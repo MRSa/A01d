@@ -77,6 +77,15 @@ class LiveViewClickTouchListener implements View.OnClickListener, View.OnTouchLi
             this.cameraConnection = interfaceProvider.getFujiXInterface().getFujiXCameraConnection();
             this.zoomLensControl = interfaceProvider.getFujiXInterface().getZoomLensControl();
         }
+        else if (connectionMethod == ICameraConnection.CameraConnectionMethod.PANASONIC)
+        {
+            this.focusingControl = interfaceProvider.getPanasonicInterface().getFocusingControl();
+            this.captureControl = interfaceProvider.getPanasonicInterface().getCaptureControl();
+            this.propertyProvider = interfaceProvider.getOlympusInterface().getCameraPropertyProvider();  // 要変更
+            this.cameraInformation = interfaceProvider.getPanasonicInterface().getCameraInformation();
+            this.cameraConnection = interfaceProvider.getPanasonicInterface().getPanasonicCameraConnection();
+            this.zoomLensControl = interfaceProvider.getPanasonicInterface().getZoomLensControl();
+        }
         else  // if (connectionMethod == ICameraConnection.CameraConnectionMethod.OPC)
         {
             this.focusingControl = interfaceProvider.getOlympusInterface().getFocusingControl();

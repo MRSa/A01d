@@ -1,41 +1,41 @@
-package net.osdn.gokigen.a01d.camera.sony.wrapper.connection;
+package net.osdn.gokigen.a01d.camera.panasonic.wrapper.connection;
 
 import android.app.Activity;
 import android.util.Log;
 
 import net.osdn.gokigen.a01d.R;
+import net.osdn.gokigen.a01d.camera.ICameraChangeListener;
 import net.osdn.gokigen.a01d.camera.ICameraConnection;
 import net.osdn.gokigen.a01d.camera.ICameraStatusReceiver;
-import net.osdn.gokigen.a01d.camera.sony.wrapper.ISonyCamera;
-import net.osdn.gokigen.a01d.camera.sony.wrapper.ISonyCameraHolder;
-import net.osdn.gokigen.a01d.camera.ICameraChangeListener;
+import net.osdn.gokigen.a01d.camera.panasonic.wrapper.IPanasonicCamera;
+import net.osdn.gokigen.a01d.camera.panasonic.wrapper.IPanasonicCameraHolder;
 
 import androidx.annotation.NonNull;
 
 
 /**
- *   SONYカメラとの接続処理
+ *   Panasonicカメラとの接続処理
  *
  */
-public class SonyCameraConnectSequence implements Runnable, SonySsdpClient.ISearchResultCallback
+public class PanasonicCameraConnectSequence implements Runnable, PanasonicSsdpClient.ISearchResultCallback
 {
     private final String TAG = this.toString();
     private final Activity context;
     private final ICameraConnection cameraConnection;
-    private final ISonyCameraHolder cameraHolder;
+    private final IPanasonicCameraHolder cameraHolder;
     private final ICameraStatusReceiver cameraStatusReceiver;
     private final ICameraChangeListener listener;
-    private final SonySsdpClient client;
+    private final PanasonicSsdpClient client;
 
-    SonyCameraConnectSequence(Activity context, ICameraStatusReceiver statusReceiver, final ICameraConnection cameraConnection, final @NonNull ISonyCameraHolder cameraHolder, final @NonNull ICameraChangeListener listener)
+    PanasonicCameraConnectSequence(Activity context, ICameraStatusReceiver statusReceiver, final ICameraConnection cameraConnection, final @NonNull IPanasonicCameraHolder cameraHolder, final @NonNull ICameraChangeListener listener)
     {
-        Log.v(TAG, "SonyCameraConnectSequence");
+        Log.v(TAG, "PanasonicCameraConnectSequence");
         this.context = context;
         this.cameraConnection = cameraConnection;
         this.cameraStatusReceiver = statusReceiver;
         this.cameraHolder = cameraHolder;
         this.listener = listener;
-        client = new SonySsdpClient(context, this, statusReceiver, 1);
+        client = new PanasonicSsdpClient(context, this, statusReceiver, 1);
     }
 
     @Override
@@ -54,7 +54,7 @@ public class SonyCameraConnectSequence implements Runnable, SonySsdpClient.ISear
     }
 
     @Override
-    public void onDeviceFound(ISonyCamera cameraDevice)
+    public void onDeviceFound(IPanasonicCamera cameraDevice)
     {
         try
         {
@@ -135,7 +135,6 @@ public class SonyCameraConnectSequence implements Runnable, SonySsdpClient.ISear
             }
         }
     }
-
 
     @Override
     public void onErrorFinished(String reason)

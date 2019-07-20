@@ -1,11 +1,11 @@
-package net.osdn.gokigen.a01d.camera.sony.wrapper.eventlistener;
+package net.osdn.gokigen.a01d.camera.panasonic.wrapper.eventlistener;
 
 import android.content.Context;
 import android.os.Handler;
 import android.util.Log;
 
 import net.osdn.gokigen.a01d.camera.ICameraChangeListener;
-import net.osdn.gokigen.a01d.camera.sony.wrapper.ISonyCameraApi;
+import net.osdn.gokigen.a01d.camera.panasonic.wrapper.IPanasonicCameraApi;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -22,16 +22,16 @@ public class CameraEventObserver implements ICameraEventObserver
     private boolean isEventMonitoring;
     private boolean isActive;
 
-    private final ISonyCameraApi remoteApi;
+    private final IPanasonicCameraApi remoteApi;
     private final ReplyJsonParser replyParser;
     private String eventVersion = "1.1";  // 初期値を "1.0" から "1.1" に更新
 
-    public static ICameraEventObserver newInstance(@NonNull Context context, @NonNull ISonyCameraApi apiClient)
+    public static ICameraEventObserver newInstance(@NonNull Context context, @NonNull IPanasonicCameraApi apiClient)
     {
         return (new CameraEventObserver(context, apiClient));
     }
 
-    private CameraEventObserver(@NonNull Context context, @NonNull ISonyCameraApi apiClient)
+    private CameraEventObserver(@NonNull Context context, @NonNull IPanasonicCameraApi apiClient)
     {
         super();
         remoteApi = apiClient;

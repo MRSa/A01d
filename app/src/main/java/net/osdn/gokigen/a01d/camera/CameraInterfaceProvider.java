@@ -8,6 +8,8 @@ import net.osdn.gokigen.a01d.camera.fujix.wrapper.FujiXInterfaceProvider;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.IOlympusLiveViewListener;
 import net.osdn.gokigen.a01d.camera.olympus.IOlympusInterfaceProvider;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.OlympusInterfaceProvider;
+import net.osdn.gokigen.a01d.camera.panasonic.IPanasonicInterfaceProvider;
+import net.osdn.gokigen.a01d.camera.panasonic.wrapper.PanasonicCameraWrapper;
 import net.osdn.gokigen.a01d.camera.ricohgr2.IRicohGr2InterfaceProvider;
 import net.osdn.gokigen.a01d.camera.ricohgr2.wrapper.RicohGr2InterfaceProvider;
 import net.osdn.gokigen.a01d.camera.sony.ISonyInterfaceProvider;
@@ -25,6 +27,7 @@ public class CameraInterfaceProvider implements IInterfaceProvider
     private final SonyCameraWrapper sony;
     private final RicohGr2InterfaceProvider ricohGr2;
     private final FujiXInterfaceProvider fujiX;
+    private final PanasonicCameraWrapper panasonic;
     private final CameraStatusListener statusListener;
 
     public CameraInterfaceProvider(@NonNull Activity context, @NonNull ICameraStatusReceiver provider)
@@ -34,6 +37,7 @@ public class CameraInterfaceProvider implements IInterfaceProvider
         olympus = new OlympusInterfaceProvider(context, provider);
         sony = new SonyCameraWrapper(context, provider, statusListener);
         fujiX = new FujiXInterfaceProvider(context, provider, statusListener);
+        panasonic = new PanasonicCameraWrapper(context, provider, statusListener);
         ricohGr2 = new RicohGr2InterfaceProvider(context, provider);
     }
 
@@ -80,6 +84,12 @@ public class CameraInterfaceProvider implements IInterfaceProvider
         return (fujiX);
     }
 
+    @Override
+    public IPanasonicInterfaceProvider getPanasonicInterface()
+    {
+        return (panasonic);
+    }
+
     /**
      *   OPCカメラを使用するかどうか
      *
@@ -103,6 +113,10 @@ public class CameraInterfaceProvider implements IInterfaceProvider
             else if (connectionMethod.contains("FUJI_X"))
             {
                 ret = ICameraConnection.CameraConnectionMethod.FUJI_X;
+            }
+            else if (connectionMethod.contains("PANASONIC"))
+            {
+                ret = ICameraConnection.CameraConnectionMethod.PANASONIC;
             }
         }
         catch (Exception e)

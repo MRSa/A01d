@@ -1,4 +1,4 @@
-package net.osdn.gokigen.a01d.camera.sony.wrapper.eventlistener;
+package net.osdn.gokigen.a01d.camera;
 
 import java.util.List;
 

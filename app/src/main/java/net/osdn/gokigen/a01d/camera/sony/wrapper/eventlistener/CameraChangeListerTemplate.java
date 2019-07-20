@@ -2,6 +2,8 @@ package net.osdn.gokigen.a01d.camera.sony.wrapper.eventlistener;
 
 import android.util.Log;
 
+import net.osdn.gokigen.a01d.camera.ICameraChangeListener;
+
 import java.util.List;
 
 public class CameraChangeListerTemplate implements ICameraChangeListener

@@ -131,6 +131,9 @@
     <string name="action_share">Share</string>
     <string name="finish_refresh">Finished Refresh</string>
 
+    <string name="pref_panasonic_api_list">Panasonic Camera Api List</string>
+    <string name="pref_summary_panasonic_api_list">Show available camera apis.</string>
+
     <string name="pref_sony_api_list">Sony Camera Api List</string>
     <string name="pref_summary_sony_api_list">Show available camera apis.</string>
 

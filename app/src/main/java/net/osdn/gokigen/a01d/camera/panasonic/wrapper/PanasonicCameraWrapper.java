@@ -1,8 +1,9 @@
-package net.osdn.gokigen.a01d.camera.sony.wrapper;
+package net.osdn.gokigen.a01d.camera.panasonic.wrapper;
 
 import android.app.Activity;
 import android.util.Log;
 
+import net.osdn.gokigen.a01d.camera.ICameraChangeListener;
 import net.osdn.gokigen.a01d.camera.ICameraConnection;
 import net.osdn.gokigen.a01d.camera.ICameraInformation;
 import net.osdn.gokigen.a01d.camera.ICameraStatusReceiver;
@@ -12,15 +13,14 @@ import net.osdn.gokigen.a01d.camera.IFocusingControl;
 import net.osdn.gokigen.a01d.camera.ILiveViewControl;
 import net.osdn.gokigen.a01d.camera.IZoomLensControl;
 import net.osdn.gokigen.a01d.camera.IFocusingModeNotify;
-import net.osdn.gokigen.a01d.camera.sony.ISonyInterfaceProvider;
-import net.osdn.gokigen.a01d.camera.sony.operation.SonyCameraCaptureControl;
-import net.osdn.gokigen.a01d.camera.sony.operation.SonyCameraFocusControl;
-import net.osdn.gokigen.a01d.camera.sony.operation.SonyCameraZoomLensControl;
-import net.osdn.gokigen.a01d.camera.sony.wrapper.connection.SonyCameraConnection;
-import net.osdn.gokigen.a01d.camera.sony.wrapper.eventlistener.CameraEventObserver;
-import net.osdn.gokigen.a01d.camera.ICameraChangeListener;
-import net.osdn.gokigen.a01d.camera.sony.wrapper.eventlistener.ICameraEventObserver;
-import net.osdn.gokigen.a01d.camera.sony.wrapper.eventlistener.ICameraStatusHolder;
+import net.osdn.gokigen.a01d.camera.panasonic.IPanasonicInterfaceProvider;
+import net.osdn.gokigen.a01d.camera.panasonic.operation.PanasonicCameraCaptureControl;
+import net.osdn.gokigen.a01d.camera.panasonic.operation.PanasonicCameraFocusControl;
+import net.osdn.gokigen.a01d.camera.panasonic.operation.PanasonicCameraZoomLensControl;
+import net.osdn.gokigen.a01d.camera.panasonic.wrapper.connection.PanasonicCameraConnection;
+import net.osdn.gokigen.a01d.camera.panasonic.wrapper.eventlistener.CameraEventObserver;
+import net.osdn.gokigen.a01d.camera.panasonic.wrapper.eventlistener.ICameraEventObserver;
+import net.osdn.gokigen.a01d.camera.panasonic.wrapper.eventlistener.ICameraStatusHolder;
 import net.osdn.gokigen.a01d.liveview.IAutoFocusFrameDisplay;
 import net.osdn.gokigen.a01d.liveview.IIndicatorControl;
 import net.osdn.gokigen.a01d.liveview.liveviewlistener.ILiveViewListener;
@@ -32,21 +32,21 @@ import java.util.List;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-public class SonyCameraWrapper implements ISonyCameraHolder, ISonyInterfaceProvider, IDisplayInjector
+public class PanasonicCameraWrapper implements IPanasonicCameraHolder, IPanasonicInterfaceProvider, IDisplayInjector
 {
     private final String TAG = toString();
     private final Activity context;
     private final ICameraStatusReceiver provider;
     private final ICameraChangeListener listener;
-    private ISonyCamera sonyCamera = null;
-    private ISonyCameraApi sonyCameraApi = null;
+    private IPanasonicCamera panasonicCamera = null;
+    private IPanasonicCameraApi panasonicCameraApi = null;
     private ICameraEventObserver eventObserver = null;
-    private SonyLiveViewControl liveViewControl = null;
-    private SonyCameraFocusControl focusControl = null;
-    private SonyCameraCaptureControl captureControl = null;
-    private SonyCameraZoomLensControl zoomControl = null;
+    private PanasonicLiveViewControl liveViewControl = null;
+    private PanasonicCameraFocusControl focusControl = null;
+    private PanasonicCameraCaptureControl captureControl = null;
+    private PanasonicCameraZoomLensControl zoomControl = null;
 
-    public SonyCameraWrapper(final Activity context, final ICameraStatusReceiver statusReceiver , final @NonNull ICameraChangeListener listener)
+    public PanasonicCameraWrapper(final Activity context, final ICameraStatusReceiver statusReceiver , final @NonNull ICameraChangeListener listener)
     {
         this.context = context;
         this.provider = statusReceiver;
@@ -56,16 +56,16 @@ public class SonyCameraWrapper implements ISonyCameraHolder, ISonyInterfaceProvi
     @Override
     public void prepare()
     {
-        Log.v(TAG, " prepare : " + sonyCamera.getFriendlyName() + " " + sonyCamera.getModelName());
+        Log.v(TAG, " prepare : " + panasonicCamera.getFriendlyName() + " " + panasonicCamera.getModelName());
         try
         {
-            this.sonyCameraApi = SonyCameraApi.newInstance(sonyCamera);
-            eventObserver = CameraEventObserver.newInstance(context, sonyCameraApi);
-            liveViewControl = new SonyLiveViewControl(sonyCameraApi);
+            this.panasonicCameraApi = PanasonicCameraApi.newInstance(panasonicCamera);
+            eventObserver = CameraEventObserver.newInstance(context, panasonicCameraApi);
+            liveViewControl = new PanasonicLiveViewControl(panasonicCameraApi);
 
-            focusControl.setCameraApi(sonyCameraApi);
-            captureControl.setCameraApi(sonyCameraApi);
-            zoomControl.setCameraApi(sonyCameraApi);
+            focusControl.setCameraApi(panasonicCameraApi);
+            captureControl.setCameraApi(panasonicCameraApi);
+            zoomControl.setCameraApi(panasonicCameraApi);
         }
         catch (Exception e)
         {
@@ -83,7 +83,7 @@ public class SonyCameraWrapper implements ISonyCameraHolder, ISonyInterfaceProvi
             {
                 // startRecMode発行
                 Log.v(TAG, "----- THIS CAMERA NEEDS COMMAND 'startRecMode'.");
-                sonyCameraApi.startRecMode();
+                panasonicCameraApi.startRecMode();
             }
         }
         catch (Exception e)
@@ -117,20 +117,20 @@ public class SonyCameraWrapper implements ISonyCameraHolder, ISonyInterfaceProvi
     }
 
     @Override
-    public void detectedCamera(@NonNull ISonyCamera camera)
+    public void detectedCamera(@NonNull IPanasonicCamera camera)
     {
         Log.v(TAG, "detectedCamera()");
-        sonyCamera = camera;
+        panasonicCamera = camera;
     }
 
     @Override
-    public ICameraConnection getSonyCameraConnection()
+    public ICameraConnection getPanasonicCameraConnection()
     {
-        return (new SonyCameraConnection(context, provider, this, listener));
+        return (new PanasonicCameraConnection(context, provider, this, listener));
     }
 
     @Override
-    public ILiveViewControl getSonyLiveViewControl()
+    public ILiveViewControl getPanasonicLiveViewControl()
     {
         return (liveViewControl);
     }
@@ -177,7 +177,7 @@ public class SonyCameraWrapper implements ISonyCameraHolder, ISonyInterfaceProvi
         List<String> availableApis = new ArrayList<>();
         try
         {
-            String apiList = sonyCameraApi.getAvailableApiList().getString("result");
+            String apiList = panasonicCameraApi.getAvailableApiList().getString("result");
             apiList = apiList.replace("[","").replace("]", "").replace("\"","");
             String[] apiListSplit = apiList.split(",");
             availableApis = Arrays.asList(apiListSplit);
@@ -190,9 +190,9 @@ public class SonyCameraWrapper implements ISonyCameraHolder, ISonyInterfaceProvi
     }
 
     @Override
-    public ISonyCameraApi getCameraApi()
+    public IPanasonicCameraApi getCameraApi()
     {
-        return (sonyCameraApi);
+        return (panasonicCameraApi);
     }
 
     @Override
@@ -200,8 +200,8 @@ public class SonyCameraWrapper implements ISonyCameraHolder, ISonyInterfaceProvi
     {
         Log.v(TAG, "injectDisplay()");
 
-        focusControl = new SonyCameraFocusControl(frameDisplayer, indicator);
-        captureControl = new SonyCameraCaptureControl(frameDisplayer, indicator);
-        zoomControl = new SonyCameraZoomLensControl();
+        focusControl = new PanasonicCameraFocusControl(frameDisplayer, indicator);
+        captureControl = new PanasonicCameraCaptureControl(frameDisplayer, indicator);
+        zoomControl = new PanasonicCameraZoomLensControl();
     }
 }

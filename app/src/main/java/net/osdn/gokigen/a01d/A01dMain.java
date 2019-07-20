@@ -1,39 +1,39 @@
 package net.osdn.gokigen.a01d;
 
-import android.Manifest;
-import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
-import android.os.Bundle;
-import android.util.Log;
-import android.view.WindowManager;
-import android.widget.Toast;
+        import android.Manifest;
+        import android.content.SharedPreferences;
+        import android.content.pm.PackageManager;
+        import android.os.Bundle;
+        import android.util.Log;
+        import android.view.WindowManager;
+        import android.widget.Toast;
 
-import net.osdn.gokigen.a01d.camera.CameraInterfaceProvider;
-import net.osdn.gokigen.a01d.camera.IInterfaceProvider;
-import net.osdn.gokigen.a01d.camera.fujix.cameraproperty.FujiXCameraCommandSendDialog;
-import net.osdn.gokigen.a01d.camera.fujix.cameraproperty.FujiXCameraStatusDialog;
-import net.osdn.gokigen.a01d.camera.olympus.cameraproperty.OlyCameraPropertyListFragment;
-import net.osdn.gokigen.a01d.camera.ICameraStatusReceiver;
-import net.osdn.gokigen.a01d.camera.ICameraConnection;
-import net.osdn.gokigen.a01d.camera.olympus.wrapper.connection.ble.ICameraPowerOn;
-import net.osdn.gokigen.a01d.camera.sony.cameraproperty.SonyCameraApiListFragment;
-import net.osdn.gokigen.a01d.liveview.IStatusViewDrawer;
-import net.osdn.gokigen.a01d.liveview.LiveViewFragment;
-import net.osdn.gokigen.a01d.logcat.LogCatFragment;
-import net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor;
-import net.osdn.gokigen.a01d.preference.fujix.FujiXPreferenceFragment;
-import net.osdn.gokigen.a01d.preference.olympus.PreferenceFragment;
-import net.osdn.gokigen.a01d.preference.ricohgr2.RicohGr2PreferenceFragment;
-import net.osdn.gokigen.a01d.preference.sony.SonyPreferenceFragment;
+        import net.osdn.gokigen.a01d.camera.CameraInterfaceProvider;
+        import net.osdn.gokigen.a01d.camera.IInterfaceProvider;
+        import net.osdn.gokigen.a01d.camera.fujix.cameraproperty.FujiXCameraCommandSendDialog;
+        import net.osdn.gokigen.a01d.camera.olympus.cameraproperty.OlyCameraPropertyListFragment;
+        import net.osdn.gokigen.a01d.camera.ICameraStatusReceiver;
+        import net.osdn.gokigen.a01d.camera.ICameraConnection;
+        import net.osdn.gokigen.a01d.camera.olympus.wrapper.connection.ble.ICameraPowerOn;
+        import net.osdn.gokigen.a01d.camera.sony.cameraproperty.SonyCameraApiListFragment;
+        import net.osdn.gokigen.a01d.liveview.IStatusViewDrawer;
+        import net.osdn.gokigen.a01d.liveview.LiveViewFragment;
+        import net.osdn.gokigen.a01d.logcat.LogCatFragment;
+        import net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor;
+        import net.osdn.gokigen.a01d.preference.fujix.FujiXPreferenceFragment;
+        import net.osdn.gokigen.a01d.preference.olympus.PreferenceFragment;
+        import net.osdn.gokigen.a01d.preference.panasonic.PanasonicPreferenceFragment;
+        import net.osdn.gokigen.a01d.preference.ricohgr2.RicohGr2PreferenceFragment;
+        import net.osdn.gokigen.a01d.preference.sony.SonyPreferenceFragment;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-import androidx.fragment.app.FragmentTransaction;
-import androidx.preference.PreferenceFragmentCompat;
-import androidx.preference.PreferenceManager;
+        import androidx.annotation.NonNull;
+        import androidx.appcompat.app.ActionBar;
+        import androidx.appcompat.app.AppCompatActivity;
+        import androidx.core.app.ActivityCompat;
+        import androidx.core.content.ContextCompat;
+        import androidx.fragment.app.FragmentTransaction;
+        import androidx.preference.PreferenceFragmentCompat;
+        import androidx.preference.PreferenceManager;
 
 /**
  *   A01d ;
@@ -225,6 +225,11 @@ public class A01dMain extends AppCompatActivity implements ICameraStatusReceiver
             }
             else if (method == ICameraConnection.CameraConnectionMethod.SONY)
             {
+                // SONYの場合は、API一覧画面へ遷移させる
+                changeSceneToApiList();
+            }
+            else if (method == ICameraConnection.CameraConnectionMethod.PANASONIC)
+            {
                 // OPCカメラでない場合には、「OPCカメラのみ有効です」表示をして画面遷移させない
                 Toast.makeText(getApplicationContext(), getText(R.string.only_opc_feature), Toast.LENGTH_SHORT).show();
             }
@@ -286,6 +291,8 @@ public class A01dMain extends AppCompatActivity implements ICameraStatusReceiver
                         preferenceFragment = RicohGr2PreferenceFragment.newInstance(this, this);
                     } else if (connectionMethod == ICameraConnection.CameraConnectionMethod.SONY) {
                         preferenceFragment = SonyPreferenceFragment.newInstance(this, this);
+                    } else if (connectionMethod == ICameraConnection.CameraConnectionMethod.PANASONIC) {
+                        preferenceFragment = PanasonicPreferenceFragment.newInstance(this, this);
                     } else if (connectionMethod == ICameraConnection.CameraConnectionMethod.FUJI_X) {
                         preferenceFragment = FujiXPreferenceFragment.newInstance(this, this);
                     } else //  if (connectionMethod == ICameraConnection.CameraConnectionMethod.OPC)
@@ -564,6 +571,10 @@ public class A01dMain extends AppCompatActivity implements ICameraStatusReceiver
         else if  (connectionMethod == ICameraConnection.CameraConnectionMethod.SONY)
         {
             connection = interfaceProvider.getSonyInterface().getSonyCameraConnection();
+        }
+        else if  (connectionMethod == ICameraConnection.CameraConnectionMethod.PANASONIC)
+        {
+            connection = interfaceProvider.getPanasonicInterface().getPanasonicCameraConnection();
         }
         else if  (connectionMethod == ICameraConnection.CameraConnectionMethod.FUJI_X)
         {

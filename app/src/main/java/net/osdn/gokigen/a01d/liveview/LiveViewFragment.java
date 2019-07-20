@@ -199,7 +199,7 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer, IFo
                                 {
                                     manualFocus.setVisibility(View.INVISIBLE);
                                 }
-                                propertyButton.setVisibility(View.INVISIBLE);
+                                propertyButton.setVisibility(View.VISIBLE);  // 押すとAPI一覧に遷移
                             }
                         });
                     }
@@ -237,6 +237,33 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer, IFo
                     if (focusIndicator != null)
                     {
                         focusIndicator.setVisibility(View.INVISIBLE);
+                    }
+                }
+                else if (connectionMethod == ICameraConnection.CameraConnectionMethod.PANASONIC)
+                {
+                    if ((favoriteButton != null)&&(manualFocus != null))
+                    {
+                        runOnUiThread(new Runnable()
+                        {
+                            @Override
+                            public void run()
+                            {
+                                favoriteButton.setVisibility(View.INVISIBLE);
+                                if (manualFocus != null)
+                                {
+                                    manualFocus.setVisibility(View.INVISIBLE);
+                                }
+                                propertyButton.setVisibility(View.INVISIBLE);  // 押すとAPI一覧に遷移
+                            }
+                        });
+                    }
+                    if (changeLiveViewScale != null)
+                    {
+                        changeLiveViewScale.setVisibility(View.INVISIBLE);
+                    }
+                    if (focusIndicator != null)
+                    {
+                        focusIndicator.setVisibility(View.VISIBLE);
                     }
                 }
                 else if (connectionMethod == ICameraConnection.CameraConnectionMethod.FUJI_X)
@@ -316,6 +343,10 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer, IFo
         {
             interfaceInjector = interfaceProvider.getFujiXInterface().getDisplayInjector();
         }
+        else if (connectionMethod == ICameraConnection.CameraConnectionMethod.PANASONIC)
+        {
+            interfaceInjector = interfaceProvider.getPanasonicInterface().getDisplayInjector();
+        }
         else // if (connectionMethod == ICameraConnection.CameraConnectionMethod.OPC)
         {
             interfaceInjector = interfaceProvider.getOlympusInterface().getDisplayInjector();
@@ -341,6 +372,12 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer, IFo
             this.liveViewControl = interfaceProvider.getFujiXInterface().getLiveViewControl();
             this.zoomLensControl = interfaceProvider.getFujiXInterface().getZoomLensControl();
             this.cameraInformation = interfaceProvider.getFujiXInterface().getCameraInformation();
+        }
+        else  if (connectionMethod == ICameraConnection.CameraConnectionMethod.PANASONIC)
+        {
+            this.liveViewControl = interfaceProvider.getPanasonicInterface().getPanasonicLiveViewControl();
+            this.zoomLensControl = interfaceProvider.getPanasonicInterface().getZoomLensControl();
+            this.cameraInformation = interfaceProvider.getPanasonicInterface().getCameraInformation();
         }
         else //  if (connectionMethod == ICameraConnection.CameraConnectionMethod.OPC)
         {
@@ -632,6 +669,10 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer, IFo
             else if (connectionMethod == ICameraConnection.CameraConnectionMethod.FUJI_X)
             {
                 lvListener = interfaceProvider.getFujiXInterface().getLiveViewListener();
+            }
+            else if (connectionMethod == ICameraConnection.CameraConnectionMethod.PANASONIC)
+            {
+                lvListener = interfaceProvider.getPanasonicInterface().getLiveViewListener();
             }
             else  // if (connectionMethod == ICameraConnection.CameraConnectionMethod.OPC)
             {

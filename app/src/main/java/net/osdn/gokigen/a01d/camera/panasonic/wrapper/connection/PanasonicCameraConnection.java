@@ -1,4 +1,4 @@
-package net.osdn.gokigen.a01d.camera.sony.wrapper.connection;
+package net.osdn.gokigen.a01d.camera.panasonic.wrapper.connection;
 
 import android.app.Activity;
 import android.content.BroadcastReceiver;
@@ -13,10 +13,10 @@ import android.provider.Settings;
 import android.util.Log;
 
 import net.osdn.gokigen.a01d.R;
+import net.osdn.gokigen.a01d.camera.ICameraChangeListener;
 import net.osdn.gokigen.a01d.camera.ICameraConnection;
 import net.osdn.gokigen.a01d.camera.ICameraStatusReceiver;
-import net.osdn.gokigen.a01d.camera.sony.wrapper.ISonyCameraHolder;
-import net.osdn.gokigen.a01d.camera.ICameraChangeListener;
+import net.osdn.gokigen.a01d.camera.panasonic.wrapper.IPanasonicCameraHolder;
 
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -28,13 +28,13 @@ import androidx.appcompat.app.AlertDialog;
  *
  *
  */
-public class SonyCameraConnection implements ICameraConnection
+public class PanasonicCameraConnection implements ICameraConnection
 {
     private final String TAG = toString();
     private final Activity context;
     private final ICameraStatusReceiver statusReceiver;
     private final BroadcastReceiver connectionReceiver;
-    private final ISonyCameraHolder cameraHolder;
+    private final IPanasonicCameraHolder cameraHolder;
     //private final ConnectivityManager connectivityManager;
     private final Executor cameraExecutor = Executors.newFixedThreadPool(1);
     private final ICameraChangeListener listener;
@@ -42,9 +42,9 @@ public class SonyCameraConnection implements ICameraConnection
     //private static final int MESSAGE_CONNECTIVITY_TIMEOUT = 1;
     private CameraConnectionStatus connectionStatus = CameraConnectionStatus.UNKNOWN;
 
-    public SonyCameraConnection(final Activity context, final ICameraStatusReceiver statusReceiver, @NonNull ISonyCameraHolder cameraHolder, final @NonNull ICameraChangeListener listener)
+    public PanasonicCameraConnection(final Activity context, final ICameraStatusReceiver statusReceiver, @NonNull IPanasonicCameraHolder cameraHolder, final @NonNull ICameraChangeListener listener)
     {
-        Log.v(TAG, "SonyCameraConnection()");
+        Log.v(TAG, "PanasonicCameraConnection()");
         this.context = context;
         this.statusReceiver = statusReceiver;
         this.cameraHolder = cameraHolder;
@@ -251,7 +251,7 @@ public class SonyCameraConnection implements ICameraConnection
         Log.v(TAG, "disconnectFromCamera()");
         try
         {
-            cameraExecutor.execute(new SonyCameraDisconnectSequence(powerOff));
+            cameraExecutor.execute(new PanasonicCameraDisconnectSequence(powerOff));
         }
         catch (Exception e)
         {
@@ -268,7 +268,7 @@ public class SonyCameraConnection implements ICameraConnection
         connectionStatus = CameraConnectionStatus.CONNECTING;
         try
         {
-            cameraExecutor.execute(new SonyCameraConnectSequence(context,statusReceiver, this, cameraHolder, listener));
+            cameraExecutor.execute(new PanasonicCameraConnectSequence(context,statusReceiver, this, cameraHolder, listener));
         }
         catch (Exception e)
         {

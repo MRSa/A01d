@@ -1,7 +1,7 @@
 package net.osdn.gokigen.a01d.camera.sony.wrapper;
 
 
-import net.osdn.gokigen.a01d.camera.sony.wrapper.eventlistener.ICameraChangeListener;
+import net.osdn.gokigen.a01d.camera.ICameraChangeListener;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;

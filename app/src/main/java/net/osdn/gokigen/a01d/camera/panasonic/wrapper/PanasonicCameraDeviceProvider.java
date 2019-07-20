@@ -1,4 +1,4 @@
-package net.osdn.gokigen.a01d.camera.sony.wrapper;
+package net.osdn.gokigen.a01d.camera.panasonic.wrapper;
 
 import android.util.Log;
 
@@ -10,10 +10,14 @@ import java.util.List;
 
 import androidx.annotation.NonNull;
 
-public class SonyCameraDeviceProvider implements ISonyCamera
+/**
+ *
+ *
+ */
+public class PanasonicCameraDeviceProvider implements IPanasonicCamera
 {
-    private static final String TAG = SonyCameraDeviceProvider.class.getSimpleName();
-    private final List<ISonyApiService> apiServices;
+    private static final String TAG = PanasonicCameraDeviceProvider.class.getSimpleName();
+    private final List<IPanasonicApiService> apiServices;
     private final String ddUrl;
     private final String udn;
     private final String friendlyName;
@@ -24,14 +28,14 @@ public class SonyCameraDeviceProvider implements ISonyCamera
      *   コンストラクタ： staticメソッド searchPanasonicCameraDevice() で生成する
      *
      */
-    private SonyCameraDeviceProvider(String ddUrl, String friendlyName, String modelName, String udn, String iconUrl)
+    private PanasonicCameraDeviceProvider(String ddUrl, String friendlyName, String modelName, String udn, String iconUrl)
     {
         this.ddUrl = ddUrl;
         this.friendlyName = friendlyName;
         this.modelName = modelName;
         this.udn = udn;
         this.iconUrl = iconUrl;
-        Log.v(TAG, "Sony Device : " + this.friendlyName + "(" + this.modelName + ") " + this.ddUrl + "  " + this.udn + " " + this.iconUrl);
+        Log.v(TAG, "Panasonic Device : " + this.friendlyName + "(" + this.modelName + ") " + this.ddUrl + "  " + this.udn + " [" + this.iconUrl + "]");
 
         apiServices = new ArrayList<>();
     }
@@ -45,7 +49,7 @@ public class SonyCameraDeviceProvider implements ISonyCamera
     {
         try
         {
-            for (ISonyApiService apiService : apiServices)
+            for (IPanasonicApiService apiService : apiServices)
             {
                 if (serviceName.equals(apiService.getName()))
                 {
@@ -66,7 +70,7 @@ public class SonyCameraDeviceProvider implements ISonyCamera
      *
      */
     @Override
-    public List<ISonyApiService> getApiServices()
+    public List<IPanasonicApiService> getApiServices()
     {
         return (apiServices);
     }
@@ -91,25 +95,65 @@ public class SonyCameraDeviceProvider implements ISonyCamera
         return (modelName);
     }
 
-
     /**
      *
      *
      */
-    private void addApiService(String name, String actionUrl)
+    @Override
+    public String getddUrl()
     {
-        Log.v(TAG, "API : " + name + "  : " + actionUrl);
-        SonyApiService service = new SonyApiService(name, actionUrl);
-        apiServices.add(service);
+        return (ddUrl);
     }
 
     /**
      *
      *
      */
-    public static ISonyCamera searchSonyCameraDevice(@NonNull String ddUrl)
+    @Override
+    public String getCmdUrl()
     {
-        SonyCameraDeviceProvider device = null;
+        // コマンド送信先を応答する
+        return (ddUrl.substring(0, ddUrl.indexOf(":", 7)) + "/");
+    }
+
+    /**
+     *
+     *
+     */
+    @Override
+    public String getObjUrl()
+    {
+        // オブジェクト取得用の送信先を応答する
+        return (ddUrl.substring(0, ddUrl.indexOf("/", 7)) + "/");
+    }
+
+    /**
+     *
+     *
+     */
+    @Override
+    public String getPictureUrl()
+    {
+        // 画像取得先を応答する
+        return (ddUrl.substring(0, ddUrl.indexOf(":", 7)) + ":50001/");
+    }
+
+/*
+    private void addApiService(String name, String actionUrl)
+    {
+        Log.v(TAG, "API : " + name + "  : " + actionUrl);
+        PanasonicApiService service = new PanasonicApiService(name, actionUrl);
+        apiServices.add(service);
+    }
+*/
+
+    /**
+     *
+     *
+     */
+    public static IPanasonicCamera searchPanasonicCameraDevice(@NonNull String ddUrl)
+    {
+        PanasonicCameraDeviceProvider device = null;
         String ddXml;
         try
         {
@@ -155,8 +199,9 @@ public class SonyCameraDeviceProvider implements ISonyCamera
                         iconUrl = hostUrl + uri;
                     }
                 }
-                device = new SonyCameraDeviceProvider(ddUrl, friendlyName, modelName, udn, iconUrl);
-
+                device = new PanasonicCameraDeviceProvider(ddUrl, friendlyName, modelName, udn, iconUrl);
+/*
+                // SONY用のAPIサービス検索部分 (なので処理を止めておく)
                 // "av:X_ScalarWebAPI_DeviceInfo"
                 XmlElement wApiElement = deviceElement.findChild("X_ScalarWebAPI_DeviceInfo");
                 XmlElement wApiServiceListElement = wApiElement.findChild("X_ScalarWebAPI_ServiceList");
@@ -167,6 +212,7 @@ public class SonyCameraDeviceProvider implements ISonyCamera
                     String actionUrl = wApiServiceElement.findChild("X_ScalarWebAPI_ActionList_URL").getValue();
                     device.addApiService(serviceName, actionUrl);
                 }
+*/
             }
         }
         catch (Exception e)

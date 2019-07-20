@@ -103,6 +103,7 @@
         <item >Sony</item>
         <item>Ricoh GR II / PENTAX DSLR</item>
         <item >Fuji X Series</item>
+        <item >Panasonic</item>
     </string-array>
 
     <string-array name="connection_method_value">
@@ -110,6 +111,7 @@
         <item >SONY</item>
         <item >RICOH_GR2</item>
         <item >FUJI_X</item>
+        <item >PANASONIC</item>
     </string-array>
 
 
@@ -126,6 +128,5 @@
         <item >2</item>
         <item >3</item>
     </string-array>
-
 
 </resources>
