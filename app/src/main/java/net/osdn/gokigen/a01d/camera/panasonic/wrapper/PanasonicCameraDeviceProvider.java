@@ -7,6 +7,7 @@ import net.osdn.gokigen.a01d.camera.utils.XmlElement;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import androidx.annotation.NonNull;
 
@@ -23,6 +24,7 @@ public class PanasonicCameraDeviceProvider implements IPanasonicCamera
     private final String friendlyName;
     private final String modelName;
     private final String iconUrl;
+    private final String uniqueID = UUID.randomUUID().toString();
 
     /**
      *   コンストラクタ： staticメソッド searchPanasonicCameraDevice() で生成する
@@ -36,7 +38,7 @@ public class PanasonicCameraDeviceProvider implements IPanasonicCamera
         this.udn = udn;
         this.iconUrl = iconUrl;
         Log.v(TAG, "Panasonic Device : " + this.friendlyName + "(" + this.modelName + ") " + this.ddUrl + "  " + this.udn + " [" + this.iconUrl + "]");
-
+        Log.v(TAG, "ANDROID DEVICE : " + uniqueID);
         apiServices = new ArrayList<>();
     }
 
@@ -136,6 +138,12 @@ public class PanasonicCameraDeviceProvider implements IPanasonicCamera
     {
         // 画像取得先を応答する
         return (ddUrl.substring(0, ddUrl.indexOf(":", 7)) + ":50001/");
+    }
+
+    @Override
+    public String getClientDeviceUuId()
+    {
+        return (uniqueID);
     }
 
 /*

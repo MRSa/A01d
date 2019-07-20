@@ -9,9 +9,9 @@ import net.osdn.gokigen.a01d.camera.ICameraConnection;
 import net.osdn.gokigen.a01d.camera.ICameraStatusReceiver;
 import net.osdn.gokigen.a01d.camera.panasonic.wrapper.IPanasonicCamera;
 import net.osdn.gokigen.a01d.camera.panasonic.wrapper.IPanasonicCameraHolder;
+import net.osdn.gokigen.a01d.camera.utils.SimpleHttpClient;
 
 import androidx.annotation.NonNull;
-
 
 /**
  *   Panasonicカメラとの接続処理
@@ -70,7 +70,7 @@ public class PanasonicCameraConnectSequence implements Runnable, PanasonicSsdpCl
     @Override
     public void onFinished()
     {
-        Log.v(TAG, "SonyCameraConnectSequence.onFinished()");
+        Log.v(TAG, "PanasonicCameraConnectSequence.onFinished()");
         try
         {
             Thread thread = new Thread(new Runnable()

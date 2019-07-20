@@ -7,6 +7,7 @@ import net.osdn.gokigen.a01d.R;
 import net.osdn.gokigen.a01d.camera.ICameraStatusReceiver;
 import net.osdn.gokigen.a01d.camera.panasonic.wrapper.IPanasonicCamera;
 import net.osdn.gokigen.a01d.camera.panasonic.wrapper.PanasonicCameraDeviceProvider;
+import net.osdn.gokigen.a01d.camera.utils.SimpleHttpClient;
 
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -124,9 +125,18 @@ class PanasonicSsdpClient
                             if (device != null)
                             {
                                 cameraStatusReceiver.onStatusNotify(context.getString(R.string.camera_found) + " " + device.getFriendlyName());
-                                callback.onDeviceFound(device);
-                                // カメラが見つかった場合は breakする
-                                break;
+
+                                ///// カメラへの登録要求... /////
+                                String registUrl = device.getCmdUrl() + "cam.cgi?mode=accctrl&type=req_acc&value=" + device.getClientDeviceUuId() + "&value2=GOKIGEN_a01Series";
+                                String reply = SimpleHttpClient.httpGet(registUrl, SSDP_RECEIVE_TIMEOUT);
+                                if (reply.contains("ok"))
+                                {
+                                    callback.onDeviceFound(device);
+                                    // カメラと接続できた場合は breakする
+                                    break;
+                                }
+                                // 接続(デバイス登録)エラー...
+                                cameraStatusReceiver.onStatusNotify(context.getString(R.string.camera_rejected));
                             }
                             else
                             {

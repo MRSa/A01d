@@ -13,4 +13,6 @@ public interface IPanasonicCamera
     String getCmdUrl();
     String getObjUrl();
     String getPictureUrl();
+
+    String getClientDeviceUuId();
 }

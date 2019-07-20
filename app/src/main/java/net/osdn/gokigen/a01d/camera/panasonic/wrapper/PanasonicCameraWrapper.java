@@ -196,6 +196,12 @@ public class PanasonicCameraWrapper implements IPanasonicCameraHolder, IPanasoni
     }
 
     @Override
+    public IPanasonicCamera getPanasonicCamera()
+    {
+        return (panasonicCamera);
+    }
+
+    @Override
     public void injectDisplay(@NonNull IAutoFocusFrameDisplay frameDisplayer, @NonNull IIndicatorControl indicator, @NonNull IFocusingModeNotify focusingModeNotify)
     {
         Log.v(TAG, "injectDisplay()");
