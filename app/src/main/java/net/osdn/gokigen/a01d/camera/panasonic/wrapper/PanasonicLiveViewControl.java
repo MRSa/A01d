@@ -22,9 +22,10 @@ public class PanasonicLiveViewControl implements ILiveViewControl
     private DatagramSocket receiveSocket = null;
     private boolean whileStreamReceive = false;
     private int errorOccur = 0;
+    private static final int TIMEOUT_MAX = 3;
     private static final int ERROR_MAX = 30;
     private static final int RECEIVE_BUFFER_SIZE = 1024 * 1024 * 4;
-    private static final int TIMEOUT_MS = 3000;
+    private static final int TIMEOUT_MS = 1000;
     private static final int LIVEVIEW_PORT = 49152;
     private final String LIVEVIEW_START_REQUEST = "cam.cgi?mode=startstream&value=49152";
     private final String LIVEVIEW_STOP_REQUEST = "cam.cgi?mode=stopstream";
@@ -247,6 +248,7 @@ public class PanasonicLiveViewControl implements ILiveViewControl
 
     private void receiverThread()
     {
+        int exceptionCount = 0;
         byte[] buffer = new byte[RECEIVE_BUFFER_SIZE];
         while (whileStreamReceive)
         {
@@ -255,8 +257,10 @@ public class PanasonicLiveViewControl implements ILiveViewControl
                 DatagramPacket receive_packet = new DatagramPacket(buffer, buffer.length);
                 if (receiveSocket != null)
                 {
+                    receiveSocket.setSoTimeout(TIMEOUT_MS);
                     receiveSocket.receive(receive_packet);
                     checkReceiveImage(receive_packet);
+                    exceptionCount = 0;
                 }
                 else
                 {
@@ -265,7 +269,26 @@ public class PanasonicLiveViewControl implements ILiveViewControl
             }
             catch (Exception e)
             {
+                exceptionCount++;
                 e.printStackTrace();
+                if (exceptionCount > TIMEOUT_MAX)
+                {
+                    try
+                    {
+                        Log.v(TAG, "LV : RETRY REQUEST");
+
+                        exceptionCount = 0;
+                        String reply = SimpleHttpClient.httpGet(camera.getCmdUrl() + LIVEVIEW_START_REQUEST, TIMEOUT_MS);
+                        if (!reply.contains("ok"))
+                        {
+                            Log.v(TAG, "LV : RETRY COMMAND FAIL...");
+                        }
+                    }
+                    catch (Exception ee)
+                    {
+                        ee.printStackTrace();
+                    }
+                }
             }
         }
         try
@@ -288,5 +311,4 @@ public class PanasonicLiveViewControl implements ILiveViewControl
     {
         return (liveViewListener);
     }
-
 }

@@ -7,7 +7,6 @@ import android.util.Log;
 
 import net.osdn.gokigen.a01d.IChangeScene;
 import net.osdn.gokigen.a01d.R;
-import net.osdn.gokigen.a01d.camera.panasonic.cameraproperty.PanasonicCameraApiListViewer;
 import net.osdn.gokigen.a01d.camera.panasonic.operation.CameraPowerOffPanasonic;
 import net.osdn.gokigen.a01d.logcat.LogCatViewer;
 import net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor;
@@ -33,7 +32,7 @@ public class PanasonicPreferenceFragment  extends PreferenceFragmentCompat imple
     private SharedPreferences preferences = null;
     private CameraPowerOffPanasonic powerOffController = null;
     private LogCatViewer logCatViewer = null;
-    private PanasonicCameraApiListViewer cameraApiListViewer = null;
+    //private PanasonicCameraApiListViewer cameraApiListViewer = null;
 
     /**
      *
@@ -67,8 +66,8 @@ public class PanasonicPreferenceFragment  extends PreferenceFragmentCompat imple
             logCatViewer = new LogCatViewer(changeScene);
             logCatViewer.prepare();
 
-            cameraApiListViewer = new PanasonicCameraApiListViewer(changeScene);
-            cameraApiListViewer.prepare();
+            //cameraApiListViewer = new PanasonicCameraApiListViewer(changeScene);
+            //cameraApiListViewer.prepare();
         }
         catch (Exception e)
         {
@@ -186,7 +185,7 @@ public class PanasonicPreferenceFragment  extends PreferenceFragmentCompat imple
 
             findPreference("exit_application").setOnPreferenceClickListener(powerOffController);
             findPreference("debug_info").setOnPreferenceClickListener(logCatViewer);
-            findPreference("panasonic_api_list").setOnPreferenceClickListener(cameraApiListViewer);
+            //findPreference("panasonic_api_list").setOnPreferenceClickListener(cameraApiListViewer);
         }
         catch (Exception e)
         {

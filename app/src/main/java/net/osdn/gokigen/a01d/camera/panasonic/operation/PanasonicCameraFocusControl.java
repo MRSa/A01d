@@ -6,7 +6,7 @@ import android.view.MotionEvent;
 
 import net.osdn.gokigen.a01d.camera.IFocusingControl;
 import net.osdn.gokigen.a01d.camera.panasonic.operation.takepicture.PanasonicAutoFocusControl;
-import net.osdn.gokigen.a01d.camera.panasonic.wrapper.IPanasonicCameraApi;
+import net.osdn.gokigen.a01d.camera.panasonic.wrapper.IPanasonicCamera;
 import net.osdn.gokigen.a01d.liveview.IAutoFocusFrameDisplay;
 import net.osdn.gokigen.a01d.liveview.IIndicatorControl;
 
@@ -24,9 +24,9 @@ public class PanasonicCameraFocusControl  implements IFocusingControl
         afControl = new PanasonicAutoFocusControl(frameDisplayer, indicator);
     }
 
-    public void setCameraApi(@NonNull IPanasonicCameraApi panasonicCameraApi)
+    public void setCamera(@NonNull IPanasonicCamera panasonicCamera)
     {
-        afControl.setCameraApi(panasonicCameraApi);
+        afControl.setCamera(panasonicCamera);
     }
 
     @Override

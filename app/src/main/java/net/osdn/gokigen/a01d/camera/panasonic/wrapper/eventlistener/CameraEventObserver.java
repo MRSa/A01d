@@ -5,7 +5,7 @@ import android.os.Handler;
 import android.util.Log;
 
 import net.osdn.gokigen.a01d.camera.ICameraChangeListener;
-import net.osdn.gokigen.a01d.camera.panasonic.wrapper.IPanasonicCameraApi;
+import net.osdn.gokigen.a01d.camera.panasonic.wrapper.IPanasonicCamera;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -22,20 +22,20 @@ public class CameraEventObserver implements ICameraEventObserver
     private boolean isEventMonitoring;
     private boolean isActive;
 
-    private final IPanasonicCameraApi remoteApi;
-    private final ReplyJsonParser replyParser;
+    private final IPanasonicCamera remote;
+    // private final ReplyJsonParser replyParser;
     private String eventVersion = "1.1";  // 初期値を "1.0" から "1.1" に更新
 
-    public static ICameraEventObserver newInstance(@NonNull Context context, @NonNull IPanasonicCameraApi apiClient)
+    public static ICameraEventObserver newInstance(@NonNull Context context, @NonNull IPanasonicCamera apiClient)
     {
         return (new CameraEventObserver(context, apiClient));
     }
 
-    private CameraEventObserver(@NonNull Context context, @NonNull IPanasonicCameraApi apiClient)
+    private CameraEventObserver(@NonNull Context context, @NonNull IPanasonicCamera apiClient)
     {
         super();
-        remoteApi = apiClient;
-        replyParser = new ReplyJsonParser(new Handler(context.getMainLooper()));
+        remote = apiClient;
+        //replyParser = new ReplyJsonParser(new Handler(context.getMainLooper()));
         isEventMonitoring = false;
         isActive = false;
     }
@@ -71,6 +71,7 @@ public class CameraEventObserver implements ICameraEventObserver
                         boolean longPolling = !firstCall;
                         try
                         {
+/*
                             // Call getEvent API.
                             JSONObject replyJson = remoteApi.getEvent(eventVersion, longPolling);
 
@@ -113,6 +114,7 @@ public class CameraEventObserver implements ICameraEventObserver
 
                             //  parse
                             replyParser.parse(replyJson);
+*/
                         }
                         catch (Exception e)
                         {
@@ -150,7 +152,7 @@ public class CameraEventObserver implements ICameraEventObserver
     {
         try
         {
-            replyParser.setEventChangeListener(listener);
+            //replyParser.setEventChangeListener(listener);
         }
         catch (Exception e)
         {
@@ -163,7 +165,7 @@ public class CameraEventObserver implements ICameraEventObserver
     {
         try
         {
-            replyParser.clearEventChangeListener();
+            //replyParser.clearEventChangeListener();
         }
         catch (Exception e)
         {
@@ -174,7 +176,8 @@ public class CameraEventObserver implements ICameraEventObserver
     @Override
     public ICameraStatusHolder getCameraStatusHolder()
     {
-        return (replyParser);
+        return (null);
+        //return (replyParser);
     }
 
     @Override

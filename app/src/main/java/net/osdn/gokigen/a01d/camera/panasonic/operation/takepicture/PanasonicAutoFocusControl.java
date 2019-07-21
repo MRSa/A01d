@@ -4,7 +4,8 @@ import android.graphics.PointF;
 import android.graphics.RectF;
 import android.util.Log;
 
-import net.osdn.gokigen.a01d.camera.panasonic.wrapper.IPanasonicCameraApi;
+import net.osdn.gokigen.a01d.camera.panasonic.wrapper.IPanasonicCamera;
+import net.osdn.gokigen.a01d.camera.utils.SimpleHttpClient;
 import net.osdn.gokigen.a01d.liveview.IAutoFocusFrameDisplay;
 import net.osdn.gokigen.a01d.liveview.IIndicatorControl;
 
@@ -21,9 +22,10 @@ import androidx.annotation.NonNull;
 public class PanasonicAutoFocusControl
 {
     private static final String TAG = PanasonicAutoFocusControl.class.getSimpleName();
+    private static final int TIMEOUT_MS = 3000;
     private final IIndicatorControl indicator;
     private final IAutoFocusFrameDisplay frameDisplayer;
-    private IPanasonicCameraApi cameraApi = null;
+    private IPanasonicCamera camera = null;
 
     /**
      *
@@ -39,9 +41,9 @@ public class PanasonicAutoFocusControl
      *
      *
      */
-    public void setCameraApi(@NonNull IPanasonicCameraApi panasonicCameraApi)
+    public void setCamera(@NonNull IPanasonicCamera panasonicCamera)
     {
-        this.cameraApi = panasonicCameraApi;
+        this.camera = panasonicCamera;
     }
 
     /**
@@ -51,7 +53,7 @@ public class PanasonicAutoFocusControl
     public void lockAutoFocus(@NonNull final PointF point)
     {
         Log.v(TAG, "lockAutoFocus() : [" + point.x + ", " + point.y + "]");
-        if (cameraApi == null)
+        if (camera == null)
         {
             Log.v(TAG, "ISonyCameraApi is null...");
             return;
@@ -68,14 +70,16 @@ public class PanasonicAutoFocusControl
                     {
                         showFocusFrame(preFocusFrameRect, IAutoFocusFrameDisplay.FocusFrameStatus.Running, 0.0);
 
-                        double posX = point.x * 100.0;
-                        double posY = point.y * 100.0;
+                        int posX = (int) (Math.floor(point.x * 1000.0));
+                        int posY = (int) (Math.floor(point.y * 1000.0));
                         Log.v(TAG, "AF (" + posX + ", " + posY + ")");
-                        JSONObject resultsObj = cameraApi.setTouchAFPosition(posX, posY);
-                        if (resultsObj == null)
+                        String reply = SimpleHttpClient.httpGet(camera.getCmdUrl() + "cam.cgi?mode=camctrl&type=touch&value=" + posX + "/" + posY + "&value2=on", TIMEOUT_MS);
+
+                        if (!reply.contains("ok"))
                         {
                             Log.v(TAG, "setTouchAFPosition() reply is null.");
                         }
+/*
                         if (findTouchAFPositionResult(resultsObj))
                         {
                             // AF FOCUSED
@@ -88,6 +92,8 @@ public class PanasonicAutoFocusControl
                             Log.v(TAG, "lockAutoFocus() : ERROR");
                             showFocusFrame(preFocusFrameRect, IAutoFocusFrameDisplay.FocusFrameStatus.Failed, 1.0);
                         }
+*/
+                        showFocusFrame(preFocusFrameRect, IAutoFocusFrameDisplay.FocusFrameStatus.Errored, 1.0);
                     }
                     catch (Exception e)
                     {
@@ -118,9 +124,9 @@ public class PanasonicAutoFocusControl
     public void halfPressShutter(final boolean isPressed)
     {
         Log.v(TAG, "halfPressShutter() : " + isPressed);
-        if (cameraApi == null)
+        if (camera == null)
         {
-            Log.v(TAG, "ISonyCameraApi is null...");
+            Log.v(TAG, "IPanasonicCamera is null...");
             return;
         }
         try
@@ -132,10 +138,11 @@ public class PanasonicAutoFocusControl
                 {
                     try
                     {
-                        JSONObject resultsObj = (isPressed) ? cameraApi.actHalfPressShutter() : cameraApi.cancelHalfPressShutter();
-                        if (resultsObj == null)
+                        String status = (isPressed) ? "on" : "off";
+                        String reply = SimpleHttpClient.httpGet(camera.getCmdUrl() + "cam.cgi?mode=camctrl&type=touch&value=500/500&value2=" + status, TIMEOUT_MS);
+                        if (!reply.contains("ok"))
                         {
-                            Log.v(TAG, "halfPressShutter() [" + isPressed + "] reply is null.");
+                            Log.v(TAG, "CENTER FOCUS (" + status + ") FAIL...");
                         }
                         else
                         {
@@ -163,9 +170,9 @@ public class PanasonicAutoFocusControl
     public void unlockAutoFocus()
     {
         Log.v(TAG, "unlockAutoFocus()");
-        if (cameraApi == null)
+        if (camera == null)
         {
-            Log.v(TAG, "ISonyCameraApi is null...");
+            Log.v(TAG, "IPanasonicCamera is null...");
             return;
         }
         try
@@ -177,10 +184,10 @@ public class PanasonicAutoFocusControl
                 {
                     try
                     {
-                        JSONObject resultsObj = cameraApi.cancelTouchAFPosition();
-                        if (resultsObj == null)
+                        String reply = SimpleHttpClient.httpGet(camera.getCmdUrl() + "cam.cgi?mode=camctrl&type=touch&value=500/500&value2=off", TIMEOUT_MS);
+                        if (!reply.contains("ok"))
                         {
-                            Log.v(TAG, "cancelTouchAFPosition() reply is null.");
+                            Log.v(TAG, "CENTER FOCUS (UNLOCK) FAIL...");
                         }
                         hideFocusFrame();
                     }

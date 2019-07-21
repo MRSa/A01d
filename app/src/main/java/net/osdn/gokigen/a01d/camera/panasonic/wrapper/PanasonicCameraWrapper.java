@@ -26,10 +26,6 @@ import net.osdn.gokigen.a01d.liveview.IAutoFocusFrameDisplay;
 import net.osdn.gokigen.a01d.liveview.IIndicatorControl;
 import net.osdn.gokigen.a01d.liveview.liveviewlistener.ILiveViewListener;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
@@ -41,7 +37,7 @@ public class PanasonicCameraWrapper implements IPanasonicCameraHolder, IPanasoni
     private final ICameraStatusReceiver provider;
     private final ICameraChangeListener listener;
     private IPanasonicCamera panasonicCamera = null;
-    private IPanasonicCameraApi panasonicCameraApi = null;
+    //private IPanasonicCameraApi panasonicCameraApi = null;
     private ICameraEventObserver eventObserver = null;
     private PanasonicLiveViewControl liveViewControl = null;
     private PanasonicCameraFocusControl focusControl = null;
@@ -61,11 +57,11 @@ public class PanasonicCameraWrapper implements IPanasonicCameraHolder, IPanasoni
         Log.v(TAG, " prepare : " + panasonicCamera.getFriendlyName() + " " + panasonicCamera.getModelName());
         try
         {
-            this.panasonicCameraApi = PanasonicCameraApi.newInstance(panasonicCamera);
-            eventObserver = CameraEventObserver.newInstance(context, panasonicCameraApi);
+            //this.panasonicCameraApi = PanasonicCameraApi.newInstance(panasonicCamera);
+            eventObserver = CameraEventObserver.newInstance(context, panasonicCamera);
             liveViewControl = new PanasonicLiveViewControl(panasonicCamera);
 
-            focusControl.setCameraApi(panasonicCameraApi);
+            focusControl.setCamera(panasonicCamera);
             captureControl.setCamera(panasonicCamera);
             zoomControl.setCamera(panasonicCamera);
         }
@@ -85,6 +81,13 @@ public class PanasonicCameraWrapper implements IPanasonicCameraHolder, IPanasoni
             if (!reply.contains("ok"))
             {
                 Log.v(TAG, "CAMERA REPLIED ERROR : CHANGE RECMODE.");
+            }
+
+            //  フォーカスに関しては、１点に切り替える（仮）
+            reply = SimpleHttpClient.httpGet(this.panasonicCamera.getCmdUrl() + "cam.cgi?mode=setsetting&type=afmode&value=1area", TIMEOUT_MS);
+            if (!reply.contains("ok"))
+            {
+                Log.v(TAG, "CAMERA REPLIED ERROR : CHANGE AF MODE 1area.");
             }
         }
         catch (Exception e)
