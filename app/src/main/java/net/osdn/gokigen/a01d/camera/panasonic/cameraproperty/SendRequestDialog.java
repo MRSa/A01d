@@ -15,7 +15,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import net.osdn.gokigen.a01d.R;
-import net.osdn.gokigen.a01d.camera.panasonic.wrapper.IPanasonicCameraApi;
+import net.osdn.gokigen.a01d.camera.panasonic.wrapper.IPanasonicCamera;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -29,9 +29,9 @@ import androidx.fragment.app.DialogFragment;
 public class SendRequestDialog  extends DialogFragment
 {
     private final String TAG = toString();
-    private IPanasonicCameraApi cameraApi;
     private String method = "";
     private int selectedPosition = 0;
+    private IPanasonicCamera camera = null;
     private SendRequestDialog.Callback callback = null;
     Dialog myDialog = null;
 
@@ -39,10 +39,10 @@ public class SendRequestDialog  extends DialogFragment
      *
      *
      */
-    public static SendRequestDialog newInstance(@NonNull IPanasonicCameraApi cameraApi, @NonNull  String method, @Nullable SendRequestDialog.Callback callback)
+    public static SendRequestDialog newInstance(@NonNull IPanasonicCamera camera, @NonNull  String method, @Nullable SendRequestDialog.Callback callback)
     {
         SendRequestDialog instance = new SendRequestDialog();
-        instance.prepare(cameraApi, method, callback);
+        instance.prepare(camera, method, callback);
 
         // パラメータはBundleにまとめておく
         Bundle arguments = new Bundle();
@@ -57,9 +57,9 @@ public class SendRequestDialog  extends DialogFragment
      *
      *
      */
-    private void prepare(@NonNull IPanasonicCameraApi cameraApi,@NonNull  String method,  @Nullable SendRequestDialog.Callback callback)
+    private void prepare(@NonNull IPanasonicCamera camera,@NonNull  String method,  @Nullable SendRequestDialog.Callback callback)
     {
-        this.cameraApi = cameraApi;
+        this.camera = camera;
         this.method = method;
         this.callback = callback;
     }
@@ -92,7 +92,7 @@ public class SendRequestDialog  extends DialogFragment
             methodName.setText("");
             version.setText(activity.getString(R.string.dialog_version_hint));
             ArrayAdapter<String> adapter = new ArrayAdapter<>(activity, android.R.layout.simple_spinner_item);
-            adapter.addAll(cameraApi.getPanasonicApiServiceList());
+            //adapter.addAll(cameraApi.getPanasonicApiServiceList());
 
             int defaultSelection;
             for (defaultSelection = (adapter.getCount() - 1); defaultSelection >= 0; defaultSelection--)

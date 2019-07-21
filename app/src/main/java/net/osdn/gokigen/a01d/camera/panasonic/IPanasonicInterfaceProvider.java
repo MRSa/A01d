@@ -23,8 +23,6 @@ public interface IPanasonicInterfaceProvider
     IZoomLensControl getZoomLensControl();
     ICaptureControl getCaptureControl();
     IDisplayInjector getDisplayInjector();
-    List<String> getApiCommands();
-    IPanasonicCameraApi getCameraApi();
 
     IPanasonicCamera getPanasonicCamera();
 }

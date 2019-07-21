@@ -9,7 +9,6 @@ import net.osdn.gokigen.a01d.camera.ICameraConnection;
 import net.osdn.gokigen.a01d.camera.ICameraStatusReceiver;
 import net.osdn.gokigen.a01d.camera.panasonic.wrapper.IPanasonicCamera;
 import net.osdn.gokigen.a01d.camera.panasonic.wrapper.IPanasonicCameraHolder;
-import net.osdn.gokigen.a01d.camera.utils.SimpleHttpClient;
 
 import androidx.annotation.NonNull;
 
@@ -123,6 +122,7 @@ public class PanasonicCameraConnectSequence implements Runnable, PanasonicSsdpCl
         }
     }
 
+/*
     private void waitForAMoment(long mills)
     {
         if (mills > 0)
@@ -135,11 +135,11 @@ public class PanasonicCameraConnectSequence implements Runnable, PanasonicSsdpCl
             }
         }
     }
+*/
 
     @Override
     public void onErrorFinished(String reason)
     {
         cameraConnection.alertConnectingFailed(reason);
     }
-
 }

@@ -279,7 +279,7 @@ public class PanasonicCameraApiListFragment extends ListFragment implements Send
                     @Override
                     public void run()
                     {
-                        SendRequestDialog dialog = SendRequestDialog.newInstance(interfaceProvider.getPanasonicInterface().getCameraApi(), apiName, apiCallback);
+                        SendRequestDialog dialog = SendRequestDialog.newInstance(interfaceProvider.getPanasonicInterface().getPanasonicCamera(), apiName, apiCallback);
                         FragmentManager manager = getFragmentManager();
                         String tag = "dialog";
                         if (manager != null)

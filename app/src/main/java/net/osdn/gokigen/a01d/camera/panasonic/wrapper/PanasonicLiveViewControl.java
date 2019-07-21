@@ -1,30 +1,37 @@
 package net.osdn.gokigen.a01d.camera.panasonic.wrapper;
 
-
 import android.util.Log;
 
 import net.osdn.gokigen.a01d.camera.ILiveViewControl;
-import net.osdn.gokigen.a01d.camera.utils.SimpleLiveviewSlicer;
+import net.osdn.gokigen.a01d.camera.utils.SimpleHttpClient;
 import net.osdn.gokigen.a01d.liveview.liveviewlistener.ILiveViewListener;
 import net.osdn.gokigen.a01d.liveview.liveviewlistener.CameraLiveViewListenerImpl;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
-
 import androidx.annotation.NonNull;
+
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.util.Arrays;
 
 public class PanasonicLiveViewControl implements ILiveViewControl
 {
     private final String TAG = toString();
-    private final IPanasonicCameraApi cameraApi;
+    private final IPanasonicCamera camera;
     //private final BlockingQueue<byte[]> mJpegQueue = new ArrayBlockingQueue<>(2);
     private final CameraLiveViewListenerImpl liveViewListener;
-    private boolean whileFetching = false;
-    private static final int FETCH_ERROR_MAX = 30;
+    private DatagramSocket receiveSocket = null;
+    private boolean whileStreamReceive = false;
+    private int errorOccur = 0;
+    private static final int ERROR_MAX = 30;
+    private static final int RECEIVE_BUFFER_SIZE = 1024 * 1024 * 4;
+    private static final int TIMEOUT_MS = 3000;
+    private static final int LIVEVIEW_PORT = 49152;
+    private final String LIVEVIEW_START_REQUEST = "cam.cgi?mode=startstream&value=49152";
+    private final String LIVEVIEW_STOP_REQUEST = "cam.cgi?mode=stopstream";
 
-    PanasonicLiveViewControl(@NonNull IPanasonicCameraApi cameraApi)
+    PanasonicLiveViewControl(@NonNull IPanasonicCamera camera)
     {
-        this.cameraApi = cameraApi;
+        this.camera = camera;
         liveViewListener = new CameraLiveViewListenerImpl();
     }
 
@@ -47,24 +54,42 @@ public class PanasonicLiveViewControl implements ILiveViewControl
                 {
                     try
                     {
-                        JSONObject replyJson;
-                        replyJson = cameraApi.startLiveview();
-                        if (!PanasonicCameraApi.isErrorReply(replyJson))
+                        startReceiveStream();
+                        if (!whileStreamReceive)
+                        {
+                            Log.v(TAG, "CANNOT OPEN : UDP RECEIVE SOCKET");
+                            return;
+                        }
+                        String requestUrl = camera.getCmdUrl() + LIVEVIEW_START_REQUEST;
+                        String reply = SimpleHttpClient.httpGet(requestUrl, TIMEOUT_MS);
+                        if (!reply.contains("<result>ok</result>"))
                         {
                             try
                             {
-                                JSONArray resultsObj = replyJson.getJSONArray("result");
-                                if (1 <= resultsObj.length())
+                                // エラー回数のカウントアップ
+                                errorOccur++;
+
+                                // 少し待つ...
+                                Thread.sleep(TIMEOUT_MS);
+
+                                if (errorOccur < ERROR_MAX)
                                 {
-                                    // Obtain liveview URL from the result.
-                                    final String liveviewUrl = resultsObj.getString(0);
-                                    start(liveviewUrl);
+                                    Log.v(TAG, "RETRY START LIVEVIEW... : " + errorOccur);
+                                    startLiveView();
+                                }
+                                else
+                                {
+                                    Log.v(TAG, "RETRY OVER : START LIVEVIEW");
                                 }
                             }
                             catch (Exception e)
                             {
                                 e.printStackTrace();
                             }
+                        }
+                        else
+                        {
+                            Log.v(TAG, "   ----- START LIVEVIEW ----- : " + requestUrl);
                         }
                     }
                     catch (Exception e)
@@ -94,10 +119,16 @@ public class PanasonicLiveViewControl implements ILiveViewControl
                 {
                     try
                     {
-                        JSONObject resultsObj = cameraApi.stopLiveview();
-                        if (resultsObj == null)
+                        String reply = SimpleHttpClient.httpGet(camera.getCmdUrl() + LIVEVIEW_STOP_REQUEST, TIMEOUT_MS);
+                        if (!reply.contains("<result>ok</result>"))
                         {
-                            Log.v(TAG, "stopLiveview() reply is null.");
+                            Log.v(TAG, "stopLiveview() reply is fail... ");
+                        }
+                        else
+                        {
+                            //  ライブビューウォッチャーを止める
+                            whileStreamReceive = false;
+                            Log.v(TAG, "stopLiveview() is issued.");
                         }
                     }
                     catch (Exception e)
@@ -138,100 +169,124 @@ public class PanasonicLiveViewControl implements ILiveViewControl
         return (1.0f);
     }
 
-
-
-    public boolean start(final String streamUrl)
+    private void startReceiveStream()
     {
-        if (streamUrl == null)
+        if (whileStreamReceive)
         {
-            Log.e(TAG, "start() streamUrl is null.");
-            return (false);
+            Log.v(TAG, "startReceiveStream() : already starting.");
+            return;
         }
-        if (whileFetching)
-        {
-            Log.v(TAG, "start() already starting.");
-        }
-        whileFetching = true;
 
-        // A thread for retrieving liveview data from server.
+        // ソケットをあける (UDP)
         try
         {
-            Thread thread = new Thread(new Runnable()
-            {
-                @Override
-                public void run()
-                {
-                    Log.d(TAG, "Starting retrieving streaming data from server.");
-                    SimpleLiveviewSlicer slicer = null;
-                    int continuousNullDataReceived = 0;
-                    try
-                    {
-                        // Create Slicer to open the stream and parse it.
-                        slicer = new SimpleLiveviewSlicer();
-                        slicer.open(streamUrl);
+            receiveSocket = new DatagramSocket(LIVEVIEW_PORT);
+            whileStreamReceive = true;
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            whileStreamReceive = false;
+            receiveSocket = null;
+        }
 
-                        while (whileFetching)
-                        {
-                            final SimpleLiveviewSlicer.Payload payload = slicer.nextPayload();
-                            if (payload == null)
-                            {
-                                //Log.v(TAG, "Liveview Payload is null.");
-                                continuousNullDataReceived++;
-                                if (continuousNullDataReceived > FETCH_ERROR_MAX)
-                                {
-                                    Log.d(TAG, " FETCH ERROR MAX OVER ");
-                                    break;
-                                }
-                                continue;
-                            }
-                            //if (mJpegQueue.size() == 2)
-                            //{
-                            //    mJpegQueue.remove();
-                            //}
-                            //mJpegQueue.add(payload.getJpegData());
-                            liveViewListener.onUpdateLiveView(payload.getJpegData(), null);
-                            continuousNullDataReceived = 0;
-                        }
-                    }
-                    catch (Exception e)
-                    {
-                        e.printStackTrace();
-                    }
-                    finally
-                    {
-                        try
-                        {
-                            if (slicer != null)
-                            {
-                                slicer.close();
-                            }
-                        }
-                        catch (Exception e)
-                        {
-                            e.printStackTrace();
-                        }
-                        //mJpegQueue.clear();
-                        if ((!whileFetching)&&(continuousNullDataReceived > FETCH_ERROR_MAX))
-                        {
-                            // 再度ライブビューのスタートをやってみる。
-                            whileFetching = false;
-                            //continuousNullDataReceived = 0;
-                            start(streamUrl);
-                        }
-                    }
-                }
-            });
+        // 受信スレッドを動かす
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                receiverThread();
+            }
+        });
+        try
+        {
             thread.start();
         }
         catch (Exception e)
         {
             e.printStackTrace();
         }
-        return (true);
+    }
+
+    private void checkReceiveImage(@NonNull DatagramPacket packet)
+    {
+        int dataLength = packet.getLength();
+        int searchIndex = 0;
+        int startPosition = 0;
+        int[] startmarker = { 0xff, 0xd8 };
+        byte[] receivedData = packet.getData();
+        if (receivedData == null)
+        {
+            // 受信データが取れなかったので終了する
+            Log.v(TAG, "RECEIVED DATA IS NULL...");
+            return;
+        }
+        //Log.v(TAG, "RECEIVED PACKET : " + dataLength);
+        while (startPosition < dataLength)
+        {
+            // 先頭のjpegマーカーが出てくるまで読み飛ばす
+            try
+            {
+                if (receivedData[startPosition++] == (byte) startmarker[searchIndex])
+                {
+                    searchIndex++;
+                    if (searchIndex >= startmarker.length)
+                    {
+                        break;
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+                return;
+            }
+        }
+        int offset = startPosition - startmarker.length;
+        liveViewListener.onUpdateLiveView(Arrays.copyOfRange(receivedData, offset, dataLength - offset), null);
+    }
+
+    private void receiverThread()
+    {
+        byte[] buffer = new byte[RECEIVE_BUFFER_SIZE];
+        while (whileStreamReceive)
+        {
+            try
+            {
+                DatagramPacket receive_packet = new DatagramPacket(buffer, buffer.length);
+                if (receiveSocket != null)
+                {
+                    receiveSocket.receive(receive_packet);
+                    checkReceiveImage(receive_packet);
+                }
+                else
+                {
+                    Log.v(TAG, "receiveSocket is NULL...");
+                }
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+        }
+        try
+        {
+            if (receiveSocket != null)
+            {
+                receiveSocket.close();
+                receiveSocket = null;
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        Log.v(TAG, "  ----- startReceiveStream() : Finished.");
+        System.gc();
     }
 
     public ILiveViewListener getLiveViewListener()
     {
         return (liveViewListener);
     }
+
 }

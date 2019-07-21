@@ -2,20 +2,20 @@ package net.osdn.gokigen.a01d.camera.panasonic.operation.takepicture;
 
 import android.util.Log;
 
-import net.osdn.gokigen.a01d.camera.panasonic.wrapper.IPanasonicCameraApi;
+import net.osdn.gokigen.a01d.camera.panasonic.wrapper.IPanasonicCamera;
+import net.osdn.gokigen.a01d.camera.utils.SimpleHttpClient;
 import net.osdn.gokigen.a01d.liveview.IAutoFocusFrameDisplay;
 import net.osdn.gokigen.a01d.liveview.IIndicatorControl;
-
-import org.json.JSONObject;
 
 import androidx.annotation.NonNull;
 
 public class SingleShotControl
 {
     private static final String TAG = SingleShotControl.class.getSimpleName();
+    private static final int TIMEOUT_MS = 3000;
     private final IAutoFocusFrameDisplay frameDisplayer;
     private final IIndicatorControl indicator;
-    private IPanasonicCameraApi cameraApi = null;
+    private IPanasonicCamera camera = null;
 
     /**
      *
@@ -31,9 +31,9 @@ public class SingleShotControl
      *
      *
      */
-    public void setCameraApi(@NonNull IPanasonicCameraApi panasonicCameraApi)
+    public void setCamera(@NonNull IPanasonicCamera panasonicCamera)
     {
-        this.cameraApi = panasonicCameraApi;
+        this.camera = panasonicCamera;
     }
 
     /**
@@ -43,9 +43,9 @@ public class SingleShotControl
     public void singleShot()
     {
         Log.v(TAG, "singleShot()");
-        if (cameraApi == null)
+        if (camera == null)
         {
-            Log.v(TAG, "ISonyCameraApi is null...");
+            Log.v(TAG, "IPanasonicCamera is null...");
             return;
         }
         try
@@ -57,11 +57,10 @@ public class SingleShotControl
                 {
                     try
                     {
-                        //JSONObject resultsObj = cameraApi.awaitTakePicture();
-                        JSONObject resultsObj = cameraApi.actTakePicture();
-                        if (resultsObj == null)
+                        String reply = SimpleHttpClient.httpGet(camera.getCmdUrl() + "cam.cgi?mode=camcmd&value=capture", TIMEOUT_MS);
+                        if (!reply.contains("ok"))
                         {
-                            Log.v(TAG, "setTouchAFPosition() reply is null.");
+                            Log.v(TAG, "Capture Failure... : " + reply);
                         }
                     }
                     catch (Exception e)

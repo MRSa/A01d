@@ -21,6 +21,7 @@ import net.osdn.gokigen.a01d.camera.panasonic.wrapper.connection.PanasonicCamera
 import net.osdn.gokigen.a01d.camera.panasonic.wrapper.eventlistener.CameraEventObserver;
 import net.osdn.gokigen.a01d.camera.panasonic.wrapper.eventlistener.ICameraEventObserver;
 import net.osdn.gokigen.a01d.camera.panasonic.wrapper.eventlistener.ICameraStatusHolder;
+import net.osdn.gokigen.a01d.camera.utils.SimpleHttpClient;
 import net.osdn.gokigen.a01d.liveview.IAutoFocusFrameDisplay;
 import net.osdn.gokigen.a01d.liveview.IIndicatorControl;
 import net.osdn.gokigen.a01d.liveview.liveviewlistener.ILiveViewListener;
@@ -36,6 +37,7 @@ public class PanasonicCameraWrapper implements IPanasonicCameraHolder, IPanasoni
 {
     private final String TAG = toString();
     private final Activity context;
+    private static final int TIMEOUT_MS = 3000;
     private final ICameraStatusReceiver provider;
     private final ICameraChangeListener listener;
     private IPanasonicCamera panasonicCamera = null;
@@ -61,11 +63,11 @@ public class PanasonicCameraWrapper implements IPanasonicCameraHolder, IPanasoni
         {
             this.panasonicCameraApi = PanasonicCameraApi.newInstance(panasonicCamera);
             eventObserver = CameraEventObserver.newInstance(context, panasonicCameraApi);
-            liveViewControl = new PanasonicLiveViewControl(panasonicCameraApi);
+            liveViewControl = new PanasonicLiveViewControl(panasonicCamera);
 
             focusControl.setCameraApi(panasonicCameraApi);
-            captureControl.setCameraApi(panasonicCameraApi);
-            zoomControl.setCameraApi(panasonicCameraApi);
+            captureControl.setCamera(panasonicCamera);
+            zoomControl.setCamera(panasonicCamera);
         }
         catch (Exception e)
         {
@@ -76,22 +78,19 @@ public class PanasonicCameraWrapper implements IPanasonicCameraHolder, IPanasoni
     @Override
     public void startRecMode()
     {
-        try {
-            List<String> apiCommands = getApiCommands();
-            int index = apiCommands.indexOf("startRecMode");
-            if (index > 0)
+        try
+        {
+            // 撮影モード(RecMode)に切り替え
+            String reply = SimpleHttpClient.httpGet(this.panasonicCamera.getCmdUrl() + "cam.cgi?mode=camcmd&value=recmode", TIMEOUT_MS);
+            if (!reply.contains("ok"))
             {
-                // startRecMode発行
-                Log.v(TAG, "----- THIS CAMERA NEEDS COMMAND 'startRecMode'.");
-                panasonicCameraApi.startRecMode();
+                Log.v(TAG, "CAMERA REPLIED ERROR : CHANGE RECMODE.");
             }
         }
         catch (Exception e)
         {
             e.printStackTrace();
         }
-
-
     }
 
     @Override
@@ -169,30 +168,6 @@ public class PanasonicCameraWrapper implements IPanasonicCameraHolder, IPanasoni
     public IDisplayInjector getDisplayInjector()
     {
         return (this);
-    }
-
-    @Override
-    public List<String> getApiCommands()
-    {
-        List<String> availableApis = new ArrayList<>();
-        try
-        {
-            String apiList = panasonicCameraApi.getAvailableApiList().getString("result");
-            apiList = apiList.replace("[","").replace("]", "").replace("\"","");
-            String[] apiListSplit = apiList.split(",");
-            availableApis = Arrays.asList(apiListSplit);
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-        return (availableApis);
-    }
-
-    @Override
-    public IPanasonicCameraApi getCameraApi()
-    {
-        return (panasonicCameraApi);
     }
 
     @Override

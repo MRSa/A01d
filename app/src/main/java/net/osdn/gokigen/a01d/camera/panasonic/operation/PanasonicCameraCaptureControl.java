@@ -3,7 +3,7 @@ package net.osdn.gokigen.a01d.camera.panasonic.operation;
 import android.util.Log;
 
 import net.osdn.gokigen.a01d.camera.ICaptureControl;
-import net.osdn.gokigen.a01d.camera.panasonic.wrapper.IPanasonicCameraApi;
+import net.osdn.gokigen.a01d.camera.panasonic.wrapper.IPanasonicCamera;
 import net.osdn.gokigen.a01d.camera.panasonic.operation.takepicture.SingleShotControl;
 import net.osdn.gokigen.a01d.liveview.IAutoFocusFrameDisplay;
 import net.osdn.gokigen.a01d.liveview.IIndicatorControl;
@@ -20,9 +20,9 @@ public class PanasonicCameraCaptureControl implements ICaptureControl
         singleShotControl = new SingleShotControl(frameDisplayer, indicator);
     }
 
-    public void setCameraApi(@NonNull IPanasonicCameraApi panasonicCameraApi)
+    public void setCamera(@NonNull IPanasonicCamera panasonicCamera)
     {
-        singleShotControl.setCameraApi(panasonicCameraApi);
+        singleShotControl.setCamera(panasonicCamera);
     }
 
     /**

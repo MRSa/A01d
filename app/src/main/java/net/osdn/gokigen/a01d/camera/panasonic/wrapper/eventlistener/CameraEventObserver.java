@@ -55,7 +55,7 @@ public class CameraEventObserver implements ICameraEventObserver
             return (false);
         }
 
-        isEventMonitoring = true;
+        isEventMonitoring = false;
         try
         {
             Thread thread = new Thread()

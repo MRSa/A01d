@@ -3,26 +3,26 @@ package net.osdn.gokigen.a01d.camera.panasonic.operation;
 import android.util.Log;
 
 import net.osdn.gokigen.a01d.camera.IZoomLensControl;
-import net.osdn.gokigen.a01d.camera.panasonic.wrapper.IPanasonicCameraApi;
-import net.osdn.gokigen.a01d.camera.sony.wrapper.ISonyCameraApi;
-
-import org.json.JSONObject;
+import net.osdn.gokigen.a01d.camera.panasonic.wrapper.IPanasonicCamera;
+import net.osdn.gokigen.a01d.camera.utils.SimpleHttpClient;
 
 import androidx.annotation.NonNull;
 
 public class PanasonicCameraZoomLensControl implements IZoomLensControl
 {
     private final String TAG = toString();
-    private IPanasonicCameraApi cameraApi = null;
+    private IPanasonicCamera camera = null;
+    private boolean isZooming = false;
+    private static final int TIMEOUT_MS = 3000;
 
     public PanasonicCameraZoomLensControl()
     {
-        Log.v(TAG, "SonyCameraZoomLensControl()");
+        Log.v(TAG, "PanasonicCameraZoomLensControl()");
     }
 
-    public void setCameraApi(@NonNull IPanasonicCameraApi panasonicCameraApi)
+    public void setCamera(@NonNull IPanasonicCamera panasonicCamera)
     {
-        cameraApi = panasonicCameraApi;
+        camera = panasonicCamera;
     }
 
     @Override
@@ -74,7 +74,7 @@ public class PanasonicCameraZoomLensControl implements IZoomLensControl
     public boolean isDrivingZoomLens()
     {
         Log.v(TAG, "isDrivingZoomLens()");
-        return (false);
+        return (isZooming);
     }
 
     /**
@@ -85,15 +85,23 @@ public class PanasonicCameraZoomLensControl implements IZoomLensControl
     public void driveZoomLens(boolean isZoomIn)
     {
         Log.v(TAG, "driveZoomLens() : " + isZoomIn);
-        if (cameraApi == null)
+        if (camera == null)
         {
             Log.v(TAG, "IPanasonicCameraApi is null...");
             return;
         }
         try
         {
-            final String direction = (isZoomIn) ? "in" : "out";
-            final String movement = "1shot";
+            String command;
+            if (isZooming)
+            {
+                command = "cam.cgi?mode=camcmd&value=zoomstop";
+            }
+            else
+            {
+                command = (isZoomIn) ? "cam.cgi?mode=camcmd&value=tele-normal" : "cam.cgi?mode=camcmd&value=wide-normal";
+            }
+            final String direction = command;
             Thread thread = new Thread(new Runnable()
             {
                 @Override
@@ -101,10 +109,14 @@ public class PanasonicCameraZoomLensControl implements IZoomLensControl
                 {
                     try
                     {
-                        JSONObject resultsObj = cameraApi.actZoom(direction, movement);
-                        if (resultsObj == null)
+                        String reply = SimpleHttpClient.httpGet(camera.getCmdUrl() + direction, TIMEOUT_MS);
+                        if (reply.contains("ok"))
                         {
-                            Log.v(TAG, "driveZoomLens() reply is null.");
+                            isZooming = !isZooming;
+                        }
+                        else
+                        {
+                            Log.v(TAG, "driveZoomLens() reply is failure.");
                         }
                     }
                     catch (Exception e)
