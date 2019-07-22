@@ -587,10 +587,13 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer, IFo
         super.onPause();
         Log.v(TAG, "onPause() Start");
 
-        // ライブビューの停止
         try
         {
-            liveViewControl.stopLiveView();
+            // ライブビューの停止
+            if (liveViewControl != null)
+            {
+                liveViewControl.stopLiveView();
+            }
         }
         catch (Exception e)
         {

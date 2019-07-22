@@ -123,14 +123,15 @@ public class PanasonicLiveViewControl implements ILiveViewControl
                         String reply = SimpleHttpClient.httpGet(camera.getCmdUrl() + LIVEVIEW_STOP_REQUEST, TIMEOUT_MS);
                         if (!reply.contains("<result>ok</result>"))
                         {
-                            Log.v(TAG, "stopLiveview() reply is fail... ");
+                            Log.v(TAG, "stopLiveview() reply is fail... " + reply);
                         }
                         else
                         {
-                            //  ライブビューウォッチャーを止める
-                            whileStreamReceive = false;
                             Log.v(TAG, "stopLiveview() is issued.");
                         }
+                        //  ライブビューウォッチャーを止める
+                        whileStreamReceive = false;
+                        closeReceiveSocket();
                     }
                     catch (Exception e)
                     {
@@ -291,10 +292,24 @@ public class PanasonicLiveViewControl implements ILiveViewControl
                 }
             }
         }
+        closeReceiveSocket();
+        Log.v(TAG, "  ----- startReceiveStream() : Finished.");
+        System.gc();
+    }
+
+    public ILiveViewListener getLiveViewListener()
+    {
+        return (liveViewListener);
+    }
+
+    private void closeReceiveSocket()
+    {
+        Log.v(TAG, "closeReceiveSocket()");
         try
         {
             if (receiveSocket != null)
             {
+                Log.v(TAG, "  ----- SOCKET CLOSE -----  ");
                 receiveSocket.close();
                 receiveSocket = null;
             }
@@ -303,12 +318,5 @@ public class PanasonicLiveViewControl implements ILiveViewControl
         {
             e.printStackTrace();
         }
-        Log.v(TAG, "  ----- startReceiveStream() : Finished.");
-        System.gc();
-    }
-
-    public ILiveViewListener getLiveViewListener()
-    {
-        return (liveViewListener);
     }
 }

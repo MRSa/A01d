@@ -43,6 +43,7 @@ public class PanasonicCameraWrapper implements IPanasonicCameraHolder, IPanasoni
     private PanasonicCameraFocusControl focusControl = null;
     private PanasonicCameraCaptureControl captureControl = null;
     private PanasonicCameraZoomLensControl zoomControl = null;
+    private PanasonicCameraConnection cameraConnection = null;
 
     public PanasonicCameraWrapper(final Activity context, final ICameraStatusReceiver statusReceiver , final @NonNull ICameraChangeListener listener)
     {
@@ -58,9 +59,14 @@ public class PanasonicCameraWrapper implements IPanasonicCameraHolder, IPanasoni
         try
         {
             //this.panasonicCameraApi = PanasonicCameraApi.newInstance(panasonicCamera);
-            eventObserver = CameraEventObserver.newInstance(context, panasonicCamera);
-            liveViewControl = new PanasonicLiveViewControl(panasonicCamera);
-
+            if (eventObserver == null)
+            {
+                eventObserver = CameraEventObserver.newInstance(context, panasonicCamera);
+            }
+            if (liveViewControl == null)
+            {
+                liveViewControl = new PanasonicLiveViewControl(panasonicCamera);
+            }
             focusControl.setCamera(panasonicCamera);
             captureControl.setCamera(panasonicCamera);
             zoomControl.setCamera(panasonicCamera);
@@ -110,10 +116,14 @@ public class PanasonicCameraWrapper implements IPanasonicCameraHolder, IPanasoni
                 eventObserver.activate();
                 eventObserver.start();
                 ICameraStatusHolder holder = eventObserver.getCameraStatusHolder();
-                holder.getLiveviewStatus();
+                if (holder != null)
+                {
+                    holder.getLiveviewStatus();
+                }
             }
         }
-        catch (Exception e) {
+        catch (Exception e)
+        {
             e.printStackTrace();
         }
     }
@@ -128,7 +138,12 @@ public class PanasonicCameraWrapper implements IPanasonicCameraHolder, IPanasoni
     @Override
     public ICameraConnection getPanasonicCameraConnection()
     {
-        return (new PanasonicCameraConnection(context, provider, this, listener));
+        // PanasonicCameraConnectionは複数生成しない。
+        if (cameraConnection == null)
+        {
+            cameraConnection = new PanasonicCameraConnection(context, provider, this, listener);
+        }
+        return (cameraConnection);
     }
 
     @Override
