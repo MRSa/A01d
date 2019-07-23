@@ -15,6 +15,7 @@ package net.osdn.gokigen.a01d;
         import net.osdn.gokigen.a01d.camera.ICameraStatusReceiver;
         import net.osdn.gokigen.a01d.camera.ICameraConnection;
         import net.osdn.gokigen.a01d.camera.olympus.wrapper.connection.ble.ICameraPowerOn;
+        import net.osdn.gokigen.a01d.camera.panasonic.operation.PanasonicSendCommandDialog;
         import net.osdn.gokigen.a01d.camera.sony.cameraproperty.SonyCameraApiListFragment;
         import net.osdn.gokigen.a01d.liveview.IStatusViewDrawer;
         import net.osdn.gokigen.a01d.liveview.LiveViewFragment;
@@ -230,8 +231,15 @@ public class A01dMain extends AppCompatActivity implements ICameraStatusReceiver
             }
             else if (method == ICameraConnection.CameraConnectionMethod.PANASONIC)
             {
-                // OPCカメラでない場合には、「OPCカメラのみ有効です」表示をして画面遷移させない
-                Toast.makeText(getApplicationContext(), getText(R.string.only_opc_feature), Toast.LENGTH_SHORT).show();
+                try
+                {
+                    // Panasonicの場合は、コマンド送信ダイアログを表示する
+                    PanasonicSendCommandDialog.newInstance(interfaceProvider.getPanasonicInterface().getSendCommandCallback()).show(getSupportFragmentManager(), "panasonicSendCommandDialog");
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
             }
             else if (method == ICameraConnection.CameraConnectionMethod.FUJI_X)
             {

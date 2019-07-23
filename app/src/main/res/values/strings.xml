@@ -174,6 +174,9 @@
     <string name="dialog_send_message">Send</string>
     <string name="dialog_button_liveview">to LiveView</string>
     <string name="dialog_button_playback">to Playback</string>
+    <string name="dialog_command_hint">(command)</string>
+    <string name="dialog_service_hint">(service)</string>
+    <string name="panasonic_service_string">cam.cgi</string>
 
 </resources>
 

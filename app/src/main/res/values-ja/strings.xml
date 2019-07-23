@@ -170,5 +170,8 @@
     <string name="dialog_send_message">送信</string>
     <string name="dialog_button_liveview">ライブビュー</string>
     <string name="dialog_button_playback">画像参照</string>
+    <string name="dialog_command_hint">(command)</string>
+    <string name="dialog_service_hint">(service)</string>
+    <string name="panasonic_service_string">cam.cgi</string>
 
 </resources>

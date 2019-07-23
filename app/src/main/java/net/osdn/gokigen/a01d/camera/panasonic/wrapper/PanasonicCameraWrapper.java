@@ -17,6 +17,7 @@ import net.osdn.gokigen.a01d.camera.panasonic.IPanasonicInterfaceProvider;
 import net.osdn.gokigen.a01d.camera.panasonic.operation.PanasonicCameraCaptureControl;
 import net.osdn.gokigen.a01d.camera.panasonic.operation.PanasonicCameraFocusControl;
 import net.osdn.gokigen.a01d.camera.panasonic.operation.PanasonicCameraZoomLensControl;
+import net.osdn.gokigen.a01d.camera.panasonic.operation.PanasonicSendCommandDialog;
 import net.osdn.gokigen.a01d.camera.panasonic.wrapper.connection.PanasonicCameraConnection;
 import net.osdn.gokigen.a01d.camera.panasonic.wrapper.eventlistener.CameraEventObserver;
 import net.osdn.gokigen.a01d.camera.panasonic.wrapper.eventlistener.ICameraEventObserver;
@@ -186,6 +187,12 @@ public class PanasonicCameraWrapper implements IPanasonicCameraHolder, IPanasoni
     public IDisplayInjector getDisplayInjector()
     {
         return (this);
+    }
+
+    @Override
+    public PanasonicSendCommandDialog.Callback getSendCommandCallback()
+    {
+        return (null);
     }
 
     @Override
