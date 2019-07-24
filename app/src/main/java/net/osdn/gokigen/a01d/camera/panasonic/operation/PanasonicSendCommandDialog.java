@@ -8,29 +8,37 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 
 import net.osdn.gokigen.a01d.R;
+import net.osdn.gokigen.a01d.camera.panasonic.wrapper.IPanasonicCamera;
+import net.osdn.gokigen.a01d.camera.utils.SimpleHttpClient;
 
-public class PanasonicSendCommandDialog  extends DialogFragment
+public class PanasonicSendCommandDialog  extends DialogFragment implements View.OnClickListener
 {
     private final String TAG = toString();
-    private PanasonicSendCommandDialog.Callback callback;
-    Dialog myDialog = null;
+    private IPanasonicCamera camera = null;
+    private Dialog myDialog = null;
+    private EditText service = null;
+    private EditText parameter = null;
+    private EditText command = null;
+    private TextView responseArea = null;
+    private static final int TIMEOUT_MS = 2000;
 
     /**
      *
      *
      */
-    public static PanasonicSendCommandDialog newInstance(@Nullable PanasonicSendCommandDialog.Callback callback)
+    public static PanasonicSendCommandDialog newInstance(@NonNull IPanasonicCamera camera)
     {
         PanasonicSendCommandDialog instance = new PanasonicSendCommandDialog();
-        instance.prepare(callback);
+        instance.prepare(camera);
 
         // パラメータはBundleにまとめておく
         Bundle arguments = new Bundle();
@@ -45,9 +53,10 @@ public class PanasonicSendCommandDialog  extends DialogFragment
      *
      *
      */
-    private void prepare(@Nullable PanasonicSendCommandDialog.Callback callback)
+    private void prepare(@NonNull IPanasonicCamera camera)
     {
-        this.callback = callback;
+        //
+        this.camera = camera;
     }
 
     @Override
@@ -55,9 +64,16 @@ public class PanasonicSendCommandDialog  extends DialogFragment
     {
         super.onPause();
         Log.v(TAG, "AlertDialog::onPause()");
-        if (myDialog != null)
+        try
         {
-            myDialog.cancel();
+            if (myDialog != null)
+            {
+                myDialog.cancel();
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
         }
     }
 
@@ -79,13 +95,14 @@ public class PanasonicSendCommandDialog  extends DialogFragment
         alertDialog.setView(alertView);
 
         alertDialog.setIcon(R.drawable.ic_linked_camera_black_24dp);
-        alertDialog.setTitle(activity.getString(R.string.dialog_fujix_command_title_command));
-        //final TextView titleName = alertView.findViewById(R.id.method_name);
-        final EditText service = alertView.findViewById(R.id.edit_service);
-        final EditText parameter = alertView.findViewById(R.id.edit_parameter);
-        final EditText command = alertView.findViewById(R.id.edit_command);
+        alertDialog.setTitle(activity.getString(R.string.dialog_panasonic_command_title_command));
+        service = alertView.findViewById(R.id.edit_service);
+        parameter = alertView.findViewById(R.id.edit_parameter);
+        command = alertView.findViewById(R.id.edit_command);
+        responseArea = alertView.findViewById(R.id.panasonic_command_response_value);
+        final Button sendButton = alertView.findViewById(R.id.send_message_button);
+        sendButton.setOnClickListener(this);
         alertDialog.setCancelable(true);
-
         try
         {
             if (service != null)
@@ -103,25 +120,6 @@ public class PanasonicSendCommandDialog  extends DialogFragment
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which)
                     {
-                        try
-                        {
-                            Activity activity = getActivity();
-                            if (activity != null)
-                            {
-                                if (callback != null)
-                                {
-                                    callback.sendPanasonicCommandRequest(service.getText().toString(), command.getText().toString(), parameter.getText().toString());
-                                }
-                            }
-                        }
-                        catch (Exception e)
-                        {
-                            e.printStackTrace();
-                            if (callback != null)
-                            {
-                                callback.cancelledPanasonicCommandRequest();
-                            }
-                        }
                         dialog.dismiss();
                     }
                 });
@@ -130,10 +128,6 @@ public class PanasonicSendCommandDialog  extends DialogFragment
         alertDialog.setNegativeButton(activity.getString(R.string.dialog_negative_cancel),
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
-                        if (callback != null)
-                        {
-                            callback.cancelledPanasonicCommandRequest();
-                        }
                         dialog.cancel();
                     }
                 });
@@ -143,13 +137,69 @@ public class PanasonicSendCommandDialog  extends DialogFragment
         return (myDialog);
     }
 
-    /**
-     * コールバックインタフェース
-     *
-     */
-    public interface Callback
+    @Override
+    public void onClick(View view)
     {
-        void sendPanasonicCommandRequest(String service, String command, String parameter); // OKを選択したとき
-        void cancelledPanasonicCommandRequest();   // キャンセルしたとき
+        try
+        {
+            String serviceStr = "";
+            String commandStr = "";
+            final Activity activity = getActivity();
+            if (activity != null)
+            {
+                if (service != null)
+                {
+                    serviceStr = service.getText().toString();
+                }
+                if (command != null)
+                {
+                    commandStr = command.getText().toString();
+                }
+                if (parameter != null)
+                {
+                    String parameterStr = parameter.getText().toString();
+                    if (parameterStr.length() > 0)
+                    {
+                        commandStr = commandStr + "&" + parameterStr;
+                    }
+                }
+                final String sendString = serviceStr + "?" + commandStr;
+
+                Thread thread = new Thread(new Runnable() {
+                    @Override
+                    public void run()
+                    {
+                        try
+                        {
+                            String url = camera.getCmdUrl() + sendString;
+                            final String response = SimpleHttpClient.httpGet(url, TIMEOUT_MS);
+                            Log.v(TAG, "URL : " + url + " RESPONSE : " + response);
+                            activity.runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    if (responseArea != null)
+                                    {
+                                        responseArea.setText(response);
+                                    }
+                                }
+                            });
+                        }
+                        catch (Exception e)
+                        {
+                            e.printStackTrace();
+                        }
+                    }
+                });
+                thread.start();
+            }
+            else
+            {
+                Log.v(TAG, "getActivity() Fail...");
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
     }
 }

@@ -163,7 +163,8 @@
     <string name="pref_use_pentax_autofocus_summary">Uses PENTAX DSLR control commands.</string>
 
 
-    <string name="dialog_fujix_command_title_command">Send Message</string>
+    <string name="dialog_panasonic_command_title_command">Send Message(Panasonic)</string>
+    <string name="dialog_fujix_command_title_command">Send Message(FUJI)</string>
     <string name="dialog_title_command">Command</string>
     <string name="dialog_command_id_hint">0x####</string>
     <string name="dialog_message_type_name">Message Type</string>

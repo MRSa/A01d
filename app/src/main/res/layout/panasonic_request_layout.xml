@@ -48,6 +48,32 @@
                 android:inputType="text"
                 android:hint="@string/dialog_parameter_hint"
                 />
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:tag="button"
+                android:id="@+id/send_message_button"
+                android:text="@string/dialog_send_message"
+                android:layout_gravity="center"
+                android:textSize="6pt" />
+
+            <View
+                android:layout_width="fill_parent"
+                android:layout_height="2dp"
+                android:background="@android:color/darker_gray"/>
+
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/panasonic_command_response_value"
+                android:text="@string/blank"
+                />
+
+            <View
+                android:layout_width="fill_parent"
+                android:layout_height="2dp"
+                android:background="@android:color/darker_gray"/>
         </LinearLayout>
     </ScrollView>
 </LinearLayout>

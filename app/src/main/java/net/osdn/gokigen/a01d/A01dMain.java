@@ -234,7 +234,7 @@ public class A01dMain extends AppCompatActivity implements ICameraStatusReceiver
                 try
                 {
                     // Panasonicの場合は、コマンド送信ダイアログを表示する
-                    PanasonicSendCommandDialog.newInstance(interfaceProvider.getPanasonicInterface().getSendCommandCallback()).show(getSupportFragmentManager(), "panasonicSendCommandDialog");
+                    PanasonicSendCommandDialog.newInstance(interfaceProvider.getPanasonicInterface().getPanasonicCamera()).show(getSupportFragmentManager(), "panasonicSendCommandDialog");
                 }
                 catch (Exception e)
                 {

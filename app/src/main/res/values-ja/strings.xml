@@ -159,7 +159,8 @@
     <string name="pref_use_pentax_autofocus_summary">PENTAX一眼カメラ用の命令を使って制御します。</string>
 
 
-    <string name="dialog_fujix_command_title_command">メッセージ送信</string>
+    <string name="dialog_panasonic_command_title_command">メッセージ送信(Panasonic)</string>
+    <string name="dialog_fujix_command_title_command">メッセージ送信(FUJI)</string>
     <string name="dialog_title_command">コマンド</string>
     <string name="dialog_command_id_hint">0x####</string>
     <string name="dialog_message_type_name">メッセージ種別</string>
