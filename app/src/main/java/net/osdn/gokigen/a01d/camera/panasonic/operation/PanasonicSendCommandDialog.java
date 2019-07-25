@@ -163,7 +163,19 @@ public class PanasonicSendCommandDialog  extends DialogFragment implements View.
                         commandStr = commandStr + "&" + parameterStr;
                     }
                 }
-                final String sendString = serviceStr + "?" + commandStr;
+                if (serviceStr.contains("pic"))
+                {
+                    serviceStr = camera.getPictureUrl() + serviceStr;
+                }
+                else if (serviceStr.contains("obj"))
+                {
+                    serviceStr = camera.getObjUrl() + serviceStr;
+                }
+                else
+                {
+                    serviceStr = camera.getCmdUrl() + serviceStr;
+                }
+                final String url = serviceStr + "?" + commandStr;
 
                 Thread thread = new Thread(new Runnable() {
                     @Override
@@ -171,7 +183,6 @@ public class PanasonicSendCommandDialog  extends DialogFragment implements View.
                     {
                         try
                         {
-                            String url = camera.getCmdUrl() + sendString;
                             final String response = SimpleHttpClient.httpGet(url, TIMEOUT_MS);
                             Log.v(TAG, "URL : " + url + " RESPONSE : " + response);
                             activity.runOnUiThread(new Runnable() {

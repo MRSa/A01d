@@ -244,7 +244,7 @@ public class PanasonicLiveViewControl implements ILiveViewControl
             }
         }
         int offset = startPosition - startmarker.length;
-        liveViewListener.onUpdateLiveView(Arrays.copyOfRange(receivedData, offset, dataLength - offset), null);
+        liveViewListener.onUpdateLiveView(Arrays.copyOfRange(receivedData, offset, dataLength - (offset + startmarker.length)), null);
     }
 
     private void receiverThread()
