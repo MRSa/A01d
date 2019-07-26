@@ -171,7 +171,7 @@ public class PanasonicPreferenceFragment  extends PreferenceFragmentCompat imple
         try
         {
             //super.onCreate(savedInstanceState);
-            addPreferencesFromResource(R.xml.preferences_sony);
+            addPreferencesFromResource(R.xml.preferences_panasonic);
 
             ListPreference connectionMethod = (ListPreference) findPreference(IPreferencePropertyAccessor.CONNECTION_METHOD);
             connectionMethod.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {

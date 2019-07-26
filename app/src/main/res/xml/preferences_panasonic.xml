@@ -20,11 +20,6 @@
     <PreferenceCategory
         android:title="@string/pref_cat_camera">
 
-        <PreferenceScreen
-            android:key="panasonic_api_list"
-            android:title="@string/pref_panasonic_api_list"
-            android:summary="@string/pref_summary_panasonic_api_list" />
-
         <CheckBoxPreference
             android:key="capture_both_camera_and_live_view"
             android:title="@string/pref_capture_both_camera_and_live_view" />

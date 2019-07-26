@@ -17,12 +17,15 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.DialogFragment;
 
 import net.osdn.gokigen.a01d.R;
+import net.osdn.gokigen.a01d.camera.ILiveViewControl;
+import net.osdn.gokigen.a01d.camera.panasonic.IPanasonicInterfaceProvider;
 import net.osdn.gokigen.a01d.camera.panasonic.wrapper.IPanasonicCamera;
 import net.osdn.gokigen.a01d.camera.utils.SimpleHttpClient;
 
 public class PanasonicSendCommandDialog  extends DialogFragment implements View.OnClickListener
 {
     private final String TAG = toString();
+    private IPanasonicInterfaceProvider interfaceProvider = null;
     private IPanasonicCamera camera = null;
     private Dialog myDialog = null;
     private EditText service = null;
@@ -35,10 +38,10 @@ public class PanasonicSendCommandDialog  extends DialogFragment implements View.
      *
      *
      */
-    public static PanasonicSendCommandDialog newInstance(@NonNull IPanasonicCamera camera)
+    public static PanasonicSendCommandDialog newInstance(@NonNull IPanasonicInterfaceProvider interfaceProvider)
     {
         PanasonicSendCommandDialog instance = new PanasonicSendCommandDialog();
-        instance.prepare(camera);
+        instance.prepare(interfaceProvider);
 
         // パラメータはBundleにまとめておく
         Bundle arguments = new Bundle();
@@ -53,10 +56,11 @@ public class PanasonicSendCommandDialog  extends DialogFragment implements View.
      *
      *
      */
-    private void prepare(@NonNull IPanasonicCamera camera)
+    private void prepare(@NonNull IPanasonicInterfaceProvider interfaceProvider)
     {
         //
-        this.camera = camera;
+        this.interfaceProvider = interfaceProvider;
+        this.camera = interfaceProvider.getPanasonicCamera();
     }
 
     @Override
@@ -101,6 +105,11 @@ public class PanasonicSendCommandDialog  extends DialogFragment implements View.
         command = alertView.findViewById(R.id.edit_command);
         responseArea = alertView.findViewById(R.id.panasonic_command_response_value);
         final Button sendButton = alertView.findViewById(R.id.send_message_button);
+        final Button toRunningButton = alertView.findViewById(R.id.change_to_liveview);
+        final Button toPlaybackButton = alertView.findViewById(R.id.change_to_playback);
+
+        toRunningButton.setOnClickListener(this);
+        toPlaybackButton.setOnClickListener(this);
         sendButton.setOnClickListener(this);
         alertDialog.setCancelable(true);
         try
@@ -137,13 +146,48 @@ public class PanasonicSendCommandDialog  extends DialogFragment implements View.
         return (myDialog);
     }
 
+    private void changeRunMode(boolean isStartLiveView)
+    {
+        // ライブビューの停止と開始
+        Log.v(TAG, "changeRunMode() : " + isStartLiveView);
+        ILiveViewControl liveViewControl = interfaceProvider.getPanasonicLiveViewControl();
+        try
+        {
+            if (isStartLiveView)
+            {
+                liveViewControl.startLiveView();
+            }
+            else
+            {
+                liveViewControl.stopLiveView();
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+
     @Override
     public void onClick(View view)
     {
+        if (view.getId() == R.id.change_to_liveview)
+        {
+            changeRunMode(true);
+            return;
+        }
+        if (view.getId() == R.id.change_to_playback)
+        {
+            changeRunMode(false);
+            return;
+        }
+
+
         try
         {
             String serviceStr = "";
             String commandStr = "";
+            String parameterStr = "";
             final Activity activity = getActivity();
             if (activity != null)
             {
@@ -155,27 +199,29 @@ public class PanasonicSendCommandDialog  extends DialogFragment implements View.
                 {
                     commandStr = command.getText().toString();
                 }
+                final boolean isPost = (serviceStr.contains("post"));
                 if (parameter != null)
                 {
-                    String parameterStr = parameter.getText().toString();
-                    if (parameterStr.length() > 0)
+                    parameterStr = parameter.getText().toString();
+                    if ((!isPost)&&(parameterStr.length() > 0))
                     {
                         commandStr = commandStr + "&" + parameterStr;
                     }
                 }
                 if (serviceStr.contains("pic"))
                 {
-                    serviceStr = camera.getPictureUrl() + serviceStr;
+                    serviceStr = camera.getPictureUrl() + commandStr;
                 }
                 else if (serviceStr.contains("obj"))
                 {
-                    serviceStr = camera.getObjUrl() + serviceStr;
+                    serviceStr = camera.getObjUrl() + commandStr;
                 }
                 else
                 {
-                    serviceStr = camera.getCmdUrl() + serviceStr;
+                    serviceStr = camera.getCmdUrl() + serviceStr + "?" + commandStr;
                 }
-                final String url = serviceStr + "?" + commandStr;
+                final String url = serviceStr;
+                final String param = parameterStr;
 
                 Thread thread = new Thread(new Runnable() {
                     @Override
@@ -183,8 +229,17 @@ public class PanasonicSendCommandDialog  extends DialogFragment implements View.
                     {
                         try
                         {
-                            final String response = SimpleHttpClient.httpGet(url, TIMEOUT_MS);
-                            Log.v(TAG, "URL : " + url + " RESPONSE : " + response);
+                            String reply;
+                            if (isPost)
+                            {
+                                reply = SimpleHttpClient.httpPost(url, param, TIMEOUT_MS);
+                            }
+                            else
+                            {
+                                reply = SimpleHttpClient.httpGet(url, TIMEOUT_MS);
+                            }
+                            Log.v(TAG, "URL : " + url + " RESPONSE : " + reply);
+                            final String response = reply;
                             activity.runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
