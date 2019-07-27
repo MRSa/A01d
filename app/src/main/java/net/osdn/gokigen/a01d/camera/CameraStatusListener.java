@@ -63,7 +63,18 @@ public class CameraStatusListener extends CameraChangeListerTemplate implements 
     @Override
     public void updateCameraStatus(String message)
     {
-
+        //Log.v(TAG, "updateCameraStatus() : " + message);
+        try
+        {
+            if (updateReceiver != null)
+            {
+                updateReceiver.updateCameraStatus(message);
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
     }
 
     @Override

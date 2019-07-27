@@ -822,7 +822,14 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer, IFo
     @Override
     public void updateCameraStatus(String message)
     {
-        Log.v(TAG, "updateCameraStatus() : " + message);
+        try
+        {
+            updateStatusView(message);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
     }
 
     @Override

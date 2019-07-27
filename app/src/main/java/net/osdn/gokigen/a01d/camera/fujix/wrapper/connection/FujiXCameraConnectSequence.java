@@ -94,6 +94,18 @@ public class FujiXCameraConnectSequence implements Runnable, IFujiXCommandCallba
     }
 
     @Override
+    public void onReceiveProgress(int currentBytes, int totalBytes, byte[] body)
+    {
+        Log.v(TAG, " " + currentBytes + "/" + totalBytes);
+    }
+
+    @Override
+    public boolean isReceiveMulti()
+    {
+        return (false);
+    }
+
+    @Override
     public void receivedMessage(int id, byte[] rx_body)
     {
         //Log.v(TAG, "receivedMessage : " + id + "[" + rx_body.length + " bytes]");
@@ -101,6 +113,7 @@ public class FujiXCameraConnectSequence implements Runnable, IFujiXCommandCallba
         switch (id)
         {
             case SEQ_REGISTRATION:
+                cameraStatusReceiver.onStatusNotify(context.getString(R.string.connect_connecting));
                 if (checkRegistrationMessage(rx_body))
                 {
                     commandIssuer.enqueueCommand(new StartMessage(this));
@@ -108,11 +121,12 @@ public class FujiXCameraConnectSequence implements Runnable, IFujiXCommandCallba
                 break;
 
             case SEQ_START:
+                cameraStatusReceiver.onStatusNotify(context.getString(R.string.connect_connecting1));
                 commandIssuer.enqueueCommand(new StartMessage2nd(this));
                 break;
 
             case SEQ_START_2ND:
-                cameraStatusReceiver.onStatusNotify(context.getString(R.string.connect_connecting));
+                cameraStatusReceiver.onStatusNotify(context.getString(R.string.connect_connecting2));
                 if (rx_body.length == (int)rx_body[0])
                 {
                     // なぜかもうちょっとデータが飛んでくるので待つ
@@ -127,10 +141,12 @@ public class FujiXCameraConnectSequence implements Runnable, IFujiXCommandCallba
                 break;
 
             case SEQ_START_2ND_RECEIVE:
+                cameraStatusReceiver.onStatusNotify(context.getString(R.string.connect_connecting3));
                 commandIssuer.enqueueCommand(new StartMessage3rd(this));
                 break;
 
             case SEQ_START_3RD:
+                cameraStatusReceiver.onStatusNotify(context.getString(R.string.connect_connecting4));
                 commandIssuer.enqueueCommand(new StartMessage4th(this));
                 break;
 
@@ -146,18 +162,22 @@ public class FujiXCameraConnectSequence implements Runnable, IFujiXCommandCallba
                 }
                 break;
             case SEQ_START_5TH:
+                cameraStatusReceiver.onStatusNotify(context.getString(R.string.connect_connecting6));
                 commandIssuer.enqueueCommand(new StatusRequestMessage(this));
                 break;
 
             case SEQ_STATUS_REQUEST:
+                cameraStatusReceiver.onStatusNotify(context.getString(R.string.connect_connecting8));
                 commandIssuer.enqueueCommand(new QueryCameraCapabilities(this));
                 break;
 
             case SEQ_QUERY_CAMERA_CAPABILITIES:
+                cameraStatusReceiver.onStatusNotify(context.getString(R.string.connect_connecting10));
                 commandIssuer.enqueueCommand(new CameraRemoteMessage(this));
                 break;
 
             case SEQ_CAMERA_REMOTE:
+                cameraStatusReceiver.onStatusNotify(context.getString(R.string.connect_connecting12));
                 connectFinished();
                 break;
 
@@ -196,8 +216,9 @@ public class FujiXCameraConnectSequence implements Runnable, IFujiXCommandCallba
         {
             // ちょっと待つ
             Thread.sleep(1000);
+            cameraStatusReceiver.onStatusNotify(context.getString(R.string.connect_connected));
             interfaceProvider.getAsyncEventCommunication().connect();
-            interfaceProvider.getStatusWatcher().startStatusWatch(interfaceProvider.getStatusListener());
+            interfaceProvider.getCameraStatusWatcher().startStatusWatch(interfaceProvider.getStatusListener());
             onConnectNotify();
         }
         catch (Exception e)

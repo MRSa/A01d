@@ -42,7 +42,7 @@ public class FujiXCameraStatusDialog extends DialogFragment
 
     private void prepare(@NonNull IFujiXInterfaceProvider interfaceProvider)
     {
-        this.cameraStatus = interfaceProvider.getCameraStatus();
+        this.cameraStatus = interfaceProvider.getCameraStatusListHolder();
     }
 
     /**

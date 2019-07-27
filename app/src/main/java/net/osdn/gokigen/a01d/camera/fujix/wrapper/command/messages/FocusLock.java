@@ -5,8 +5,6 @@ import androidx.annotation.NonNull;
 import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.IFujiXCommandCallback;
 import net.osdn.gokigen.a01d.camera.fujix.wrapper.connection.FujiXCameraConnectSequence;
 
-import static net.osdn.gokigen.a01d.camera.fujix.operation.FujiXFocusingControl.FOCUS_LOCK;
-
 public class FocusLock extends FujiXCommandBase
 {
     private final IFujiXCommandCallback callback;
@@ -29,7 +27,7 @@ public class FocusLock extends FujiXCommandBase
     @Override
     public int getId()
     {
-        return (FOCUS_LOCK);
+        return (FujiXCameraConnectSequence.SEQ_FOCUS_LOCK);
     }
 
     @Override

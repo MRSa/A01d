@@ -14,6 +14,7 @@ import net.osdn.gokigen.a01d.camera.IZoomLensControl;
 import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.IFujiXCommandCallback;
 import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.IFujiXCommandPublisher;
 import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.IFujiXCommunication;
+import net.osdn.gokigen.a01d.camera.fujix.wrapper.status.IFujiXRunModeHolder;
 import net.osdn.gokigen.a01d.liveview.ICameraStatusUpdateNotify;
 import net.osdn.gokigen.a01d.liveview.liveviewlistener.ILiveViewListener;
 
@@ -28,12 +29,17 @@ public interface IFujiXInterfaceProvider
     ICaptureControl getCaptureControl();
     IDisplayInjector getDisplayInjector();
 
+    IFujiXRunModeHolder getRunModeHolder();
+    IFujiXCommandCallback getStatusHolder();
     IFujiXCommandPublisher getCommandPublisher();
     IFujiXCommunication getLiveviewCommunication();
     IFujiXCommunication getAsyncEventCommunication();
     IFujiXCommunication getCommandCommunication();
     ICameraStatusWatcher getStatusWatcher();
     ICameraStatusUpdateNotify getStatusListener();
-    ICameraStatus getCameraStatus();
+
+    ICameraStatusWatcher getCameraStatusWatcher();
+    ICameraStatus getCameraStatusListHolder();
+
     void setAsyncEventReceiver(@NonNull IFujiXCommandCallback receiver);
 }

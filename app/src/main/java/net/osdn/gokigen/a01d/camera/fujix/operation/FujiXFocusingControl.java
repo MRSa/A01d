@@ -185,6 +185,17 @@ public class FujiXFocusingControl implements IFocusingControl, IFujiXCommandCall
         indicator.onAfLockUpdate(false);
     }
 
+    @Override
+    public void onReceiveProgress(int currentBytes, int totalBytes, byte[] body)
+    {
+        Log.v(TAG, " " + currentBytes + "/" + totalBytes);
+    }
+
+    @Override
+    public boolean isReceiveMulti()
+    {
+        return (false);
+    }
 
     @Override
     public void receivedMessage(int id, byte[] rx_body)

@@ -168,7 +168,8 @@ class FujiXStatusHolder implements IFujiXCameraProperties
         try
         {
             int strIndex = key.indexOf("x");
-            if (strIndex > 1)
+            Log.v(TAG, "getItemStatus() : " + key + " [" + strIndex + "]");
+            if (strIndex >= 1)
             {
                 key = key.substring(strIndex + 1);
                 try

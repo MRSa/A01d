@@ -28,6 +28,7 @@ import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.IFujiXCommunication;
 import net.osdn.gokigen.a01d.camera.fujix.wrapper.connection.FujiXConnection;
 import net.osdn.gokigen.a01d.camera.fujix.wrapper.liveview.FujiXLiveViewControl;
 import net.osdn.gokigen.a01d.camera.fujix.wrapper.status.FujiXStatusChecker;
+import net.osdn.gokigen.a01d.camera.fujix.wrapper.status.IFujiXRunModeHolder;
 import net.osdn.gokigen.a01d.liveview.IAutoFocusFrameDisplay;
 import net.osdn.gokigen.a01d.liveview.ICameraStatusUpdateNotify;
 import net.osdn.gokigen.a01d.liveview.IIndicatorControl;
@@ -52,6 +53,8 @@ public class FujiXInterfaceProvider implements IFujiXInterfaceProvider, IDisplay
     private FujiXFocusingControl focusingControl;
     private FujiXStatusChecker statusChecker;
     private ICameraStatusUpdateNotify statusListener;
+    private FujiXRunMode runmode;
+
 
     public FujiXInterfaceProvider(@NonNull Activity context, @NonNull ICameraStatusReceiver provider, @NonNull ICameraStatusUpdateNotify statusListener)
     {
@@ -62,6 +65,7 @@ public class FujiXInterfaceProvider implements IFujiXInterfaceProvider, IDisplay
         fujiXConnection = new FujiXConnection(context, provider, this);
         zoomControl = new FujiXZoomControl();
         statusChecker = new FujiXStatusChecker(activity, commandPublisher);
+        this.runmode = new FujiXRunMode();
         this.statusListener = statusListener;
     }
 
@@ -122,6 +126,17 @@ public class FujiXInterfaceProvider implements IFujiXInterfaceProvider, IDisplay
     }
 
     @Override
+    public IFujiXRunModeHolder getRunModeHolder()
+    {
+        return (runmode);
+    }
+
+    @Override
+    public IFujiXCommandCallback getStatusHolder() {
+        return (statusChecker);
+    }
+
+    @Override
     public IFujiXCommandPublisher getCommandPublisher()
     {
         return (commandPublisher);
@@ -152,13 +167,19 @@ public class FujiXInterfaceProvider implements IFujiXInterfaceProvider, IDisplay
     }
 
     @Override
+    public ICameraStatusWatcher getCameraStatusWatcher()
+    {
+        return (statusChecker);
+    }
+
+    @Override
     public ICameraStatusUpdateNotify getStatusListener()
     {
         return (statusListener);
     }
 
     @Override
-    public ICameraStatus getCameraStatus()
+    public ICameraStatus getCameraStatusListHolder()
     {
         return (statusChecker);
     }

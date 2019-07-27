@@ -87,7 +87,7 @@ public class SetPropertyValue extends FujiXCommandBase
     @Override
     public int getId()
     {
-        return (FujiXCameraConnectSequence.SEQ_STATUS_REQUEST);
+        return (FujiXCameraConnectSequence.SEQ_SET_PROPERTY_VALUE);
     }
 
     @Override

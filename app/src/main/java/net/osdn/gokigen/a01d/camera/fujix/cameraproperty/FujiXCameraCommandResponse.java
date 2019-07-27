@@ -1,6 +1,7 @@
 package net.osdn.gokigen.a01d.camera.fujix.cameraproperty;
 
 import android.app.Activity;
+import android.util.Log;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -9,6 +10,7 @@ import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.IFujiXCommandCallback;
 
 class FujiXCameraCommandResponse  implements IFujiXCommandCallback
 {
+    private final String TAG = toString();
     private final Activity activity;
     private final TextView field;
 
@@ -35,6 +37,17 @@ class FujiXCameraCommandResponse  implements IFujiXCommandCallback
         }
     }
 
+    @Override
+    public void onReceiveProgress(int currentBytes, int totalBytes, byte[] body)
+    {
+        Log.v(TAG, " " + currentBytes + "/" + totalBytes);
+    }
+
+    @Override
+    public boolean isReceiveMulti()
+    {
+        return (false);
+    }
 
     @Override
     public void receivedMessage(int id, byte[] rx_body)

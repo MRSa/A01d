@@ -26,5 +26,12 @@ public interface IFujiXMessages
     int SEQ_CHANGE_TO_LIVEVIEW_4TH = 19;
     int SEQ_CHANGE_TO_LIVEVIEW_5TH = 20;
 
+    int SEQ_SET_PROPERTY_VALUE = 21;
+    int SEQ_FOCUS_LOCK = 22;
+    int SEQ_FOCUS_UNLOCK = 23;
+    int SEQ_CAPTURE = 24;
 
+    int SEQ_IMAGE_INFO = 25;
+    int SEQ_THUMBNAIL = 26;
+    int SEQ_FULL_IMAGE = 27;
 }
