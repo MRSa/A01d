@@ -193,7 +193,28 @@ public class CameraLiveImageView extends View implements IImageDataReceiver, IAu
             // Create a bitmap.
             try
             {
+                //ByteArrayInputStream bais = new ByteArrayInputStream(data);
+                //bitmap = BitmapFactory.decodeStream(bais);
+                //bais.close();
                 bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
+                if (bitmap == null)
+                {
+                    BitmapFactory.Options opts = new BitmapFactory.Options();
+                    //opts.inPreferredConfig = Bitmap.Config.ARGB_8888;
+                    opts.inPreferredConfig = Bitmap.Config.RGB_565;
+                    bitmap = BitmapFactory.decodeByteArray(data, 0, data.length, opts);
+                    //byte[] temp = Arrays.copyOfRange(data, 0, data.length);
+                    //ByteArrayInputStream bais = new ByteArrayInputStream(temp);
+                    //bitmap = BitmapFactory.decodeStream(bais);
+                    //bais.close();
+                    //bitmap = BitmapFactory.decodeStream(new ByteArrayInputStream(data, 0, data.length));
+                    //Log.v(TAG, " BitmapFactory.decodeStream() ");
+                }
+                if (bitmap == null)
+                {
+                    // bitmapがNULLの場合、表示は省略する...
+                    return;
+                }
             }
             catch (Throwable e)
             {
