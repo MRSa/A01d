@@ -10,6 +10,7 @@ import android.graphics.Paint;
 import android.graphics.PointF;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.os.Environment;
 import android.os.Looper;
 import android.preference.PreferenceManager;
 import android.util.AttributeSet;
@@ -31,6 +32,8 @@ import net.osdn.gokigen.a01d.liveview.message.IMessageHolder;
 import net.osdn.gokigen.a01d.liveview.message.ShowMessageHolder;
 import net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -64,6 +67,10 @@ public class CameraLiveImageView extends View implements IImageDataReceiver, IAu
     private IStoreImage storeImage = null;
     private IFocusLockIndicator focusLockIndicator = null;
 
+    private FileOutputStream outputStream = null;
+    private static final int LIMIT_SAVE_COUNT = 0;  // 0なら、ダミーファイルを作らない
+    private int saveCount = 10;       // LIMIT_SAVE_COUNTより大きければダミーファイルに書かない
+
     public CameraLiveImageView(Context context)
     {
         super(context);
@@ -84,6 +91,7 @@ public class CameraLiveImageView extends View implements IImageDataReceiver, IAu
 
     private void initComponent(Context context)
     {
+        prepareFile();
         storeImage = new StoreImage(context);
         messageHolder = new ShowMessageHolder();
         imageScaleType = ImageView.ScaleType.FIT_CENTER;
@@ -199,16 +207,43 @@ public class CameraLiveImageView extends View implements IImageDataReceiver, IAu
                 bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
                 if (bitmap == null)
                 {
-                    BitmapFactory.Options opts = new BitmapFactory.Options();
-                    //opts.inPreferredConfig = Bitmap.Config.ARGB_8888;
-                    opts.inPreferredConfig = Bitmap.Config.RGB_565;
-                    bitmap = BitmapFactory.decodeByteArray(data, 0, data.length, opts);
-                    //byte[] temp = Arrays.copyOfRange(data, 0, data.length);
-                    //ByteArrayInputStream bais = new ByteArrayInputStream(temp);
-                    //bitmap = BitmapFactory.decodeStream(bais);
-                    //bais.close();
-                    //bitmap = BitmapFactory.decodeStream(new ByteArrayInputStream(data, 0, data.length));
-                    //Log.v(TAG, " BitmapFactory.decodeStream() ");
+                    // ダミーの記録ファイルが開いていたらファイルに書いておく。
+                    if (saveCount < LIMIT_SAVE_COUNT)
+                    {
+                        outputFile(data);
+                        saveCount++;
+                    }
+
+                    // 規定回数以上書き込んだら書き込みをやめる
+                    if (saveCount == LIMIT_SAVE_COUNT)
+                    {
+                        try
+                        {
+                            outputStream.close();
+                            outputStream = null;
+                            System.gc();
+                        }
+                        catch (Exception eee)
+                        {
+                            eee.printStackTrace();
+                        }
+                    }
+                    /*
+                    //  データをなんとか作り出そうとする処理...
+                    try
+                    {
+                        //YuvImage yuv = new YuvImage(data, ImageFormat.NV21, 640, 480, null);
+                        YuvImage yuv = new YuvImage(data, ImageFormat.NV21, 640, 480, null);
+                        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+                        yuv.compressToJpeg(new Rect(0, 0, 640,480), 100, buffer);
+                        byte[] yuvData = buffer.toByteArray();
+                        bitmap = BitmapFactory.decodeByteArray(yuvData, 0, yuvData.length);
+                    }
+                    catch (Exception ee)
+                    {
+                        ee.printStackTrace();
+                    }
+                    */
                 }
                 if (bitmap == null)
                 {
@@ -1050,5 +1085,41 @@ public class CameraLiveImageView extends View implements IImageDataReceiver, IAu
     public void onBracketingStatusUpdate(String message)
     {
        // Log.v(TAG, "onBracketingStatusUpdate() : " + message);
+    }
+
+    private void outputFile(byte[] receivedData)
+    {
+        try
+        {
+            if (outputStream != null)
+            {
+                outputStream.write(receivedData, 0, receivedData.length);
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    private void prepareFile()
+    {
+        if (LIMIT_SAVE_COUNT == 0)
+        {
+            // 保存回数がゼロなら、このファイル出力用のロジックは走らないようにする。
+            return;
+        }
+        try
+        {
+            final String directoryPath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).getPath() + "/AirA01a/";
+            final String outputFileName = "camtest.bin";
+            File filepath = new File(directoryPath.toLowerCase(), outputFileName.toLowerCase());
+            outputStream = new FileOutputStream(filepath);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            outputStream = null;
+        }
     }
 }

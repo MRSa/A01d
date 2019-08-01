@@ -25,7 +25,7 @@ public class PanasonicLiveViewControl implements ILiveViewControl
     private static final int TIMEOUT_MAX = 3;
     private static final int ERROR_MAX = 30;
     private static final int RECEIVE_BUFFER_SIZE = 1024 * 1024 * 4;
-    private static final int TIMEOUT_MS = 1000;
+    private static final int TIMEOUT_MS = 1500;
     private static final int LIVEVIEW_PORT = 49152;
     private final String LIVEVIEW_START_REQUEST = "cam.cgi?mode=startstream&value=49152";
     private final String LIVEVIEW_STOP_REQUEST = "cam.cgi?mode=stopstream";
@@ -244,7 +244,8 @@ public class PanasonicLiveViewControl implements ILiveViewControl
             }
         }
         int offset = startPosition - startmarker.length;
-        liveViewListener.onUpdateLiveView(Arrays.copyOfRange(receivedData, offset, dataLength - (offset + startmarker.length)), null);
+        //liveViewListener.onUpdateLiveView(Arrays.copyOfRange(receivedData, offset, dataLength - offset), null);
+        liveViewListener.onUpdateLiveView(Arrays.copyOfRange(receivedData, offset, dataLength), null);
     }
 
     private void receiverThread()
