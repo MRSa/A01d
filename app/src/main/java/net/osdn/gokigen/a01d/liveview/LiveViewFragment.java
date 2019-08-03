@@ -7,6 +7,7 @@ import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -153,6 +154,10 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer, IFo
             imageView.setOnClickListener(onClickTouchListener);
             imageView.setOnTouchListener(onClickTouchListener);
             imageView.setFocuslockIndicator(this);
+
+            // キーイベントを拾う処理を追加
+            view.setOnKeyListener(onClickTouchListener);
+            view.setFocusableInTouchMode(true);
 
             view.findViewById(R.id.show_preference_button).setOnClickListener(onClickTouchListener);
             view.findViewById(R.id.camera_property_settings_button).setOnClickListener(onClickTouchListener);

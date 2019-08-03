@@ -3,6 +3,7 @@ package net.osdn.gokigen.a01d.liveview;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Toast;
@@ -19,13 +20,14 @@ import net.osdn.gokigen.a01d.camera.olympus.wrapper.property.IOlyCameraProperty;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.property.IOlyCameraPropertyProvider;
 import net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor;
 
+import androidx.annotation.NonNull;
 import androidx.preference.PreferenceManager;
 
 /**
  *
  *
  */
-class LiveViewClickTouchListener implements View.OnClickListener, View.OnTouchListener
+class LiveViewClickTouchListener implements View.OnClickListener, View.OnTouchListener, View.OnKeyListener
 {
     private final String TAG = toString();
     private final Context context;
@@ -345,4 +347,22 @@ class LiveViewClickTouchListener implements View.OnClickListener, View.OnTouchLi
         return ((id == R.id.cameraLiveImageView)&&(focusingControl.driveAutoFocus(motionEvent)));
     }
 
+    @Override
+    public boolean onKey(View view, int keyCode, @NonNull KeyEvent keyEvent)
+    {
+        Log.v(TAG, "onKey() : " + keyCode);
+        try
+        {
+            if ((keyEvent.getAction() == KeyEvent.ACTION_DOWN)&&
+                    ((keyCode == KeyEvent.KEYCODE_VOLUME_UP)||(keyCode == KeyEvent.KEYCODE_CAMERA)))
+            {
+                pushedShutterButton();
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        return (false);
+    }
 }
