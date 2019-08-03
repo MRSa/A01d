@@ -347,6 +347,10 @@ class LiveViewClickTouchListener implements View.OnClickListener, View.OnTouchLi
         return ((id == R.id.cameraLiveImageView)&&(focusingControl.driveAutoFocus(motionEvent)));
     }
 
+    /**
+     *   ボタンを押したときの対応
+     *
+     */
     @Override
     public boolean onKey(View view, int keyCode, @NonNull KeyEvent keyEvent)
     {
