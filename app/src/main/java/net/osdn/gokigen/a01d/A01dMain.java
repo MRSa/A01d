@@ -16,6 +16,7 @@ import net.osdn.gokigen.a01d.camera.ICameraStatusReceiver;
 import net.osdn.gokigen.a01d.camera.ICameraConnection;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.connection.ble.ICameraPowerOn;
 import net.osdn.gokigen.a01d.camera.panasonic.operation.PanasonicSendCommandDialog;
+import net.osdn.gokigen.a01d.camera.ricohgr2.operation.RicohGr2SendCommandDialog;
 import net.osdn.gokigen.a01d.camera.sony.cameraproperty.SonyCameraApiListFragment;
 import net.osdn.gokigen.a01d.liveview.IStatusViewDrawer;
 import net.osdn.gokigen.a01d.liveview.LiveViewFragment;
@@ -221,8 +222,15 @@ public class A01dMain extends AppCompatActivity implements ICameraStatusReceiver
             ICameraConnection connection = getCameraConnection(method);
             if (method == ICameraConnection.CameraConnectionMethod.RICOH_GR2)
             {
-                // OPCカメラでない場合には、「OPCカメラのみ有効です」表示をして画面遷移させない
-                Toast.makeText(getApplicationContext(), getText(R.string.only_opc_feature), Toast.LENGTH_SHORT).show();
+                try
+                {
+                    // Ricohの場合は、コマンド送信ダイアログを表示する
+                    RicohGr2SendCommandDialog.newInstance().show(getSupportFragmentManager(), "RicohGr2SendCommandDialog");
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
             }
             else if (method == ICameraConnection.CameraConnectionMethod.SONY)
             {

@@ -159,6 +159,7 @@
     <string name="pref_use_pentax_autofocus_summary">PENTAX一眼カメラ用の命令を使って制御します。</string>
 
 
+    <string name="dialog_ricoh_command_title_command">メッセージ送信(RICOH)</string>
     <string name="dialog_panasonic_command_title_command">メッセージ送信(Panasonic)</string>
     <string name="dialog_fujix_command_title_command">メッセージ送信(FUJI)</string>
     <string name="dialog_title_command">コマンド</string>
@@ -174,6 +175,8 @@
     <string name="dialog_command_hint">(command)</string>
     <string name="dialog_service_hint">(service)</string>
     <string name="panasonic_service_string">cam.cgi</string>
+    <string name="ricoh_service_string">GET</string>
+    <string name="ricoh_get_status_string">v1/status/camera</string>
 
     <string name="error_reply_from_camera">カメラからエラー応答&#8230;</string>
     <string name="other_error_reply_from_camera">カメラから不明なエラー応答&#8230;</string>

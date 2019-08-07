@@ -163,6 +163,7 @@
     <string name="pref_use_pentax_autofocus_summary">Uses PENTAX DSLR control commands.</string>
 
 
+    <string name="dialog_ricoh_command_title_command">Send Message(RICOH)</string>
     <string name="dialog_panasonic_command_title_command">Send Message(Panasonic)</string>
     <string name="dialog_fujix_command_title_command">Send Message(FUJI)</string>
     <string name="dialog_title_command">Command</string>
@@ -178,6 +179,8 @@
     <string name="dialog_command_hint">(command)</string>
     <string name="dialog_service_hint">(service)</string>
     <string name="panasonic_service_string">cam.cgi</string>
+    <string name="ricoh_service_string">GET</string>
+    <string name="ricoh_get_status_string">v1/status/camera</string>
 
     <string name="error_reply_from_camera">The camera replies a errror&#8230;</string>
     <string name="other_error_reply_from_camera">The camera replies a unknown errror&#8230;</string>
@@ -198,5 +201,4 @@
     <string name="connect_connecting12">Connecting&#8230;(12/12)</string>
     <string name="connect_connect_finished">Connect Finished.</string>
     <string name="connect_error_message">CONNECTION ERROR</string>
-
 </resources>
