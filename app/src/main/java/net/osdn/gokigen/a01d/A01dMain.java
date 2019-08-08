@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.WindowManager;
 import android.widget.Toast;
 
@@ -51,6 +52,7 @@ public class A01dMain extends AppCompatActivity implements ICameraStatusReceiver
     private OlyCameraPropertyListFragment propertyListFragment = null;
     private SonyCameraApiListFragment sonyApiListFragmentSony = null;
     private LogCatFragment logCatFragment = null;
+    private LiveViewFragment liveViewFragment = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -174,11 +176,14 @@ public class A01dMain extends AppCompatActivity implements ICameraStatusReceiver
     {
         try
         {
-            LiveViewFragment fragment = LiveViewFragment.newInstance(this, interfaceProvider);
-            statusViewDrawer = fragment;
-            fragment.setRetainInstance(true);
+            if (liveViewFragment == null)
+            {
+                liveViewFragment = LiveViewFragment.newInstance(this, interfaceProvider);
+            }
+            statusViewDrawer = liveViewFragment;
+            liveViewFragment.setRetainInstance(true);
             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-            transaction.replace(R.id.fragment1, fragment);
+            transaction.replace(R.id.fragment1, liveViewFragment);
             transaction.commitAllowingStateLoss();
         }
         catch (Exception e)
@@ -617,5 +622,29 @@ public class A01dMain extends AppCompatActivity implements ICameraStatusReceiver
             // カメラへ自動接続する設定だった場合、カメラへWiFi接続する (BLEで起動しなくても)
             changeCameraConnection();
         }
+    }
+
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event)
+    {
+        Log.v(TAG, "onKeyDown()" + " " + keyCode);
+        try
+        {
+            if ((event.getAction() == KeyEvent.ACTION_DOWN)&&
+                    ((keyCode == KeyEvent.KEYCODE_VOLUME_UP)||(keyCode == KeyEvent.KEYCODE_CAMERA)))
+            {
+                if (liveViewFragment != null)
+                {
+                    liveViewFragment.handleKeyDown(keyCode, event);
+                }
+                return (true);
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        return (false);
     }
 }

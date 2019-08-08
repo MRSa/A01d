@@ -958,4 +958,9 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer, IFo
     {
         updateFocusedStatus(focused, focusLocked);
     }
+
+    public boolean handleKeyDown(int keyCode, KeyEvent event)
+    {
+        return (onClickTouchListener.onKey(null, keyCode, event));
+    }
 }
