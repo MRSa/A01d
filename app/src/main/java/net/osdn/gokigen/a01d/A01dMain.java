@@ -176,7 +176,7 @@ public class A01dMain extends AppCompatActivity implements ICameraStatusReceiver
     {
         try
         {
-            if (liveViewFragment == null)
+            //if (liveViewFragment == null)
             {
                 liveViewFragment = LiveViewFragment.newInstance(this, interfaceProvider);
             }
@@ -636,15 +636,14 @@ public class A01dMain extends AppCompatActivity implements ICameraStatusReceiver
             {
                 if (liveViewFragment != null)
                 {
-                    liveViewFragment.handleKeyDown(keyCode, event);
+                    return (liveViewFragment.handleKeyDown(keyCode, event));
                 }
-                return (true);
             }
         }
         catch (Exception e)
         {
             e.printStackTrace();
         }
-        return (false);
+        return (super.onKeyDown(keyCode, event));
     }
 }
