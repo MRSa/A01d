@@ -45,6 +45,7 @@ public class SonyCameraWrapper implements ISonyCameraHolder, ISonyInterfaceProvi
     private SonyCameraFocusControl focusControl = null;
     private SonyCameraCaptureControl captureControl = null;
     private SonyCameraZoomLensControl zoomControl = null;
+    private SonyCameraConnection cameraConnection = null;
 
     public SonyCameraWrapper(final Activity context, final ICameraStatusReceiver statusReceiver , final @NonNull ICameraChangeListener listener)
     {
@@ -126,7 +127,11 @@ public class SonyCameraWrapper implements ISonyCameraHolder, ISonyInterfaceProvi
     @Override
     public ICameraConnection getSonyCameraConnection()
     {
-        return (new SonyCameraConnection(context, provider, this, listener));
+        if (cameraConnection == null)
+        {
+            cameraConnection = new SonyCameraConnection(context, provider, this, listener);
+        }
+        return (cameraConnection);
     }
 
     @Override
