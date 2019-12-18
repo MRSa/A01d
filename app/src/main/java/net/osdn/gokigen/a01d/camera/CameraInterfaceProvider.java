@@ -118,6 +118,10 @@ public class CameraInterfaceProvider implements IInterfaceProvider
             {
                 ret = ICameraConnection.CameraConnectionMethod.PANASONIC;
             }
+            else if (connectionMethod.contains("PHONE"))
+            {
+                ret = ICameraConnection.CameraConnectionMethod.PHONE_CAMERA;
+            }
         }
         catch (Exception e)
         {

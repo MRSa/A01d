@@ -26,6 +26,7 @@ import net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor;
 import net.osdn.gokigen.a01d.preference.fujix.FujiXPreferenceFragment;
 import net.osdn.gokigen.a01d.preference.olympus.PreferenceFragment;
 import net.osdn.gokigen.a01d.preference.panasonic.PanasonicPreferenceFragment;
+import net.osdn.gokigen.a01d.preference.phonecamera.PhoneCameraPreferenceFragment;
 import net.osdn.gokigen.a01d.preference.ricohgr2.RicohGr2PreferenceFragment;
 import net.osdn.gokigen.a01d.preference.sony.SonyPreferenceFragment;
 
@@ -314,6 +315,8 @@ public class A01dMain extends AppCompatActivity implements ICameraStatusReceiver
                         preferenceFragment = SonyPreferenceFragment.newInstance(this, this);
                     } else if (connectionMethod == ICameraConnection.CameraConnectionMethod.PANASONIC) {
                         preferenceFragment = PanasonicPreferenceFragment.newInstance(this, this);
+                    } else if (connectionMethod == ICameraConnection.CameraConnectionMethod.PHONE_CAMERA) {
+                        preferenceFragment = PhoneCameraPreferenceFragment.newInstance(this, this);
                     } else if (connectionMethod == ICameraConnection.CameraConnectionMethod.FUJI_X) {
                         preferenceFragment = FujiXPreferenceFragment.newInstance(this, this);
                     } else //  if (connectionMethod == ICameraConnection.CameraConnectionMethod.OPC)
