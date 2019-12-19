@@ -23,6 +23,12 @@ public class OlyCameraHardwareStatus implements ICameraHardwareStatus
     }
 
     @Override
+    public boolean isAvailableHardwareStatus()
+    {
+        return (true);
+    }
+
+    @Override
     public String getLensMountStatus()
     {
         String message;

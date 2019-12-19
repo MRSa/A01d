@@ -6,7 +6,7 @@
         <PreferenceScreen
             android:key="exit_application"
             android:icon="@drawable/ic_power_settings_new_black_24dp"
-            android:title="@string/pref_exit_power_off_camera" />
+            android:title="@string/pref_exit_power_off_olympuspen" />
 
         <ListPreference
             android:title="@string/pref_connection_method"

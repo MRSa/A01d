@@ -1,4 +1,4 @@
-package net.osdn.gokigen.a01d.preference.phonecamera;
+package net.osdn.gokigen.a01d.preference.olympuspen;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -16,7 +16,7 @@ import androidx.preference.PreferenceManager;
 
 import net.osdn.gokigen.a01d.IChangeScene;
 import net.osdn.gokigen.a01d.R;
-import net.osdn.gokigen.a01d.camera.panasonic.operation.CameraPowerOffPanasonic;
+import net.osdn.gokigen.a01d.camera.olympuspen.operation.OlympusPenCameraPowerOff;
 import net.osdn.gokigen.a01d.logcat.LogCatViewer;
 import net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor;
 
@@ -26,11 +26,11 @@ import java.util.Map;
  *
  *
  */
-public class PhoneCameraPreferenceFragment  extends PreferenceFragmentCompat implements SharedPreferences.OnSharedPreferenceChangeListener
+public class OlympusPreferenceFragment extends PreferenceFragmentCompat implements SharedPreferences.OnSharedPreferenceChangeListener
 {
     private final String TAG = toString();
     private SharedPreferences preferences = null;
-    private CameraPowerOffPanasonic powerOffController = null;
+    private OlympusPenCameraPowerOff powerOffController = null;
     private LogCatViewer logCatViewer = null;
     //private PanasonicCameraApiListViewer cameraApiListViewer = null;
 
@@ -38,9 +38,9 @@ public class PhoneCameraPreferenceFragment  extends PreferenceFragmentCompat imp
      *
      *
      */
-    public static PhoneCameraPreferenceFragment newInstance(@NonNull AppCompatActivity context, @NonNull IChangeScene changeScene)
+    public static OlympusPreferenceFragment newInstance(@NonNull AppCompatActivity context, @NonNull IChangeScene changeScene)
     {
-        PhoneCameraPreferenceFragment instance = new PhoneCameraPreferenceFragment();
+        OlympusPreferenceFragment instance = new OlympusPreferenceFragment();
         instance.prepare(context, changeScene);
 
         // パラメータはBundleにまとめておく
@@ -60,7 +60,7 @@ public class PhoneCameraPreferenceFragment  extends PreferenceFragmentCompat imp
     {
         try
         {
-            powerOffController = new CameraPowerOffPanasonic(context, changeScene);
+            powerOffController = new OlympusPenCameraPowerOff(context, changeScene);
             powerOffController.prepare();
 
             logCatViewer = new LogCatViewer(changeScene);
@@ -80,7 +80,7 @@ public class PhoneCameraPreferenceFragment  extends PreferenceFragmentCompat imp
      *
      */
     @Override
-    public void onAttach(Context activity)
+    public void onAttach(@NonNull Context activity)
     {
         super.onAttach(activity);
         Log.v(TAG, "onAttach()");
@@ -171,9 +171,9 @@ public class PhoneCameraPreferenceFragment  extends PreferenceFragmentCompat imp
         try
         {
             //super.onCreate(savedInstanceState);
-            addPreferencesFromResource(R.xml.preferences_panasonic);
+            addPreferencesFromResource(R.xml.preferences_olympuspen);
 
-            ListPreference connectionMethod = (ListPreference) findPreference(IPreferencePropertyAccessor.CONNECTION_METHOD);
+            ListPreference connectionMethod = findPreference(IPreferencePropertyAccessor.CONNECTION_METHOD);
             connectionMethod.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
                 @Override
                 public boolean onPreferenceChange(Preference preference, Object newValue) {
@@ -276,7 +276,7 @@ public class PhoneCameraPreferenceFragment  extends PreferenceFragmentCompat imp
     {
         try
         {
-            CheckBoxPreference pref = (CheckBoxPreference) findPreference(pref_key);
+            CheckBoxPreference pref = findPreference(pref_key);
             if (pref != null) {
                 boolean value = preferences.getBoolean(key, defaultValue);
                 pref.setChecked(value);

@@ -105,7 +105,7 @@
         <item>Ricoh GR Series / PENTAX</item>
         <item >Fuji X Series</item>
         <item >Panasonic</item>
-        <item >Phone</item>
+        <item >Olympus Pen/OM-D</item>
     </string-array>
 
     <string-array name="connection_method_value">
@@ -114,7 +114,7 @@
         <item >RICOH_GR2</item>
         <item >FUJI_X</item>
         <item >PANASONIC</item>
-        <item >PHONE</item>
+        <item >OLYMPUS</item>
     </string-array>
 
     <string-array name="gr2_display_mode">

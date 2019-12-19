@@ -8,6 +8,8 @@ import java.util.Map;
  */
 public interface ICameraHardwareStatus
 {
+    boolean isAvailableHardwareStatus();
+
     String getLensMountStatus();
     String getMediaMountStatus();
 

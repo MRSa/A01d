@@ -12,6 +12,8 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.List;
+import java.util.Map;
 
 import androidx.annotation.NonNull;
 
@@ -128,7 +130,7 @@ public class SimpleHttpClient
      *
      *
      */
-    public static void httpGetBytes(String url, int timeoutMs, @NonNull IReceivedMessageCallback callback)
+    public static void httpGetBytes(String url, Map<String, String> setProperty, int timeoutMs, @NonNull IReceivedMessageCallback callback)
     {
         HttpURLConnection httpConn = null;
         InputStream inputStream = null;
@@ -144,6 +146,14 @@ public class SimpleHttpClient
             final URL urlObj = new URL(url);
             httpConn = (HttpURLConnection) urlObj.openConnection();
             httpConn.setRequestMethod("GET");
+            if (setProperty != null)
+            {
+                for (String key : setProperty.keySet())
+                {
+                    String value = setProperty.get(key);
+                    httpConn.setRequestProperty(key, value);
+                }
+            }
             httpConn.setConnectTimeout(timeout);
             httpConn.setReadTimeout(timeout);
             httpConn.connect();
@@ -178,6 +188,42 @@ public class SimpleHttpClient
         try
         {
             int contentLength = httpConn.getContentLength();
+            if (contentLength < 0)
+            {
+                // コンテンツ長が取れない場合の処理...
+                try
+                {
+                    Map<String, List<String>> headers = httpConn.getHeaderFields();
+
+                    /*
+                    // 応答ヘッダをすべてダンプするロジック...
+                    for (String key : headers.keySet())
+                    {
+                        final List<String> valueList = headers.get(key);
+                        Log.v(TAG, " " + key + " : " + getValue(valueList));
+                    }
+                    */
+
+                    // コンテンツ長さが取れない場合は、HTTP応答ヘッダから取得する
+                    List<String> valueList = headers.get("X-FILE_SIZE");
+                    try
+                    {
+                        if (valueList != null)
+                        {
+                            contentLength = Integer.parseInt(getValue(valueList));
+                        }
+                    }
+                    catch (Exception ee)
+                    {
+                        ee.printStackTrace();
+                    }
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+            }
+
             byte[] buffer = new byte[BUFFER_SIZE];
             int readBytes = 0;
             int readSize = inputStream.read(buffer, 0, BUFFER_SIZE);
@@ -210,12 +256,32 @@ public class SimpleHttpClient
         callback.onCompleted();
     }
 
+    public static String getValue(List<String> valueList)
+    {
+        // 応答ヘッダの値切り出し用...
+        boolean isFirst = true;
+        final StringBuilder values = new StringBuilder();
+        for (String value : valueList)
+        {
+            values.append(value);
+            if (isFirst)
+            {
+                isFirst = false;
+            }
+            else
+            {
+                values.append(" ");
+            }
+        }
+        return (values.toString());
+    }
+
     /**
      *
      *
      *
      */
-    public static Bitmap httpGetBitmap(String url, int timeoutMs)
+    public static Bitmap httpGetBitmap(String url, Map<String, String> setProperty, int timeoutMs)
     {
         HttpURLConnection httpConn = null;
         InputStream inputStream = null;
@@ -233,6 +299,14 @@ public class SimpleHttpClient
             final URL urlObj = new URL(url);
             httpConn = (HttpURLConnection) urlObj.openConnection();
             httpConn.setRequestMethod("GET");
+            if (setProperty != null)
+            {
+                for (String key : setProperty.keySet())
+                {
+                    String value = setProperty.get(key);
+                    httpConn.setRequestProperty(key, value);
+                }
+            }
             httpConn.setConnectTimeout(timeout);
             httpConn.setReadTimeout(timeout);
             httpConn.connect();
@@ -273,7 +347,28 @@ public class SimpleHttpClient
      */
     public static String httpPost(String url, String postData, int timeoutMs)
     {
-        return (httpCommand(url, "POST", postData, timeoutMs));
+        return (httpCommand(url, "POST", postData, null, null, timeoutMs));
+    }
+
+
+    /**
+     *
+     *
+     *
+     */
+    public static String httpGetWithHeader(String url, Map<String, String> headerMap, String contentType, int timeoutMs)
+    {
+        return (httpCommand(url, "GET", null, headerMap, contentType, timeoutMs));
+    }
+
+    /**
+     *
+     *
+     *
+     */
+    public static String httpPostWithHeader(String url, String postData, Map<String, String> headerMap, String contentType, int timeoutMs)
+    {
+        return (httpCommand(url, "POST", postData, headerMap, contentType, timeoutMs));
     }
 
     /**
@@ -283,7 +378,7 @@ public class SimpleHttpClient
      */
     public static String httpPut(String url, String postData, int timeoutMs)
     {
-        return (httpCommand(url, "PUT", postData, timeoutMs));
+        return (httpCommand(url, "PUT", postData, null, null, timeoutMs));
     }
 
     /**
@@ -293,7 +388,7 @@ public class SimpleHttpClient
      */
     public static String httpOptions(String url, String postData, int timeoutMs)
     {
-        return (httpCommand(url, "OPTIONS", postData, timeoutMs));
+        return (httpCommand(url, "OPTIONS", postData, null, null, timeoutMs));
     }
 
     /**
@@ -301,7 +396,7 @@ public class SimpleHttpClient
      *
      *
      */
-    private static String httpCommand(String url, String requestMethod, String postData, int timeoutMs)
+    private static String httpCommand(String url, String requestMethod, String postData, Map<String, String> setProperty, String contentType, int timeoutMs)
     {
         HttpURLConnection httpConn = null;
         OutputStream outputStream = null;
@@ -320,20 +415,38 @@ public class SimpleHttpClient
             final URL urlObj = new URL(url);
             httpConn = (HttpURLConnection) urlObj.openConnection();
             httpConn.setRequestMethod(requestMethod);
+            if (setProperty != null)
+            {
+                for (String key : setProperty.keySet())
+                {
+                    String value = setProperty.get(key);
+                    httpConn.setRequestProperty(key, value);
+                }
+            }
+            if (contentType != null)
+            {
+                httpConn.setRequestProperty("Content-Type", contentType);
+            }
             httpConn.setConnectTimeout(timeout);
             httpConn.setReadTimeout(timeout);
-            httpConn.setDoInput(true);
-            httpConn.setDoOutput(true);
 
-            outputStream = httpConn.getOutputStream();
-            writer = new OutputStreamWriter(outputStream, "UTF-8");
-            writer.write(postData);
-            writer.flush();
-            writer.close();
-            writer = null;
-            outputStream.close();
-            outputStream = null;
-
+            if (postData == null)
+            {
+                httpConn.connect();
+            }
+            else
+            {
+                httpConn.setDoInput(true);
+                httpConn.setDoOutput(true);
+                outputStream = httpConn.getOutputStream();
+                writer = new OutputStreamWriter(outputStream, "UTF-8");
+                writer.write(postData);
+                writer.flush();
+                writer.close();
+                writer = null;
+                outputStream.close();
+                outputStream = null;
+            }
             int responseCode = httpConn.getResponseCode();
             if (responseCode == HttpURLConnection.HTTP_OK)
             {
