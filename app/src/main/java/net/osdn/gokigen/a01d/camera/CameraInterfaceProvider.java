@@ -8,6 +8,8 @@ import net.osdn.gokigen.a01d.camera.fujix.wrapper.FujiXInterfaceProvider;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.IOlympusLiveViewListener;
 import net.osdn.gokigen.a01d.camera.olympus.IOlympusInterfaceProvider;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.OlympusInterfaceProvider;
+import net.osdn.gokigen.a01d.camera.olympuspen.IOlympusPenInterfaceProvider;
+import net.osdn.gokigen.a01d.camera.olympuspen.wrapper.OlympusPenInterfaceProvider;
 import net.osdn.gokigen.a01d.camera.panasonic.IPanasonicInterfaceProvider;
 import net.osdn.gokigen.a01d.camera.panasonic.wrapper.PanasonicCameraWrapper;
 import net.osdn.gokigen.a01d.camera.ricohgr2.IRicohGr2InterfaceProvider;
@@ -24,6 +26,7 @@ public class CameraInterfaceProvider implements IInterfaceProvider
 {
     private final Activity context;
     private final OlympusInterfaceProvider olympus;
+    private final OlympusPenInterfaceProvider olympusPen;
     private final SonyCameraWrapper sony;
     private final RicohGr2InterfaceProvider ricohGr2;
     private final FujiXInterfaceProvider fujiX;
@@ -35,6 +38,7 @@ public class CameraInterfaceProvider implements IInterfaceProvider
         this.context = context;
         this.statusListener = new CameraStatusListener();
         olympus = new OlympusInterfaceProvider(context, provider);
+        olympusPen = new OlympusPenInterfaceProvider(context, provider);
         sony = new SonyCameraWrapper(context, provider, statusListener);
         fujiX = new FujiXInterfaceProvider(context, provider, statusListener);
         panasonic = new PanasonicCameraWrapper(context, provider, statusListener);
@@ -88,6 +92,12 @@ public class CameraInterfaceProvider implements IInterfaceProvider
     public IPanasonicInterfaceProvider getPanasonicInterface()
     {
         return (panasonic);
+    }
+
+    @Override
+    public IOlympusPenInterfaceProvider getOlympusPenInterface()
+    {
+        return (olympusPen);
     }
 
     /**

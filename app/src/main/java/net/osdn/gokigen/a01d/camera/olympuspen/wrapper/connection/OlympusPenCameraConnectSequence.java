@@ -34,6 +34,7 @@ class OlympusPenCameraConnectSequence implements Runnable
         final String camInfoUrl = "http://192.168.0.10/get_caminfo.cgi";
         final String getCommandListUrl = "http://192.168.0.10/get_commandlist.cgi";
         final String getConnectModeUrl = "http://192.168.0.10/get_connectmode.cgi";
+        final String switchCameraModeUrl = "http://192.168.0.10/switch_cammode.cgi";
 
         final int TIMEOUT_MS = 5000;
         try
@@ -52,6 +53,11 @@ class OlympusPenCameraConnectSequence implements Runnable
                 String response3 = SimpleHttpClient.httpGetWithHeader(camInfoUrl, headerMap, null, TIMEOUT_MS);
                 Log.v(TAG, " " + camInfoUrl + " " + response3);
 
+                // 撮影モードに切り替え。
+                String lvUrl = switchCameraModeUrl + "?mode=rec" + "&lvqty=" + getLiveViewQuality();
+                String response4 = SimpleHttpClient.httpGetWithHeader(lvUrl, headerMap, null, TIMEOUT_MS);
+                Log.v(TAG, " " + lvUrl + " " + response4);
+
                 onConnectNotify();
             }
             else
@@ -64,6 +70,12 @@ class OlympusPenCameraConnectSequence implements Runnable
             e.printStackTrace();
             onConnectError(e.getLocalizedMessage());
         }
+    }
+
+    private String getLiveViewQuality()
+    {
+        //  ※ LV解像度をここで取得する
+        return ("0640x0480");
     }
 
     private void onConnectNotify()

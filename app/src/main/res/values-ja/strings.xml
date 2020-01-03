@@ -70,6 +70,9 @@
     <string name="pref_instruction_manual">操作説明</string>
     <string name="pref_privacy_policy">プライバシーポリシー</string>
 
+    <string name="pref_wifi_settings">WiFi設定</string>
+    <string name="pref_summary_wifi_settings"> </string>
+
     <string name="information"> </string>
     <string name="favorite">お気に入り</string>
     <string name="preferences">設定</string>
@@ -118,7 +121,12 @@
     <string name="dialog_start_load_property_title">カメラプロパティ設定中</string>
     <string name="dialog_title_button_network_settings">WiFi設定</string>
     <string name="dialog_title_button_retry">再試行</string>
-    <string name="dialog_title_connect_failed">接続失敗</string>
+    <string name="dialog_title_connect_failed_ricoh">接続失敗(RICOH)</string>
+    <string name="dialog_title_connect_failed_opc">接続失敗(OPC)</string>
+    <string name="dialog_title_connect_failed_olympus">接続失敗(Olympus)</string>
+    <string name="dialog_title_connect_failed_panasonic">接続失敗(PANASONIC)</string>
+    <string name="dialog_title_connect_failed_sony">接続失敗(SONY)</string>
+    <string name="dialog_title_connect_failed_fuji">接続失敗(FUJI)</string>
     <string name="fatal_cannot_use_camera">Olympus Camera Kitが動作しないモードのため、カメラのリセットが必要です。電源ボタンを8秒以上長押しして、カメラをリセットしてください。</string>
     <string name="network_connection_timeout">接続タイムアウト</string>
     <string name="restored_my_props">設定を展開しました。 : </string>
@@ -198,6 +206,8 @@
     <string name="connect_connecting11">接続中&#8230;(11/12)</string>
     <string name="connect_connecting12">接続中&#8230;(12/12)</string>
     <string name="connect_connect_finished">カメラと接続</string>
-    <string name="connect_error_message">接続失敗</string>
+
+    <string name="connect_error_message_olympus">接続失敗 (OLYMPUS)</string>
+    <string name="connect_error_message_fuji">接続失敗 (FUJI)</string>
 
 </resources>

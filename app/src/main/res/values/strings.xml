@@ -70,13 +70,21 @@
     <string name="pref_instruction_manual">A01d Instructions</string>
     <string name="pref_privacy_policy">Privacy Policy</string>
 
+    <string name="pref_wifi_settings">WIFI Settings</string>
+    <string name="pref_summary_wifi_settings"> </string>
+
     <string name="information"> </string>
     <string name="favorite">Favorite</string>
     <string name="preferences">Preferences</string>
     <string name="grid">Grid</string>
 
     <string name="network_connection_timeout">Connection time out</string>
-    <string name="dialog_title_connect_failed">Connect failed</string>
+    <string name="dialog_title_connect_failed_ricoh">Connect failed (RICOH)</string>
+    <string name="dialog_title_connect_failed_opc">Connect failed (OPC)</string>
+    <string name="dialog_title_connect_failed_olympus">Connect failed (Olympus)</string>
+    <string name="dialog_title_connect_failed_panasonic">Connect failed (PANASONIC)</string>
+    <string name="dialog_title_connect_failed_sony">Connect failed (SONY)</string>
+    <string name="dialog_title_connect_failed_fuji">Connect failed (FUJI)</string>
     <string name="dialog_title_button_retry">Retry</string>
     <string name="dialog_title_button_network_settings">WiFi Settings</string>
 
@@ -202,5 +210,8 @@
     <string name="connect_connecting11">Connecting&#8230;(11/12)</string>
     <string name="connect_connecting12">Connecting&#8230;(12/12)</string>
     <string name="connect_connect_finished">Connect Finished.</string>
-    <string name="connect_error_message">CONNECTION ERROR</string>
+
+    <string name="connect_error_message_olympus">CONNECTION ERROR (OLYMPUS)</string>
+    <string name="connect_error_message_fuji">CONNECTION ERROR (FUJI)</string>
+
 </resources>

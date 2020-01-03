@@ -11,6 +11,7 @@ import net.osdn.gokigen.a01d.camera.ILiveViewControl;
 import net.osdn.gokigen.a01d.camera.IZoomLensControl;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.ICameraHardwareStatus;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.ICameraRunMode;
+import net.osdn.gokigen.a01d.camera.olympus.wrapper.property.IOlyCameraPropertyProvider;
 import net.osdn.gokigen.a01d.liveview.liveviewlistener.ILiveViewListener;
 
 /**
@@ -26,6 +27,7 @@ public interface IOlympusPenInterfaceProvider
     IZoomLensControl getZoomLensControl();
     ICaptureControl getCaptureControl();
     IDisplayInjector getDisplayInjector();
+    IOlyCameraPropertyProvider getCameraPropertyProvider();
 
     ICameraStatus getCameraStatusListHolder();
     ICameraStatusWatcher getCameraStatusWatcher();

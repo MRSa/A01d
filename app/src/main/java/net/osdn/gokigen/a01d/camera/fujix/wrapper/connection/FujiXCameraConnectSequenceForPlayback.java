@@ -76,9 +76,9 @@ public class FujiXCameraConnectSequenceForPlayback implements Runnable, IFujiXCo
                     // 接続失敗...
                     if (cameraStatusReceiver != null)
                     {
-                        cameraStatusReceiver.onStatusNotify(context.getString(R.string.dialog_title_connect_failed));
+                        cameraStatusReceiver.onStatusNotify(context.getString(R.string.dialog_title_connect_failed_fuji));
                     }
-                    onConnectError(context.getString(R.string.dialog_title_connect_failed));
+                    onConnectError(context.getString(R.string.dialog_title_connect_failed_fuji));
                     return;
                 }
             }
@@ -98,7 +98,7 @@ public class FujiXCameraConnectSequenceForPlayback implements Runnable, IFujiXCo
             e.printStackTrace();
             if (cameraStatusReceiver != null)
             {
-                cameraStatusReceiver.onStatusNotify(context.getString(R.string.dialog_title_connect_failed));
+                cameraStatusReceiver.onStatusNotify(context.getString(R.string.dialog_title_connect_failed_fuji));
             }
             onConnectError(e.getLocalizedMessage());
         }
@@ -136,7 +136,7 @@ public class FujiXCameraConnectSequenceForPlayback implements Runnable, IFujiXCo
                 }
                 else
                 {
-                    onConnectError(context.getString(R.string.connect_error_message));
+                    onConnectError(context.getString(R.string.connect_error_message_fuji));
                 }
                 break;
 
@@ -234,7 +234,8 @@ public class FujiXCameraConnectSequenceForPlayback implements Runnable, IFujiXCo
                 {
                     cameraStatusReceiver.onStatusNotify(context.getString(R.string.connect_connecting9));
                 }
-                commandIssuer.enqueueCommand(new ChangeToPlayback2nd(this));
+                //commandIssuer.enqueueCommand(new ChangeToPlayback2nd(this));
+                commandIssuer.enqueueCommand(new StatusRequestMessage(this));
                 break;
 
             case SEQ_CHANGE_TO_PLAYBACK_2ND:

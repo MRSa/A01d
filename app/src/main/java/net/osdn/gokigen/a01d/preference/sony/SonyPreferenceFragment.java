@@ -1,8 +1,10 @@
 package net.osdn.gokigen.a01d.preference.sony;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.util.Log;
 
 import net.osdn.gokigen.a01d.IChangeScene;
@@ -23,13 +25,16 @@ import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.PreferenceManager;
 
+import static net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor.WIFI_SETTINGS;
+
 /**
  *
  *
  */
-public class SonyPreferenceFragment  extends PreferenceFragmentCompat implements SharedPreferences.OnSharedPreferenceChangeListener
+public class SonyPreferenceFragment  extends PreferenceFragmentCompat implements SharedPreferences.OnSharedPreferenceChangeListener, Preference.OnPreferenceClickListener
 {
     private final String TAG = toString();
+    private AppCompatActivity context = null;
     private SharedPreferences preferences = null;
     private CameraPowerOffSony powerOffController = null;
     private LogCatViewer logCatViewer = null;
@@ -70,6 +75,8 @@ public class SonyPreferenceFragment  extends PreferenceFragmentCompat implements
 
             cameraApiListViewer = new SonyCameraApiListViewer(changeScene);
             cameraApiListViewer.prepare();
+
+            this.context = context;
         }
         catch (Exception e)
         {
@@ -188,6 +195,7 @@ public class SonyPreferenceFragment  extends PreferenceFragmentCompat implements
             findPreference("exit_application").setOnPreferenceClickListener(powerOffController);
             findPreference("debug_info").setOnPreferenceClickListener(logCatViewer);
             findPreference("sony_api_list").setOnPreferenceClickListener(cameraApiListViewer);
+            findPreference(WIFI_SETTINGS).setOnPreferenceClickListener(this);
         }
         catch (Exception e)
         {
@@ -318,4 +326,27 @@ public class SonyPreferenceFragment  extends PreferenceFragmentCompat implements
         }
     }
 
+    @Override
+    public boolean onPreferenceClick(Preference preference)
+    {
+        try
+        {
+            String preferenceKey = preference.getKey();
+            if (preferenceKey.contains(WIFI_SETTINGS))
+            {
+                // Wifi 設定画面を表示する
+                Log.v(TAG, " onPreferenceClick : " + preferenceKey);
+                if (context != null)
+                {
+                    context.startActivity(new Intent(Settings.ACTION_WIFI_SETTINGS));
+                }
+            }
+            return (true);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        return (false);
+    }
 }

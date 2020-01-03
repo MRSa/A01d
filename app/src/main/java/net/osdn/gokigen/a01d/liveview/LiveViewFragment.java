@@ -295,6 +295,32 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer, IFo
                         propertyButton.setOnClickListener(onClickTouchListener);
                     }
                 }
+                else if (connectionMethod == ICameraConnection.CameraConnectionMethod.OLYMPUS)
+                {
+                    /*
+                    if (favoriteButton != null)
+                    {
+                        favoriteButton.setVisibility(View.VISIBLE);
+                        favoriteButton.setOnClickListener(onClickTouchListener);
+                    }
+                    if (manualFocus != null)
+                    {
+                        manualFocus.setVisibility(View.INVISIBLE);
+                    }
+                    if (changeLiveViewScale != null)
+                    {
+                        changeLiveViewScale.setVisibility(View.INVISIBLE);
+                    }
+                    if (focusIndicator != null)
+                    {
+                        focusIndicator.setVisibility(View.VISIBLE);
+                    }
+                    if (propertyButton != null)
+                    {
+                        propertyButton.setOnClickListener(onClickTouchListener);
+                    }
+                    */
+                }
             }
             if (manualFocus != null)
             {
@@ -352,6 +378,10 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer, IFo
         {
             interfaceInjector = interfaceProvider.getPanasonicInterface().getDisplayInjector();
         }
+        else if (connectionMethod == ICameraConnection.CameraConnectionMethod.OLYMPUS)
+        {
+            interfaceInjector = interfaceProvider.getOlympusPenInterface().getDisplayInjector();
+        }
         else // if (connectionMethod == ICameraConnection.CameraConnectionMethod.OPC)
         {
             interfaceInjector = interfaceProvider.getOlympusInterface().getDisplayInjector();
@@ -383,6 +413,12 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer, IFo
             this.liveViewControl = interfaceProvider.getPanasonicInterface().getPanasonicLiveViewControl();
             this.zoomLensControl = interfaceProvider.getPanasonicInterface().getZoomLensControl();
             this.cameraInformation = interfaceProvider.getPanasonicInterface().getCameraInformation();
+        }
+        else  if (connectionMethod == ICameraConnection.CameraConnectionMethod.OLYMPUS)
+        {
+            this.liveViewControl = interfaceProvider.getOlympusPenInterface().getLiveViewControl();
+            this.zoomLensControl = interfaceProvider.getOlympusPenInterface().getZoomLensControl();
+            this.cameraInformation = interfaceProvider.getOlympusPenInterface().getCameraInformation();
         }
         else //  if (connectionMethod == ICameraConnection.CameraConnectionMethod.OPC)
         {
@@ -681,6 +717,10 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer, IFo
             else if (connectionMethod == ICameraConnection.CameraConnectionMethod.PANASONIC)
             {
                 lvListener = interfaceProvider.getPanasonicInterface().getLiveViewListener();
+            }
+            else if (connectionMethod == ICameraConnection.CameraConnectionMethod.OLYMPUS)
+            {
+                lvListener = interfaceProvider.getOlympusPenInterface().getLiveViewListener();
             }
             else  // if (connectionMethod == ICameraConnection.CameraConnectionMethod.OPC)
             {

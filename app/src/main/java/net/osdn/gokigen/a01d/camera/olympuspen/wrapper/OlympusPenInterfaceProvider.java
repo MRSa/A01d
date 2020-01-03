@@ -1,11 +1,9 @@
 package net.osdn.gokigen.a01d.camera.olympuspen.wrapper;
 
 import android.app.Activity;
-import android.content.SharedPreferences;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
-import androidx.preference.PreferenceManager;
 
 import net.osdn.gokigen.a01d.camera.ICameraConnection;
 import net.osdn.gokigen.a01d.camera.ICameraInformation;
@@ -20,13 +18,13 @@ import net.osdn.gokigen.a01d.camera.ILiveViewControl;
 import net.osdn.gokigen.a01d.camera.IZoomLensControl;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.ICameraHardwareStatus;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.ICameraRunMode;
+import net.osdn.gokigen.a01d.camera.olympus.wrapper.property.IOlyCameraPropertyProvider;
 import net.osdn.gokigen.a01d.camera.olympuspen.IOlympusPenInterfaceProvider;
 import net.osdn.gokigen.a01d.camera.olympuspen.wrapper.connection.OlympusPenConnection;
 import net.osdn.gokigen.a01d.camera.olympuspen.wrapper.hardware.OlympusPenHardwareStatus;
 import net.osdn.gokigen.a01d.liveview.IAutoFocusFrameDisplay;
 import net.osdn.gokigen.a01d.liveview.IIndicatorControl;
 import net.osdn.gokigen.a01d.liveview.liveviewlistener.ILiveViewListener;
-import net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor;
 
 /**
  *
@@ -38,6 +36,12 @@ public class OlympusPenInterfaceProvider implements IOlympusPenInterfaceProvider
     private final OlympusPenConnection olympusPenConnection;
     private final OlympusPenHardwareStatus hardwareStatus;
     private final OlympusPenRunMode runMode;
+    private final OlympusPenLiveViewControl liveViewControl;
+    private final OlympusPenZoomLensControl zoomLensControl;
+    private final OlympusPenCameraInformation cameraInformation;
+    private final OlympusPenCameraStatusWatcher statusWatcher;
+    private  OlympusPenFocusControl focusControl = null;
+    private  OlympusPenCaptureControl captureControl = null;
 
     /**
      *
@@ -66,6 +70,10 @@ public class OlympusPenInterfaceProvider implements IOlympusPenInterfaceProvider
         olympusPenConnection = new OlympusPenConnection(context, provider);
         hardwareStatus = new OlympusPenHardwareStatus();
         runMode = new OlympusPenRunMode();
+        liveViewControl = new OlympusPenLiveViewControl();
+        zoomLensControl = new OlympusPenZoomLensControl();
+        cameraInformation = new OlympusPenCameraInformation();
+        statusWatcher = new OlympusPenCameraStatusWatcher();
     }
 
     public void prepare()
@@ -77,6 +85,8 @@ public class OlympusPenInterfaceProvider implements IOlympusPenInterfaceProvider
     public void injectDisplay(IAutoFocusFrameDisplay frameDisplayer, IIndicatorControl indicator, IFocusingModeNotify focusingModeNotify)
     {
         Log.v(TAG, "injectDisplay()");
+        focusControl = new OlympusPenFocusControl(frameDisplayer, indicator);
+        captureControl = new OlympusPenCaptureControl(frameDisplayer, indicator);
     }
 
     @Override
@@ -88,37 +98,37 @@ public class OlympusPenInterfaceProvider implements IOlympusPenInterfaceProvider
     @Override
     public ILiveViewControl getLiveViewControl()
     {
-        return (null);
+        return (liveViewControl);
     }
 
     @Override
     public ILiveViewListener getLiveViewListener()
     {
-        return (null);
+        return (liveViewControl.getLiveViewListener());
     }
 
     @Override
     public IFocusingControl getFocusingControl()
     {
-        return (null);
+        return (focusControl);
     }
 
     @Override
     public ICameraInformation getCameraInformation()
     {
-        return (null);
+        return (cameraInformation);
     }
 
     @Override
     public IZoomLensControl getZoomLensControl()
     {
-        return (null);
+        return (zoomLensControl);
     }
 
     @Override
     public ICaptureControl getCaptureControl()
     {
-        return (null);
+        return (captureControl);
     }
 
     @Override
@@ -127,14 +137,20 @@ public class OlympusPenInterfaceProvider implements IOlympusPenInterfaceProvider
     }
 
     @Override
+    public IOlyCameraPropertyProvider getCameraPropertyProvider()
+    {
+        return (cameraInformation);
+    }
+
+    @Override
     public ICameraStatus getCameraStatusListHolder()
     {
-        return (null);
+        return (statusWatcher);
     }
 
     @Override
     public ICameraStatusWatcher getCameraStatusWatcher() {
-        return (null);
+        return (statusWatcher);
     }
 
     @Override

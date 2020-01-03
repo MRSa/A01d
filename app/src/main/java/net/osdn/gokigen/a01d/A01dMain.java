@@ -267,6 +267,19 @@ public class A01dMain extends AppCompatActivity implements ICameraStatusReceiver
                     e.printStackTrace();
                 }
             }
+            else if (method == ICameraConnection.CameraConnectionMethod.OLYMPUS)
+            {
+                try
+                {
+                    // Olympus Penの場合は、コマンド送信ダイアログを表示する
+                    //FujiXCameraCommandSendDialog.newInstance(interfaceProvider.getFujiXInterface()).show(getSupportFragmentManager(), "sendCommandDialog");
+
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+            }
             else
             {
                 // OPC カメラの場合...
@@ -602,6 +615,10 @@ public class A01dMain extends AppCompatActivity implements ICameraStatusReceiver
         else if  (connectionMethod == ICameraConnection.CameraConnectionMethod.FUJI_X)
         {
             connection = interfaceProvider.getFujiXInterface().getFujiXCameraConnection();
+        }
+        else if  (connectionMethod == ICameraConnection.CameraConnectionMethod.OLYMPUS)
+        {
+            connection = interfaceProvider.getOlympusPenInterface().getOlyCameraConnection();
         }
         else // if (connectionMethod == ICameraConnection.CameraConnectionMethod.OPC)
         {

@@ -12,6 +12,8 @@ public interface IPreferencePropertyAccessor
     String AUTO_CONNECT_TO_CAMERA = "auto_connect_to_camera";
     String BLE_POWER_ON = "ble_power_on";
 
+    String WIFI_SETTINGS = "wifi_settings";
+
     String TAKE_MODE =  "take_mode";
     String TAKE_MODE_DEFAULT_VALUE =  "P";
 
