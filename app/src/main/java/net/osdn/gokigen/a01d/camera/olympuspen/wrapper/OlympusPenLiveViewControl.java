@@ -34,6 +34,7 @@ public class OlympusPenLiveViewControl implements ILiveViewControl
 
     private Map<String, String> headerMap;
     private ByteArrayOutputStream receivedByteStream;
+    private byte[] rtpHeader;
 
     OlympusPenLiveViewControl()
     {
@@ -211,29 +212,23 @@ public class OlympusPenLiveViewControl implements ILiveViewControl
                 extensionLength = 16;
                 extensionLength = checkJpegStartPosition(receivedData, extensionLength) - position;
 
+                rtpHeader = Arrays.copyOf(receivedData, extensionLength);
+                System.gc();
             }
             else if (receivedData[1] == (byte) 0xe0)
             {
                 // 末尾パケット (RTPヘッダは 12bytes)
                 isFinished = true;
             }
-            //Log.v(TAG, "RECEIVED PACKET : " + dataLength + " [" + isFinished + "] ext : " + extensionLength);
 
             int offset = position + extensionLength;
             receivedByteStream.write(receivedData, (position + extensionLength), (dataLength - offset));
             if (isFinished)
             {
                 byte[] dataArray = receivedByteStream.toByteArray();
-/*
-                {
-                    byte[] start = Arrays.copyOfRange(dataArray, 0, 32);
-                    byte[] end = Arrays.copyOfRange(dataArray, (dataArray.length - 32), dataArray.length);
-                    dump_bytes(" ST ", start);
-                    dump_bytes(" ED ", end);
-                }
-*/
-                liveViewListener.onUpdateLiveView(Arrays.copyOf(dataArray, dataArray.length), null);
                 receivedByteStream.flush();
+                liveViewListener.onUpdateLiveView(Arrays.copyOf(dataArray, dataArray.length), null);
+                receivedByteStream.reset();
                 //System.gc();
             }
         }
