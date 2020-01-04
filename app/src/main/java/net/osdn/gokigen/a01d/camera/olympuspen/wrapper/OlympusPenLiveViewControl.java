@@ -4,7 +4,9 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
+import net.osdn.gokigen.a01d.camera.CameraStatusListener;
 import net.osdn.gokigen.a01d.camera.ILiveViewControl;
+import net.osdn.gokigen.a01d.camera.olympuspen.wrapper.status.OlympusPenCameraStatusWatcher;
 import net.osdn.gokigen.a01d.camera.utils.SimpleHttpClient;
 import net.osdn.gokigen.a01d.liveview.liveviewlistener.CameraLiveViewListenerImpl;
 import net.osdn.gokigen.a01d.liveview.liveviewlistener.ILiveViewListener;
@@ -19,7 +21,9 @@ import java.util.Map;
 public class OlympusPenLiveViewControl implements ILiveViewControl
 {
     private final String TAG = toString();
+    private final CameraStatusListener statusListener;
     private final CameraLiveViewListenerImpl liveViewListener;
+    private final OlympusPenCameraStatusWatcher statusHolder;
     private DatagramSocket receiveSocket = null;
     private boolean whileStreamReceive = false;
 
@@ -34,11 +38,12 @@ public class OlympusPenLiveViewControl implements ILiveViewControl
 
     private Map<String, String> headerMap;
     private ByteArrayOutputStream receivedByteStream;
-    private byte[] rtpHeader;
 
-    OlympusPenLiveViewControl()
+    OlympusPenLiveViewControl(@NonNull OlympusPenCameraStatusWatcher statusHolder, @NonNull CameraStatusListener statusListener)
     {
         liveViewListener = new CameraLiveViewListenerImpl();
+        this.statusHolder = statusHolder;
+        this.statusListener = statusListener;
 
         headerMap = new HashMap<>();
         headerMap.put("User-Agent", "OlympusCameraKit"); // "OI.Share"
@@ -83,6 +88,7 @@ public class OlympusPenLiveViewControl implements ILiveViewControl
                 }
             });
             thread.start();
+            statusHolder.startStatusWatch(statusListener);
         }
         catch (Exception e)
         {
@@ -118,6 +124,7 @@ public class OlympusPenLiveViewControl implements ILiveViewControl
                 }
             });
             thread.start();
+            statusHolder.stopStatusWatch();
         }
         catch (Exception e)
         {
@@ -212,7 +219,7 @@ public class OlympusPenLiveViewControl implements ILiveViewControl
                 extensionLength = 16;
                 extensionLength = checkJpegStartPosition(receivedData, extensionLength) - position;
 
-                rtpHeader = Arrays.copyOf(receivedData, extensionLength);
+                statusHolder.setRtpHeader(Arrays.copyOf(receivedData, extensionLength));
                 System.gc();
             }
             else if (receivedData[1] == (byte) 0xe0)

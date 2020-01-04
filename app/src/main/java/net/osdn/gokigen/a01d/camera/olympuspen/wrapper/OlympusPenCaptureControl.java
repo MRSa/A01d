@@ -22,11 +22,6 @@ public class OlympusPenCaptureControl  implements ICaptureControl
         singleShotControl = new OlympusPenSingleShotControl(frameDisplayer, indicator);
     }
 
-    public void setCamera(@NonNull IPanasonicCamera panasonicCamera)
-    {
-        singleShotControl.setCamera(panasonicCamera);
-    }
-
     /**
      *   撮影する
      *

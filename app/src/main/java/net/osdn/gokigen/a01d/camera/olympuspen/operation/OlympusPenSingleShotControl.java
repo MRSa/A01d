@@ -10,13 +10,18 @@ import net.osdn.gokigen.a01d.camera.utils.SimpleHttpClient;
 import net.osdn.gokigen.a01d.liveview.IAutoFocusFrameDisplay;
 import net.osdn.gokigen.a01d.liveview.IIndicatorControl;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class OlympusPenSingleShotControl
 {
     private static final String TAG = SingleShotControl.class.getSimpleName();
     private static final int TIMEOUT_MS = 3000;
     private final IAutoFocusFrameDisplay frameDisplayer;
+    private final String COMMUNICATION_URL = "http://192.168.0.10/";
+    private final String CAPTURE_COMMAND = "exec_takemotion.cgi?com=starttake";
     private final IIndicatorControl indicator;
-    private IPanasonicCamera camera = null;
+    private Map<String, String> headerMap;
 
     /**
      *
@@ -26,15 +31,11 @@ public class OlympusPenSingleShotControl
     {
         this.frameDisplayer = frameDisplayer;
         this.indicator = indicator;
-    }
 
-    /**
-     *
-     *
-     */
-    public void setCamera(@NonNull IPanasonicCamera panasonicCamera)
-    {
-        this.camera = panasonicCamera;
+        headerMap = new HashMap<>();
+        headerMap.put("User-Agent", "OlympusCameraKit"); // "OI.Share"
+        headerMap.put("X-Protocol", "OlympusCameraKit"); // "OI.Share"
+
     }
 
     /**
@@ -44,11 +45,6 @@ public class OlympusPenSingleShotControl
     public void singleShot()
     {
         Log.v(TAG, "singleShot()");
-        if (camera == null)
-        {
-            Log.v(TAG, "IPanasonicCamera is null...");
-            return;
-        }
         try
         {
             Thread thread = new Thread(new Runnable()
@@ -58,7 +54,7 @@ public class OlympusPenSingleShotControl
                 {
                     try
                     {
-                        String reply = SimpleHttpClient.httpGet(camera.getCmdUrl() + "cam.cgi?mode=camcmd&value=capture", TIMEOUT_MS);
+                        String reply = SimpleHttpClient.httpGetWithHeader((COMMUNICATION_URL + CAPTURE_COMMAND), headerMap, null, TIMEOUT_MS);
                         if (!reply.contains("ok"))
                         {
                             Log.v(TAG, "Capture Failure... : " + reply);

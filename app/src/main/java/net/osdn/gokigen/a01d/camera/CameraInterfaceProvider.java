@@ -38,7 +38,7 @@ public class CameraInterfaceProvider implements IInterfaceProvider
         this.context = context;
         this.statusListener = new CameraStatusListener();
         olympus = new OlympusInterfaceProvider(context, provider);
-        olympusPen = new OlympusPenInterfaceProvider(context, provider);
+        olympusPen = new OlympusPenInterfaceProvider(context, provider, statusListener);
         sony = new SonyCameraWrapper(context, provider, statusListener);
         fujiX = new FujiXInterfaceProvider(context, provider, statusListener);
         panasonic = new PanasonicCameraWrapper(context, provider, statusListener);

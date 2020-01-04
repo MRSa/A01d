@@ -15,13 +15,24 @@ import net.osdn.gokigen.a01d.liveview.IIndicatorControl;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+
 public class OlympusPenAutoFocusControl
 {
-    private static final String TAG = PanasonicAutoFocusControl.class.getSimpleName();
+    private static final String TAG = OlympusPenAutoFocusControl.class.getSimpleName();
     private static final int TIMEOUT_MS = 3000;
     private final IIndicatorControl indicator;
     private final IAutoFocusFrameDisplay frameDisplayer;
-    //private IPanasonicCamera camera = null;
+    private Map<String, String> headerMap;
+
+    private final String COMMUNICATION_URL = "http://192.168.0.10/";
+    private final String AF_FRAME_COMMAND = "exec_takemotion.cgi?com=assignafframe";
+    private final String AF_RELEASE_COMMAND = "exec_takemotion.cgi?com=releaseafframe";
+
+    private float scaleX = 640.0f;
+    private float scaleY = 480.0f;
 
     /**
      *
@@ -31,15 +42,10 @@ public class OlympusPenAutoFocusControl
     {
         this.frameDisplayer = frameDisplayer;
         this.indicator = indicator;
-    }
 
-    /**
-     *
-     *
-     */
-    public void setCamera(@NonNull IPanasonicCamera panasonicCamera)
-    {
-        //this.camera = panasonicCamera;
+        headerMap = new HashMap<>();
+        headerMap.put("User-Agent", "OlympusCameraKit"); // "OI.Share"
+        headerMap.put("X-Protocol", "OlympusCameraKit"); // "OI.Share"
     }
 
     /**
@@ -49,13 +55,7 @@ public class OlympusPenAutoFocusControl
     public void lockAutoFocus(@NonNull final PointF point)
     {
         Log.v(TAG, "lockAutoFocus() : [" + point.x + ", " + point.y + "]");
-/*
-        if (camera == null)
-        {
-            Log.v(TAG, "ISonyCameraApi is null...");
-            return;
-        }
-*/
+
         try
         {
             Thread thread = new Thread(new Runnable()
@@ -68,19 +68,17 @@ public class OlympusPenAutoFocusControl
                     {
                         showFocusFrame(preFocusFrameRect, IAutoFocusFrameDisplay.FocusFrameStatus.Running, 0.0);
 
-                        int posX = (int) (Math.floor(point.x * 1000.0));
-                        int posY = (int) (Math.floor(point.y * 1000.0));
+                        int posX = (int) (Math.floor(point.x * 1000.0 * scaleX));
+                        int posY = (int) (Math.floor(point.y * 1000.0) * scaleY);
                         Log.v(TAG, "AF (" + posX + ", " + posY + ")");
-/*
-                        //String reply = SimpleHttpClient.httpGet(camera.getCmdUrl() + "cam.cgi?mode=camctrl&type=touch&value=" + posX + "/" + posY + "&value2=on", TIMEOUT_MS);
-
+                        String sendUrl = String.format(Locale.US, "%s%s&point=%04dx%04d", COMMUNICATION_URL, AF_FRAME_COMMAND, posX, posY);
+                        String reply =  SimpleHttpClient.httpGetWithHeader(sendUrl, headerMap, null, TIMEOUT_MS);
                         if (!reply.contains("ok"))
                         {
                             Log.v(TAG, "setTouchAFPosition() reply is null.");
                         }
-*/
-/*
-                        if (findTouchAFPositionResult(resultsObj))
+
+                        if (findTouchAFPositionResult(reply))
                         {
                             // AF FOCUSED
                             Log.v(TAG, "lockAutoFocus() : FOCUSED");
@@ -92,7 +90,6 @@ public class OlympusPenAutoFocusControl
                             Log.v(TAG, "lockAutoFocus() : ERROR");
                             showFocusFrame(preFocusFrameRect, IAutoFocusFrameDisplay.FocusFrameStatus.Failed, 1.0);
                         }
-*/
                         showFocusFrame(preFocusFrameRect, IAutoFocusFrameDisplay.FocusFrameStatus.Errored, 1.0);
                     }
                     catch (Exception e)
@@ -124,13 +121,6 @@ public class OlympusPenAutoFocusControl
     public void halfPressShutter(final boolean isPressed)
     {
         Log.v(TAG, "halfPressShutter() : " + isPressed);
-/*
-        if (camera == null)
-        {
-            Log.v(TAG, "IPanasonicCamera is null...");
-            return;
-        }
-*/
         try
         {
             Thread thread = new Thread(new Runnable()
@@ -174,13 +164,6 @@ public class OlympusPenAutoFocusControl
     public void unlockAutoFocus()
     {
         Log.v(TAG, "unlockAutoFocus()");
-/*
-        if (camera == null)
-        {
-            Log.v(TAG, "IPanasonicCamera is null...");
-            return;
-        }
-*/
         try
         {
             Thread thread = new Thread(new Runnable()
@@ -190,13 +173,12 @@ public class OlympusPenAutoFocusControl
                 {
                     try
                     {
-/*
-                        String reply = SimpleHttpClient.httpGet(camera.getCmdUrl() + "cam.cgi?mode=camctrl&type=touch&value=500/500&value2=off", TIMEOUT_MS);
+
+                        String reply =  SimpleHttpClient.httpGetWithHeader(COMMUNICATION_URL + AF_RELEASE_COMMAND, headerMap, null, TIMEOUT_MS);
                         if (!reply.contains("ok"))
                         {
-                            Log.v(TAG, "CENTER FOCUS (UNLOCK) FAIL...");
+                            Log.v(TAG, "unlockAutoFocus() reply is null.");
                         }
-*/
                         hideFocusFrame();
                     }
                     catch (Exception e)
@@ -261,24 +243,19 @@ public class OlympusPenAutoFocusControl
      *
      *
      */
-    private static boolean findTouchAFPositionResult(JSONObject replyJson)
+    private static boolean findTouchAFPositionResult(String replyXml)
     {
-        boolean afResult = false;
         try
         {
-            int indexOfTouchAFPositionResult = 1;
-            JSONArray resultsObj = replyJson.getJSONArray("result");
-            if (!resultsObj.isNull(indexOfTouchAFPositionResult))
+            if (replyXml.contains("ok"))
             {
-                JSONObject touchAFPositionResultObj = resultsObj.getJSONObject(indexOfTouchAFPositionResult);
-                afResult = touchAFPositionResultObj.getBoolean("AFResult");
-                Log.v(TAG, "AF Result : " + afResult);
+                return (true);
             }
         }
         catch (Exception e)
         {
             e.printStackTrace();
         }
-        return (afResult);
+        return (false);
     }
 }

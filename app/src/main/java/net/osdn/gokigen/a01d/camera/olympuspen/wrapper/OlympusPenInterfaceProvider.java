@@ -5,6 +5,7 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
+import net.osdn.gokigen.a01d.camera.CameraStatusListener;
 import net.osdn.gokigen.a01d.camera.ICameraConnection;
 import net.osdn.gokigen.a01d.camera.ICameraInformation;
 import net.osdn.gokigen.a01d.camera.ICameraStatus;
@@ -22,6 +23,7 @@ import net.osdn.gokigen.a01d.camera.olympus.wrapper.property.IOlyCameraPropertyP
 import net.osdn.gokigen.a01d.camera.olympuspen.IOlympusPenInterfaceProvider;
 import net.osdn.gokigen.a01d.camera.olympuspen.wrapper.connection.OlympusPenConnection;
 import net.osdn.gokigen.a01d.camera.olympuspen.wrapper.hardware.OlympusPenHardwareStatus;
+import net.osdn.gokigen.a01d.camera.olympuspen.wrapper.status.OlympusPenCameraStatusWatcher;
 import net.osdn.gokigen.a01d.liveview.IAutoFocusFrameDisplay;
 import net.osdn.gokigen.a01d.liveview.IIndicatorControl;
 import net.osdn.gokigen.a01d.liveview.liveviewlistener.ILiveViewListener;
@@ -47,7 +49,7 @@ public class OlympusPenInterfaceProvider implements IOlympusPenInterfaceProvider
      *
      *
      */
-    public OlympusPenInterfaceProvider(@NonNull Activity context, @NonNull ICameraStatusReceiver provider)
+    public OlympusPenInterfaceProvider(@NonNull Activity context, @NonNull ICameraStatusReceiver provider, @NonNull CameraStatusListener statusListener)
     {
 /*
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
@@ -69,11 +71,11 @@ public class OlympusPenInterfaceProvider implements IOlympusPenInterfaceProvider
         //this.provider = provider;
         olympusPenConnection = new OlympusPenConnection(context, provider);
         hardwareStatus = new OlympusPenHardwareStatus();
-        runMode = new OlympusPenRunMode();
-        liveViewControl = new OlympusPenLiveViewControl();
-        zoomLensControl = new OlympusPenZoomLensControl();
-        cameraInformation = new OlympusPenCameraInformation();
         statusWatcher = new OlympusPenCameraStatusWatcher();
+        runMode = new OlympusPenRunMode();
+        liveViewControl = new OlympusPenLiveViewControl(statusWatcher, statusListener);
+        zoomLensControl = new OlympusPenZoomLensControl(hardwareStatus);
+        cameraInformation = new OlympusPenCameraInformation();
     }
 
     public void prepare()
