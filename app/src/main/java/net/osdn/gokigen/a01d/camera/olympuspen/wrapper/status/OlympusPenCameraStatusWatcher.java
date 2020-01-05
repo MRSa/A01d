@@ -10,8 +10,6 @@ import net.osdn.gokigen.a01d.liveview.ICameraStatusUpdateNotify;
 
 import java.util.List;
 
-import static net.osdn.gokigen.a01d.camera.utils.SimpleLogDumper.dump_bytes;
-
 public class OlympusPenCameraStatusWatcher implements ICameraStatusWatcher, ICameraStatus
 {
     private final String TAG = toString();
