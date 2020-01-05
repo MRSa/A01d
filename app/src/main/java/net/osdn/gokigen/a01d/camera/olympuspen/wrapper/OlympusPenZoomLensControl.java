@@ -4,7 +4,10 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
+import net.osdn.gokigen.a01d.camera.IFocusingControl;
 import net.osdn.gokigen.a01d.camera.IZoomLensControl;
+import net.osdn.gokigen.a01d.camera.olympuspen.IOlympusPenInterfaceProvider;
+import net.osdn.gokigen.a01d.camera.olympuspen.operation.OlympusPenAutoFocusControl;
 import net.osdn.gokigen.a01d.camera.olympuspen.wrapper.hardware.OlympusPenHardwareStatus;
 import net.osdn.gokigen.a01d.camera.panasonic.wrapper.IPanasonicCamera;
 import net.osdn.gokigen.a01d.camera.utils.SimpleHttpClient;

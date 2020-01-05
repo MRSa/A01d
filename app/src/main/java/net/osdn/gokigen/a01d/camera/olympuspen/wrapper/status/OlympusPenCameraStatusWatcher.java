@@ -138,10 +138,14 @@ public class OlympusPenCameraStatusWatcher implements ICameraStatusWatcher, ICam
         int status = (buffer[position + 7] & 0xff);
         if (status != focusingStatus)
         {
-            boolean focus = (status == 1);
-            boolean isError = (status == 2);
-            //Log.v(TAG, "FOCUS : " + focus + "(" + isError + ") " + status);
-            notifier.updateFocusedStatus(focus, isError);
+            // ドライブ停止時には、マーカの色は消さない
+            if (status > 0)
+            {
+                boolean focus = (status == 1);
+                boolean isError = (status == 2);
+                //Log.v(TAG, "FOCUS : " + focus + "(" + isError + ") " + status);
+                notifier.updateFocusedStatus(focus, isError);
+            }
             focusingStatus = status;
         }
     }
