@@ -24,6 +24,7 @@ public class OlympusPenCameraStatusWatcher implements ICameraStatusWatcher, ICam
     private int focusingStatus = 0;
     private static final int ID_FRAME_SIZE = 1;
     private static final int ID_AF_FRAME_INFO = 2;
+    private static final int ID_ZOOM_LENS_INFO = 18;
 
 
     public OlympusPenCameraStatusWatcher()
@@ -111,6 +112,8 @@ public class OlympusPenCameraStatusWatcher implements ICameraStatusWatcher, ICam
                         checkFocused(buffer, position, length);
                         break;
 
+                    case ID_ZOOM_LENS_INFO:
+                        // レンズのズーム情報
                     case ID_FRAME_SIZE:
                     default:
                         // Log.v(TAG, " ID : " + id + "  LENGTH : " + length);
@@ -137,6 +140,7 @@ public class OlympusPenCameraStatusWatcher implements ICameraStatusWatcher, ICam
         {
             boolean focus = (status == 1);
             boolean isError = (status == 2);
+            //Log.v(TAG, "FOCUS : " + focus + "(" + isError + ") " + status);
             notifier.updateFocusedStatus(focus, isError);
             focusingStatus = status;
         }

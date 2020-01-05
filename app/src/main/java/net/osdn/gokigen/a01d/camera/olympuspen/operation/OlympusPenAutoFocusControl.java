@@ -68,8 +68,8 @@ public class OlympusPenAutoFocusControl
                     {
                         showFocusFrame(preFocusFrameRect, IAutoFocusFrameDisplay.FocusFrameStatus.Running, 0.0);
 
-                        int posX = (int) (Math.floor(point.x * 1000.0 * scaleX));
-                        int posY = (int) (Math.floor(point.y * 1000.0) * scaleY);
+                        int posX = (int) (Math.floor((point.x * scaleX)));
+                        int posY = (int) (Math.floor((point.y * scaleY)));
                         Log.v(TAG, "AF (" + posX + ", " + posY + ")");
                         String sendUrl = String.format(Locale.US, "%s%s&point=%04dx%04d", COMMUNICATION_URL, AF_FRAME_COMMAND, posX, posY);
                         String reply =  SimpleHttpClient.httpGetWithHeader(sendUrl, headerMap, null, TIMEOUT_MS);
@@ -78,7 +78,7 @@ public class OlympusPenAutoFocusControl
                             Log.v(TAG, "setTouchAFPosition() reply is null.");
                         }
 
-                        if (findTouchAFPositionResult(reply))
+                        if (findTouchAFPositionResult(reply, " [" + posX + "x" + posY +"]"))
                         {
                             // AF FOCUSED
                             Log.v(TAG, "lockAutoFocus() : FOCUSED");
@@ -90,7 +90,7 @@ public class OlympusPenAutoFocusControl
                             Log.v(TAG, "lockAutoFocus() : ERROR");
                             showFocusFrame(preFocusFrameRect, IAutoFocusFrameDisplay.FocusFrameStatus.Failed, 1.0);
                         }
-                        showFocusFrame(preFocusFrameRect, IAutoFocusFrameDisplay.FocusFrameStatus.Errored, 1.0);
+                        //showFocusFrame(preFocusFrameRect, IAutoFocusFrameDisplay.FocusFrameStatus.Errored, 1.0);
                     }
                     catch (Exception e)
                     {
@@ -120,41 +120,8 @@ public class OlympusPenAutoFocusControl
      */
     public void halfPressShutter(final boolean isPressed)
     {
-        Log.v(TAG, "halfPressShutter() : " + isPressed);
-        try
-        {
-            Thread thread = new Thread(new Runnable()
-            {
-                @Override
-                public void run()
-                {
-                    try
-                    {
-                        String status = (isPressed) ? "on" : "off";
-/*
-                        String reply = SimpleHttpClient.httpGet(camera.getCmdUrl() + "cam.cgi?mode=camctrl&type=touch&value=500/500&value2=" + status, TIMEOUT_MS);
-                        if (!reply.contains("ok"))
-                        {
-                            Log.v(TAG, "CENTER FOCUS (" + status + ") FAIL...");
-                        }
-                        else
-                        {
-                            indicator.onAfLockUpdate(isPressed);
-                        }
-*/
-                    }
-                    catch (Exception e)
-                    {
-                        e.printStackTrace();
-                    }
-                }
-            });
-            thread.start();
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
+        // フォーカスのボタンを押したときは、AFを UNLOCKする。
+        unlockAutoFocus();
     }
 
     /**
@@ -243,10 +210,11 @@ public class OlympusPenAutoFocusControl
      *
      *
      */
-    private static boolean findTouchAFPositionResult(String replyXml)
+    private static boolean findTouchAFPositionResult(String replyXml, String position)
     {
         try
         {
+            Log.v(TAG, " REPLY : " + replyXml + " " + position);
             if (replyXml.contains("ok"))
             {
                 return (true);

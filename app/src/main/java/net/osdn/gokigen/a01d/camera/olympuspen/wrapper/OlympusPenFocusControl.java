@@ -17,7 +17,7 @@ public class OlympusPenFocusControl implements IFocusingControl
     private final OlympusPenAutoFocusControl afControl;
     private final IAutoFocusFrameDisplay frameDisplay;
 
-    public OlympusPenFocusControl(@NonNull final IAutoFocusFrameDisplay frameDisplayer, @NonNull final IIndicatorControl indicator)
+    OlympusPenFocusControl(@NonNull final IAutoFocusFrameDisplay frameDisplayer, @NonNull final IIndicatorControl indicator)
     {
         this.frameDisplay = frameDisplayer;
         afControl = new OlympusPenAutoFocusControl(frameDisplayer, indicator);
