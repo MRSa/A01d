@@ -110,7 +110,7 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer, IFo
      *
      */
     @Override
-    public void onAttach(Context context)
+    public void onAttach(@NonNull Context context)
     {
         super.onAttach(context);
         Log.v(TAG, "onAttach()");
@@ -297,19 +297,14 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer, IFo
                 }
                 else if (connectionMethod == ICameraConnection.CameraConnectionMethod.OLYMPUS)
                 {
-                    /*
-                    if (favoriteButton != null)
-                    {
-                        favoriteButton.setVisibility(View.VISIBLE);
-                        favoriteButton.setOnClickListener(onClickTouchListener);
-                    }
                     if (manualFocus != null)
                     {
                         manualFocus.setVisibility(View.INVISIBLE);
                     }
-                    if (changeLiveViewScale != null)
+                    if (favoriteButton != null)
                     {
-                        changeLiveViewScale.setVisibility(View.INVISIBLE);
+                        favoriteButton.setVisibility(View.INVISIBLE);
+                        //favoriteButton.setOnClickListener(onClickTouchListener);
                     }
                     if (focusIndicator != null)
                     {
@@ -317,9 +312,13 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer, IFo
                     }
                     if (propertyButton != null)
                     {
-                        propertyButton.setOnClickListener(onClickTouchListener);
+                        propertyButton.setVisibility(View.INVISIBLE);
+                        //propertyButton.setOnClickListener(onClickTouchListener);
                     }
-                    */
+                    if (changeLiveViewScale != null)
+                    {
+                        changeLiveViewScale.setVisibility(View.INVISIBLE);
+                    }
                 }
             }
             if (manualFocus != null)
