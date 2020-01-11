@@ -15,6 +15,7 @@ import net.osdn.gokigen.a01d.camera.olympus.cameraproperty.OlyCameraPropertyList
 import net.osdn.gokigen.a01d.camera.ICameraStatusReceiver;
 import net.osdn.gokigen.a01d.camera.ICameraConnection;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.connection.ble.ICameraPowerOn;
+import net.osdn.gokigen.a01d.camera.olympuspen.operation.OlympusPenSendCommandDialog;
 import net.osdn.gokigen.a01d.camera.panasonic.operation.PanasonicSendCommandDialog;
 import net.osdn.gokigen.a01d.camera.ricohgr2.operation.RicohGr2SendCommandDialog;
 import net.osdn.gokigen.a01d.camera.sony.cameraproperty.SonyCameraApiListFragment;
@@ -272,7 +273,7 @@ public class A01dMain extends AppCompatActivity implements ICameraStatusReceiver
                 try
                 {
                     // Olympus Penの場合は、コマンド送信ダイアログを表示する
-                    //FujiXCameraCommandSendDialog.newInstance(interfaceProvider.getFujiXInterface()).show(getSupportFragmentManager(), "sendCommandDialog");
+                    OlympusPenSendCommandDialog.newInstance(interfaceProvider.getOlympusPenInterface()).show(getSupportFragmentManager(), "olympusPenSendCommandDialog");
 
                 }
                 catch (Exception e)
