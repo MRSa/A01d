@@ -1,4 +1,4 @@
-package net.osdn.gokigen.a01d.camera.olympuspen.operation;
+package net.osdn.gokigen.a01d.camera.utils;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -12,41 +12,38 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
-
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 
 import net.osdn.gokigen.a01d.R;
 import net.osdn.gokigen.a01d.camera.ILiveViewControl;
-import net.osdn.gokigen.a01d.camera.olympuspen.IOlympusPenInterfaceProvider;
-import net.osdn.gokigen.a01d.camera.utils.SimpleHttpClient;
-
-import java.util.HashMap;
 import java.util.Map;
 
-public class OlympusPenSendCommandDialog  extends DialogFragment implements View.OnClickListener
+public class SimpleHttpSendCommandDialog extends DialogFragment implements View.OnClickListener
 {
     private final String TAG = toString();
-    private IOlympusPenInterfaceProvider interfaceProvider = null;
+    private ILiveViewControl liveViewControl = null;
     private Dialog myDialog = null;
     private EditText method = null;
     private EditText service = null;
     private EditText parameter = null;
     private EditText command = null;
     private TextView responseArea = null;
+    private String urlToSend = null;
     private Map<String, String> headerMap;
 
     private static final int TIMEOUT_MS = 6000;
-    private static final String COMMUNICATE_URL = "http://192.168.0.10/";
+    private static final String COMMUNICATE_URL_DEFAULT = "http://192.168.0.10/";
 
     /**
      *
      *
      */
-    public static OlympusPenSendCommandDialog newInstance(@NonNull IOlympusPenInterfaceProvider interfaceProvider)
+    public static SimpleHttpSendCommandDialog newInstance(@Nullable String urlToSend, @NonNull ILiveViewControl liveViewControl,  @Nullable Map<String, String> headerMap)
     {
-        OlympusPenSendCommandDialog instance = new OlympusPenSendCommandDialog();
-        instance.prepare(interfaceProvider);
+        SimpleHttpSendCommandDialog instance = new SimpleHttpSendCommandDialog();
+        instance.prepare(urlToSend, liveViewControl, headerMap);
 
         // パラメータはBundleにまとめておく
         Bundle arguments = new Bundle();
@@ -61,14 +58,24 @@ public class OlympusPenSendCommandDialog  extends DialogFragment implements View
      *
      *
      */
-    private void prepare(@NonNull IOlympusPenInterfaceProvider interfaceProvider)
+    private void prepare(@Nullable String urlToSend, @NonNull ILiveViewControl liveViewControl, @Nullable Map<String, String> headerMap)
     {
-        //
-        this.interfaceProvider = interfaceProvider;
+        if ((urlToSend == null)||(!urlToSend.contains("http://")))
+        {
+            this.urlToSend = COMMUNICATE_URL_DEFAULT;
+        }
+        else
+        {
+            this.urlToSend = urlToSend;
+        }
 
-        headerMap = new HashMap<>();
-        headerMap.put("User-Agent", "OlympusCameraKit"); // "OI.Share"
-        headerMap.put("X-Protocol", "OlympusCameraKit"); // "OI.Share"
+        //
+        this.liveViewControl = liveViewControl;
+
+        this.headerMap = headerMap;
+        //headerMap = new HashMap<>();
+        //headerMap.put("User-Agent", "OlympusCameraKit"); // "OI.Share"
+        //headerMap.put("X-Protocol", "OlympusCameraKit"); // "OI.Share"
     }
 
     @Override
@@ -103,11 +110,11 @@ public class OlympusPenSendCommandDialog  extends DialogFragment implements View
 
         // Get the layout inflater
         LayoutInflater inflater = activity.getLayoutInflater();
-        final View alertView = inflater.inflate(R.layout.olympuspen_request_layout, null, false);
+        final View alertView = inflater.inflate(R.layout.http_request_layout, null, false);
         alertDialog.setView(alertView);
 
         alertDialog.setIcon(R.drawable.ic_linked_camera_black_24dp);
-        alertDialog.setTitle(activity.getString(R.string.dialog_olympuspen_command_title_command));
+        alertDialog.setTitle(activity.getString(R.string.dialog_http_command_title_command));
         method = alertView.findViewById(R.id.edit_method);
         service = alertView.findViewById(R.id.edit_service);
         parameter = alertView.findViewById(R.id.edit_parameter);
@@ -123,13 +130,9 @@ public class OlympusPenSendCommandDialog  extends DialogFragment implements View
         alertDialog.setCancelable(true);
         try
         {
-            if (service != null)
-            {
-                service.setText(activity.getText(R.string.olympuspen_service_string));
-            }
             if (method != null)
             {
-                method.setText(activity.getText(R.string.olympuspen_method_string));
+                method.setText(activity.getText(R.string.http_method_string));
             }
         }
         catch (Exception e)
@@ -163,7 +166,11 @@ public class OlympusPenSendCommandDialog  extends DialogFragment implements View
     {
         // ライブビューの停止と開始
         Log.v(TAG, "changeRunMode() : " + isStartLiveView);
-        ILiveViewControl liveViewControl = interfaceProvider.getLiveViewControl();
+        if (liveViewControl == null)
+        {
+            Log.v(TAG, "liveViewControl is NULL...");
+            return;
+        }
         try
         {
             if (isStartLiveView)
@@ -210,6 +217,7 @@ public class OlympusPenSendCommandDialog  extends DialogFragment implements View
                     methodStr = method.getText().toString().toLowerCase();
                 }
                 final boolean isPost = (methodStr.contains("post"));
+                final boolean isPut = (methodStr.contains("put"));
 
                 if (service != null)
                 {
@@ -233,12 +241,12 @@ public class OlympusPenSendCommandDialog  extends DialogFragment implements View
                 //  > POST : http://xxx.xxx.xxx.xxx/(serviceStr) + "?" (commandStr) , parameterStr ← BODY
                 if (commandStr.length() > 0)
                 {
-                    serviceStr = COMMUNICATE_URL + serviceStr + "?" + commandStr;
+                    serviceStr = urlToSend + serviceStr + "?" + commandStr;
                 }
                 else
                 {
                     // commandStrにデータが記入されていない場合はServiceStrのみ
-                    serviceStr = COMMUNICATE_URL + serviceStr;
+                    serviceStr = urlToSend + serviceStr;
                 }
 
                 final String url = serviceStr;
@@ -254,6 +262,10 @@ public class OlympusPenSendCommandDialog  extends DialogFragment implements View
                             if (isPost)
                             {
                                 reply =  SimpleHttpClient.httpPostWithHeader(url, param, headerMap, null, TIMEOUT_MS);
+                            }
+                            else if (isPut)
+                            {
+                                reply =  SimpleHttpClient.httpPutWithHeader(url, param, headerMap, null, TIMEOUT_MS);
                             }
                             else
                             {

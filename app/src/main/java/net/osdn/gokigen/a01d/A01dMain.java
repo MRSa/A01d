@@ -15,7 +15,7 @@ import net.osdn.gokigen.a01d.camera.olympus.cameraproperty.OlyCameraPropertyList
 import net.osdn.gokigen.a01d.camera.ICameraStatusReceiver;
 import net.osdn.gokigen.a01d.camera.ICameraConnection;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.connection.ble.ICameraPowerOn;
-import net.osdn.gokigen.a01d.camera.olympuspen.operation.OlympusPenSendCommandDialog;
+import net.osdn.gokigen.a01d.camera.utils.SimpleHttpSendCommandDialog;
 import net.osdn.gokigen.a01d.camera.panasonic.operation.PanasonicSendCommandDialog;
 import net.osdn.gokigen.a01d.camera.ricohgr2.operation.RicohGr2SendCommandDialog;
 import net.osdn.gokigen.a01d.camera.sony.cameraproperty.SonyCameraApiListFragment;
@@ -38,6 +38,9 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.PreferenceManager;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  *   A01d ;
@@ -272,9 +275,12 @@ public class A01dMain extends AppCompatActivity implements ICameraStatusReceiver
             {
                 try
                 {
-                    // Olympus Penの場合は、コマンド送信ダイアログを表示する
-                    OlympusPenSendCommandDialog.newInstance(interfaceProvider.getOlympusPenInterface()).show(getSupportFragmentManager(), "olympusPenSendCommandDialog");
+                    Map<String, String> headerMap = new HashMap<>();
+                    headerMap.put("User-Agent", "OlympusCameraKit"); // "OI.Share"
+                    headerMap.put("X-Protocol", "OlympusCameraKit"); // "OI.Share"
 
+                    // Olympus Penの場合は、コマンド送信ダイアログを表示する
+                    SimpleHttpSendCommandDialog.newInstance("http://192.168.0.10/", interfaceProvider.getOlympusPenInterface().getLiveViewControl(), headerMap).show(getSupportFragmentManager(), "olympusPenSendCommandDialog");
                 }
                 catch (Exception e)
                 {

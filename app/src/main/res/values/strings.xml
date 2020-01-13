@@ -175,7 +175,7 @@
     <string name="pref_use_pentax_autofocus_summary">Uses PENTAX DSLR control commands.</string>
 
 
-    <string name="dialog_olympuspen_command_title_command">Send Message(Olympus)</string>
+    <string name="dialog_http_command_title_command">HTTP Send Message</string>
     <string name="dialog_ricoh_command_title_command">Send Message(RICOH)</string>
     <string name="dialog_panasonic_command_title_command">Send Message(Panasonic)</string>
     <string name="dialog_fujix_command_title_command">Send Message(FUJI)</string>
@@ -192,12 +192,12 @@
     <string name="dialog_command_hint">(command)</string>
     <string name="dialog_service_hint">(service)</string>
     <string name="panasonic_service_string">cam.cgi</string>
-    <string name="olympuspen_dialog_service_hint">(service)</string>
-    <string name="olympuspen_dialog_method_hint">GET/POST</string>
-    <string name="olympuspen_method_string">GET</string>
-    <string name="olympuspen_service_string">get_camprop.cgi</string>
-    <string name="olympuspen_dialog_command_hint">com=desc</string>
-    <string name="olympuspen_dialog_parameter_hint">propname=desclist</string>
+    <string name="http_dialog_service_hint">(service)</string>
+    <string name="http_dialog_method_hint">GET/POST/PUT</string>
+    <string name="http_method_string">GET</string>
+    <string name="http_service_string">get_camprop.cgi</string>
+    <string name="http_dialog_command_hint">com=desc</string>
+    <string name="http_dialog_parameter_hint">propname=desclist</string>
     <string name="ricoh_service_string">GET</string>
     <string name="ricoh_get_status_string">v1/status/camera</string>
 
