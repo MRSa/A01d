@@ -82,7 +82,7 @@
                 android:layout_height="wrap_content"
                 android:autoLink="all"
                 android:linksClickable="true"
-                android:inputType="text"
+                android:inputType="textMultiLine"
                 android:hint="@string/http_dialog_parameter_hint"
                 />
 
