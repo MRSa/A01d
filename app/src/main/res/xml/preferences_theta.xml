@@ -26,6 +26,11 @@
         android:title="@string/pref_cat_camera">
 
         <CheckBoxPreference
+            android:key="use_osc_theta_v21"
+            android:title="@string/pref_use_osc_theta_v21"
+            android:summary="@string/pref_summary_use_osc_theta_v21"/>
+
+        <CheckBoxPreference
             android:key="capture_both_camera_and_live_view"
             android:title="@string/pref_capture_both_camera_and_live_view" />
 

@@ -130,6 +130,7 @@
     <string name="dialog_title_connect_failed_panasonic">接続失敗(PANASONIC)</string>
     <string name="dialog_title_connect_failed_sony">接続失敗(SONY)</string>
     <string name="dialog_title_connect_failed_fuji">接続失敗(FUJI)</string>
+    <string name="dialog_title_connect_failed_theta">接続失敗(THETA)</string>
     <string name="fatal_cannot_use_camera">Olympus Camera Kitが動作しないモードのため、カメラのリセットが必要です。電源ボタンを8秒以上長押しして、カメラをリセットしてください。</string>
     <string name="network_connection_timeout">接続タイムアウト</string>
     <string name="restored_my_props">設定を展開しました。 : </string>
@@ -188,6 +189,7 @@
     <string name="dialog_button_playback">画像参照</string>
     <string name="dialog_command_hint">(command)</string>
     <string name="dialog_service_hint">(service)</string>
+    <string name="http_dialog_http_url_hint">http://192.168.1.1/</string>
     <string name="panasonic_service_string">cam.cgi</string>
     <string name="http_dialog_service_hint">(service)</string>
     <string name="http_dialog_method_hint">GET/POST/PUT</string>
@@ -219,5 +221,8 @@
 
     <string name="connect_error_message_olympus">接続失敗 (OLYMPUS)</string>
     <string name="connect_error_message_fuji">接続失敗 (FUJI)</string>
+
+    <string name="pref_use_osc_theta_v21">THETA Web API v2.1の使用</string>
+    <string name="pref_summary_use_osc_theta_v21"> </string>
 
 </resources>

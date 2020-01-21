@@ -14,7 +14,7 @@ import net.osdn.gokigen.a01d.liveview.liveviewlistener.ILiveViewListener;
 
 public interface IThetaInterfaceProvider
 {
-    ICameraConnection getCanonCameraConnection();
+    ICameraConnection getCameraConnection();
     ILiveViewControl getLiveViewControl();
     ILiveViewListener getLiveViewListener();
     IFocusingControl getFocusingControl();

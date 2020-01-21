@@ -264,7 +264,6 @@ public class A01dMain extends AppCompatActivity implements ICameraStatusReceiver
                 {
                     // FUJI X Seriesの場合は、コマンド送信ダイアログを表示する
                     FujiXCameraCommandSendDialog.newInstance(interfaceProvider.getFujiXInterface()).show(getSupportFragmentManager(), "sendCommandDialog");
-
                 }
                 catch (Exception e)
                 {

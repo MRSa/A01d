@@ -65,6 +65,8 @@ public interface IPreferencePropertyAccessor
 
     String FUJIX_CONNECTION_FOR_READ = "fujix_connection_for_read";
 
+    String USE_OSC_THETA_V21 = "use_osc_theta_v21";
+
     /*
     int CHOICE_SPLASH_SCREEN = 10;
 

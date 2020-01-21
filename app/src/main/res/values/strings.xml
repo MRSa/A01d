@@ -88,6 +88,7 @@
     <string name="dialog_title_connect_failed_panasonic">Connect failed (PANASONIC)</string>
     <string name="dialog_title_connect_failed_sony">Connect failed (SONY)</string>
     <string name="dialog_title_connect_failed_fuji">Connect failed (FUJI)</string>
+    <string name="dialog_title_connect_failed_theta">Connect failed (THETA)</string>
     <string name="dialog_title_button_retry">Retry</string>
     <string name="dialog_title_button_network_settings">WiFi Settings</string>
 
@@ -192,6 +193,7 @@
     <string name="dialog_button_playback">to Playback</string>
     <string name="dialog_command_hint">(command)</string>
     <string name="dialog_service_hint">(service)</string>
+    <string name="http_dialog_http_url_hint">http://192.168.1.1/</string>
     <string name="panasonic_service_string">cam.cgi</string>
     <string name="http_dialog_service_hint">(service)</string>
     <string name="http_dialog_method_hint">GET/POST/PUT</string>
@@ -223,5 +225,8 @@
 
     <string name="connect_error_message_olympus">CONNECTION ERROR (OLYMPUS)</string>
     <string name="connect_error_message_fuji">CONNECTION ERROR (FUJI)</string>
+
+    <string name="pref_use_osc_theta_v21">Use THETA Web API v2.1</string>
+    <string name="pref_summary_use_osc_theta_v21"> </string>
 
 </resources>

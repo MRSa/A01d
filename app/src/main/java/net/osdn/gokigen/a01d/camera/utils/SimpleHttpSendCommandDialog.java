@@ -1,5 +1,4 @@
 package net.osdn.gokigen.a01d.camera.utils;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -18,6 +17,7 @@ import androidx.fragment.app.DialogFragment;
 
 import net.osdn.gokigen.a01d.R;
 import net.osdn.gokigen.a01d.camera.ILiveViewControl;
+
 import java.util.Map;
 
 public class SimpleHttpSendCommandDialog extends DialogFragment implements View.OnClickListener
@@ -25,6 +25,7 @@ public class SimpleHttpSendCommandDialog extends DialogFragment implements View.
     private final String TAG = toString();
     private ILiveViewControl liveViewControl = null;
     private Dialog myDialog = null;
+    private EditText http_header = null;
     private EditText method = null;
     private EditText service = null;
     private EditText parameter = null;
@@ -40,7 +41,7 @@ public class SimpleHttpSendCommandDialog extends DialogFragment implements View.
      *
      *
      */
-    public static SimpleHttpSendCommandDialog newInstance(@Nullable String urlToSend, @NonNull ILiveViewControl liveViewControl,  @Nullable Map<String, String> headerMap)
+    public static SimpleHttpSendCommandDialog newInstance(@Nullable String urlToSend, @Nullable ILiveViewControl liveViewControl,  @Nullable Map<String, String> headerMap)
     {
         SimpleHttpSendCommandDialog instance = new SimpleHttpSendCommandDialog();
         instance.prepare(urlToSend, liveViewControl, headerMap);
@@ -58,7 +59,7 @@ public class SimpleHttpSendCommandDialog extends DialogFragment implements View.
      *
      *
      */
-    private void prepare(@Nullable String urlToSend, @NonNull ILiveViewControl liveViewControl, @Nullable Map<String, String> headerMap)
+    private void prepare(@Nullable String urlToSend, @Nullable ILiveViewControl liveViewControl, @Nullable Map<String, String> headerMap)
     {
         if ((urlToSend == null)||(!urlToSend.contains("http://")))
         {
@@ -115,6 +116,7 @@ public class SimpleHttpSendCommandDialog extends DialogFragment implements View.
 
         alertDialog.setIcon(R.drawable.ic_linked_camera_black_24dp);
         alertDialog.setTitle(activity.getString(R.string.dialog_http_command_title_command));
+        http_header = alertView.findViewById(R.id.edit_http_header);
         method = alertView.findViewById(R.id.edit_method);
         service = alertView.findViewById(R.id.edit_service);
         parameter = alertView.findViewById(R.id.edit_parameter);
@@ -124,8 +126,17 @@ public class SimpleHttpSendCommandDialog extends DialogFragment implements View.
         final Button toRunningButton = alertView.findViewById(R.id.change_to_liveview);
         final Button toPlaybackButton = alertView.findViewById(R.id.change_to_playback);
 
-        toRunningButton.setOnClickListener(this);
-        toPlaybackButton.setOnClickListener(this);
+        if (liveViewControl != null)
+        {
+            toRunningButton.setOnClickListener(this);
+            toPlaybackButton.setOnClickListener(this);
+        }
+        else
+        {
+            // ライブビューのオン・オフ切り替えボタンを非表示にする
+            toRunningButton.setVisibility(View.GONE);
+            toPlaybackButton.setVisibility(View.GONE);
+        }
         sendButton.setOnClickListener(this);
         alertDialog.setCancelable(true);
         try
@@ -133,6 +144,10 @@ public class SimpleHttpSendCommandDialog extends DialogFragment implements View.
             if (method != null)
             {
                 method.setText(activity.getText(R.string.http_method_string));
+            }
+            if (http_header != null)
+            {
+                http_header.setText(urlToSend);
             }
         }
         catch (Exception e)
@@ -212,6 +227,20 @@ public class SimpleHttpSendCommandDialog extends DialogFragment implements View.
             final Activity activity = getActivity();
             if (activity != null)
             {
+                if (http_header != null)
+                {
+                    String httpStr = http_header.getText().toString().toLowerCase();
+                    if (!httpStr.contains("http://"))
+                    {
+                        this.urlToSend = COMMUNICATE_URL_DEFAULT;
+                        http_header.setText(COMMUNICATE_URL_DEFAULT);
+                    }
+                    else
+                    {
+                        this.urlToSend = httpStr;
+                    }
+                }
+                
                 if (method != null)
                 {
                     methodStr = method.getText().toString().toLowerCase();
@@ -271,7 +300,7 @@ public class SimpleHttpSendCommandDialog extends DialogFragment implements View.
                             {
                                 reply = SimpleHttpClient.httpGetWithHeader(url, headerMap, null, TIMEOUT_MS);
                             }
-                            Log.v(TAG, "URL : " + url + " RESPONSE : " + reply);
+                            Log.v(TAG, "URL : " + url + " "+ param + " RESP : " + reply);
                             final String response = reply;
                             activity.runOnUiThread(new Runnable() {
                                 @Override
