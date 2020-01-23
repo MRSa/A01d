@@ -1,43 +1,30 @@
 package net.osdn.gokigen.a01d.camera.theta.wrapper;
 
-import android.graphics.PointF;
 import android.util.Log;
 import android.view.MotionEvent;
 
 import androidx.annotation.NonNull;
 
 import net.osdn.gokigen.a01d.camera.IFocusingControl;
-import net.osdn.gokigen.a01d.camera.olympuspen.operation.OlympusPenAutoFocusControl;
 import net.osdn.gokigen.a01d.liveview.IAutoFocusFrameDisplay;
-import net.osdn.gokigen.a01d.liveview.IIndicatorControl;
 
 public class ThetaFocusControl implements IFocusingControl
 {
     private final String TAG = toString();
-    //private final OlympusPenAutoFocusControl afControl;
     private final IAutoFocusFrameDisplay frameDisplay;
 
-    ThetaFocusControl(@NonNull final IAutoFocusFrameDisplay frameDisplayer, @NonNull final IIndicatorControl indicator)
+    ThetaFocusControl(@NonNull final IAutoFocusFrameDisplay frameDisplayer)
     {
         this.frameDisplay = frameDisplayer;
-        //afControl = new OlympusPenAutoFocusControl(frameDisplayer, indicator);
     }
 
     @Override
     public boolean driveAutoFocus(final MotionEvent motionEvent)
     {
         Log.v(TAG, "driveAutoFocus()");
-        if (motionEvent.getAction() != MotionEvent.ACTION_DOWN)
-        {
-            return (false);
-        }
         try
         {
-            PointF point = frameDisplay.getPointWithEvent(motionEvent);
-            if (frameDisplay.isContainsPoint(point))
-            {
-               //afControl.lockAutoFocus(point);
-            }
+            frameDisplay.hideFocusFrame();
         }
         catch (Exception e)
         {
@@ -52,7 +39,6 @@ public class ThetaFocusControl implements IFocusingControl
         Log.v(TAG, "unlockAutoFocus()");
         try
         {
-            //afControl.unlockAutoFocus();
             frameDisplay.hideFocusFrame();
         }
         catch (Exception e)
@@ -67,13 +53,7 @@ public class ThetaFocusControl implements IFocusingControl
         Log.v(TAG, "halfPressShutter() " + isPressed);
         try
         {
-            //afControl.halfPressShutter(isPressed);
-            if (!isPressed)
-            {
-                // フォーカスを外す
-                frameDisplay.hideFocusFrame();
-                //afControl.unlockAutoFocus();
-            }
+            frameDisplay.hideFocusFrame();
         }
         catch (Exception e)
         {

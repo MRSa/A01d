@@ -5,7 +5,6 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 
 import net.osdn.gokigen.a01d.camera.IZoomLensControl;
-import net.osdn.gokigen.a01d.camera.olympuspen.wrapper.hardware.OlympusPenHardwareStatus;
 import net.osdn.gokigen.a01d.camera.theta.wrapper.hardware.ThetaHardwareStatus;
 import net.osdn.gokigen.a01d.camera.utils.SimpleHttpClient;
 

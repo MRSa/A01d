@@ -10,6 +10,7 @@ import androidx.preference.PreferenceManager;
 import net.osdn.gokigen.a01d.R;
 import net.osdn.gokigen.a01d.camera.ICameraConnection;
 import net.osdn.gokigen.a01d.camera.ICameraStatusReceiver;
+import net.osdn.gokigen.a01d.camera.theta.wrapper.IThetaSessionIdNotifier;
 import net.osdn.gokigen.a01d.camera.utils.SimpleHttpClient;
 import net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor;
 
@@ -26,13 +27,15 @@ public class ThetaCameraConnectSequence implements Runnable
     private final Activity context;
     private final ICameraConnection cameraConnection;
     private final ICameraStatusReceiver cameraStatusReceiver;
+    private final IThetaSessionIdNotifier sessionIdNotifier;
 
-    ThetaCameraConnectSequence(@NonNull Activity context, @NonNull ICameraStatusReceiver statusReceiver, @NonNull final ICameraConnection cameraConnection)
+    ThetaCameraConnectSequence(@NonNull Activity context, @NonNull ICameraStatusReceiver statusReceiver, @NonNull final ICameraConnection cameraConnection, @NonNull IThetaSessionIdNotifier sessionIdNotifier)
     {
         Log.v(TAG, "ThetaCameraConnectSequence");
         this.context = context;
         this.cameraConnection = cameraConnection;
         this.cameraStatusReceiver = statusReceiver;
+        this.sessionIdNotifier = sessionIdNotifier;
     }
 
     @Override
@@ -125,6 +128,7 @@ public class ThetaCameraConnectSequence implements Runnable
             if (response.length() > 0)
             {
                 int apiLevel = 1;
+                String sessionId = null;
                JSONObject object = new JSONObject(response);
                try
                {
@@ -134,12 +138,18 @@ public class ThetaCameraConnectSequence implements Runnable
                {
                    e.printStackTrace();
                }
+                try
+                {
+                    sessionId = object.getJSONObject("state").getString("sessionId");
+                    sessionIdNotifier.receivedSessionId(sessionId);
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
                if (apiLevel != 2)
                {
-                   JSONObject jsonObject = object.getJSONObject("state");
-                   String sessionId = jsonObject.getString("sessionId");
                    String setApiLevelData = "{\"name\":\"camera.setOptions\",\"parameters\":{" + "\"sessionId\" : \"" + sessionId + "\", \"options\":{ \"clientVersion\":2}}}";
-
                    String response3 = SimpleHttpClient.httpPost(commandsExecuteUrl, setApiLevelData, TIMEOUT_MS);
                    Log.v(TAG, " " + commandsExecuteUrl + " " + setApiLevelData + " " + response3);
                }

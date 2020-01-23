@@ -30,7 +30,7 @@ import net.osdn.gokigen.a01d.liveview.liveviewlistener.ILiveViewListener;
  *
  *
  */
-public class ThetaInterfaceProvider implements IThetaInterfaceProvider, IDisplayInjector
+public class ThetaInterfaceProvider implements IThetaInterfaceProvider, IDisplayInjector, IThetaSessionIdNotifier, IThetaSessionIdProvider
 {
     private final String TAG = toString();
     private final ThetaConnection thetaConnection;
@@ -41,8 +41,9 @@ public class ThetaInterfaceProvider implements IThetaInterfaceProvider, IDisplay
     private final ThetaCameraInformation cameraInformation;
     private final ThetaCameraStatusWatcher statusWatcher;
     private final CameraStatusListener statusListener;
-    private  ThetaFocusControl focusControl = null;
-    private  ThetaCaptureControl captureControl = null;
+    private ThetaFocusControl focusControl = null;
+    private ThetaCaptureControl captureControl = null;
+    private String sessionId = "";
 
     /**
      *
@@ -69,11 +70,11 @@ public class ThetaInterfaceProvider implements IThetaInterfaceProvider, IDisplay
         //this.activity = context;
         //this.provider = provider;
         this.statusListener = statusListener;
-        thetaConnection = new ThetaConnection(context, provider);
+        thetaConnection = new ThetaConnection(context, provider, this);
         hardwareStatus = new ThetaHardwareStatus();
         statusWatcher = new ThetaCameraStatusWatcher();
         runMode = new ThetaRunMode();
-        liveViewControl = new ThetaLiveViewControl(statusWatcher, statusListener);
+        liveViewControl = new ThetaLiveViewControl(context, this);
         zoomLensControl = new ThetaZoomLensControl(hardwareStatus);
         cameraInformation = new ThetaCameraInformation();
     }
@@ -87,7 +88,7 @@ public class ThetaInterfaceProvider implements IThetaInterfaceProvider, IDisplay
     public void injectDisplay(IAutoFocusFrameDisplay frameDisplayer, IIndicatorControl indicator, IFocusingModeNotify focusingModeNotify)
     {
         Log.v(TAG, "injectDisplay()");
-        focusControl = new ThetaFocusControl(frameDisplayer, indicator);
+        focusControl = new ThetaFocusControl(frameDisplayer);
         captureControl = new ThetaCaptureControl(frameDisplayer, indicator);
     }
 
@@ -161,4 +162,15 @@ public class ThetaInterfaceProvider implements IThetaInterfaceProvider, IDisplay
         return (statusWatcher);
     }
 
+    @Override
+    public void receivedSessionId(String sessionId)
+    {
+        this.sessionId = sessionId;
+    }
+
+    @Override
+    public String getSessionId()
+    {
+        return (this.sessionId);
+    }
 }

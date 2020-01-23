@@ -4,7 +4,10 @@ import android.util.Log;
 
 import java.io.ByteArrayOutputStream;
 import java.io.EOFException;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.Socket;
 import java.net.URL;
@@ -41,6 +44,70 @@ public class SimpleLiveviewSlicer
     public void open(InputStream inputStream)
     {
             mInputStream = inputStream;
+    }
+
+    public void open(String liveviewUrl, String postData)
+    {
+        OutputStream outputStream = null;
+        OutputStreamWriter writer = null;
+        try
+        {
+            if ((mInputStream != null)||(mHttpConn != null))
+            {
+                Log.v(TAG, "Slicer is already open.");
+                return;
+            }
+
+            final URL urlObj = new URL(liveviewUrl);
+            mHttpConn = (HttpURLConnection) urlObj.openConnection();
+            mHttpConn.setRequestMethod("POST");
+            mHttpConn.setConnectTimeout(CONNECTION_TIMEOUT);
+            {
+                mHttpConn.setDoInput(true);
+                mHttpConn.setDoOutput(true);
+                outputStream = mHttpConn.getOutputStream();
+                writer = new OutputStreamWriter(outputStream, "UTF-8");
+                writer.write(postData);
+                writer.flush();
+                writer.close();
+                writer = null;
+                outputStream.close();
+                outputStream = null;
+            }
+            if (mHttpConn.getResponseCode() == HttpURLConnection.HTTP_OK)
+            {
+                mInputStream = mHttpConn.getInputStream();
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        finally
+        {
+            try
+            {
+                if (writer != null)
+                {
+                    writer.close();
+                }
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+            try
+            {
+                if (outputStream != null)
+                {
+                    outputStream.close();
+                }
+            }
+            catch (IOException e)
+            {
+                e.printStackTrace();
+            }
+        }
     }
 
     public void open(String liveviewUrl)

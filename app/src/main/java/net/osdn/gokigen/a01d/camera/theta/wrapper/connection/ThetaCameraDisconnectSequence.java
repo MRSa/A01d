@@ -1,14 +1,13 @@
 package net.osdn.gokigen.a01d.camera.theta.wrapper.connection;
 
-import android.app.Activity;
-
 public class ThetaCameraDisconnectSequence implements Runnable
 {
-    private final String TAG = this.toString();
+    //private final String TAG = this.toString();
 
-    ThetaCameraDisconnectSequence(Activity activity, boolean isOff)
+    ThetaCameraDisconnectSequence()
+    //ThetaCameraDisconnectSequence(Activity activity, boolean isOff)
     {
-        //
+
     }
 
     @Override

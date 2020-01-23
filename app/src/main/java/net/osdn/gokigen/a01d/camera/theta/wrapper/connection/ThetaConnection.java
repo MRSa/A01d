@@ -18,6 +18,7 @@ import androidx.appcompat.app.AlertDialog;
 import net.osdn.gokigen.a01d.R;
 import net.osdn.gokigen.a01d.camera.ICameraConnection;
 import net.osdn.gokigen.a01d.camera.ICameraStatusReceiver;
+import net.osdn.gokigen.a01d.camera.theta.wrapper.IThetaSessionIdNotifier;
 
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -28,6 +29,7 @@ public class ThetaConnection implements ICameraConnection
     private final Activity context;
     private final ICameraStatusReceiver statusReceiver;
     private final BroadcastReceiver connectionReceiver;
+    private final IThetaSessionIdNotifier sessionIdNotifier;
     //private final ConnectivityManager connectivityManager;
     private final Executor cameraExecutor = Executors.newFixedThreadPool(1);
     //private final Handler networkConnectionTimeoutHandler;
@@ -39,11 +41,12 @@ public class ThetaConnection implements ICameraConnection
      *
      *
      */
-    public ThetaConnection(@NonNull final Activity context, @NonNull final ICameraStatusReceiver statusReceiver)
+    public ThetaConnection(@NonNull final Activity context, @NonNull final ICameraStatusReceiver statusReceiver, @NonNull final IThetaSessionIdNotifier sessionIdNotifier)
     {
         Log.v(TAG, "ThetaConnection()");
         this.context = context;
         this.statusReceiver = statusReceiver;
+        this.sessionIdNotifier = sessionIdNotifier;
         connectionReceiver = new BroadcastReceiver()
         {
             @Override
@@ -239,10 +242,11 @@ public class ThetaConnection implements ICameraConnection
      */
     private void disconnectFromCamera(final boolean powerOff)
     {
-        Log.v(TAG, "disconnectFromCamera()");
+        Log.v(TAG, "disconnectFromCamera() : " + powerOff);
         try
         {
-            cameraExecutor.execute(new ThetaCameraDisconnectSequence(context, powerOff));
+            //cameraExecutor.execute(new ThetaCameraDisconnectSequence(context, powerOff));
+            cameraExecutor.execute(new ThetaCameraDisconnectSequence());
         }
         catch (Exception e)
         {
@@ -259,7 +263,7 @@ public class ThetaConnection implements ICameraConnection
         connectionStatus = CameraConnectionStatus.CONNECTING;
         try
         {
-            cameraExecutor.execute(new ThetaCameraConnectSequence(context, statusReceiver, this));
+            cameraExecutor.execute(new ThetaCameraConnectSequence(context, statusReceiver, this, sessionIdNotifier));
         }
         catch (Exception e)
         {
