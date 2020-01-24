@@ -103,6 +103,7 @@
         <item >Olympus Pen/OM-D</item>
         <item >Sony</item>
         <item >Ricoh GR Series / PENTAX</item>
+        <item >Ricoh THETA Series</item>
         <item >Fuji X Series</item>
         <item >Panasonic</item>
     </string-array>
@@ -112,6 +113,7 @@
         <item >OLYMPUS</item>
         <item >SONY</item>
         <item >RICOH_GR2</item>
+        <item >THETA</item>
         <item >FUJI_X</item>
         <item >PANASONIC</item>
     </string-array>

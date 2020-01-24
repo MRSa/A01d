@@ -29,6 +29,7 @@ import net.osdn.gokigen.a01d.preference.panasonic.PanasonicPreferenceFragment;
 import net.osdn.gokigen.a01d.preference.olympuspen.OlympusPreferenceFragment;
 import net.osdn.gokigen.a01d.preference.ricohgr2.RicohGr2PreferenceFragment;
 import net.osdn.gokigen.a01d.preference.sony.SonyPreferenceFragment;
+import net.osdn.gokigen.a01d.preference.theta.ThetaPreferenceFragment;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
@@ -286,6 +287,18 @@ public class A01dMain extends AppCompatActivity implements ICameraStatusReceiver
                     e.printStackTrace();
                 }
             }
+            else if (method == ICameraConnection.CameraConnectionMethod.THETA)
+            {
+                try
+                {
+                    // THETA の場合は、HTTPコマンド送信ダイアログを表示する
+                    SimpleHttpSendCommandDialog.newInstance("http://192.168.1.1/", null, null).show(getSupportFragmentManager(), "thetaSendCommandDialog");
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+            }
             else
             {
                 // OPC カメラの場合...
@@ -337,6 +350,8 @@ public class A01dMain extends AppCompatActivity implements ICameraStatusReceiver
                         preferenceFragment = OlympusPreferenceFragment.newInstance(this, this);
                     } else if (connectionMethod == ICameraConnection.CameraConnectionMethod.FUJI_X) {
                         preferenceFragment = FujiXPreferenceFragment.newInstance(this, this);
+                    } else if (connectionMethod == ICameraConnection.CameraConnectionMethod.THETA) {
+                        preferenceFragment = ThetaPreferenceFragment.newInstance(this, this);
                     } else //  if (connectionMethod == ICameraConnection.CameraConnectionMethod.OPC)
                     {
                         preferenceFragment = PreferenceFragment.newInstance(this, interfaceProvider, this);
@@ -625,6 +640,10 @@ public class A01dMain extends AppCompatActivity implements ICameraStatusReceiver
         else if  (connectionMethod == ICameraConnection.CameraConnectionMethod.OLYMPUS)
         {
             connection = interfaceProvider.getOlympusPenInterface().getOlyCameraConnection();
+        }
+        else if  (connectionMethod == ICameraConnection.CameraConnectionMethod.THETA)
+        {
+            connection = interfaceProvider.getThetaInterface().getCameraConnection();
         }
         else // if (connectionMethod == ICameraConnection.CameraConnectionMethod.OPC)
         {

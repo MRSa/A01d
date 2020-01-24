@@ -16,6 +16,8 @@ import net.osdn.gokigen.a01d.camera.ricohgr2.IRicohGr2InterfaceProvider;
 import net.osdn.gokigen.a01d.camera.ricohgr2.wrapper.RicohGr2InterfaceProvider;
 import net.osdn.gokigen.a01d.camera.sony.ISonyInterfaceProvider;
 import net.osdn.gokigen.a01d.camera.sony.wrapper.SonyCameraWrapper;
+import net.osdn.gokigen.a01d.camera.theta.IThetaInterfaceProvider;
+import net.osdn.gokigen.a01d.camera.theta.wrapper.ThetaInterfaceProvider;
 import net.osdn.gokigen.a01d.liveview.ICameraStatusUpdateNotify;
 import net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor;
 
@@ -31,6 +33,7 @@ public class CameraInterfaceProvider implements IInterfaceProvider
     private final RicohGr2InterfaceProvider ricohGr2;
     private final FujiXInterfaceProvider fujiX;
     private final PanasonicCameraWrapper panasonic;
+    private final ThetaInterfaceProvider theta;
     private final CameraStatusListener statusListener;
 
     public CameraInterfaceProvider(@NonNull Activity context, @NonNull ICameraStatusReceiver provider)
@@ -43,6 +46,7 @@ public class CameraInterfaceProvider implements IInterfaceProvider
         fujiX = new FujiXInterfaceProvider(context, provider, statusListener);
         panasonic = new PanasonicCameraWrapper(context, provider, statusListener);
         ricohGr2 = new RicohGr2InterfaceProvider(context, provider);
+        theta = new ThetaInterfaceProvider(context, provider, statusListener);
     }
 
     @Override
@@ -100,6 +104,12 @@ public class CameraInterfaceProvider implements IInterfaceProvider
         return (olympusPen);
     }
 
+    @Override
+    public IThetaInterfaceProvider getThetaInterface()
+    {
+        return (theta);
+    }
+
     /**
      *   OPCカメラを使用するかどうか
      *
@@ -131,6 +141,10 @@ public class CameraInterfaceProvider implements IInterfaceProvider
             else if (connectionMethod.contains("OLYMPUS"))
             {
                 ret = ICameraConnection.CameraConnectionMethod.OLYMPUS;
+            }
+            else if (connectionMethod.contains("THETA"))
+            {
+                ret = ICameraConnection.CameraConnectionMethod.THETA;
             }
         }
         catch (Exception e)

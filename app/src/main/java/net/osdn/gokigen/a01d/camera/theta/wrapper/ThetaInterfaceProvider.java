@@ -33,6 +33,7 @@ import net.osdn.gokigen.a01d.liveview.liveviewlistener.ILiveViewListener;
 public class ThetaInterfaceProvider implements IThetaInterfaceProvider, IDisplayInjector, IThetaSessionIdNotifier, IThetaSessionIdProvider
 {
     private final String TAG = toString();
+    private final Activity activity;
     private final ThetaConnection thetaConnection;
     private final ThetaHardwareStatus hardwareStatus;
     private final ThetaRunMode runMode;
@@ -67,7 +68,7 @@ public class ThetaInterfaceProvider implements IThetaInterfaceProvider, IDisplay
             e.printStackTrace();
         }
 */
-        //this.activity = context;
+        this.activity = context;
         //this.provider = provider;
         this.statusListener = statusListener;
         thetaConnection = new ThetaConnection(context, provider, this);
@@ -89,7 +90,7 @@ public class ThetaInterfaceProvider implements IThetaInterfaceProvider, IDisplay
     {
         Log.v(TAG, "injectDisplay()");
         focusControl = new ThetaFocusControl(frameDisplayer);
-        captureControl = new ThetaCaptureControl(frameDisplayer, indicator);
+        captureControl = new ThetaCaptureControl(activity, this, frameDisplayer, indicator);
     }
 
     @Override

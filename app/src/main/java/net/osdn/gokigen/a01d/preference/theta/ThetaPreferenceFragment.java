@@ -124,6 +124,9 @@ public class ThetaPreferenceFragment extends PreferenceFragmentCompat implements
             if (!items.containsKey(IPreferencePropertyAccessor.CAPTURE_BOTH_CAMERA_AND_LIVE_VIEW)) {
                 editor.putBoolean(IPreferencePropertyAccessor.CAPTURE_BOTH_CAMERA_AND_LIVE_VIEW, true);
             }
+            if (!items.containsKey(IPreferencePropertyAccessor.USE_OSC_THETA_V21)) {
+                editor.putBoolean(IPreferencePropertyAccessor.USE_OSC_THETA_V21, false);
+            }
             if (!items.containsKey(IPreferencePropertyAccessor.CONNECTION_METHOD)) {
                 editor.putString(IPreferencePropertyAccessor.CONNECTION_METHOD, IPreferencePropertyAccessor.CONNECTION_METHOD_DEFAULT_VALUE);
             }
@@ -158,6 +161,11 @@ public class ThetaPreferenceFragment extends PreferenceFragmentCompat implements
                     Log.v(TAG, " " + key + " , " + value);
                     break;
 
+                case IPreferencePropertyAccessor.USE_OSC_THETA_V21:
+                    value = preferences.getBoolean(key, false);
+                    Log.v(TAG, " " + key + " , " + value);
+                    break;
+
                 default:
                     String strValue = preferences.getString(key, "");
                     setListPreference(key, key, strValue);
@@ -177,7 +185,7 @@ public class ThetaPreferenceFragment extends PreferenceFragmentCompat implements
         try
         {
             //super.onCreate(savedInstanceState);
-            addPreferencesFromResource(R.xml.preferences_olympuspen);
+            addPreferencesFromResource(R.xml.preferences_theta);
 
             ListPreference connectionMethod = findPreference(IPreferencePropertyAccessor.CONNECTION_METHOD);
             connectionMethod.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
@@ -313,6 +321,7 @@ public class ThetaPreferenceFragment extends PreferenceFragmentCompat implements
                         // Preferenceの画面に反映させる
                         setBooleanPreference(IPreferencePropertyAccessor.AUTO_CONNECT_TO_CAMERA, IPreferencePropertyAccessor.AUTO_CONNECT_TO_CAMERA, defaultValue);
                         setBooleanPreference(IPreferencePropertyAccessor.CAPTURE_BOTH_CAMERA_AND_LIVE_VIEW, IPreferencePropertyAccessor.CAPTURE_BOTH_CAMERA_AND_LIVE_VIEW, defaultValue);
+                        setBooleanPreference(IPreferencePropertyAccessor.USE_OSC_THETA_V21, IPreferencePropertyAccessor.USE_OSC_THETA_V21, false);
                     }
                     catch (Exception e)
                     {
