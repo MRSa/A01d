@@ -70,13 +70,13 @@ public class ThetaSingleShotControl
                             Log.v(TAG, " singleShot() : " + result);
                             indicator.onShootingStatusUpdate(IIndicatorControl.shootingStatus.Starting);
 
-                            // TODO: 画像処理が終わるまで待つ
-                            waitMs(2000);
+                            // TODO: 画像処理が終わるまで待つ ... 本当は状態を見て次に進めないといけない
+                            waitMs(3500);
 
                             // ライブビューのの再実行を指示する
                             indicator.onShootingStatusUpdate(IIndicatorControl.shootingStatus.Stopping);
                             liveViewControl.stopLiveView();
-                            waitMs(500);
+                            waitMs(1500);
                             liveViewControl.startLiveView();
                         }
                     }

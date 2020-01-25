@@ -80,6 +80,7 @@ public class ThetaLiveViewControl implements ILiveViewControl
     @Override
     public void stopLiveView()
     {
+        Log.v(TAG, " stopLiveView()");
         whileFetching = false;
     }
 
