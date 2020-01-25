@@ -5,12 +5,8 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 
 import net.osdn.gokigen.a01d.camera.ICaptureControl;
-import net.osdn.gokigen.a01d.camera.olympuspen.operation.OlympusPenSingleShotControl;
-import net.osdn.gokigen.a01d.camera.panasonic.operation.PanasonicCameraCaptureControl;
-import net.osdn.gokigen.a01d.camera.panasonic.operation.takepicture.SingleShotControl;
-import net.osdn.gokigen.a01d.camera.panasonic.wrapper.IPanasonicCamera;
+import net.osdn.gokigen.a01d.camera.ILiveViewControl;
 import net.osdn.gokigen.a01d.camera.theta.operation.ThetaSingleShotControl;
-import net.osdn.gokigen.a01d.liveview.IAutoFocusFrameDisplay;
 import net.osdn.gokigen.a01d.liveview.IIndicatorControl;
 
 public class ThetaCaptureControl implements ICaptureControl
@@ -18,9 +14,9 @@ public class ThetaCaptureControl implements ICaptureControl
     private static final String TAG = ThetaCaptureControl.class.getSimpleName();
     private final ThetaSingleShotControl singleShotControl;
 
-    public ThetaCaptureControl(@NonNull Context context, @NonNull final IThetaSessionIdProvider sessionIdProvider, @NonNull IAutoFocusFrameDisplay frameDisplayer, @NonNull IIndicatorControl indicator)
+    ThetaCaptureControl(@NonNull Context context, @NonNull final IThetaSessionIdProvider sessionIdProvider, @NonNull IIndicatorControl indicator, @NonNull ILiveViewControl liveViewControl)
     {
-        singleShotControl = new ThetaSingleShotControl(context, sessionIdProvider, frameDisplayer, indicator);
+        singleShotControl = new ThetaSingleShotControl(context, sessionIdProvider, indicator, liveViewControl);
     }
 
     /**

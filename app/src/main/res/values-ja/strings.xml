@@ -224,5 +224,6 @@
 
     <string name="pref_use_osc_theta_v21">THETA Web API v2.1の使用</string>
     <string name="pref_summary_use_osc_theta_v21"> </string>
+    <string name="theta_connect_response_ng">応答がありません。</string>
 
 </resources>

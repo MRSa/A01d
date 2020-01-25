@@ -90,7 +90,7 @@ public class ThetaInterfaceProvider implements IThetaInterfaceProvider, IDisplay
     {
         Log.v(TAG, "injectDisplay()");
         focusControl = new ThetaFocusControl(frameDisplayer);
-        captureControl = new ThetaCaptureControl(activity, this, frameDisplayer, indicator);
+        captureControl = new ThetaCaptureControl(activity, this, indicator, liveViewControl);
     }
 
     @Override

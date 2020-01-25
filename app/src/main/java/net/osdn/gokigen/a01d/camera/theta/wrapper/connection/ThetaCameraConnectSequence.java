@@ -101,8 +101,23 @@ public class ThetaCameraConnectSequence implements Runnable
 
             String response2 = SimpleHttpClient.httpPost(getStateUrl, "", TIMEOUT_MS);
             Log.v(TAG, " " + getStateUrl + " " + response2);
-
-            onConnectNotify();
+           if (response2.length() > 0)
+           {
+               try
+               {
+                   JSONObject object = new JSONObject(response2);
+                   String sessionId = object.getJSONObject("state").getString("sessionId");
+                   sessionIdNotifier.receivedSessionId(sessionId);
+                   onConnectNotify();
+                   return;
+               }
+               catch (Exception e)
+               {
+                   e.printStackTrace();
+               }
+           }
+           // 応答なし、を応答する。
+           onConnectError(context.getString(R.string.theta_connect_response_ng));
         }
         catch (Exception e)
         {

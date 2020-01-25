@@ -7,6 +7,7 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
+import net.osdn.gokigen.a01d.camera.ILiveViewControl;
 import net.osdn.gokigen.a01d.camera.theta.wrapper.IThetaSessionIdProvider;
 import net.osdn.gokigen.a01d.camera.utils.SimpleHttpClient;
 import net.osdn.gokigen.a01d.liveview.IAutoFocusFrameDisplay;
@@ -17,15 +18,17 @@ public class ThetaSingleShotControl
 {
     private final String TAG = toString();
     private final IThetaSessionIdProvider sessionIdProvider;
-    private final IAutoFocusFrameDisplay frameDisplayer;
+    private final ILiveViewControl liveViewControl;
+    private final IIndicatorControl indicator;
     private boolean useThetaV21 = false;
     private int timeoutMs = 6000;
 
 
-    public ThetaSingleShotControl(@NonNull Context context, @NonNull final IThetaSessionIdProvider sessionIdProvider, @NonNull IAutoFocusFrameDisplay frameDisplayer, @NonNull IIndicatorControl indicator)
+    public ThetaSingleShotControl(@NonNull Context context, @NonNull final IThetaSessionIdProvider sessionIdProvider, @NonNull IIndicatorControl indicator, @NonNull ILiveViewControl liveViewControl)
     {
         this.sessionIdProvider = sessionIdProvider;
-        this.frameDisplayer = frameDisplayer;
+        this.liveViewControl = liveViewControl;
+        this.indicator = indicator;
         try
         {
             SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
@@ -48,7 +51,7 @@ public class ThetaSingleShotControl
         Log.v(TAG, "singleShot()");
         try
         {
-            Thread thread = new Thread(new Runnable()
+            final Thread thread = new Thread(new Runnable()
             {
                 @Override
                 public void run()
@@ -62,12 +65,25 @@ public class ThetaSingleShotControl
                         {
                             Log.v(TAG, "singleShot() reply is null.");
                         }
+                        else
+                        {
+                            Log.v(TAG, " singleShot() : " + result);
+                            indicator.onShootingStatusUpdate(IIndicatorControl.shootingStatus.Starting);
+
+                            // TODO: 画像処理が終わるまで待つ
+                            waitMs(2000);
+
+                            // ライブビューのの再実行を指示する
+                            indicator.onShootingStatusUpdate(IIndicatorControl.shootingStatus.Stopping);
+                            liveViewControl.stopLiveView();
+                            waitMs(500);
+                            liveViewControl.startLiveView();
+                        }
                     }
                     catch (Exception e)
                     {
                         e.printStackTrace();
                     }
-                    frameDisplayer.hideFocusFrame();
                 }
             });
             thread.start();
@@ -77,4 +93,17 @@ public class ThetaSingleShotControl
             e.printStackTrace();
         }
     }
+
+    private void waitMs(int waitMs)
+    {
+        try
+        {
+            Thread.sleep(waitMs);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+
 }

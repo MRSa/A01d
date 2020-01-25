@@ -49,7 +49,7 @@ public class ThetaLiveViewControl implements ILiveViewControl
     @Override
     public void startLiveView()
     {
-        Log.v(TAG, "startLiveView()");
+        Log.v(TAG, " startLiveView()");
         //prepare();
         try
         {
