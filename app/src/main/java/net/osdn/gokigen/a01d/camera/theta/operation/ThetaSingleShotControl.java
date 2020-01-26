@@ -10,9 +10,10 @@ import androidx.annotation.NonNull;
 import net.osdn.gokigen.a01d.camera.ILiveViewControl;
 import net.osdn.gokigen.a01d.camera.theta.wrapper.IThetaSessionIdProvider;
 import net.osdn.gokigen.a01d.camera.utils.SimpleHttpClient;
-import net.osdn.gokigen.a01d.liveview.IAutoFocusFrameDisplay;
 import net.osdn.gokigen.a01d.liveview.IIndicatorControl;
 import net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor;
+
+import org.json.JSONObject;
 
 public class ThetaSingleShotControl
 {
@@ -40,7 +41,6 @@ public class ThetaSingleShotControl
         }
         Log.v(TAG, "USE THETA WEB API V2.1 (OSC V2) : " + useThetaV21);
     }
-
 
     /**
      *
@@ -70,13 +70,13 @@ public class ThetaSingleShotControl
                             Log.v(TAG, " singleShot() : " + result);
                             indicator.onShootingStatusUpdate(IIndicatorControl.shootingStatus.Starting);
 
-                            // TODO: 画像処理が終わるまで待つ ... 本当は状態を見て次に進めないといけない
-                            waitMs(3500);
+                            // 画像処理が終わるまで待つ
+                            waitChangeStatus();
 
                             // ライブビューのの再実行を指示する
                             indicator.onShootingStatusUpdate(IIndicatorControl.shootingStatus.Stopping);
                             liveViewControl.stopLiveView();
-                            waitMs(1500);
+                            waitMs(300);  // ちょっと待つ...
                             liveViewControl.startLiveView();
                         }
                     }
@@ -94,6 +94,67 @@ public class ThetaSingleShotControl
         }
     }
 
+    /**
+     *    撮影状態が変わるまで待つ。
+     *     (ただし、タイムアウト時間を超えたらライブビューを再開させる)
+     */
+    private void waitChangeStatus()
+    {
+        final String getStateUrl = "http://192.168.1.1/osc/state";
+        final int maxWaitTimeoutMs = 9000;  // 最大待ち時間 (単位: ms)
+        String fingerprint = "";
+        try
+        {
+            String result = SimpleHttpClient.httpPost(getStateUrl, "", timeoutMs);
+            if (result.length() > 0)
+            {
+                JSONObject object = new JSONObject(result);
+                fingerprint = object.getString("fingerprint");
+
+                //  現在の状態(ログを出す)
+                Log.v(TAG, " " + getStateUrl + " " + result + " " + "(" + fingerprint + ")");
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        try
+        {
+            long firstTime = System.currentTimeMillis();
+            long currentTime = firstTime;
+            while ((currentTime - firstTime) < maxWaitTimeoutMs)
+            {
+                //  ... 状態を見て次に進める
+                String result = SimpleHttpClient.httpPost(getStateUrl, "", timeoutMs);
+                if (result.length() > 0)
+                {
+                    JSONObject object = new JSONObject(result);
+                    String current_fingerprint = object.getString("fingerprint");
+
+                    //  ログを出してみる
+                    // Log.v(TAG, " " + getStateUrl + " ( " + result + " ) " + "(" + fingerprint + " " + current_fingerprint + ")");
+                    if (!fingerprint.equals(current_fingerprint))
+                    {
+                        // fingerprintが更新された！
+                        break;
+                    }
+                    Log.v(TAG, "  -----  NOW PROCESSING  ----- : " + fingerprint);
+                }
+                waitMs(1000);
+                currentTime = System.currentTimeMillis();
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     *
+     *
+     */
     private void waitMs(int waitMs)
     {
         try
@@ -105,5 +166,4 @@ public class ThetaSingleShotControl
             e.printStackTrace();
         }
     }
-
 }
