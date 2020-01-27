@@ -1,4 +1,4 @@
-package net.osdn.gokigen.a01d.camera.ptpip.command;
+package net.osdn.gokigen.a01d.camera.ptpip.wrapper.command;
 
 public interface IPtpIpCommandCallback
 {

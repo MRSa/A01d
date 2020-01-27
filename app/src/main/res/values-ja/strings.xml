@@ -131,6 +131,8 @@
     <string name="dialog_title_connect_failed_sony">接続失敗(SONY)</string>
     <string name="dialog_title_connect_failed_fuji">接続失敗(FUJI)</string>
     <string name="dialog_title_connect_failed_theta">接続失敗(THETA)</string>
+    <string name="dialog_title_connect_failed_nikon">接続失敗(NIKON)</string>
+    <string name="dialog_title_connect_failed_canon">接続失敗(CANON)</string>
     <string name="fatal_cannot_use_camera">Olympus Camera Kitが動作しないモードのため、カメラのリセットが必要です。電源ボタンを8秒以上長押しして、カメラをリセットしてください。</string>
     <string name="network_connection_timeout">接続タイムアウト</string>
     <string name="restored_my_props">設定を展開しました。 : </string>
@@ -218,6 +220,15 @@
     <string name="connect_connecting11">接続中&#8230;(11/12)</string>
     <string name="connect_connecting12">接続中&#8230;(12/12)</string>
     <string name="connect_connect_finished">カメラと接続</string>
+
+    <string name="connect_start_2">準備中&#8230;</string>
+    <string name="canon_connect_connecting1">接続中&#8230;(1/5)</string>
+    <string name="canon_connect_connecting2">接続中&#8230;(2/5)</string>
+    <string name="canon_connect_connecting3">接続中&#8230;(3/5)</string>
+    <string name="canon_connect_connecting4">接続中&#8230;(4/5)</string>
+    <string name="canon_connect_connecting5">接続中&#8230;(5/5)</string>
+
+    <string name="connect_error_message">接続失敗</string>
 
     <string name="connect_error_message_olympus">接続失敗 (OLYMPUS)</string>
     <string name="connect_error_message_fuji">接続失敗 (FUJI)</string>
