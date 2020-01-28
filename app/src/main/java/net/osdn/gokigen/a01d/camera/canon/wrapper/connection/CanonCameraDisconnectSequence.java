@@ -4,7 +4,7 @@ import android.app.Activity;
 
 import androidx.annotation.NonNull;
 
-import net.osdn.gokigen.a01d.camera.canon.ICanonInterfaceProvider;
+import net.osdn.gokigen.a01d.camera.ptpip.IPtpIpInterfaceProvider;
 import net.osdn.gokigen.a01d.camera.ptpip.wrapper.command.IPtpIpCommunication;
 
 class CanonCameraDisconnectSequence implements Runnable
@@ -15,7 +15,7 @@ class CanonCameraDisconnectSequence implements Runnable
     private final IPtpIpCommunication async;
     private final IPtpIpCommunication liveview;
 
-    CanonCameraDisconnectSequence(Activity activity, @NonNull ICanonInterfaceProvider interfaceProvider)
+    CanonCameraDisconnectSequence(Activity activity, @NonNull IPtpIpInterfaceProvider interfaceProvider)
     {
         this.activity = activity;
         this.command = interfaceProvider.getCommandCommunication();

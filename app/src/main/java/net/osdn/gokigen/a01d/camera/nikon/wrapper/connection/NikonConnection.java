@@ -19,8 +19,8 @@ import androidx.appcompat.app.AlertDialog;
 import net.osdn.gokigen.a01d.R;
 import net.osdn.gokigen.a01d.camera.ICameraConnection;
 import net.osdn.gokigen.a01d.camera.ICameraStatusReceiver;
-import net.osdn.gokigen.a01d.camera.nikon.INikonInterfaceProvider;
 import net.osdn.gokigen.a01d.camera.nikon.wrapper.status.NikonStatusChecker;
+import net.osdn.gokigen.a01d.camera.ptpip.IPtpIpInterfaceProvider;
 
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -30,7 +30,7 @@ public class NikonConnection implements ICameraConnection
     private final String TAG = toString();
     private final Activity context;
     private final ICameraStatusReceiver statusReceiver;
-    private final INikonInterfaceProvider interfaceProvider;
+    private final IPtpIpInterfaceProvider interfaceProvider;
     private final BroadcastReceiver connectionReceiver;
     private final Executor cameraExecutor = Executors.newFixedThreadPool(1);
 
@@ -39,7 +39,7 @@ public class NikonConnection implements ICameraConnection
     private final NikonCameraConnectSequence connectSequence;
     private final NikonCameraDisconnectSequence disconnectSequence;
 
-    public NikonConnection(@NonNull final Activity context, @NonNull final ICameraStatusReceiver statusReceiver, @NonNull INikonInterfaceProvider interfaceProvider, @NonNull NikonStatusChecker statusChecker)
+    public NikonConnection(@NonNull final Activity context, @NonNull final ICameraStatusReceiver statusReceiver, @NonNull IPtpIpInterfaceProvider interfaceProvider, @NonNull NikonStatusChecker statusChecker)
     {
         Log.v(TAG, "NikonConnection()");
         this.context = context;

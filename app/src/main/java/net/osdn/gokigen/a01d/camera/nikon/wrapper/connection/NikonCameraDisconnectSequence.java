@@ -4,8 +4,8 @@ import android.app.Activity;
 
 import androidx.annotation.NonNull;
 
-import net.osdn.gokigen.a01d.camera.nikon.INikonInterfaceProvider;
 import net.osdn.gokigen.a01d.camera.nikon.wrapper.status.NikonStatusChecker;
+import net.osdn.gokigen.a01d.camera.ptpip.IPtpIpInterfaceProvider;
 import net.osdn.gokigen.a01d.camera.ptpip.wrapper.command.IPtpIpCommunication;
 
 class NikonCameraDisconnectSequence implements Runnable
@@ -17,7 +17,7 @@ class NikonCameraDisconnectSequence implements Runnable
     private final IPtpIpCommunication liveview;
     private final NikonStatusChecker statusChecker;
 
-    NikonCameraDisconnectSequence(Activity activity, @NonNull INikonInterfaceProvider interfaceProvider, @NonNull NikonStatusChecker statusChecker)
+    NikonCameraDisconnectSequence(Activity activity, @NonNull IPtpIpInterfaceProvider interfaceProvider, @NonNull NikonStatusChecker statusChecker)
     {
         this.activity = activity;
         this.command = interfaceProvider.getCommandCommunication();

@@ -1,16 +1,16 @@
-package net.osdn.gokigen.a01d.camera.canon.wrapper.command.messages.specific;
+package net.osdn.gokigen.a01d.camera.ptpip.wrapper.command.messages.specific;
 
 import androidx.annotation.NonNull;
 
 import net.osdn.gokigen.a01d.camera.ptpip.wrapper.command.IPtpIpCommandCallback;
 import net.osdn.gokigen.a01d.camera.ptpip.wrapper.command.messages.PtpIpCommandBase;
 
-public class CanonInitEventRequest extends PtpIpCommandBase
+public class InitEventRequest extends PtpIpCommandBase
 {
     private final IPtpIpCommandCallback callback;
     private final int connectionNumber;
 
-    public CanonInitEventRequest(@NonNull IPtpIpCommandCallback callback, int connectionNumber)
+    public InitEventRequest(@NonNull IPtpIpCommandCallback callback, int connectionNumber)
     {
         this.callback = callback;
         this.connectionNumber = connectionNumber;

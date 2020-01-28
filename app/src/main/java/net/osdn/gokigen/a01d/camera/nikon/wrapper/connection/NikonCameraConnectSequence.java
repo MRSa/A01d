@@ -9,9 +9,9 @@ import androidx.annotation.NonNull;
 import net.osdn.gokigen.a01d.R;
 import net.osdn.gokigen.a01d.camera.ICameraConnection;
 import net.osdn.gokigen.a01d.camera.ICameraStatusReceiver;
-import net.osdn.gokigen.a01d.camera.nikon.INikonInterfaceProvider;
 import net.osdn.gokigen.a01d.camera.nikon.wrapper.command.messages.specific.NikonRegistrationMessage;
 import net.osdn.gokigen.a01d.camera.nikon.wrapper.status.NikonStatusChecker;
+import net.osdn.gokigen.a01d.camera.ptpip.IPtpIpInterfaceProvider;
 import net.osdn.gokigen.a01d.camera.ptpip.wrapper.command.IPtpIpCommandCallback;
 import net.osdn.gokigen.a01d.camera.ptpip.wrapper.command.IPtpIpCommandPublisher;
 import net.osdn.gokigen.a01d.camera.ptpip.wrapper.command.IPtpIpMessages;
@@ -24,12 +24,12 @@ public class NikonCameraConnectSequence implements Runnable, IPtpIpCommandCallba
     private final Activity context;
     private final ICameraConnection cameraConnection;
     private final ICameraStatusReceiver cameraStatusReceiver;
-    private final INikonInterfaceProvider interfaceProvider;
+    private final IPtpIpInterfaceProvider interfaceProvider;
     private final IPtpIpCommandPublisher commandIssuer;
     private final NikonStatusChecker statusChecker;
     private boolean isDumpLog = false;
 
-    NikonCameraConnectSequence(@NonNull Activity context, @NonNull ICameraStatusReceiver statusReceiver, @NonNull final ICameraConnection cameraConnection, @NonNull INikonInterfaceProvider interfaceProvider, @NonNull NikonStatusChecker statusChecker)
+    NikonCameraConnectSequence(@NonNull Activity context, @NonNull ICameraStatusReceiver statusReceiver, @NonNull final ICameraConnection cameraConnection, @NonNull IPtpIpInterfaceProvider interfaceProvider, @NonNull NikonStatusChecker statusChecker)
     {
         Log.v(TAG, " NikonCameraConnectSequenceForPlayback");
         this.context = context;

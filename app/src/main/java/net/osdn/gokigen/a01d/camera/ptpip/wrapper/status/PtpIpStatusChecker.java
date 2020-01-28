@@ -11,6 +11,7 @@ import net.osdn.gokigen.a01d.camera.ptpip.wrapper.command.IPtpIpCommand;
 import net.osdn.gokigen.a01d.camera.ptpip.wrapper.command.IPtpIpCommandCallback;
 import net.osdn.gokigen.a01d.camera.ptpip.wrapper.command.IPtpIpCommandPublisher;
 import net.osdn.gokigen.a01d.camera.ptpip.wrapper.command.IPtpIpMessages;
+import net.osdn.gokigen.a01d.camera.ptpip.wrapper.command.messages.specific.InitEventRequest;
 import net.osdn.gokigen.a01d.liveview.ICameraStatusUpdateNotify;
 
 import java.io.BufferedReader;
@@ -37,20 +38,18 @@ public class PtpIpStatusChecker implements IPtpIpCommandCallback, ICameraStatusW
     private boolean logcat = false;
     private final String ipAddress;
     private final int portNumber;
-    private final IPtpIpInitEventRequest eventRequest;
 
     private Socket socket = null;
     private DataOutputStream dos = null;
     private BufferedReader bufferedReader = null;
     private int eventConnectionNumber = 0;
 
-    public PtpIpStatusChecker(@NonNull Activity activity, @NonNull IPtpIpCommandPublisher issuer, @NonNull String ip, int portNumber, @NonNull IPtpIpInitEventRequest eventRequest)
+    public PtpIpStatusChecker(@NonNull Activity activity, @NonNull IPtpIpCommandPublisher issuer, @NonNull String ip, int portNumber)
     {
         this.issuer = issuer;
         this.statusHolder = new PtpIpStatusHolder();
         this.ipAddress = ip;
         this.portNumber = portNumber;
-        this.eventRequest = eventRequest;
         Log.v(TAG, "POLLING WAIT : " + sleepMs);
     }
 
@@ -174,7 +173,7 @@ public class PtpIpStatusChecker implements IPtpIpCommandCallback, ICameraStatusW
             {
                 Log.v(TAG, "  CONNECT FAIL...(EVENT) : " + ipAddress + "  " + portNumber);
             }
-            issueCommand(eventRequest.getInitEventRequest(this, eventConnectionNumber));
+            issueCommand(new InitEventRequest(this, eventConnectionNumber));
         }
         catch (Exception e)
         {

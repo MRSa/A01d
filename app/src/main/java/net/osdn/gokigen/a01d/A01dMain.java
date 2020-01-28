@@ -3,10 +3,13 @@ package net.osdn.gokigen.a01d;
 import android.Manifest;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.WindowManager;
+import android.widget.TextView;
 
 import net.osdn.gokigen.a01d.camera.CameraInterfaceProvider;
 import net.osdn.gokigen.a01d.camera.IInterfaceProvider;
@@ -47,7 +50,7 @@ import java.util.Map;
  *   A01d ;
  *
  */
-public class A01dMain extends AppCompatActivity implements ICameraStatusReceiver, IChangeScene, ICameraPowerOn.PowerOnCameraCallback
+public class A01dMain extends AppCompatActivity implements ICameraStatusReceiver, IChangeScene, ICameraPowerOn.PowerOnCameraCallback, IInformationReceiver
 {
     private final String TAG = toString();
     private IInterfaceProvider interfaceProvider = null;
@@ -689,5 +692,48 @@ public class A01dMain extends AppCompatActivity implements ICameraStatusReceiver
             e.printStackTrace();
         }
         return (super.onKeyDown(keyCode, event));
+    }
+
+    @Override
+    public void updateMessage(final String message, final boolean isBold, final boolean isColor, final int color)
+    {
+        Log.v(TAG, " updateMessage() : " + message);
+/*
+        try {
+            final TextView messageArea = findViewById(R.id.message);
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        if ((messageArea != null) && (message != null))
+                        {
+                            messageArea.setText(message);
+                            if (isBold)
+                            {
+                                messageArea.setTypeface(Typeface.DEFAULT_BOLD);
+                            }
+                            if (isColor)
+                            {
+                                messageArea.setTextColor(color);
+                            }
+                            else
+                            {
+                                messageArea.setTextColor(Color.DKGRAY);
+                            }
+                            messageArea.invalidate();
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                    }
+                }
+            });
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+*/
     }
 }

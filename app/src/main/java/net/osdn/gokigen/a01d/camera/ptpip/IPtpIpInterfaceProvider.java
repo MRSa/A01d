@@ -1,4 +1,4 @@
-package net.osdn.gokigen.a01d.camera.canon;
+package net.osdn.gokigen.a01d.camera.ptpip;
 
 
 import androidx.annotation.NonNull;
@@ -20,9 +20,9 @@ import net.osdn.gokigen.a01d.camera.ptpip.wrapper.status.IPtpIpRunModeHolder;
 import net.osdn.gokigen.a01d.liveview.ICameraStatusUpdateNotify;
 import net.osdn.gokigen.a01d.liveview.liveviewlistener.ILiveViewListener;
 
-public interface ICanonInterfaceProvider
+public interface IPtpIpInterfaceProvider
 {
-    ICameraConnection getCanonCameraConnection();
+    ICameraConnection getCameraConnection();
     ILiveViewControl getLiveViewControl();
     ILiveViewListener getLiveViewListener();
     IFocusingControl getFocusingControl();

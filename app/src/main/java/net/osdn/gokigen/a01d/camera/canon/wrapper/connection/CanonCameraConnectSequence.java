@@ -10,7 +10,7 @@ import androidx.annotation.NonNull;
 import net.osdn.gokigen.a01d.R;
 import net.osdn.gokigen.a01d.camera.ICameraConnection;
 import net.osdn.gokigen.a01d.camera.ICameraStatusReceiver;
-import net.osdn.gokigen.a01d.camera.canon.ICanonInterfaceProvider;
+import net.osdn.gokigen.a01d.camera.ptpip.IPtpIpInterfaceProvider;
 import net.osdn.gokigen.a01d.camera.canon.wrapper.command.messages.specific.CanonRegistrationMessage;
 import net.osdn.gokigen.a01d.camera.ptpip.wrapper.command.IPtpIpCommandCallback;
 import net.osdn.gokigen.a01d.camera.ptpip.wrapper.command.IPtpIpCommandPublisher;
@@ -25,12 +25,12 @@ public class CanonCameraConnectSequence implements Runnable, IPtpIpCommandCallba
     private final Activity context;
     private final ICameraConnection cameraConnection;
     private final ICameraStatusReceiver cameraStatusReceiver;
-    private final ICanonInterfaceProvider interfaceProvider;
+    private final IPtpIpInterfaceProvider interfaceProvider;
     private final IPtpIpCommandPublisher commandIssuer;
     private final PtpIpStatusChecker statusChecker;
     private boolean isDumpLog = false;
 
-    CanonCameraConnectSequence(@NonNull Activity context, @NonNull ICameraStatusReceiver statusReceiver, @NonNull final ICameraConnection cameraConnection, @NonNull ICanonInterfaceProvider interfaceProvider, @NonNull PtpIpStatusChecker statusChecker)
+    CanonCameraConnectSequence(@NonNull Activity context, @NonNull ICameraStatusReceiver statusReceiver, @NonNull final ICameraConnection cameraConnection, @NonNull IPtpIpInterfaceProvider interfaceProvider, @NonNull PtpIpStatusChecker statusChecker)
     {
         Log.v(TAG, " CanonCameraConnectSequenceForPlayback");
         this.context = context;
