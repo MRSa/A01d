@@ -17,6 +17,7 @@ public interface ICameraConnection
         PANASONIC,
         OLYMPUS,
         THETA,
+        CANON,
     }
 
     enum CameraConnectionStatus

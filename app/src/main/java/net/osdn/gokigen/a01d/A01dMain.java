@@ -3,13 +3,10 @@ package net.osdn.gokigen.a01d;
 import android.Manifest;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
-import android.graphics.Typeface;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.WindowManager;
-import android.widget.TextView;
 
 import net.osdn.gokigen.a01d.camera.CameraInterfaceProvider;
 import net.osdn.gokigen.a01d.camera.IInterfaceProvider;
@@ -18,6 +15,7 @@ import net.osdn.gokigen.a01d.camera.olympus.cameraproperty.OlyCameraPropertyList
 import net.osdn.gokigen.a01d.camera.ICameraStatusReceiver;
 import net.osdn.gokigen.a01d.camera.ICameraConnection;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.connection.ble.ICameraPowerOn;
+import net.osdn.gokigen.a01d.camera.ptpip.operation.PtpIpCameraCommandSendDialog;
 import net.osdn.gokigen.a01d.camera.utils.SimpleHttpSendCommandDialog;
 import net.osdn.gokigen.a01d.camera.panasonic.operation.PanasonicSendCommandDialog;
 import net.osdn.gokigen.a01d.camera.ricohgr2.operation.RicohGr2SendCommandDialog;
@@ -26,6 +24,7 @@ import net.osdn.gokigen.a01d.liveview.IStatusViewDrawer;
 import net.osdn.gokigen.a01d.liveview.LiveViewFragment;
 import net.osdn.gokigen.a01d.logcat.LogCatFragment;
 import net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor;
+import net.osdn.gokigen.a01d.preference.canon.CanonPreferenceFragment;
 import net.osdn.gokigen.a01d.preference.fujix.FujiXPreferenceFragment;
 import net.osdn.gokigen.a01d.preference.olympus.PreferenceFragment;
 import net.osdn.gokigen.a01d.preference.panasonic.PanasonicPreferenceFragment;
@@ -140,7 +139,7 @@ public class A01dMain extends AppCompatActivity implements ICameraStatusReceiver
     {
         try
         {
-            interfaceProvider = new CameraInterfaceProvider(this, this);
+            interfaceProvider = new CameraInterfaceProvider(this, this, this);
         }
         catch (Exception e)
         {
@@ -302,6 +301,18 @@ public class A01dMain extends AppCompatActivity implements ICameraStatusReceiver
                     e.printStackTrace();
                 }
             }
+            else if (method == ICameraConnection.CameraConnectionMethod.CANON)
+            {
+                try
+                {
+                    // CANON の場合は、PTPIPコマンド送信ダイアログを表示する
+                    PtpIpCameraCommandSendDialog.newInstance(interfaceProvider.getCanonInterface(), true).show(getSupportFragmentManager(), "ptpipSendCommandDialog");
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+            }
             else
             {
                 // OPC カメラの場合...
@@ -355,6 +366,8 @@ public class A01dMain extends AppCompatActivity implements ICameraStatusReceiver
                         preferenceFragment = FujiXPreferenceFragment.newInstance(this, this);
                     } else if (connectionMethod == ICameraConnection.CameraConnectionMethod.THETA) {
                         preferenceFragment = ThetaPreferenceFragment.newInstance(this, this);
+                    } else if (connectionMethod == ICameraConnection.CameraConnectionMethod.CANON) {
+                        preferenceFragment = CanonPreferenceFragment.newInstance(this, this);
                     } else //  if (connectionMethod == ICameraConnection.CameraConnectionMethod.OPC)
                     {
                         preferenceFragment = PreferenceFragment.newInstance(this, interfaceProvider, this);
@@ -647,6 +660,10 @@ public class A01dMain extends AppCompatActivity implements ICameraStatusReceiver
         else if  (connectionMethod == ICameraConnection.CameraConnectionMethod.THETA)
         {
             connection = interfaceProvider.getThetaInterface().getCameraConnection();
+        }
+        else if  (connectionMethod == ICameraConnection.CameraConnectionMethod.CANON)
+        {
+            connection = interfaceProvider.getCanonInterface().getCameraConnection();
         }
         else // if (connectionMethod == ICameraConnection.CameraConnectionMethod.OPC)
         {

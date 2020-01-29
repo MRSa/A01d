@@ -3,8 +3,11 @@ package net.osdn.gokigen.a01d.camera;
 import android.app.Activity;
 import android.content.SharedPreferences;
 
+import net.osdn.gokigen.a01d.IInformationReceiver;
+import net.osdn.gokigen.a01d.camera.canon.wrapper.CanonInterfaceProvider;
 import net.osdn.gokigen.a01d.camera.fujix.IFujiXInterfaceProvider;
 import net.osdn.gokigen.a01d.camera.fujix.wrapper.FujiXInterfaceProvider;
+import net.osdn.gokigen.a01d.camera.nikon.wrapper.NikonInterfaceProvider;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.IOlympusLiveViewListener;
 import net.osdn.gokigen.a01d.camera.olympus.IOlympusInterfaceProvider;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.OlympusInterfaceProvider;
@@ -12,6 +15,7 @@ import net.osdn.gokigen.a01d.camera.olympuspen.IOlympusPenInterfaceProvider;
 import net.osdn.gokigen.a01d.camera.olympuspen.wrapper.OlympusPenInterfaceProvider;
 import net.osdn.gokigen.a01d.camera.panasonic.IPanasonicInterfaceProvider;
 import net.osdn.gokigen.a01d.camera.panasonic.wrapper.PanasonicCameraWrapper;
+import net.osdn.gokigen.a01d.camera.ptpip.IPtpIpInterfaceProvider;
 import net.osdn.gokigen.a01d.camera.ricohgr2.IRicohGr2InterfaceProvider;
 import net.osdn.gokigen.a01d.camera.ricohgr2.wrapper.RicohGr2InterfaceProvider;
 import net.osdn.gokigen.a01d.camera.sony.ISonyInterfaceProvider;
@@ -34,9 +38,11 @@ public class CameraInterfaceProvider implements IInterfaceProvider
     private final FujiXInterfaceProvider fujiX;
     private final PanasonicCameraWrapper panasonic;
     private final ThetaInterfaceProvider theta;
+    private final CanonInterfaceProvider canon;
+    private final NikonInterfaceProvider nikon;
     private final CameraStatusListener statusListener;
 
-    public CameraInterfaceProvider(@NonNull Activity context, @NonNull ICameraStatusReceiver provider)
+    public CameraInterfaceProvider(@NonNull Activity context, @NonNull ICameraStatusReceiver provider, @NonNull IInformationReceiver informationReceiver)
     {
         this.context = context;
         this.statusListener = new CameraStatusListener();
@@ -47,6 +53,8 @@ public class CameraInterfaceProvider implements IInterfaceProvider
         panasonic = new PanasonicCameraWrapper(context, provider, statusListener);
         ricohGr2 = new RicohGr2InterfaceProvider(context, provider);
         theta = new ThetaInterfaceProvider(context, provider, statusListener);
+        canon = new CanonInterfaceProvider(context, provider, statusListener, informationReceiver);
+        nikon = new NikonInterfaceProvider(context, provider, statusListener, informationReceiver);
     }
 
     @Override
@@ -99,6 +107,18 @@ public class CameraInterfaceProvider implements IInterfaceProvider
     }
 
     @Override
+    public IPtpIpInterfaceProvider getCanonInterface()
+    {
+        return (canon);
+    }
+
+    @Override
+    public IPtpIpInterfaceProvider getNikonInterface()
+    {
+        return (nikon);
+    }
+
+    @Override
     public IOlympusPenInterfaceProvider getOlympusPenInterface()
     {
         return (olympusPen);
@@ -145,6 +165,10 @@ public class CameraInterfaceProvider implements IInterfaceProvider
             else if (connectionMethod.contains("THETA"))
             {
                 ret = ICameraConnection.CameraConnectionMethod.THETA;
+            }
+            else if (connectionMethod.contains("CANON"))
+            {
+                ret = ICameraConnection.CameraConnectionMethod.CANON;
             }
         }
         catch (Exception e)
