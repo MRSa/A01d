@@ -32,7 +32,7 @@ public class PtpIpCameraCommandSendDialog  extends DialogFragment
     private IPtpIpCommandPublisher commandPublisher = null;
     private PtpIpCameraCommandResponse responseReceiver = null;
     private SparseArrayCompat<String> commandNameIndexArray;
-    private boolean isDumpLog = false;
+    private boolean isDumpLog = true;
 
     private int selectedCommandIdPosition = 0;
     private int selectedBodyLengthPosition = 0;

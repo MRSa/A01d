@@ -9,12 +9,14 @@ public class CanonStatusWatcher implements ICameraStatusWatcher
 {
 
     @Override
-    public void startStatusWatch(@NonNull ICameraStatusUpdateNotify notifier) {
+    public void startStatusWatch(@NonNull ICameraStatusUpdateNotify notifier)
+    {
 
     }
 
     @Override
-    public void stopStatusWatch() {
+    public void stopStatusWatch()
+    {
 
     }
 }

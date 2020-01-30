@@ -134,11 +134,15 @@ public class CanonCameraConnectSequence implements Runnable, IPtpIpCommandCallba
 
             case SEQ_CHANGE_REMOTE:
                 interfaceProvider.getInformationReceiver().updateMessage(context.getString(R.string.canon_connect_connecting4), false, false, 0);
-                commandIssuer.enqueueCommand(new PtpIpCommandGeneric(this, SEQ_SET_EVENT_MODE, isDumpLog, 0, 0x902f, 4, 0x02));
+                commandIssuer.enqueueCommand(new PtpIpCommandGeneric(this, SEQ_SET_EVENT_MODE, isDumpLog, 0, 0x9115, 4, 0x02));
                 break;
 
             case SEQ_SET_EVENT_MODE:
                 interfaceProvider.getInformationReceiver().updateMessage(context.getString(R.string.canon_connect_connecting5), false, false, 0);
+                commandIssuer.enqueueCommand(new PtpIpCommandGeneric(this, SEQ_GET_EVENT, isDumpLog, 0, 0x902f, 4, 0x02));
+                break;
+
+            case SEQ_GET_EVENT:
                 interfaceProvider.getInformationReceiver().updateMessage(context.getString(R.string.connect_connect_finished), false, false, 0);
                 connectFinished();
                 Log.v(TAG, "CHANGED PLAYBACK MODE : DONE.");
@@ -169,7 +173,7 @@ public class CanonCameraConnectSequence implements Runnable, IPtpIpCommandCallba
             eventConnectionNumber = eventConnectionNumber + ((receiveData[10] & 0xff) << 16);
             eventConnectionNumber = eventConnectionNumber + ((receiveData[11] & 0xff) << 24);
             statusChecker.setEventConnectionNumber(eventConnectionNumber);
-            interfaceProvider.getCameraStatusWatcher().startStatusWatch(null);
+            interfaceProvider.getCameraStatusWatcher().startStatusWatch(interfaceProvider.getStatusListener());
 
             commandIssuer.enqueueCommand(new PtpIpCommandGeneric(this, SEQ_OPEN_SESSION, isDumpLog, 0, 0x1002, 4, 0x41));
         }

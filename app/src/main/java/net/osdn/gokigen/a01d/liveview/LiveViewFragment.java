@@ -819,8 +819,23 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer, IFo
                         @Override
                         public void run()
                         {
-                            activity.findViewById(R.id.btn_zoomin).setVisibility(View.INVISIBLE);
-                            activity.findViewById(R.id.btn_zoomout).setVisibility(View.INVISIBLE);
+                            try
+                            {
+                                View zoomin = activity.findViewById(R.id.btn_zoomin);
+                                if (zoomin != null)
+                                {
+                                    zoomin.setVisibility(View.INVISIBLE);
+                                }
+                                View zoomout = activity.findViewById(R.id.btn_zoomout);
+                                if (zoomout != null)
+                                {
+                                    zoomout.setVisibility(View.INVISIBLE);
+                                }
+                            }
+                            catch (Exception e)
+                            {
+                                e.printStackTrace();
+                            }
                         }
                     });
                 }

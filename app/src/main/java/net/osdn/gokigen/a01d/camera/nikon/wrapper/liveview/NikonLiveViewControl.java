@@ -1,6 +1,7 @@
 package net.osdn.gokigen.a01d.camera.nikon.wrapper.liveview;
 
 import android.app.Activity;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 
@@ -11,6 +12,8 @@ import net.osdn.gokigen.a01d.liveview.liveviewlistener.ILiveViewListener;
 
 public class NikonLiveViewControl implements ILiveViewControl, ILiveViewListener, IPtpIpCommunication
 {
+    private final String TAG = this.toString();
+
     private final Activity context;
     private final String ipAddr;
     private final int portNo;
@@ -36,12 +39,14 @@ public class NikonLiveViewControl implements ILiveViewControl, ILiveViewListener
     @Override
     public void startLiveView()
     {
+        Log.v(TAG, " startLiveView() ");
 
     }
 
     @Override
     public void stopLiveView()
     {
+        Log.v(TAG, " stopLiveView() ");
 
     }
 
@@ -78,12 +83,13 @@ public class NikonLiveViewControl implements ILiveViewControl, ILiveViewListener
     @Override
     public boolean connect()
     {
-        return false;
+        Log.v(TAG, " connect() ");
+        return (true);
     }
 
     @Override
     public void disconnect()
     {
-
+        Log.v(TAG, " disconnect() ");
     }
 }

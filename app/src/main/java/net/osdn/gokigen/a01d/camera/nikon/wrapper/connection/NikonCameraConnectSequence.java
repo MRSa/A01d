@@ -162,7 +162,7 @@ public class NikonCameraConnectSequence implements Runnable, IPtpIpCommandCallba
             eventConnectionNumber = eventConnectionNumber + ((receiveData[10] & 0xff) << 16);
             eventConnectionNumber = eventConnectionNumber + ((receiveData[11] & 0xff) << 24);
             statusChecker.setEventConnectionNumber(eventConnectionNumber);
-            interfaceProvider.getCameraStatusWatcher().startStatusWatch(null);
+            interfaceProvider.getCameraStatusWatcher().startStatusWatch(interfaceProvider.getStatusListener());
 
             commandIssuer.enqueueCommand(new PtpIpCommandGeneric(this, SEQ_OPEN_SESSION, 50, isDumpLog, 0, 0x1002, 4, 0x41, 0, 0, 0));
         }
