@@ -11,6 +11,7 @@ import net.osdn.gokigen.a01d.camera.ptpip.wrapper.command.IPtpIpCommand;
 import net.osdn.gokigen.a01d.camera.ptpip.wrapper.command.IPtpIpCommandCallback;
 import net.osdn.gokigen.a01d.camera.ptpip.wrapper.command.IPtpIpCommandPublisher;
 import net.osdn.gokigen.a01d.camera.ptpip.wrapper.command.IPtpIpMessages;
+import net.osdn.gokigen.a01d.camera.ptpip.wrapper.command.messages.PtpIpCommandGeneric;
 import net.osdn.gokigen.a01d.camera.ptpip.wrapper.command.messages.specific.InitEventRequest;
 import net.osdn.gokigen.a01d.liveview.ICameraStatusUpdateNotify;
 
@@ -73,16 +74,18 @@ public class PtpIpStatusChecker implements IPtpIpCommandCallback, ICameraStatusW
             logcat("receivedMessage : " + id + ", length: " + data.length);
             if (id == IPtpIpMessages.SEQ_EVENT_INITIALIZE)
             {
-                // 終わる
+                // 終わる...んじゃなくて、イベント受信待ちに遷移する。
                 Log.v(TAG, " ----- PTP-IP Connection is ESTABLISHED. -----");
+                waitForEvent();
                 return;
             }
+
             if (data.length < STATUS_MESSAGE_HEADER_SIZE)
             {
                 Log.v(TAG, "received status length is short. (" + data.length + " bytes.)");
                 return;
             }
-
+/*
             int nofStatus = (data[13] * 256) + data[12];
             int statusCount = 0;
             int index = STATUS_MESSAGE_HEADER_SIZE;
@@ -93,6 +96,7 @@ public class PtpIpStatusChecker implements IPtpIpCommandCallback, ICameraStatusW
                 index = index + 6;
                 statusCount++;
             }
+*/
         }
         catch (Exception e)
         {
@@ -320,8 +324,10 @@ public class PtpIpStatusChecker implements IPtpIpCommandCallback, ICameraStatusW
      *    カメラからにコマンドの結果を受信する（メイン部分）
      *
      */
-    private void receive_from_camera(boolean isDumpReceiveLog, int id, IPtpIpCommandCallback callback, boolean receiveAgain, int delayMs) {
-        try {
+    private void receive_from_camera(boolean isDumpReceiveLog, int id, IPtpIpCommandCallback callback, boolean receiveAgain, int delayMs)
+    {
+        try
+        {
             sleep(delayMs);
 
             boolean isFirstTime = true;
@@ -329,24 +335,31 @@ public class PtpIpStatusChecker implements IPtpIpCommandCallback, ICameraStatusW
             int receive_message_buffer_size = BUFFER_SIZE;
             byte[] byte_array = new byte[receive_message_buffer_size];
             InputStream is = socket.getInputStream();
-            if (is != null) {
+            if (is != null)
+            {
                 int read_bytes = is.read(byte_array, 0, receive_message_buffer_size);
                 byte[] receive_body;
-                if (read_bytes > 4) {
-                    if (receiveAgain) {
+                if (read_bytes > 4)
+                {
+                    if (receiveAgain)
+                    {
                         int length = ((((int) byte_array[3]) & 0xff) << 24) + ((((int) byte_array[2]) & 0xff) << 16) + ((((int) byte_array[1]) & 0xff) << 8) + (((int) byte_array[0]) & 0xff);
-                        if (length > receive_message_buffer_size) {
+                        if (length > receive_message_buffer_size)
+                        {
                             Log.v(TAG, "+++++ TOTAL RECEIVE MESSAGE SIZE IS " + length + " +++++");
                         }
                         totalReadBytes = read_bytes;
-                        while ((length > totalReadBytes) || ((length == read_bytes) && ((int) byte_array[4] == 0x02))) {
+                        while ((length > totalReadBytes) || ((length == read_bytes) && ((int) byte_array[4] == 0x02)))
+                        {
                             // データについて、もう一回受信が必要な場合...
-                            if (isDumpReceiveLog) {
+                            if (isDumpReceiveLog)
+                            {
                                 Log.v(TAG, "--- RECEIVE AGAIN --- [" + length + "(" + read_bytes + ") " + byte_array[4] + "] ");
                             }
                             sleep(delayMs);
                             int read_bytes2 = is.read(byte_array, read_bytes, receive_message_buffer_size - read_bytes);
-                            if (read_bytes2 > 0) {
+                            if (read_bytes2 > 0)
+                            {
                                 read_bytes = read_bytes + read_bytes2;
                                 totalReadBytes = totalReadBytes + read_bytes2;
                             } else {
@@ -354,10 +367,13 @@ public class PtpIpStatusChecker implements IPtpIpCommandCallback, ICameraStatusW
                                 Log.v(TAG, "FINISHED RECEIVE... ");
                                 break;
                             }
-                            if (callback != null) {
-                                if (callback.isReceiveMulti()) {
+                            if (callback != null)
+                            {
+                                if (callback.isReceiveMulti())
+                                {
                                     int offset = 0;
-                                    if (isFirstTime) {
+                                    if (isFirstTime)
+                                    {
                                         // 先頭のヘッダ部分をカットして送る
                                         offset = 12;
                                         isFirstTime = false;
@@ -375,13 +391,16 @@ public class PtpIpStatusChecker implements IPtpIpCommandCallback, ICameraStatusW
                 } else {
                     receive_body = new byte[1];
                 }
-                if (isDumpReceiveLog) {
+                if (isDumpReceiveLog)
+                {
                     // ログに受信メッセージを出力する
                     Log.v(TAG, " receive_from_camera() : " + read_bytes + " bytes.");
                     dump_bytes("RECV[" + receive_body.length + "] ", receive_body);
                 }
-                if (callback != null) {
-                    if (callback.isReceiveMulti()) {
+                if (callback != null)
+                {
+                    if (callback.isReceiveMulti())
+                    {
                         callback.receivedMessage(id, null);
                     } else {
                         callback.receivedMessage(id, receive_body);
@@ -389,7 +408,9 @@ public class PtpIpStatusChecker implements IPtpIpCommandCallback, ICameraStatusW
                     }
                 }
             }
-        } catch (Throwable e) {
+        }
+        catch (Throwable e)
+        {
             e.printStackTrace();
         }
     }
@@ -406,4 +427,96 @@ public class PtpIpStatusChecker implements IPtpIpCommandCallback, ICameraStatusW
         }
     }
 
+    private void waitForEvent()
+    {
+        final int delayMs = 25;
+        try
+        {
+            Thread thread = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try
+                    {
+                        Log.v(TAG, " waitForEvent : " + whileFetching);
+                        // if (whileFetching)
+                        {
+                            sleep(delayMs);
+
+                            // 受信待ちする...
+                            receive_from_camera(true, IPtpIpMessages.SEQ_EVENT_RECEIVE, new IPtpIpCommandCallback() {
+                                        @Override
+                                        public void receivedMessage(int id, byte[] rx_body)
+                                        {
+                                            try
+                                            {
+                                                //  メッセージを受信。 応答を返さないといけない...
+                                                sendReplyMessage(rx_body);
+
+                                                //  そして次のイベントを待つ
+                                                waitForEvent();
+                                            }
+                                            catch (Exception e)
+                                            {
+                                                e.printStackTrace();
+                                            }
+                                        }
+
+                                        @Override
+                                        public void onReceiveProgress(int currentBytes, int totalBytes, byte[] rx_body)
+                                        {
+                                            Log.v(TAG, " onReceiveProgress : [" + currentBytes + "/" + totalBytes + "]");
+                                        }
+
+                                        @Override
+                                        public boolean isReceiveMulti()
+                                        {
+                                            return false;
+                                        }
+                                    }, true, delayMs);
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                    }
+                }
+            });
+            thread.start();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    private void sendReplyMessage(byte[] received_message)
+    {
+        try
+        {
+            Log.v(TAG, " RECEIVE : " + received_message.length + " bytes.");
+            if (received_message.length >= 26)
+            {
+                // 受信パケットを解析
+                int packetType = (((int) received_message[4]) & 0xff);
+                int eventCode =  ((((int) received_message[9]) & 0xff) << 8) + (((int) received_message[8]) & 0xff);
+                int parameter1 = ((((int) received_message[17]) & 0xff) << 24) + ((((int) received_message[16]) & 0xff) << 16) + ((((int) received_message[15]) & 0xff) << 8) + (((int) received_message[14]) & 0xff);
+                int parameter2 = ((((int) received_message[21]) & 0xff) << 24) + ((((int) received_message[20]) & 0xff) << 16) + ((((int) received_message[19]) & 0xff) << 8) + (((int) received_message[18]) & 0xff);
+                int parameter3 = ((((int) received_message[25]) & 0xff) << 24) + ((((int) received_message[24]) & 0xff) << 16) + ((((int) received_message[23]) & 0xff) << 8) + (((int) received_message[22]) & 0xff);
+
+                if (eventCode == 0xc101)
+                {
+                    // イベント受信指示
+                    issuer.enqueueCommand(new PtpIpCommandGeneric(this, IPtpIpMessages.SEQ_GET_STATUS, true, 0, 0x9116));
+                    issuer.enqueueCommand(new PtpIpCommandGeneric(this, IPtpIpMessages.SEQ_GET_STATUS, true, 0, 0x9116));
+                    issuer.enqueueCommand(new PtpIpCommandGeneric(this, IPtpIpMessages.SEQ_GET_STATUS, true, 0, 0x9116));
+                }
+
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
 }
+

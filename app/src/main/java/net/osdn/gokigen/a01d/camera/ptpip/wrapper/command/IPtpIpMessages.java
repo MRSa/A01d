@@ -10,9 +10,18 @@ public interface IPtpIpMessages
     int SEQ_CHANGE_REMOTE = 5;
     int SEQ_SET_EVENT_MODE = 6;
     int SEQ_GET_EVENT = 7;
-
-
+    int SEQ_GET_EVENT1 = 8;
     int SEQ_STATUS_REQUEST = 9;
+    int SEQ_DEVICE_PROPERTY = 10;
+    int SEQ_DEVICE_PROPERTY_FINISHED = 11;
+    int SEQ_DEVICE_INFORMATION= 12;
+    int SEQ_SET_DEVICE_PROPERTY = 13;
+    int SEQ_EVENT_RECEIVE = 14;
+    int SEQ_GET_STATUS = 15;
+    int SEQ_GET_VIEWFRAME = 16;
+    int SEQ_SET_DEVICE_PROPERTY_2 = 17;
+    int SEQ_SET_DEVICE_PROPERTY_3 = 18;
+
 
     int GET_STORAGE_ID = 101;
     int GET_STORAGE_INFO = 102;

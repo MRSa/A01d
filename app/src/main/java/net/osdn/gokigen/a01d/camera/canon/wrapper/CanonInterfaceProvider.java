@@ -23,7 +23,6 @@ import net.osdn.gokigen.a01d.camera.canon.wrapper.connection.CanonConnection;
 import net.osdn.gokigen.a01d.camera.canon.operation.CanonZoomLensControl;
 import net.osdn.gokigen.a01d.camera.canon.wrapper.hardware.CanonCameraInformation;
 import net.osdn.gokigen.a01d.camera.canon.wrapper.liveview.CanonLiveViewControl;
-import net.osdn.gokigen.a01d.camera.canon.wrapper.status.CanonStatusWatcher;
 import net.osdn.gokigen.a01d.camera.ptpip.IPtpIpInterfaceProvider;
 import net.osdn.gokigen.a01d.camera.ptpip.wrapper.command.IPtpIpCommandCallback;
 import net.osdn.gokigen.a01d.camera.ptpip.wrapper.command.IPtpIpCommandPublisher;
@@ -61,7 +60,6 @@ public class CanonInterfaceProvider implements IPtpIpInterfaceProvider, IDisplay
     private PtpIpStatusChecker statusChecker;
     private ICameraStatusUpdateNotify statusListener;
     private IInformationReceiver informationReceiver;
-    private CanonStatusWatcher statusWatcher;
 
     public CanonInterfaceProvider(@NonNull Activity context, @NonNull ICameraStatusReceiver provider, @NonNull ICameraStatusUpdateNotify statusListener, @NonNull IInformationReceiver informationReceiver)
     {
@@ -75,7 +73,6 @@ public class CanonInterfaceProvider implements IPtpIpInterfaceProvider, IDisplay
         zoomControl = new CanonZoomLensControl();
         this.statusListener = statusListener;
         this.runmode = new PtpIpRunMode();
-        statusWatcher = new CanonStatusWatcher();
         this.informationReceiver = informationReceiver;
     }
 
@@ -198,7 +195,7 @@ public class CanonInterfaceProvider implements IPtpIpInterfaceProvider, IDisplay
     @Override
     public ICameraStatusWatcher getStatusWatcher()
     {
-        return (statusWatcher);
+        return (statusChecker);
     }
 
     @Override

@@ -10,6 +10,7 @@ import androidx.annotation.NonNull;
 import net.osdn.gokigen.a01d.R;
 import net.osdn.gokigen.a01d.camera.ICameraConnection;
 import net.osdn.gokigen.a01d.camera.ICameraStatusReceiver;
+import net.osdn.gokigen.a01d.camera.canon.wrapper.command.messages.specific.CanonSetDevicePropertyValue;
 import net.osdn.gokigen.a01d.camera.ptpip.IPtpIpInterfaceProvider;
 import net.osdn.gokigen.a01d.camera.canon.wrapper.command.messages.specific.CanonRegistrationMessage;
 import net.osdn.gokigen.a01d.camera.ptpip.wrapper.command.IPtpIpCommandCallback;
@@ -28,11 +29,11 @@ public class CanonCameraConnectSequence implements Runnable, IPtpIpCommandCallba
     private final IPtpIpInterfaceProvider interfaceProvider;
     private final IPtpIpCommandPublisher commandIssuer;
     private final PtpIpStatusChecker statusChecker;
-    private boolean isDumpLog = false;
+    private boolean isDumpLog = true;
 
     CanonCameraConnectSequence(@NonNull Activity context, @NonNull ICameraStatusReceiver statusReceiver, @NonNull final ICameraConnection cameraConnection, @NonNull IPtpIpInterfaceProvider interfaceProvider, @NonNull PtpIpStatusChecker statusChecker)
     {
-        Log.v(TAG, " CanonCameraConnectSequenceForPlayback");
+        Log.v(TAG, " CanonCameraConnectSequence");
         this.context = context;
         this.cameraConnection = cameraConnection;
         this.cameraStatusReceiver = statusReceiver;
@@ -139,13 +140,90 @@ public class CanonCameraConnectSequence implements Runnable, IPtpIpCommandCallba
 
             case SEQ_SET_EVENT_MODE:
                 interfaceProvider.getInformationReceiver().updateMessage(context.getString(R.string.canon_connect_connecting5), false, false, 0);
-                commandIssuer.enqueueCommand(new PtpIpCommandGeneric(this, SEQ_GET_EVENT, isDumpLog, 0, 0x902f, 4, 0x02));
+                commandIssuer.enqueueCommand(new PtpIpCommandGeneric(this, SEQ_GET_EVENT, isDumpLog, 0, 0x913d, 4, 0x0fff));
+                // commandIssuer.enqueueCommand(new PtpIpCommandGeneric(this, SEQ_GET_EVENT, isDumpLog, 0, 0x902f, 4, 0x02));
                 break;
 
             case SEQ_GET_EVENT:
-                interfaceProvider.getInformationReceiver().updateMessage(context.getString(R.string.connect_connect_finished), false, false, 0);
-                connectFinished();
-                Log.v(TAG, "CHANGED PLAYBACK MODE : DONE.");
+                interfaceProvider.getInformationReceiver().updateMessage(context.getString(R.string.canon_connect_connecting6), false, false, 0);
+                commandIssuer.enqueueCommand(new PtpIpCommandGeneric(this, SEQ_GET_EVENT1, isDumpLog, 0, 0x9033, 4, 0x0000));
+                // commandIssuer.enqueueCommand(new PtpIpCommandGeneric(this, SEQ_GET_EVENT, isDumpLog, 0, 0x902f, 4, 0x02));
+                break;
+
+            case SEQ_GET_EVENT1:
+                interfaceProvider.getInformationReceiver().updateMessage(context.getString(R.string.canon_connect_connecting7), false, false, 0);
+                commandIssuer.enqueueCommand(new PtpIpCommandGeneric(this, SEQ_DEVICE_INFORMATION, isDumpLog, 0, 0x1001));
+                break;
+
+            case SEQ_DEVICE_INFORMATION:
+                interfaceProvider.getInformationReceiver().updateMessage(context.getString(R.string.canon_connect_connecting8), false, false, 0);
+                commandIssuer.enqueueCommand(new PtpIpCommandGeneric(this, SEQ_DEVICE_PROPERTY, isDumpLog, 0, 0x9127, 4, 0x0000d1a6));
+                commandIssuer.enqueueCommand(new PtpIpCommandGeneric(this, SEQ_DEVICE_PROPERTY, isDumpLog, 0, 0x9127, 4, 0x0000d169));
+                commandIssuer.enqueueCommand(new PtpIpCommandGeneric(this, SEQ_DEVICE_PROPERTY, isDumpLog, 0, 0x9127, 4, 0x0000d16a));
+                commandIssuer.enqueueCommand(new PtpIpCommandGeneric(this, SEQ_DEVICE_PROPERTY, isDumpLog, 0, 0x9127, 4, 0x0000d16b));
+                commandIssuer.enqueueCommand(new PtpIpCommandGeneric(this, SEQ_DEVICE_PROPERTY, isDumpLog, 0, 0x9127, 4, 0x0000d1af));
+                break;
+
+            case SEQ_DEVICE_PROPERTY:
+                interfaceProvider.getInformationReceiver().updateMessage(context.getString(R.string.canon_connect_connecting9), false, false, 0);
+                Log.v(TAG, " SEQ_DEVICE_PROPERTY ");
+                if ((rx_body[8] == (byte) 0x01)&&(rx_body[9] == (byte) 0x20))
+                {
+                    // コマンドが受け付けられた！
+                    try
+                    {
+                        // ちょっと(200ms)待つ
+                        Thread.sleep(200);
+
+                        // コマンド発行
+                        commandIssuer.enqueueCommand(new CanonSetDevicePropertyValue(this, SEQ_SET_DEVICE_PROPERTY, isDumpLog, 0, 20, 0xd136, 0x00));
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                    }
+                }
+                break;
+
+            case SEQ_SET_DEVICE_PROPERTY:
+                interfaceProvider.getInformationReceiver().updateMessage(context.getString(R.string.canon_connect_connecting10), false, false, 0);
+                Log.v(TAG, " SEQ_SET_DEVICE_PROPERTY ");
+                commandIssuer.enqueueCommand(new CanonSetDevicePropertyValue(this, SEQ_SET_DEVICE_PROPERTY_2, isDumpLog, 0, 20, 0xd136, 0x01));
+                break;
+
+            case SEQ_SET_DEVICE_PROPERTY_2:
+                interfaceProvider.getInformationReceiver().updateMessage(context.getString(R.string.canon_connect_connecting10), false, false, 0);
+                Log.v(TAG, " SEQ_SET_DEVICE_PROPERTY_2 ");
+                commandIssuer.enqueueCommand(new CanonSetDevicePropertyValue(this, SEQ_SET_DEVICE_PROPERTY_3, isDumpLog, 0, 20, 0xd136, 0x00));
+                break;
+
+            case SEQ_SET_DEVICE_PROPERTY_3:
+                interfaceProvider.getInformationReceiver().updateMessage(context.getString(R.string.canon_connect_connecting11), false, false, 0);
+                Log.v(TAG, " SEQ_SET_DEVICE_PROPERTY_3 ");
+                commandIssuer.enqueueCommand(new CanonSetDevicePropertyValue(this, SEQ_DEVICE_PROPERTY_FINISHED, isDumpLog, 0, 20, 0xd1b0, 0x08));
+                break;
+
+            case SEQ_DEVICE_PROPERTY_FINISHED:
+                interfaceProvider.getInformationReceiver().updateMessage(context.getString(R.string.canon_connect_connecting12), false, false, 0);
+                Log.v(TAG, " SEQ_DEVICE_PROPERTY_FINISHED ");
+/*
+                if (rx_body.length <= 80)
+                {
+                    // 『仮』： OP CODE: 0x9116 の応答データが80バイト以下なら、再度イベントを要求する
+                    Log.v(TAG, "  TRY AGAIN ... : " + rx_body.length);
+                    interfaceProvider.getInformationReceiver().updateMessage(context.getString(R.string.canon_connect_connecting5), false, false, 0);
+                    //commandIssuer.enqueueCommand(new PtpIpCommandGeneric(this, SEQ_DEVICE_PROPERTY_FINISHED, isDumpLog, 0, 0x9116));
+                }
+                else
+ */
+                {
+                    interfaceProvider.getInformationReceiver().updateMessage(context.getString(R.string.connect_connect_finished), false, false, 0);
+                    connectFinished();
+                    Log.v(TAG, "CHANGED MODE : DONE.");
+                }
+
+                // 実験...
+                commandIssuer.enqueueCommand(new PtpIpCommandGeneric(this, SEQ_GET_VIEWFRAME, isDumpLog, 0, 0x9153, 12, 0x00200000, 0x01, 0x00));
                 break;
 
             default:
