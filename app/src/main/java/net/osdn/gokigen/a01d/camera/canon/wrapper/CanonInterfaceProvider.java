@@ -31,7 +31,7 @@ import net.osdn.gokigen.a01d.camera.ptpip.wrapper.command.PtpIpAsyncResponseRece
 import net.osdn.gokigen.a01d.camera.ptpip.wrapper.command.PtpIpCommandPublisher;
 import net.osdn.gokigen.a01d.camera.ptpip.wrapper.status.IPtpIpRunModeHolder;
 import net.osdn.gokigen.a01d.camera.ptpip.wrapper.status.PtpIpRunMode;
-import net.osdn.gokigen.a01d.camera.ptpip.wrapper.status.PtpIpStatusChecker;
+import net.osdn.gokigen.a01d.camera.canon.wrapper.status.CanonStatusChecker;
 import net.osdn.gokigen.a01d.liveview.IAutoFocusFrameDisplay;
 import net.osdn.gokigen.a01d.liveview.ICameraStatusUpdateNotify;
 import net.osdn.gokigen.a01d.liveview.IIndicatorControl;
@@ -57,7 +57,7 @@ public class CanonInterfaceProvider implements IPtpIpInterfaceProvider, IDisplay
     private CanonLiveViewControl liveViewControl;
     private PtpIpAsyncResponseReceiver asyncReceiver;
     private CanonZoomLensControl zoomControl;
-    private PtpIpStatusChecker statusChecker;
+    private CanonStatusChecker statusChecker;
     private ICameraStatusUpdateNotify statusListener;
     private IInformationReceiver informationReceiver;
 
@@ -67,7 +67,7 @@ public class CanonInterfaceProvider implements IPtpIpInterfaceProvider, IDisplay
         commandPublisher = new PtpIpCommandPublisher(CAMERA_IP, CONTROL_PORT);
         liveViewControl = new CanonLiveViewControl(context, CAMERA_IP, STREAM_PORT);
         asyncReceiver = new PtpIpAsyncResponseReceiver(CAMERA_IP, ASYNC_RESPONSE_PORT);
-        statusChecker = new PtpIpStatusChecker(activity, commandPublisher, CAMERA_IP, EVENT_PORT);
+        statusChecker = new CanonStatusChecker(activity, commandPublisher, CAMERA_IP, EVENT_PORT);
         canonConnection = new CanonConnection(context, provider, this, statusChecker);
         cameraInformation = new CanonCameraInformation();
         zoomControl = new CanonZoomLensControl();

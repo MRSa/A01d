@@ -107,4 +107,10 @@ public class PtpIpCommandBase implements IPtpIpCommand, IPtpIpMessages
     {
         return (true);
     }
+
+    @Override
+    public boolean isRetrySend()
+    {
+        return (true);
+    }
 }

@@ -52,4 +52,7 @@ public interface IPtpIpCommand
 
     // デバッグ用： ログ(logcat)に通信結果を残すかどうか
     boolean dumpLog();
+
+    // リトライオーバー発生時、コマンドを再送するか？
+    boolean isRetrySend();
 }

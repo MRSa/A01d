@@ -22,7 +22,7 @@ public class PtpIpCommandPublisher implements IPtpIpCommandPublisher, IPtpIpComm
     private static final int SEQUENCE_START_NUMBER = 1;
     private static final int BUFFER_SIZE = 1024 * 1024 + 16;  // 受信バッファは 256kB
     private static final int COMMAND_SEND_RECEIVE_DURATION_MS = 5;
-    private static final int COMMAND_SEND_RECEIVE_DURATION_MAX = 1000;
+    private static final int COMMAND_SEND_RECEIVE_DURATION_MAX = 3000;
     private static final int COMMAND_POLL_QUEUE_MS = 5;
 
     private final String ipAddress;
@@ -267,6 +267,11 @@ public class PtpIpCommandPublisher implements IPtpIpCommandPublisher, IPtpIpComm
                 retry_over = receive_from_camera(command);
                 if ((retry_over)&&(commandBody != null))
                 {
+                    if (!command.isRetrySend())
+                    {
+                        //  コマンドを再送信しない場合はここで抜ける
+                        break;
+                    }
                     // 再送信...のために、シーケンス番号を戻す...
                     sequenceNumber--;
                 }
@@ -595,6 +600,7 @@ public class PtpIpCommandPublisher implements IPtpIpCommandPublisher, IPtpIpComm
 
     private int waitForReceive(InputStream is, int delayMs)
     {
+        boolean isLogOutput = true;
         int retry_count = 50;
         int read_bytes = 0;
         try
@@ -605,7 +611,11 @@ public class PtpIpCommandPublisher implements IPtpIpCommandPublisher, IPtpIpComm
                 read_bytes = is.available();
                 if (read_bytes == 0)
                 {
-                    Log.v(TAG, " is.available() WAIT... ");
+                    if (isLogOutput)
+                    {
+                        Log.v(TAG, " is.available() WAIT... ");
+                        isLogOutput = false;
+                    }
                     retry_count--;
                     if (retry_count < 0)
                     {

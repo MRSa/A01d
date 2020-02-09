@@ -1,4 +1,4 @@
-package net.osdn.gokigen.a01d.camera.ptpip.wrapper.status;
+package net.osdn.gokigen.a01d.camera.canon.wrapper.status;
 
 import android.app.Activity;
 import android.util.Log;
@@ -25,16 +25,15 @@ import java.util.List;
 
 import static net.osdn.gokigen.a01d.camera.utils.SimpleLogDumper.dump_bytes;
 
-public class PtpIpStatusChecker implements IPtpIpCommandCallback, ICameraStatusWatcher, ICameraStatus
+public class CanonStatusChecker implements IPtpIpCommandCallback, ICameraStatusWatcher, ICameraStatus
 {
     private final String TAG = toString();
 
     private static final int BUFFER_SIZE = 1024 * 1024 + 8;
     private static final int STATUS_MESSAGE_HEADER_SIZE = 14;
-    private int sleepMs;
     private final IPtpIpCommandPublisher issuer;
     private ICameraStatusUpdateNotify notifier = null;
-    private PtpIpStatusHolder statusHolder;
+    private CanonStatusHolder statusHolder;
     private boolean whileFetching = false;
     private boolean logcat = false;
     private final String ipAddress;
@@ -45,13 +44,12 @@ public class PtpIpStatusChecker implements IPtpIpCommandCallback, ICameraStatusW
     private BufferedReader bufferedReader = null;
     private int eventConnectionNumber = 0;
 
-    public PtpIpStatusChecker(@NonNull Activity activity, @NonNull IPtpIpCommandPublisher issuer, @NonNull String ip, int portNumber)
+    public CanonStatusChecker(@NonNull Activity activity, @NonNull IPtpIpCommandPublisher issuer, @NonNull String ip, int portNumber)
     {
         this.issuer = issuer;
-        this.statusHolder = new PtpIpStatusHolder();
+        this.statusHolder = new CanonStatusHolder();
         this.ipAddress = ip;
         this.portNumber = portNumber;
-        Log.v(TAG, "POLLING WAIT : " + sleepMs);
     }
 
     @Override
@@ -85,7 +83,6 @@ public class PtpIpStatusChecker implements IPtpIpCommandCallback, ICameraStatusW
                 Log.v(TAG, "received status length is short. (" + data.length + " bytes.)");
                 return;
             }
-/*
             int nofStatus = (data[13] * 256) + data[12];
             int statusCount = 0;
             int index = STATUS_MESSAGE_HEADER_SIZE;
@@ -96,7 +93,6 @@ public class PtpIpStatusChecker implements IPtpIpCommandCallback, ICameraStatusW
                 index = index + 6;
                 statusCount++;
             }
-*/
         }
         catch (Exception e)
         {
@@ -502,15 +498,12 @@ public class PtpIpStatusChecker implements IPtpIpCommandCallback, ICameraStatusW
                 int parameter1 = ((((int) received_message[17]) & 0xff) << 24) + ((((int) received_message[16]) & 0xff) << 16) + ((((int) received_message[15]) & 0xff) << 8) + (((int) received_message[14]) & 0xff);
                 int parameter2 = ((((int) received_message[21]) & 0xff) << 24) + ((((int) received_message[20]) & 0xff) << 16) + ((((int) received_message[19]) & 0xff) << 8) + (((int) received_message[18]) & 0xff);
                 int parameter3 = ((((int) received_message[25]) & 0xff) << 24) + ((((int) received_message[24]) & 0xff) << 16) + ((((int) received_message[23]) & 0xff) << 8) + (((int) received_message[22]) & 0xff);
-
+                Log.v(TAG, String.format(" event : 0x%x, code: 0x%x, prm1: 0x%x, prm2: 0x%x, prm3 : 0x%x", packetType, eventCode, parameter1, parameter2, parameter3));
                 if (eventCode == 0xc101)
                 {
-                    // イベント受信指示
-                    issuer.enqueueCommand(new PtpIpCommandGeneric(this, IPtpIpMessages.SEQ_GET_STATUS, true, 0, 0x9116));
-                    issuer.enqueueCommand(new PtpIpCommandGeneric(this, IPtpIpMessages.SEQ_GET_STATUS, true, 0, 0x9116));
+                    // イベントの受信指示
                     issuer.enqueueCommand(new PtpIpCommandGeneric(this, IPtpIpMessages.SEQ_GET_STATUS, true, 0, 0x9116));
                 }
-
             }
         }
         catch (Exception e)
@@ -519,4 +512,3 @@ public class PtpIpStatusChecker implements IPtpIpCommandCallback, ICameraStatusW
         }
     }
 }
-

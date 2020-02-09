@@ -1,4 +1,4 @@
-package net.osdn.gokigen.a01d.camera.ptpip.wrapper.status;
+package net.osdn.gokigen.a01d.camera.canon.wrapper.status;
 
 import android.util.Log;
 import android.util.SparseIntArray;
@@ -6,19 +6,20 @@ import android.util.SparseIntArray;
 import androidx.annotation.NonNull;
 import androidx.collection.SparseArrayCompat;
 
+import net.osdn.gokigen.a01d.camera.ptpip.wrapper.status.IPtpIpCameraProperties;
 import net.osdn.gokigen.a01d.liveview.ICameraStatusUpdateNotify;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-class PtpIpStatusHolder implements IPtpIpCameraProperties
+class CanonStatusHolder implements IPtpIpCameraProperties
 {
     private final String TAG = toString();
     private SparseIntArray statusHolder;
     private SparseArrayCompat<String> statusNameArray;
 
-    PtpIpStatusHolder()
+    CanonStatusHolder()
     {
         statusHolder = new SparseIntArray();
         statusHolder.clear();
@@ -67,6 +68,8 @@ class PtpIpStatusHolder implements IPtpIpCameraProperties
     {
         try
         {
+            Log.v(TAG, " updateValue() ");
+/*
             int value = ((((int) data3) & 0xff) << 24) + ((((int) data2) & 0xff) << 16) + ((((int) data1) & 0xff) << 8) + (((int) data0) & 0xff);
             int currentValue = statusHolder.get(id, -1);
             Log.v(TAG, "STATUS  ID: " + id + "  value : " + value + " (" + currentValue + ")");
@@ -79,6 +82,7 @@ class PtpIpStatusHolder implements IPtpIpCameraProperties
                     updateDetected(notifier, id, currentValue, value);
                 }
             }
+*/
         }
         catch (Exception e)
         {

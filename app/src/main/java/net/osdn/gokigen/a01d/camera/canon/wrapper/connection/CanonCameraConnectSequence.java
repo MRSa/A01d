@@ -17,7 +17,7 @@ import net.osdn.gokigen.a01d.camera.ptpip.wrapper.command.IPtpIpCommandCallback;
 import net.osdn.gokigen.a01d.camera.ptpip.wrapper.command.IPtpIpCommandPublisher;
 import net.osdn.gokigen.a01d.camera.ptpip.wrapper.command.IPtpIpMessages;
 import net.osdn.gokigen.a01d.camera.ptpip.wrapper.command.messages.PtpIpCommandGeneric;
-import net.osdn.gokigen.a01d.camera.ptpip.wrapper.status.PtpIpStatusChecker;
+import net.osdn.gokigen.a01d.camera.canon.wrapper.status.CanonStatusChecker;
 
 public class CanonCameraConnectSequence implements Runnable, IPtpIpCommandCallback, IPtpIpMessages
 {
@@ -28,10 +28,10 @@ public class CanonCameraConnectSequence implements Runnable, IPtpIpCommandCallba
     private final ICameraStatusReceiver cameraStatusReceiver;
     private final IPtpIpInterfaceProvider interfaceProvider;
     private final IPtpIpCommandPublisher commandIssuer;
-    private final PtpIpStatusChecker statusChecker;
+    private final CanonStatusChecker statusChecker;
     private boolean isDumpLog = true;
 
-    CanonCameraConnectSequence(@NonNull Activity context, @NonNull ICameraStatusReceiver statusReceiver, @NonNull final ICameraConnection cameraConnection, @NonNull IPtpIpInterfaceProvider interfaceProvider, @NonNull PtpIpStatusChecker statusChecker)
+    CanonCameraConnectSequence(@NonNull Activity context, @NonNull ICameraStatusReceiver statusReceiver, @NonNull final ICameraConnection cameraConnection, @NonNull IPtpIpInterfaceProvider interfaceProvider, @NonNull CanonStatusChecker statusChecker)
     {
         Log.v(TAG, " CanonCameraConnectSequence");
         this.context = context;
@@ -124,38 +124,45 @@ public class CanonCameraConnectSequence implements Runnable, IPtpIpCommandCallba
                 break;
 
             case SEQ_OPEN_SESSION:
+                Log.v(TAG, " SEQ_OPEN_SESSION ");
                 interfaceProvider.getInformationReceiver().updateMessage(context.getString(R.string.canon_connect_connecting2), false, false, 0);
                 commandIssuer.enqueueCommand(new PtpIpCommandGeneric(this, SEQ_INIT_SESSION, isDumpLog, 0, 0x902f));
                 break;
 
             case SEQ_INIT_SESSION:
+                Log.v(TAG, " SEQ_INIT_SESSION ");
                 interfaceProvider.getInformationReceiver().updateMessage(context.getString(R.string.canon_connect_connecting3), false, false, 0);
                 commandIssuer.enqueueCommand(new PtpIpCommandGeneric(this, SEQ_CHANGE_REMOTE, isDumpLog, 0, 0x9114, 4, 0x15));
                 break;
 
             case SEQ_CHANGE_REMOTE:
+                Log.v(TAG, " SEQ_CHANGE_REMOTE ");
                 interfaceProvider.getInformationReceiver().updateMessage(context.getString(R.string.canon_connect_connecting4), false, false, 0);
                 commandIssuer.enqueueCommand(new PtpIpCommandGeneric(this, SEQ_SET_EVENT_MODE, isDumpLog, 0, 0x9115, 4, 0x02));
                 break;
 
             case SEQ_SET_EVENT_MODE:
+                Log.v(TAG, " SEQ_SET_EVENT_MODE ");
                 interfaceProvider.getInformationReceiver().updateMessage(context.getString(R.string.canon_connect_connecting5), false, false, 0);
                 commandIssuer.enqueueCommand(new PtpIpCommandGeneric(this, SEQ_GET_EVENT, isDumpLog, 0, 0x913d, 4, 0x0fff));
                 // commandIssuer.enqueueCommand(new PtpIpCommandGeneric(this, SEQ_GET_EVENT, isDumpLog, 0, 0x902f, 4, 0x02));
                 break;
 
             case SEQ_GET_EVENT:
+                Log.v(TAG, " SEQ_GET_EVENT ");
                 interfaceProvider.getInformationReceiver().updateMessage(context.getString(R.string.canon_connect_connecting6), false, false, 0);
                 commandIssuer.enqueueCommand(new PtpIpCommandGeneric(this, SEQ_GET_EVENT1, isDumpLog, 0, 0x9033, 4, 0x0000));
                 // commandIssuer.enqueueCommand(new PtpIpCommandGeneric(this, SEQ_GET_EVENT, isDumpLog, 0, 0x902f, 4, 0x02));
                 break;
 
             case SEQ_GET_EVENT1:
+                Log.v(TAG, " SEQ_GET_EVENT1 ");
                 interfaceProvider.getInformationReceiver().updateMessage(context.getString(R.string.canon_connect_connecting7), false, false, 0);
                 commandIssuer.enqueueCommand(new PtpIpCommandGeneric(this, SEQ_DEVICE_INFORMATION, isDumpLog, 0, 0x1001));
                 break;
 
             case SEQ_DEVICE_INFORMATION:
+                Log.v(TAG, " SEQ_DEVICE_INFORMATION ");
                 interfaceProvider.getInformationReceiver().updateMessage(context.getString(R.string.canon_connect_connecting8), false, false, 0);
                 commandIssuer.enqueueCommand(new PtpIpCommandGeneric(this, SEQ_DEVICE_PROPERTY, isDumpLog, 0, 0x9127, 4, 0x0000d1a6));
                 commandIssuer.enqueueCommand(new PtpIpCommandGeneric(this, SEQ_DEVICE_PROPERTY, isDumpLog, 0, 0x9127, 4, 0x0000d169));
@@ -165,18 +172,18 @@ public class CanonCameraConnectSequence implements Runnable, IPtpIpCommandCallba
                 break;
 
             case SEQ_DEVICE_PROPERTY:
-                interfaceProvider.getInformationReceiver().updateMessage(context.getString(R.string.canon_connect_connecting9), false, false, 0);
                 Log.v(TAG, " SEQ_DEVICE_PROPERTY ");
+                interfaceProvider.getInformationReceiver().updateMessage(context.getString(R.string.canon_connect_connecting9), false, false, 0);
                 if ((rx_body[8] == (byte) 0x01)&&(rx_body[9] == (byte) 0x20))
                 {
-                    // コマンドが受け付けられた！
+                    // コマンドが受け付けられたときだけ次に進む！
                     try
                     {
-                        // ちょっと(200ms)待つ
-                        Thread.sleep(200);
+                        // ちょっと(250ms)待つ
+                        Thread.sleep(250);
 
                         // コマンド発行
-                        commandIssuer.enqueueCommand(new CanonSetDevicePropertyValue(this, SEQ_SET_DEVICE_PROPERTY, isDumpLog, 0, 20, 0xd136, 0x00));
+                        commandIssuer.enqueueCommand(new CanonSetDevicePropertyValue(this, SEQ_SET_DEVICE_PROPERTY, isDumpLog, 0, 150, 0xd136, 0x00));
                     }
                     catch (Exception e)
                     {
@@ -186,44 +193,28 @@ public class CanonCameraConnectSequence implements Runnable, IPtpIpCommandCallba
                 break;
 
             case SEQ_SET_DEVICE_PROPERTY:
-                interfaceProvider.getInformationReceiver().updateMessage(context.getString(R.string.canon_connect_connecting10), false, false, 0);
                 Log.v(TAG, " SEQ_SET_DEVICE_PROPERTY ");
-                commandIssuer.enqueueCommand(new CanonSetDevicePropertyValue(this, SEQ_SET_DEVICE_PROPERTY_2, isDumpLog, 0, 20, 0xd136, 0x01));
+                interfaceProvider.getInformationReceiver().updateMessage(context.getString(R.string.canon_connect_connecting10), false, false, 0);
+                commandIssuer.enqueueCommand(new CanonSetDevicePropertyValue(this, SEQ_SET_DEVICE_PROPERTY_2, isDumpLog, 0, 150, 0xd136, 0x01));
                 break;
 
             case SEQ_SET_DEVICE_PROPERTY_2:
-                interfaceProvider.getInformationReceiver().updateMessage(context.getString(R.string.canon_connect_connecting10), false, false, 0);
                 Log.v(TAG, " SEQ_SET_DEVICE_PROPERTY_2 ");
-                commandIssuer.enqueueCommand(new CanonSetDevicePropertyValue(this, SEQ_SET_DEVICE_PROPERTY_3, isDumpLog, 0, 20, 0xd136, 0x00));
+                interfaceProvider.getInformationReceiver().updateMessage(context.getString(R.string.canon_connect_connecting11), false, false, 0);
+                commandIssuer.enqueueCommand(new CanonSetDevicePropertyValue(this, SEQ_SET_DEVICE_PROPERTY_3, isDumpLog, 0, 150, 0xd136, 0x00));
                 break;
 
             case SEQ_SET_DEVICE_PROPERTY_3:
-                interfaceProvider.getInformationReceiver().updateMessage(context.getString(R.string.canon_connect_connecting11), false, false, 0);
                 Log.v(TAG, " SEQ_SET_DEVICE_PROPERTY_3 ");
-                commandIssuer.enqueueCommand(new CanonSetDevicePropertyValue(this, SEQ_DEVICE_PROPERTY_FINISHED, isDumpLog, 0, 20, 0xd1b0, 0x08));
+                interfaceProvider.getInformationReceiver().updateMessage(context.getString(R.string.canon_connect_connecting12), false, false, 0);
+                commandIssuer.enqueueCommand(new CanonSetDevicePropertyValue(this, SEQ_DEVICE_PROPERTY_FINISHED, isDumpLog, 0, 300, 0xd1b0, 0x08));
                 break;
 
             case SEQ_DEVICE_PROPERTY_FINISHED:
-                interfaceProvider.getInformationReceiver().updateMessage(context.getString(R.string.canon_connect_connecting12), false, false, 0);
                 Log.v(TAG, " SEQ_DEVICE_PROPERTY_FINISHED ");
-/*
-                if (rx_body.length <= 80)
-                {
-                    // 『仮』： OP CODE: 0x9116 の応答データが80バイト以下なら、再度イベントを要求する
-                    Log.v(TAG, "  TRY AGAIN ... : " + rx_body.length);
-                    interfaceProvider.getInformationReceiver().updateMessage(context.getString(R.string.canon_connect_connecting5), false, false, 0);
-                    //commandIssuer.enqueueCommand(new PtpIpCommandGeneric(this, SEQ_DEVICE_PROPERTY_FINISHED, isDumpLog, 0, 0x9116));
-                }
-                else
- */
-                {
-                    interfaceProvider.getInformationReceiver().updateMessage(context.getString(R.string.connect_connect_finished), false, false, 0);
-                    connectFinished();
-                    Log.v(TAG, "CHANGED MODE : DONE.");
-                }
-
-                // 実験...
-                commandIssuer.enqueueCommand(new PtpIpCommandGeneric(this, SEQ_GET_VIEWFRAME, isDumpLog, 0, 0x9153, 12, 0x00200000, 0x01, 0x00));
+                interfaceProvider.getInformationReceiver().updateMessage(context.getString(R.string.connect_connect_finished), false, false, 0);
+                connectFinished();
+                Log.v(TAG, "CHANGED MODE : DONE.");
                 break;
 
             default:
@@ -283,8 +274,8 @@ public class CanonCameraConnectSequence implements Runnable, IPtpIpCommandCallba
             // ちょっと待つ
             Thread.sleep(1000);
 
-            //interfaceProvider.getAsyncEventCommunication().connect();
-            //interfaceProvider.getCameraStatusWatcher().startStatusWatch(interfaceProvider.getStatusListener());  ステータスの定期確認は実施しない
+            // // ステータスの監視はイベント受信時のみに実施する
+            // interfaceProvider.getCameraStatusWatcher().startStatusWatch(interfaceProvider.getStatusListener());
 
             // 接続成功！のメッセージを出す
             interfaceProvider.getInformationReceiver().updateMessage(context.getString(R.string.connect_connected), false, false, 0);

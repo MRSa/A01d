@@ -19,7 +19,7 @@ import net.osdn.gokigen.a01d.R;
 import net.osdn.gokigen.a01d.camera.ICameraConnection;
 import net.osdn.gokigen.a01d.camera.ICameraStatusReceiver;
 import net.osdn.gokigen.a01d.camera.ptpip.IPtpIpInterfaceProvider;
-import net.osdn.gokigen.a01d.camera.ptpip.wrapper.status.PtpIpStatusChecker;
+import net.osdn.gokigen.a01d.camera.canon.wrapper.status.CanonStatusChecker;
 
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -32,10 +32,10 @@ public class CanonConnection implements ICameraConnection
     private final IPtpIpInterfaceProvider interfaceProvider;
     private final BroadcastReceiver connectionReceiver;
     private final Executor cameraExecutor = Executors.newFixedThreadPool(1);
-    private final PtpIpStatusChecker statusChecker;
+    private final CanonStatusChecker statusChecker;
     private CameraConnectionStatus connectionStatus = CameraConnectionStatus.UNKNOWN;
 
-    public CanonConnection(@NonNull final Activity context, @NonNull final ICameraStatusReceiver statusReceiver, @NonNull IPtpIpInterfaceProvider interfaceProvider, @NonNull PtpIpStatusChecker statusChecker)
+    public CanonConnection(@NonNull final Activity context, @NonNull final ICameraStatusReceiver statusReceiver, @NonNull IPtpIpInterfaceProvider interfaceProvider, @NonNull CanonStatusChecker statusChecker)
     {
         Log.v(TAG, "CanonConnection()");
         this.context = context;
