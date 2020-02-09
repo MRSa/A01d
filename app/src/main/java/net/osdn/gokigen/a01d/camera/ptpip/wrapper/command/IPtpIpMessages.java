@@ -34,6 +34,9 @@ public interface IPtpIpMessages
     int GET_STORAGE_HANDLE3 = 112;
     int GET_PARTIAL_OBJECT= 113;
 
+    int REQUEST_SHUTTER_ON = 200;
+    int REQUEST_SHUTTER_OFF = 201;
+
 /*
     int SEQ_REGISTRATION = 1;
     int SEQ_START = 2;

@@ -41,7 +41,6 @@ public class CanonInterfaceProvider implements IPtpIpInterfaceProvider, IDisplay
 {
     private final String TAG = toString();
 
-    private static final int STREAM_PORT = 15742;   // ??
     private static final int ASYNC_RESPONSE_PORT = 15741;  // ??
     private static final int CONTROL_PORT = 15740;
     private static final int EVENT_PORT = 15740;
@@ -65,7 +64,7 @@ public class CanonInterfaceProvider implements IPtpIpInterfaceProvider, IDisplay
     {
         this.activity = context;
         commandPublisher = new PtpIpCommandPublisher(CAMERA_IP, CONTROL_PORT);
-        liveViewControl = new CanonLiveViewControl(context, CAMERA_IP, STREAM_PORT);
+        liveViewControl = new CanonLiveViewControl(context, this, 10);  //
         asyncReceiver = new PtpIpAsyncResponseReceiver(CAMERA_IP, ASYNC_RESPONSE_PORT);
         statusChecker = new CanonStatusChecker(activity, commandPublisher, CAMERA_IP, EVENT_PORT);
         canonConnection = new CanonConnection(context, provider, this, statusChecker);
@@ -79,7 +78,7 @@ public class CanonInterfaceProvider implements IPtpIpInterfaceProvider, IDisplay
     @Override
     public void injectDisplay(IAutoFocusFrameDisplay frameDisplayer, IIndicatorControl indicator, IFocusingModeNotify focusingModeNotify)
     {
-        Log.v(TAG, "injectDisplay()");
+        Log.v(TAG, " injectDisplay()");
         captureControl = new CanonCaptureControl(commandPublisher, frameDisplayer);
         focusingControl = new CanonFocusingControl(activity, commandPublisher, frameDisplayer, indicator);
     }

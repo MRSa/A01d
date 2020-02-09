@@ -83,6 +83,7 @@ public class CanonStatusChecker implements IPtpIpCommandCallback, ICameraStatusW
                 Log.v(TAG, "received status length is short. (" + data.length + " bytes.)");
                 return;
             }
+/*
             int nofStatus = (data[13] * 256) + data[12];
             int statusCount = 0;
             int index = STATUS_MESSAGE_HEADER_SIZE;
@@ -93,6 +94,7 @@ public class CanonStatusChecker implements IPtpIpCommandCallback, ICameraStatusW
                 index = index + 6;
                 statusCount++;
             }
+*/
         }
         catch (Exception e)
         {

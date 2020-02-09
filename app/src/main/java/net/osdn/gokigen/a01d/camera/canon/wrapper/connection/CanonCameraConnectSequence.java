@@ -29,7 +29,7 @@ public class CanonCameraConnectSequence implements Runnable, IPtpIpCommandCallba
     private final IPtpIpInterfaceProvider interfaceProvider;
     private final IPtpIpCommandPublisher commandIssuer;
     private final CanonStatusChecker statusChecker;
-    private boolean isDumpLog = true;
+    private boolean isDumpLog = false;
 
     CanonCameraConnectSequence(@NonNull Activity context, @NonNull ICameraStatusReceiver statusReceiver, @NonNull final ICameraConnection cameraConnection, @NonNull IPtpIpInterfaceProvider interfaceProvider, @NonNull CanonStatusChecker statusChecker)
     {

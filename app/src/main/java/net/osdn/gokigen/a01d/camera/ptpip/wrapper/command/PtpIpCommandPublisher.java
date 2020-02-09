@@ -146,6 +146,7 @@ public class PtpIpCommandPublisher implements IPtpIpCommandPublisher, IPtpIpComm
                                 issueCommand(command);
                             }
                             Thread.sleep(COMMAND_POLL_QUEUE_MS);
+                            // Log.v(TAG, " QUEUE SIZE : " + commandQueue.size());
                         }
                         catch (Exception e)
                         {
@@ -580,10 +581,12 @@ public class PtpIpCommandPublisher implements IPtpIpCommandPublisher, IPtpIpComm
             {
                 lenlen = ((((int) byte_array[position + 3]) & 0xff) << 24) + ((((int) byte_array[position + 2]) & 0xff) << 16) + ((((int) byte_array[position + 1]) & 0xff) << 8) + (((int) byte_array[position]) & 0xff);
                 packetType = (((int) byte_array[position + 4]) & 0xff);
+/*
                 if (packetType != 0x0a)
                 {
                     Log.v(TAG, " <><><> PACKET TYPE : " + packetType + " LENGTH : " + lenlen);
                 }
+*/
                 int copyByte = ((lenlen - 12) > (limit - (position + 12))) ? (limit - (position + 12)) : (lenlen - 12);
                 outputStream.write(byte_array, (position + 12), copyByte);
                 position = position + lenlen;
