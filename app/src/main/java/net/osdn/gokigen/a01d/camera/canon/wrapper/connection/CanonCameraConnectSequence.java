@@ -145,14 +145,13 @@ public class CanonCameraConnectSequence implements Runnable, IPtpIpCommandCallba
                 Log.v(TAG, " SEQ_SET_EVENT_MODE ");
                 interfaceProvider.getInformationReceiver().updateMessage(context.getString(R.string.canon_connect_connecting5), false, false, 0);
                 commandIssuer.enqueueCommand(new PtpIpCommandGeneric(this, SEQ_GET_EVENT, isDumpLog, 0, 0x913d, 4, 0x0fff));
-                // commandIssuer.enqueueCommand(new PtpIpCommandGeneric(this, SEQ_GET_EVENT, isDumpLog, 0, 0x902f, 4, 0x02));
                 break;
 
             case SEQ_GET_EVENT:
                 Log.v(TAG, " SEQ_GET_EVENT ");
                 interfaceProvider.getInformationReceiver().updateMessage(context.getString(R.string.canon_connect_connecting6), false, false, 0);
-                commandIssuer.enqueueCommand(new PtpIpCommandGeneric(this, SEQ_GET_EVENT1, isDumpLog, 0, 0x9033, 4, 0x0000));
-                // commandIssuer.enqueueCommand(new PtpIpCommandGeneric(this, SEQ_GET_EVENT, isDumpLog, 0, 0x902f, 4, 0x02));
+                commandIssuer.enqueueCommand(new PtpIpCommandGeneric(this, SEQ_GET_EVENT1, isDumpLog, 0, 0x9033, 4, 0x00000000));
+                //commandIssuer.enqueueCommand(new PtpIpCommandGeneric(this, SEQ_GET_EVENT1, isDumpLog, 0, 0x9033, 4, 0x00200000));
                 break;
 
             case SEQ_GET_EVENT1:
@@ -164,6 +163,7 @@ public class CanonCameraConnectSequence implements Runnable, IPtpIpCommandCallba
             case SEQ_DEVICE_INFORMATION:
                 Log.v(TAG, " SEQ_DEVICE_INFORMATION ");
                 interfaceProvider.getInformationReceiver().updateMessage(context.getString(R.string.canon_connect_connecting8), false, false, 0);
+                //commandIssuer.enqueueCommand(new PtpIpCommandGeneric(this, SEQ_DEVICE_PROPERTY, isDumpLog, 0, 0x9127, 4, 0x0000d1a6));
                 commandIssuer.enqueueCommand(new PtpIpCommandGeneric(this, SEQ_DEVICE_PROPERTY, isDumpLog, 0, 0x9127, 4, 0x0000d1a6));
                 commandIssuer.enqueueCommand(new PtpIpCommandGeneric(this, SEQ_DEVICE_PROPERTY, isDumpLog, 0, 0x9127, 4, 0x0000d169));
                 commandIssuer.enqueueCommand(new PtpIpCommandGeneric(this, SEQ_DEVICE_PROPERTY, isDumpLog, 0, 0x9127, 4, 0x0000d16a));
@@ -273,9 +273,6 @@ public class CanonCameraConnectSequence implements Runnable, IPtpIpCommandCallba
 
             // ちょっと待つ
             Thread.sleep(1000);
-
-            // // ステータスの監視はイベント受信時のみに実施する
-            // interfaceProvider.getCameraStatusWatcher().startStatusWatch(interfaceProvider.getStatusListener());
 
             // 接続成功！のメッセージを出す
             interfaceProvider.getInformationReceiver().updateMessage(context.getString(R.string.connect_connected), false, false, 0);

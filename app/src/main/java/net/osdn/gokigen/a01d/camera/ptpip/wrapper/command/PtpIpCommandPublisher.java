@@ -20,7 +20,7 @@ public class PtpIpCommandPublisher implements IPtpIpCommandPublisher, IPtpIpComm
     private static final String TAG = PtpIpCommandPublisher.class.getSimpleName();
 
     private static final int SEQUENCE_START_NUMBER = 1;
-    private static final int BUFFER_SIZE = 1024 * 1024 + 16;  // 受信バッファは 256kB
+    private static final int BUFFER_SIZE = 1024 * 1024 + 16;  // 受信バッファは 1MB
     private static final int COMMAND_SEND_RECEIVE_DURATION_MS = 5;
     private static final int COMMAND_SEND_RECEIVE_DURATION_MAX = 3000;
     private static final int COMMAND_POLL_QUEUE_MS = 5;

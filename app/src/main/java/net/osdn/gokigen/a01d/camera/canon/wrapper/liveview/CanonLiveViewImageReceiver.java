@@ -22,6 +22,8 @@ public class CanonLiveViewImageReceiver implements IPtpIpCommandCallback
         this.callback = callback;
     }
 
+
+
     @Override
     public void receivedMessage(int id, byte[] rx_body)
     {
@@ -33,6 +35,7 @@ public class CanonLiveViewImageReceiver implements IPtpIpCommandCallback
                 callback.onCompleted(null, null);
                 return;
             }
+            Log.v(TAG, " CanonLiveViewImageReceiver::receivedMessage() : " + rx_body.length);
 
             /////// 受信データから、サムネイルの先頭(0xff 0xd8)を検索する  /////
             int offset = rx_body.length - 22;
