@@ -13,6 +13,7 @@ import net.osdn.gokigen.a01d.camera.ptpip.wrapper.command.messages.PtpIpCommandG
 import net.osdn.gokigen.a01d.liveview.liveviewlistener.IImageDataReceiver;
 import net.osdn.gokigen.a01d.liveview.liveviewlistener.ILiveViewListener;
 
+import java.util.Arrays;
 import java.util.Map;
 
 import static net.osdn.gokigen.a01d.camera.ptpip.wrapper.command.IPtpIpMessages.SEQ_GET_VIEWFRAME;
@@ -150,7 +151,8 @@ public class CanonLiveViewControl implements ILiveViewControl, ILiveViewListener
         {
             if ((dataReceiver != null)&&(data != null))
             {
-                dataReceiver.setImageData(data, metadata);
+                //dataReceiver.setImageData(data, metadata);
+                dataReceiver.setImageData(Arrays.copyOfRange(data, 8, data.length), metadata);
             }
         }
         catch (Exception e)
