@@ -4,6 +4,8 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
+import net.osdn.gokigen.a01d.camera.utils.SimpleLogDumper;
+
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
@@ -439,7 +441,8 @@ public class PtpIpCommandPublisher implements IPtpIpCommandPublisher, IPtpIpComm
 
     private boolean receive_multi(@NonNull IPtpIpCommand command, int delayMs)
     {
-        int estimatedSize = command.estimatedReceiveDataSize();
+        //int estimatedSize = command.estimatedReceiveDataSize();
+        int maxRetryCount = 20;
         int id = command.getId();
         IPtpIpCommandCallback callback = command.responseCallback();
 
@@ -472,7 +475,7 @@ public class PtpIpCommandPublisher implements IPtpIpCommandPublisher, IPtpIpComm
             //  一時的な処理
             if (callback != null)
             {
-                Log.v(TAG, "  --- 1st CALL : read_bytes : "+ read_bytes + "(" + received_length + ") : total_length : " + target_length + "  buffer SIZE : " + byte_array.length);
+                Log.v(TAG, "  --- 1st CALL : read_bytes : "+ read_bytes + "(" + received_length + ") : target_length : " + target_length + "  buffer SIZE : " + byte_array.length);
                 callback.onReceiveProgress(received_length, target_length, Arrays.copyOfRange(byte_array, 0, received_length));
             }
 
@@ -482,10 +485,12 @@ public class PtpIpCommandPublisher implements IPtpIpCommandPublisher, IPtpIpComm
                 read_bytes = is.available();
                 if (read_bytes == 0)
                 {
-                    Log.v(TAG, " WAIT is.available() ... " + received_length + " < " + estimatedSize);
+                    Log.v(TAG, " WAIT is.available() ... [" + received_length + ", " + target_length + "] retry : " + maxRetryCount);
+                    maxRetryCount--;
                 }
-            } while ((read_bytes == 0)&&(estimatedSize > 0)&&(received_length < estimatedSize));
-            while (read_bytes > 0)
+            } while ((read_bytes == 0)&&(maxRetryCount > 0)&&(received_length < target_length)); // ((read_bytes == 0)&&(estimatedSize > 0)&&(received_length < estimatedSize));
+
+            while ((read_bytes >= 0)&&(received_length < target_length))
             {
                 read_bytes = is.read(byte_array, 0, receive_message_buffer_size);
                 if (read_bytes <= 0)
@@ -503,12 +508,18 @@ public class PtpIpCommandPublisher implements IPtpIpCommandPublisher, IPtpIpComm
                 }
                 //byteStream.write(byte_array, 0, read_bytes);
 
+                maxRetryCount = 20;
                 do
                 {
                     sleep(delayMs);
                     read_bytes = is.available();
                     //Log.v(TAG, "  is.available() read_bytes : " + read_bytes + " " + received_length + " < " + estimatedSize);
-                } while ((read_bytes == 0)&&(estimatedSize > 0)&&(received_length < estimatedSize));
+                    if (read_bytes == 0)
+                    {
+                        Log.v(TAG, " WAIT is.available() ... [" + received_length + ", " + target_length + "] " + read_bytes + " retry : " + maxRetryCount);
+                        maxRetryCount--;
+                    }
+                } while ((read_bytes == 0)&&(maxRetryCount > 0)&&(received_length < target_length)); // while ((read_bytes == 0)&&(estimatedSize > 0)&&(received_length < estimatedSize));
             }
             //ByteArrayOutputStream outputStream = cutHeader(byteStream);
             //receivedMessage(isDumpReceiveLog, id, outputStream.toByteArray(), callback);
@@ -516,7 +527,7 @@ public class PtpIpCommandPublisher implements IPtpIpCommandPublisher, IPtpIpComm
             //  終了報告...一時的？
             if (callback != null)
             {
-                Log.v(TAG, "  --- receive_multi : receivedMessage() : " + id + "  (" + read_bytes + ") [" + estimatedSize + "] " + receive_message_buffer_size + " (" + received_length + ")");
+                Log.v(TAG, "  --- receive_multi : " + id + "  (" + read_bytes + ") [" + maxRetryCount + "] " + receive_message_buffer_size + " (" + received_length + ") ");
                 callback.receivedMessage(id, null);
             }
             System.gc();
@@ -568,7 +579,7 @@ public class PtpIpCommandPublisher implements IPtpIpCommandPublisher, IPtpIpComm
                 lenlen = ((((int) byte_array[15]) & 0xff) << 24) + ((((int) byte_array[14]) & 0xff) << 16) + ((((int) byte_array[13]) & 0xff) << 8) + (((int) byte_array[12]) & 0xff);
                 packetType = (((int) byte_array[16]) & 0xff);
             }
-            Log.v(TAG, " ---  RECEIVED MESSAGE : " + len + " bytes (BUFFER: " + byte_array.length + " bytes)" + " length : " + lenlen + " TYPE : " + packetType + " --- ");
+            // Log.v(TAG, " ---  RECEIVED MESSAGE : " + len + " bytes (BUFFER: " + byte_array.length + " bytes)" + " length : " + lenlen + " TYPE : " + packetType + " --- ");
             if (lenlen == 0)
             {
                 // データとしては変なので、なにもしない

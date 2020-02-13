@@ -4,106 +4,8 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 import net.osdn.gokigen.a01d.camera.ptpip.wrapper.command.IPtpIpCommandCallback;
-import net.osdn.gokigen.a01d.camera.utils.SimpleLogDumper;
 
 import java.io.ByteArrayOutputStream;
-import java.util.Arrays;
-
-/**
- *   Canonサムネイル画像の受信
- *
- *
- */
-/*
-public class CanonLiveViewImageReceiver implements IPtpIpCommandCallback
-{
-    private final String TAG = toString();
-    private final ICanonLiveViewImageCallback callback;
-    private ByteArrayOutputStream byteStream;
-
-    CanonLiveViewImageReceiver(@NonNull ICanonLiveViewImageCallback callback)
-    {
-        this.callback = callback;
-        byteStream = new ByteArrayOutputStream();
-    }
-
-
-    public void reset()
-    {
-        try
-        {
-            byteStream.flush();
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-        byteStream.reset();
-    }
-
-
-    @Override
-    public void receivedMessage(int id, byte[] rx_body)
-    {
-        try
-        {
-            if (rx_body == null)
-            {
-                Log.v(TAG, " BITMAP IS NONE...");
-                callback.onCompleted(null, null);
-                return;
-            }
-            Log.v(TAG, " CanonLiveViewImageReceiver::receivedMessage() : " + rx_body.length);
-
-            /////// 受信データから、サムネイルの先頭(0xff 0xd8)を検索する  /////
-            int offset = rx_body.length - 22;
-            //byte[] thumbnail0 = Arrays.copyOfRange(rx_body, 0, rx_body.length);
-            while (offset > 32)
-            {
-                if ((rx_body[offset] == (byte) 0xff)&&((rx_body[offset + 1] == (byte) 0xd8)))
-                {
-                    break;
-                }
-                offset--;
-            }
-            byte[] thumbnail = Arrays.copyOfRange(rx_body, offset, rx_body.length);
-            callback.onCompleted(thumbnail, null);
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-            {
-                callback.onErrorOccurred(e);
-            }
-        }
-    }
-
-    @Override
-    public void onReceiveProgress(int currentBytes, int totalBytes, byte[] body)
-    {
-        Log.v(TAG, " " + currentBytes + "/" + totalBytes);
-        try
-        {
-            if (byteStream != null)
-            {
-                byteStream.write(body, 0, currentBytes);
-            }
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-    }
-
-    @Override
-    public boolean isReceiveMulti()
-    {
-        return (true);
-    }
-}
-
-*/
-
 
 public class CanonLiveViewImageReceiver implements IPtpIpCommandCallback
 {
@@ -154,9 +56,10 @@ public class CanonLiveViewImageReceiver implements IPtpIpCommandCallback
     @Override
     public void onReceiveProgress(final int currentBytes, final int totalBytes, byte[] rx_body)
     {
+        // Log.v(TAG, " onReceiveProgress() " + currentBytes + "/" + totalBytes);
+
         // 受信したデータから、通信のヘッダ部分を削除する
         cutHeader(rx_body);
-        Log.v(TAG, " onReceiveProgress() " + currentBytes + "/" + totalBytes);
     }
 
     private void cutHeader(byte[] rx_body)

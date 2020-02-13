@@ -146,13 +146,17 @@ public class CanonLiveViewControl implements ILiveViewControl, ILiveViewListener
     @Override
     public void onCompleted(byte[] data, Map<String, Object> metadata)
     {
-        // Log.v(TAG, "  ---+++--- RECEIVED LV IMAGE ---+++--- ");
+        //Log.v(TAG, "  ---+++--- RECEIVED LV IMAGE ---+++--- ");
         try
         {
             if ((dataReceiver != null)&&(data != null))
             {
+                Log.v(TAG, "  ---+++--- RECEIVED LV IMAGE ---+++--- : " + data.length + " bytes.");
                 //dataReceiver.setImageData(data, metadata);
-                dataReceiver.setImageData(Arrays.copyOfRange(data, 8, data.length), metadata);
+                if (data.length > 8)
+                {
+                    dataReceiver.setImageData(Arrays.copyOfRange(data, 8, data.length), metadata);  // ヘッダ部分を切り取って送る
+                }
             }
         }
         catch (Exception e)
