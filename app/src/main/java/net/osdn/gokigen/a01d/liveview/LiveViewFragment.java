@@ -361,7 +361,7 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer, IFo
                     }
                     if (focusIndicator != null)
                     {
-                        focusIndicator.setVisibility(View.INVISIBLE);
+                        focusIndicator.setVisibility(View.VISIBLE);
                     }
                     if (propertyButton != null)
                     {

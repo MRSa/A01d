@@ -479,16 +479,16 @@ public class PtpIpCommandPublisher implements IPtpIpCommandPublisher, IPtpIpComm
                 callback.onReceiveProgress(received_length, target_length, Arrays.copyOfRange(byte_array, 0, received_length));
             }
 
-            do
+            //do
             {
                 sleep(delayMs);
                 read_bytes = is.available();
                 if (read_bytes == 0)
                 {
-                    Log.v(TAG, " WAIT is.available() ... [" + received_length + ", " + target_length + "] retry : " + maxRetryCount);
+                    //Log.v(TAG, " WAIT is.available() ... [" + received_length + ", " + target_length + "] retry : " + maxRetryCount);
                     maxRetryCount--;
                 }
-            } while ((read_bytes == 0)&&(maxRetryCount > 0)&&(received_length < target_length)); // ((read_bytes == 0)&&(estimatedSize > 0)&&(received_length < estimatedSize));
+            } // while ((read_bytes == 0)&&(maxRetryCount > 0)&&(received_length < target_length)); // ((read_bytes == 0)&&(estimatedSize > 0)&&(received_length < estimatedSize));
 
             while ((read_bytes >= 0)&&(received_length < target_length))
             {
@@ -509,7 +509,7 @@ public class PtpIpCommandPublisher implements IPtpIpCommandPublisher, IPtpIpComm
                 //byteStream.write(byte_array, 0, read_bytes);
 
                 maxRetryCount = 20;
-                do
+                //do
                 {
                     sleep(delayMs);
                     read_bytes = is.available();
@@ -519,7 +519,7 @@ public class PtpIpCommandPublisher implements IPtpIpCommandPublisher, IPtpIpComm
                         Log.v(TAG, " WAIT is.available() ... [" + received_length + ", " + target_length + "] " + read_bytes + " retry : " + maxRetryCount);
                         maxRetryCount--;
                     }
-                } while ((read_bytes == 0)&&(maxRetryCount > 0)&&(received_length < target_length)); // while ((read_bytes == 0)&&(estimatedSize > 0)&&(received_length < estimatedSize));
+                } // while ((read_bytes == 0)&&(maxRetryCount > 0)&&(received_length < target_length)); // while ((read_bytes == 0)&&(estimatedSize > 0)&&(received_length < estimatedSize));
             }
             //ByteArrayOutputStream outputStream = cutHeader(byteStream);
             //receivedMessage(isDumpReceiveLog, id, outputStream.toByteArray(), callback);

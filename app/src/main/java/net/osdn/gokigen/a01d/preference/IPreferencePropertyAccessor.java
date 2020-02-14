@@ -67,6 +67,10 @@ public interface IPreferencePropertyAccessor
 
     String USE_OSC_THETA_V21 = "use_osc_theta_v21";
 
+    String CANON_FOCUS_XY = "canon_focus_xy";
+    String CANON_FOCUS_XY_DEFAULT_VALUE = "6000,4000";
+
+
     /*
     int CHOICE_SPLASH_SCREEN = 10;
 

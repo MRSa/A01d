@@ -124,6 +124,9 @@ public class CanonPreferenceFragment extends PreferenceFragmentCompat implements
             if (!items.containsKey(IPreferencePropertyAccessor.CAPTURE_BOTH_CAMERA_AND_LIVE_VIEW)) {
                 editor.putBoolean(IPreferencePropertyAccessor.CAPTURE_BOTH_CAMERA_AND_LIVE_VIEW, true);
             }
+            if (!items.containsKey(IPreferencePropertyAccessor.CANON_FOCUS_XY)) {
+                editor.putString(IPreferencePropertyAccessor.CANON_FOCUS_XY, IPreferencePropertyAccessor.CANON_FOCUS_XY_DEFAULT_VALUE);
+            }
             if (!items.containsKey(IPreferencePropertyAccessor.CONNECTION_METHOD)) {
                 editor.putString(IPreferencePropertyAccessor.CONNECTION_METHOD, IPreferencePropertyAccessor.CONNECTION_METHOD_DEFAULT_VALUE);
             }
@@ -257,8 +260,7 @@ public class CanonPreferenceFragment extends PreferenceFragmentCompat implements
     {
         try
         {
-            ListPreference pref;
-            pref = (ListPreference) findPreference(pref_key);
+            ListPreference pref = findPreference(pref_key);
             String value = preferences.getString(key, defaultValue);
             if (pref != null)
             {

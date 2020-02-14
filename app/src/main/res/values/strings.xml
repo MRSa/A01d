@@ -38,6 +38,8 @@
     <string name="pref_fujix_display_camera_view_summary">EXPERIMENTAL: Shows liveview screen both camera and smartphone.</string>
     <string name="pref_fujix_focus_xy">Number of Focus Point X,Y (default: 7,7)</string>
     <string name="pref_summary_fujix_focus_xy"> </string>
+    <string name="pref_canon_focus_xy">Number of Focus Point X,Y (default: 6000,4000)</string>
+    <string name="pref_summary_canon_focus_xy"> </string>
     <string name="pref_fujix_liveview_wait">Liveview receive wait (default: 80)</string>
     <string name="pref_summary_fujix_liveview_wait"> </string>
     <string name="pref_fujix_command_polling_wait">Status polling wait (default: 500)</string>

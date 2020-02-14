@@ -64,7 +64,7 @@ public class CanonLiveViewControl implements ILiveViewControl, ILiveViewListener
                             if (!commandIssued)
                             {
                                 commandIssued = true;
-                                commandIssuer.enqueueCommand(new PtpIpCommandGeneric(imageReceiver, SEQ_GET_VIEWFRAME, 10, false, 0, 0x9153, 12, 0x00200000, 0x01, 0x00, 0x00));
+                                commandIssuer.enqueueCommand(new PtpIpCommandGeneric(imageReceiver, SEQ_GET_VIEWFRAME, 20, false, 0, 0x9153, 12, 0x00200000, 0x01, 0x00, 0x00));
                             }
                             try
                             {
@@ -151,7 +151,7 @@ public class CanonLiveViewControl implements ILiveViewControl, ILiveViewListener
         {
             if ((dataReceiver != null)&&(data != null))
             {
-                Log.v(TAG, "  ---+++--- RECEIVED LV IMAGE ---+++--- : " + data.length + " bytes.");
+                //Log.v(TAG, "  ---+++--- RECEIVED LV IMAGE ---+++--- : " + data.length + " bytes.");
                 //dataReceiver.setImageData(data, metadata);
                 if (data.length > 8)
                 {
