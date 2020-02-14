@@ -180,7 +180,7 @@ public class CanonPreferenceFragment extends PreferenceFragmentCompat implements
         try
         {
             //super.onCreate(savedInstanceState);
-            addPreferencesFromResource(R.xml.preferences_olympuspen);
+            addPreferencesFromResource(R.xml.preferences_canon);
 
             ListPreference connectionMethod = findPreference(IPreferencePropertyAccessor.CONNECTION_METHOD);
             connectionMethod.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
