@@ -472,6 +472,14 @@ public class PtpIpCommandPublisher implements IPtpIpCommandPublisher, IPtpIpComm
             int target_length = parseDataLength(byte_array, read_bytes);
             int received_length = read_bytes;
 
+            if (target_length <= 0)
+            {
+                // 受信サイズ異常の場合...
+                Log.v(TAG, " WRONG LENGTH. : " + target_length);
+                callback.receivedMessage(id, null);
+                return (false);
+            }
+
             //  一時的な処理
             if (callback != null)
             {
@@ -530,12 +538,10 @@ public class PtpIpCommandPublisher implements IPtpIpCommandPublisher, IPtpIpComm
                 Log.v(TAG, "  --- receive_multi : " + id + "  (" + read_bytes + ") [" + maxRetryCount + "] " + receive_message_buffer_size + " (" + received_length + ") ");
                 callback.receivedMessage(id, null);
             }
-            System.gc();
         }
         catch (Throwable e)
         {
             e.printStackTrace();
-            System.gc();
         }
         return (false);
     }
@@ -543,15 +549,15 @@ public class PtpIpCommandPublisher implements IPtpIpCommandPublisher, IPtpIpComm
     private int parseDataLength(byte[] byte_array, int read_bytes)
     {
         int lenlen = 0;
-        int packetType = 0;
+        //int packetType = 0;
         try
         {
             if ((read_bytes > 20)&&((int) byte_array[4] == 0x09))
             {
                 lenlen = ((((int) byte_array[15]) & 0xff) << 24) + ((((int) byte_array[14]) & 0xff) << 16) + ((((int) byte_array[13]) & 0xff) << 8) + (((int) byte_array[12]) & 0xff);
-                packetType = (((int)byte_array[16]) & 0xff);
+                //packetType = (((int)byte_array[16]) & 0xff);
             }
-            Log.v(TAG, " --- parseDataLength() length: " + lenlen + " TYPE: " + packetType + " read_bytes: " + read_bytes);
+            //Log.v(TAG, " --- parseDataLength() length: " + lenlen + " TYPE: " + packetType + " read_bytes: " + read_bytes);
         }
         catch (Exception e)
         {

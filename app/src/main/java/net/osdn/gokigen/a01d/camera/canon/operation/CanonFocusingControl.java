@@ -11,16 +11,12 @@ import androidx.annotation.NonNull;
 import androidx.preference.PreferenceManager;
 
 import net.osdn.gokigen.a01d.camera.IFocusingControl;
-import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.messages.FocusLock;
-import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.messages.FocusUnlock;
 import net.osdn.gokigen.a01d.camera.ptpip.wrapper.command.IPtpIpCommandCallback;
 import net.osdn.gokigen.a01d.camera.ptpip.wrapper.command.PtpIpCommandPublisher;
 import net.osdn.gokigen.a01d.camera.ptpip.wrapper.command.messages.PtpIpCommandGeneric;
 import net.osdn.gokigen.a01d.liveview.IAutoFocusFrameDisplay;
 import net.osdn.gokigen.a01d.liveview.IIndicatorControl;
 import net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor;
-
-import static net.osdn.gokigen.a01d.camera.ptpip.wrapper.command.IPtpIpMessages.SEQ_GET_VIEWFRAME;
 
 public class CanonFocusingControl implements IFocusingControl, IPtpIpCommandCallback
 {
@@ -39,6 +35,7 @@ public class CanonFocusingControl implements IFocusingControl, IPtpIpCommandCall
     private float maxPointLimitWidth;
     private float maxPointLimitHeight;
     private RectF preFocusFrameRect = null;
+    private boolean isDumpLog = false;
 
     public CanonFocusingControl(@NonNull Activity context, @NonNull PtpIpCommandPublisher commandPublisher, IAutoFocusFrameDisplay frameDisplayer, IIndicatorControl indicator)
     {
@@ -119,7 +116,7 @@ public class CanonFocusingControl implements IFocusingControl, IPtpIpCommandCall
         try
         {
             Log.v(TAG, " Unlock AF ");
-            commandPublisher.enqueueCommand(new PtpIpCommandGeneric(this, FOCUS_UNLOCK, false, 0, 0x9160));
+            commandPublisher.enqueueCommand(new PtpIpCommandGeneric(this, FOCUS_UNLOCK, isDumpLog, 0, 0x9160));
         }
         catch (Exception e)
         {
@@ -141,9 +138,9 @@ public class CanonFocusingControl implements IFocusingControl, IPtpIpCommandCall
             int x = (0x0000ffff & (Math.round(point.x * maxPointLimitWidth) + 1));
             int y = (0x0000ffff & (Math.round(point.y * maxPointLimitHeight) + 1));
             Log.v(TAG, "Lock AF: [" + x + ","+ y + "]");
-            commandPublisher.enqueueCommand(new PtpIpCommandGeneric(this, FOCUS_LOCK_PRE, false, 0, 0x9160));
-            commandPublisher.enqueueCommand(new PtpIpCommandGeneric(this, FOCUS_LOCK, 25, false, 0, 0x915b, 16, 0x03, x, y, 0x01));
-            commandPublisher.enqueueCommand(new PtpIpCommandGeneric(this, FOCUS_MOVE, false, 0, 0x9154));
+            commandPublisher.enqueueCommand(new PtpIpCommandGeneric(this, FOCUS_LOCK_PRE, isDumpLog, 0, 0x9160));
+            commandPublisher.enqueueCommand(new PtpIpCommandGeneric(this, FOCUS_LOCK, 25, isDumpLog, 0, 0x915b, 16, 0x03, x, y, 0x01));
+            commandPublisher.enqueueCommand(new PtpIpCommandGeneric(this, FOCUS_MOVE, isDumpLog, 0, 0x9154));
         }
         catch (Exception e)
         {
@@ -201,6 +198,16 @@ public class CanonFocusingControl implements IFocusingControl, IPtpIpCommandCall
     {
         try
         {
+
+
+            if ((rx_body.length > 10)&&((rx_body[8] != (byte) 0x01)||(rx_body[9] != (byte) 0x20)))
+            {
+                Log.v(TAG, " --- RECEIVED NG REPLY. : FOCUS OPERATION ---");
+                hideFocusFrame();
+                preFocusFrameRect = null;
+                return;
+            }
+
             if ((id == FOCUS_LOCK)||(id == FOCUS_LOCK_PRE))
             {
                 Log.v(TAG, "FOCUS LOCKED");
