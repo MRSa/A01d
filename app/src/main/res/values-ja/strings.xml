@@ -249,4 +249,11 @@
     <string name="pref_summary_use_osc_theta_v21"> </string>
     <string name="theta_connect_response_ng">応答がありません。</string>
 
+    <string name="pref_canon_zoom_magnification">ズーム最大倍率</string>
+    <string name="pref_summary_canon_zoom_magnification">カメラのズーム倍率を設定してください (0 : ズームなし)</string>
+
+    <string name="pref_canon_zoom_resolution">ズームステップ</string>
+    <string name="pref_summary_canon_zoom_resolution">ズームを何段階にするか指定します (標準: 25)</string>
+
+
 </resources>

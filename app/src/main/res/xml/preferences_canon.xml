@@ -26,6 +26,18 @@
         android:title="@string/pref_cat_camera">
 
         <EditTextPreference
+            android:key="canon_zoom_magnification"
+            android:title="@string/pref_canon_zoom_magnification"
+            android:defaultValue="0"
+            android:summary="@string/pref_summary_canon_zoom_magnification" />
+
+        <EditTextPreference
+            android:key="canon_zoom_resolution"
+            android:title="@string/pref_canon_zoom_resolution"
+            android:defaultValue="25"
+            android:summary="@string/pref_summary_canon_zoom_resolution" />
+
+        <EditTextPreference
             android:key="canon_focus_xy"
             android:title="@string/pref_canon_focus_xy"
             android:defaultValue="6000,4000"

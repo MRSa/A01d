@@ -70,6 +70,11 @@ public interface IPreferencePropertyAccessor
     String CANON_FOCUS_XY = "canon_focus_xy";
     String CANON_FOCUS_XY_DEFAULT_VALUE = "6000,4000";
 
+    String CANON_ZOOM_MAGNIFICATION = "canon_zoom_magnification";
+    String CANON_ZOOM_MAGNIFICATION_DEFAULT_VALUE = "0";
+
+    String CANON_ZOOM_RESOLUTION = "canon_zoom_resolution";
+    String CANON_ZOOM_RESOLUTION_DEFAULT_VALUE = "25";
 
     /*
     int CHOICE_SPLASH_SCREEN = 10;

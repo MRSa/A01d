@@ -26,7 +26,6 @@ public class CanonFocusingControl implements IFocusingControl, IPtpIpCommandCall
     private static final int FOCUS_MOVE = 17;
     private static final int FOCUS_UNLOCK = 18;
 
-
     //private final Activity context;
     private final PtpIpCommandPublisher commandPublisher;
     private final IAutoFocusFrameDisplay frameDisplayer;
@@ -59,7 +58,6 @@ public class CanonFocusingControl implements IFocusingControl, IPtpIpCommandCall
                 maxPointLimitHeight = 4000.0f;
             }
             Log.v(TAG, "FOCUS RESOLUTION : " + maxPointLimitWidth + "," + maxPointLimitHeight);
-
         }
         catch (Exception e)
         {

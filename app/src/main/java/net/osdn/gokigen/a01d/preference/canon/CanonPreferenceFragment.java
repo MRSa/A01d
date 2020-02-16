@@ -127,6 +127,12 @@ public class CanonPreferenceFragment extends PreferenceFragmentCompat implements
             if (!items.containsKey(IPreferencePropertyAccessor.CANON_FOCUS_XY)) {
                 editor.putString(IPreferencePropertyAccessor.CANON_FOCUS_XY, IPreferencePropertyAccessor.CANON_FOCUS_XY_DEFAULT_VALUE);
             }
+            if (!items.containsKey(IPreferencePropertyAccessor.CANON_ZOOM_MAGNIFICATION)) {
+                editor.putString(IPreferencePropertyAccessor.CANON_ZOOM_MAGNIFICATION, IPreferencePropertyAccessor.CANON_ZOOM_MAGNIFICATION_DEFAULT_VALUE);
+            }
+            if (!items.containsKey(IPreferencePropertyAccessor.CANON_ZOOM_RESOLUTION)) {
+                editor.putString(IPreferencePropertyAccessor.CANON_ZOOM_RESOLUTION, IPreferencePropertyAccessor.CANON_ZOOM_RESOLUTION_DEFAULT_VALUE);
+            }
             if (!items.containsKey(IPreferencePropertyAccessor.CONNECTION_METHOD)) {
                 editor.putString(IPreferencePropertyAccessor.CONNECTION_METHOD, IPreferencePropertyAccessor.CONNECTION_METHOD_DEFAULT_VALUE);
             }

@@ -253,4 +253,10 @@
     <string name="pref_summary_use_osc_theta_v21"> </string>
     <string name="theta_connect_response_ng">Did not receive any response.</string>
 
+    <string name="pref_canon_zoom_magnification">Zoom magnification</string>
+    <string name="pref_summary_canon_zoom_magnification">set zoom magnification (0 : no zoom)</string>
+
+    <string name="pref_canon_zoom_resolution">Zoom Step</string>
+    <string name="pref_summary_canon_zoom_resolution"> </string>
+
 </resources>
