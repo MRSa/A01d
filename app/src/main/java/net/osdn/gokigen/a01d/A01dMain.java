@@ -29,6 +29,7 @@ import net.osdn.gokigen.a01d.logcat.LogCatFragment;
 import net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor;
 import net.osdn.gokigen.a01d.preference.canon.CanonPreferenceFragment;
 import net.osdn.gokigen.a01d.preference.fujix.FujiXPreferenceFragment;
+import net.osdn.gokigen.a01d.preference.nikon.NikonPreferenceFragment;
 import net.osdn.gokigen.a01d.preference.olympus.PreferenceFragment;
 import net.osdn.gokigen.a01d.preference.panasonic.PanasonicPreferenceFragment;
 import net.osdn.gokigen.a01d.preference.olympuspen.OlympusPreferenceFragment;
@@ -316,6 +317,18 @@ public class A01dMain extends AppCompatActivity implements ICameraStatusReceiver
                     e.printStackTrace();
                 }
             }
+            else if (method == ICameraConnection.CameraConnectionMethod.NIKON)
+            {
+                try
+                {
+                    // NIKON の場合は、PTPIPコマンド送信ダイアログを表示する
+                    PtpIpCameraCommandSendDialog.newInstance(interfaceProvider.getCanonInterface(), true).show(getSupportFragmentManager(), "ptpipSendCommandDialog");
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+            }
             else
             {
                 // OPC カメラの場合...
@@ -371,6 +384,8 @@ public class A01dMain extends AppCompatActivity implements ICameraStatusReceiver
                         preferenceFragment = ThetaPreferenceFragment.newInstance(this, this);
                     } else if (connectionMethod == ICameraConnection.CameraConnectionMethod.CANON) {
                         preferenceFragment = CanonPreferenceFragment.newInstance(this, this);
+                    } else if (connectionMethod == ICameraConnection.CameraConnectionMethod.NIKON) {
+                        preferenceFragment = NikonPreferenceFragment.newInstance(this, this);
                     } else //  if (connectionMethod == ICameraConnection.CameraConnectionMethod.OPC)
                     {
                         preferenceFragment = PreferenceFragment.newInstance(this, interfaceProvider, this);
@@ -667,6 +682,10 @@ public class A01dMain extends AppCompatActivity implements ICameraStatusReceiver
         else if  (connectionMethod == ICameraConnection.CameraConnectionMethod.CANON)
         {
             connection = interfaceProvider.getCanonInterface().getCameraConnection();
+        }
+        else if  (connectionMethod == ICameraConnection.CameraConnectionMethod.NIKON)
+        {
+            connection = interfaceProvider.getNikonInterface().getCameraConnection();
         }
         else // if (connectionMethod == ICameraConnection.CameraConnectionMethod.OPC)
         {

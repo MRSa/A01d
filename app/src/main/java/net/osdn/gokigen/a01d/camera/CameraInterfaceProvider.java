@@ -170,6 +170,10 @@ public class CameraInterfaceProvider implements IInterfaceProvider
             {
                 ret = ICameraConnection.CameraConnectionMethod.CANON;
             }
+            else if (connectionMethod.contains("NIKON"))
+            {
+                ret = ICameraConnection.CameraConnectionMethod.NIKON;
+            }
         }
         catch (Exception e)
         {

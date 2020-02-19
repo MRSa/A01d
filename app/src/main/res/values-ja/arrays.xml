@@ -107,6 +107,7 @@
         <item >Fuji X Series</item>
         <item >Panasonic</item>
         <item >Canon</item>
+        <item >NIKON</item>
     </string-array>
 
     <string-array name="connection_method_value">
@@ -118,6 +119,7 @@
         <item >FUJI_X</item>
         <item >PANASONIC</item>
         <item >CANON</item>
+        <item >NIKON</item>
     </string-array>
 
 

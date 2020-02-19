@@ -368,6 +368,30 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer, IFo
                         propertyButton.setOnClickListener(onClickTouchListener);
                     }
                 }
+                else if (connectionMethod == ICameraConnection.CameraConnectionMethod.NIKON)
+                {
+                    if (favoriteButton != null)
+                    {
+                        favoriteButton.setVisibility(View.VISIBLE);
+                        favoriteButton.setOnClickListener(onClickTouchListener);
+                    }
+                    if (manualFocus != null)
+                    {
+                        manualFocus.setVisibility(View.INVISIBLE);
+                    }
+                    if (changeLiveViewScale != null)
+                    {
+                        changeLiveViewScale.setVisibility(View.INVISIBLE);
+                    }
+                    if (focusIndicator != null)
+                    {
+                        focusIndicator.setVisibility(View.VISIBLE);
+                    }
+                    if (propertyButton != null)
+                    {
+                        propertyButton.setOnClickListener(onClickTouchListener);
+                    }
+                }
             }
             if (manualFocus != null)
             {
@@ -437,6 +461,10 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer, IFo
         {
             interfaceInjector = interfaceProvider.getCanonInterface().getDisplayInjector();
         }
+        else if (connectionMethod == ICameraConnection.CameraConnectionMethod.NIKON)
+        {
+            interfaceInjector = interfaceProvider.getNikonInterface().getDisplayInjector();
+        }
         else // if (connectionMethod == ICameraConnection.CameraConnectionMethod.OPC)
         {
             interfaceInjector = interfaceProvider.getOlympusInterface().getDisplayInjector();
@@ -486,6 +514,12 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer, IFo
             this.liveViewControl = interfaceProvider.getCanonInterface().getLiveViewControl();
             this.zoomLensControl = interfaceProvider.getCanonInterface().getZoomLensControl();
             this.cameraInformation = interfaceProvider.getCanonInterface().getCameraInformation();
+        }
+        else  if (connectionMethod == ICameraConnection.CameraConnectionMethod.NIKON)
+        {
+            this.liveViewControl = interfaceProvider.getNikonInterface().getLiveViewControl();
+            this.zoomLensControl = interfaceProvider.getNikonInterface().getZoomLensControl();
+            this.cameraInformation = interfaceProvider.getNikonInterface().getCameraInformation();
         }
         else //  if (connectionMethod == ICameraConnection.CameraConnectionMethod.OPC)
         {
@@ -796,6 +830,10 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer, IFo
             else if (connectionMethod == ICameraConnection.CameraConnectionMethod.CANON)
             {
                 lvListener = interfaceProvider.getCanonInterface().getLiveViewListener();
+            }
+            else if (connectionMethod == ICameraConnection.CameraConnectionMethod.NIKON)
+            {
+                lvListener = interfaceProvider.getNikonInterface().getLiveViewListener();
             }
             else  // if (connectionMethod == ICameraConnection.CameraConnectionMethod.OPC)
             {
