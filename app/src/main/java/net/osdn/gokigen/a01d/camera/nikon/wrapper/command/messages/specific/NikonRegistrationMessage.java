@@ -6,7 +6,6 @@ import net.osdn.gokigen.a01d.camera.ptpip.wrapper.command.IPtpIpCommandCallback;
 import net.osdn.gokigen.a01d.camera.ptpip.wrapper.command.messages.PtpIpCommandBase;
 
 import java.nio.ByteBuffer;
-import java.util.UUID;
 
 public class NikonRegistrationMessage extends PtpIpCommandBase
 {
@@ -56,7 +55,7 @@ public class NikonRegistrationMessage extends PtpIpCommandBase
     @Override
     public byte[] commandBody()
     {
-        int uuid = UUID.randomUUID().hashCode();
+        //int uuid = UUID.randomUUID().hashCode();
 
         byte[] typeArray = {
                 (byte)0x01, (byte)0x00, (byte)0x00, (byte)0x00,

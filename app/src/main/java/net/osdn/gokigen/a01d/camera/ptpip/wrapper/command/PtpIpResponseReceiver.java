@@ -2,26 +2,30 @@ package net.osdn.gokigen.a01d.camera.ptpip.wrapper.command;
 
 import android.util.Log;
 
+import androidx.annotation.Nullable;
+
 public class PtpIpResponseReceiver implements IPtpIpCommandCallback
 {
     private final String TAG = toString();
+    private final IPtpIpResponseReceiver callback;
 
-    public PtpIpResponseReceiver()
+    public PtpIpResponseReceiver(@Nullable IPtpIpResponseReceiver callback)
     {
-        //
+        this.callback = callback;
     }
 
     @Override
     public void receivedMessage(int id, byte[] rx_body)
     {
+        int responseCode = 0;
         if (rx_body != null)
         {
             try
             {
                 if (rx_body.length > 10)
                 {
-                    int responseCode = (rx_body[9] & 0xff) + ((rx_body[10] & 0xff) * 256);
-                    Log.v(TAG, String.format(" ID : %d, RESPONSE CODE : 0x%x ", id, responseCode));
+                    responseCode = (rx_body[8] & 0xff) + ((rx_body[9] & 0xff) * 256);
+                    Log.v(TAG, String.format(" ID : %d, RESPONSE CODE : 0x%04x ", id, responseCode));
                 }
                 else
                 {
@@ -36,6 +40,10 @@ public class PtpIpResponseReceiver implements IPtpIpCommandCallback
         else
         {
             Log.v(TAG, " receivedMessage() " + id);
+        }
+        if (callback != null)
+        {
+            callback.response(id, responseCode);
         }
     }
 

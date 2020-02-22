@@ -7,9 +7,9 @@ import androidx.annotation.NonNull;
 
 import net.osdn.gokigen.a01d.camera.ILiveViewControl;
 import net.osdn.gokigen.a01d.camera.ptpip.IPtpIpInterfaceProvider;
-import net.osdn.gokigen.a01d.camera.ptpip.wrapper.command.IPtpIpCommandCallback;
 import net.osdn.gokigen.a01d.camera.ptpip.wrapper.command.IPtpIpCommandPublisher;
 import net.osdn.gokigen.a01d.camera.ptpip.wrapper.command.IPtpIpCommunication;
+import net.osdn.gokigen.a01d.camera.ptpip.wrapper.command.IPtpIpResponseReceiver;
 import net.osdn.gokigen.a01d.camera.ptpip.wrapper.command.PtpIpResponseReceiver;
 import net.osdn.gokigen.a01d.camera.ptpip.wrapper.command.messages.PtpIpCommandGeneric;
 import net.osdn.gokigen.a01d.camera.ptpip.wrapper.liveview.IPtpIpLiveViewImageCallback;
@@ -25,7 +25,7 @@ import static net.osdn.gokigen.a01d.camera.ptpip.wrapper.command.IPtpIpMessages.
 import static net.osdn.gokigen.a01d.camera.ptpip.wrapper.command.IPtpIpMessages.SEQ_START_LIVEVIEW;
 import static net.osdn.gokigen.a01d.camera.ptpip.wrapper.command.IPtpIpMessages.SEQ_STOP_LIVEVIEW;
 
-public class NikonLiveViewControl  implements ILiveViewControl, ILiveViewListener, IPtpIpCommunication, IPtpIpLiveViewImageCallback
+public class NikonLiveViewControl  implements ILiveViewControl, ILiveViewListener, IPtpIpCommunication, IPtpIpLiveViewImageCallback, IPtpIpResponseReceiver
 {
     private final String TAG = this.toString();
     private final IPtpIpCommandPublisher commandIssuer;
@@ -34,7 +34,7 @@ public class NikonLiveViewControl  implements ILiveViewControl, ILiveViewListene
     private IImageDataReceiver dataReceiver = null;
     private boolean liveViewIsReceiving = false;
     private boolean commandIssued = false;
-    private boolean isDumpLog = true;
+    private boolean isDumpLog = false;
 
     public NikonLiveViewControl(@NonNull Activity context, @NonNull IPtpIpInterfaceProvider interfaceProvider, int delayMs)
     {
@@ -60,9 +60,9 @@ public class NikonLiveViewControl  implements ILiveViewControl, ILiveViewListene
         Log.v(TAG, " startLiveView() ");
         try
         {
-            commandIssuer.enqueueCommand(new PtpIpCommandGeneric(new PtpIpResponseReceiver(), SEQ_START_LIVEVIEW, 20, isDumpLog, 0, 0x9201, 0, 0x00, 0x00, 0x00, 0x00));
-            commandIssuer.enqueueCommand(new PtpIpCommandGeneric(new PtpIpResponseReceiver(), SEQ_DEVICE_READY, 20, isDumpLog, 0, 0x90c8, 0, 0x00, 0x00, 0x00, 0x00));
-            commandIssuer.enqueueCommand(new PtpIpCommandGeneric(new PtpIpResponseReceiver(), SEQ_AFDRIVE, 20, isDumpLog, 0, 0x90c1, 0, 0x00, 0x00, 0x00, 0x00));
+            commandIssuer.enqueueCommand(new PtpIpCommandGeneric(new PtpIpResponseReceiver(null), SEQ_START_LIVEVIEW, 20, isDumpLog, 0, 0x9201, 0, 0x00, 0x00, 0x00, 0x00));
+            commandIssuer.enqueueCommand(new PtpIpCommandGeneric(new PtpIpResponseReceiver(null), SEQ_DEVICE_READY, 20, isDumpLog, 0, 0x90c8, 0, 0x00, 0x00, 0x00, 0x00));
+            commandIssuer.enqueueCommand(new PtpIpCommandGeneric(new PtpIpResponseReceiver(this), SEQ_AFDRIVE, 20, isDumpLog, 0, 0x90c1, 0, 0x00, 0x00, 0x00, 0x00));
         }
         catch (Exception e)
         {
@@ -74,10 +74,13 @@ public class NikonLiveViewControl  implements ILiveViewControl, ILiveViewListene
     public void stopLiveView()
     {
         Log.v(TAG, " stopLiveView() ");
-        liveViewIsReceiving = false;
         try
         {
-            commandIssuer.enqueueCommand(new PtpIpCommandGeneric(new PtpIpResponseReceiver(), SEQ_STOP_LIVEVIEW, 20, isDumpLog, 0, 0x9202, 0, 0x00, 0x00, 0x00, 0x00));
+            if (liveViewIsReceiving)
+            {
+                liveViewIsReceiving = false;
+                commandIssuer.enqueueCommand(new PtpIpCommandGeneric(new PtpIpResponseReceiver(null), SEQ_STOP_LIVEVIEW, 20, isDumpLog, 0, 0x9202, 0, 0x00, 0x00, 0x00, 0x00));
+            }
         }
         catch (Exception e)
         {
@@ -126,9 +129,6 @@ public class NikonLiveViewControl  implements ILiveViewControl, ILiveViewListene
             e.printStackTrace();
         }
     }
-
-
-
 
     @Override
     public void updateDigitalZoom()
@@ -203,5 +203,19 @@ public class NikonLiveViewControl  implements ILiveViewControl, ILiveViewListene
     {
         Log.v(TAG, " onErrorOccurred () : " + e.getLocalizedMessage());
         commandIssued = false;
+    }
+
+    @Override
+    public void response(int id, int responseCode)
+    {
+        // 応答OKなら LV開始。
+        if ((id == SEQ_AFDRIVE)&&(responseCode == 0x2001))
+        {
+            startLiveviewImpl();
+        }
+        else
+        {
+            Log.v(TAG, String.format(" ===== NikonLiveViewControl::response() ID : %d, RESPONSE CODE : 0x%04x ", id, responseCode));
+        }
     }
 }

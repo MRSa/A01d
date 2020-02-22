@@ -59,7 +59,7 @@ public class NikonLiveViewImageReceiver implements IPtpIpCommandCallback
     @Override
     public void onReceiveProgress(final int currentBytes, final int totalBytes, byte[] rx_body)
     {
-        // Log.v(TAG, " onReceiveProgress() " + currentBytes + "/" + totalBytes);
+        Log.v(TAG, " onReceiveProgress() " + currentBytes + "/" + totalBytes);
 
         // 受信したデータから、通信のヘッダ部分を削除する
         cutHeader(rx_body);
@@ -78,8 +78,8 @@ public class NikonLiveViewImageReceiver implements IPtpIpCommandCallback
             // データを最初に読んだとき。ヘッダ部分を読み飛ばす
             receivedFirstData = true;
             data_position = (int) rx_body[0] & (0xff);
-            //Log.v(TAG, " FIRST DATA POS. : " + data_position);
-            //SimpleLogDumper.dump_bytes(" [sssss]", Arrays.copyOfRange(rx_body, 0, (64)));
+            Log.v(TAG, " FIRST DATA POS. : " + data_position);
+            SimpleLogDumper.dump_bytes(" [sssss]", Arrays.copyOfRange(rx_body, 0, (512)));
         }
         else if (received_remain_bytes > 0)
         {
@@ -111,8 +111,8 @@ public class NikonLiveViewImageReceiver implements IPtpIpCommandCallback
             }
 
             // 受信データ(のヘッダ部分)をダンプする
-            Log.v(TAG, " RX DATA : " + data_position + " (" + body_size + ") [" + received_remain_bytes + "] (" + received_total_bytes + ")");
-            SimpleLogDumper.dump_bytes(" [zzz] " + data_position + ": ", Arrays.copyOfRange(rx_body, data_position, (data_position + 48)));
+            //Log.v(TAG, " RX DATA : " + data_position + " (" + body_size + ") [" + received_remain_bytes + "] (" + received_total_bytes + ")");
+            //SimpleLogDumper.dump_bytes(" [zzz] " + data_position + ": ", Arrays.copyOfRange(rx_body, data_position, (data_position + 48)));
 
             if ((data_position + body_size) > length) {
                 // データがすべてバッファ内になかったときは、バッファすべてコピーして残ったサイズを記憶しておく。
@@ -139,7 +139,7 @@ public class NikonLiveViewImageReceiver implements IPtpIpCommandCallback
     @Override
     public boolean isReceiveMulti()
     {
-        return (true);
+        return (false);
     }
 
 }

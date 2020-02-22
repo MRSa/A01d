@@ -27,7 +27,7 @@ public class NikonCameraConnectSequence implements Runnable, IPtpIpCommandCallba
     private final IPtpIpInterfaceProvider interfaceProvider;
     private final IPtpIpCommandPublisher commandIssuer;
     private final NikonStatusChecker statusChecker;
-    private boolean isDumpLog = true;
+    private boolean isDumpLog = false;
 
     NikonCameraConnectSequence(@NonNull Activity context, @NonNull ICameraStatusReceiver statusReceiver, @NonNull final ICameraConnection cameraConnection, @NonNull IPtpIpInterfaceProvider interfaceProvider, @NonNull NikonStatusChecker statusChecker)
     {
