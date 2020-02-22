@@ -27,11 +27,11 @@ public class NikonCameraConnectSequence implements Runnable, IPtpIpCommandCallba
     private final IPtpIpInterfaceProvider interfaceProvider;
     private final IPtpIpCommandPublisher commandIssuer;
     private final NikonStatusChecker statusChecker;
-    private boolean isDumpLog = false;
+    private boolean isDumpLog = true;
 
     NikonCameraConnectSequence(@NonNull Activity context, @NonNull ICameraStatusReceiver statusReceiver, @NonNull final ICameraConnection cameraConnection, @NonNull IPtpIpInterfaceProvider interfaceProvider, @NonNull NikonStatusChecker statusChecker)
     {
-        Log.v(TAG, " NikonCameraConnectSequenceForPlayback");
+        Log.v(TAG, " NikonCameraConnectSequence");
         this.context = context;
         this.cameraConnection = cameraConnection;
         this.cameraStatusReceiver = statusReceiver;
@@ -110,9 +110,14 @@ public class NikonCameraConnectSequence implements Runnable, IPtpIpCommandCallba
                 break;
 
             case SEQ_EVENT_INITIALIZE:
+                interfaceProvider.getInformationReceiver().updateMessage(context.getString(R.string.canon_connect_connecting1), false, false, 0);
+                commandIssuer.enqueueCommand(new PtpIpCommandGeneric(this, SEQ_INIT_SESSION, 50, isDumpLog, 0, 0x1001, 0, 0, 0, 0, 0));  // GetDeviceInfo
+                break;
+
+            case SEQ_INIT_SESSION:
                 if (checkEventInitialize(rx_body))
                 {
-                    interfaceProvider.getInformationReceiver().updateMessage(context.getString(R.string.canon_connect_connecting1), false, false, 0);
+                    interfaceProvider.getInformationReceiver().updateMessage(context.getString(R.string.canon_connect_connecting2), false, false, 0);
                     commandIssuer.enqueueCommand(new PtpIpCommandGeneric(this, SEQ_OPEN_SESSION, 50, isDumpLog, 0, 0x1002, 4, 0x41, 0, 0, 0));  // OpenSession
                 }
                 else
@@ -120,16 +125,13 @@ public class NikonCameraConnectSequence implements Runnable, IPtpIpCommandCallba
                     onConnectError(context.getString(R.string.connect_error_message));
                 }
                 break;
-
             case SEQ_OPEN_SESSION:
-                interfaceProvider.getInformationReceiver().updateMessage(context.getString(R.string.canon_connect_connecting2), false, false, 0);
-                commandIssuer.enqueueCommand(new PtpIpCommandGeneric(this, SEQ_INIT_SESSION, 50, isDumpLog, 0, 0x1001, 0, 0, 0, 0, 0));  // GetDeviceInfo
+                interfaceProvider.getInformationReceiver().updateMessage(context.getString(R.string.canon_connect_connecting3), false, false, 0);
+                commandIssuer.enqueueCommand(new PtpIpCommandGeneric(this, SEQ_CHANGE_REMOTE, 50, isDumpLog, 0, 0x902c, 4, 0x01, 0, 0, 0));  //
                 break;
 
-            case SEQ_INIT_SESSION:
             case SEQ_CHANGE_REMOTE:
             case SEQ_SET_EVENT_MODE:
-                interfaceProvider.getInformationReceiver().updateMessage(context.getString(R.string.canon_connect_connecting3), false, false, 0);
                 interfaceProvider.getInformationReceiver().updateMessage(context.getString(R.string.canon_connect_connecting4), false, false, 0);
                 interfaceProvider.getInformationReceiver().updateMessage(context.getString(R.string.canon_connect_connecting5), false, false, 0);
                 interfaceProvider.getInformationReceiver().updateMessage(context.getString(R.string.connect_connect_finished), false, false, 0);

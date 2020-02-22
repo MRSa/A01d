@@ -61,6 +61,7 @@ public class PtpIpCommandPublisher implements IPtpIpCommandPublisher, IPtpIpComm
     {
         try
         {
+            Log.v(TAG, " connect()");
             socket = new Socket(ipAddress, portNumber);
             return (true);
         }
@@ -129,6 +130,7 @@ public class PtpIpCommandPublisher implements IPtpIpCommandPublisher, IPtpIpComm
             return;
         }
         isStart = true;
+        Log.v(TAG, " start()");
 
         Thread thread = new Thread(new Runnable()
         {

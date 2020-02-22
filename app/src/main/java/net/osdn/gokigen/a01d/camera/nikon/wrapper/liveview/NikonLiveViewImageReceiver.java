@@ -1,14 +1,16 @@
-package net.osdn.gokigen.a01d.camera.canon.wrapper.liveview;
+package net.osdn.gokigen.a01d.camera.nikon.wrapper.liveview;
 
 import android.util.Log;
 
 import androidx.annotation.NonNull;
 import net.osdn.gokigen.a01d.camera.ptpip.wrapper.command.IPtpIpCommandCallback;
 import net.osdn.gokigen.a01d.camera.ptpip.wrapper.liveview.IPtpIpLiveViewImageCallback;
+import net.osdn.gokigen.a01d.camera.utils.SimpleLogDumper;
 
 import java.io.ByteArrayOutputStream;
+import java.util.Arrays;
 
-public class CanonLiveViewImageReceiver implements IPtpIpCommandCallback
+public class NikonLiveViewImageReceiver implements IPtpIpCommandCallback
 {
     private final String TAG = toString();
 
@@ -21,7 +23,7 @@ public class CanonLiveViewImageReceiver implements IPtpIpCommandCallback
     private boolean receivedFirstData = false;
     private ByteArrayOutputStream byteStream;
 
-    CanonLiveViewImageReceiver(@NonNull IPtpIpLiveViewImageCallback callback)
+    NikonLiveViewImageReceiver(@NonNull IPtpIpLiveViewImageCallback callback)
     {
         this.callback = callback;
         byteStream = new ByteArrayOutputStream();
@@ -109,8 +111,8 @@ public class CanonLiveViewImageReceiver implements IPtpIpCommandCallback
             }
 
             // 受信データ(のヘッダ部分)をダンプする
-            //Log.v(TAG, " RX DATA : " + data_position + " (" + body_size + ") [" + received_remain_bytes + "] (" + received_total_bytes + ")");
-            //SimpleLogDumper.dump_bytes(" [zzz] " + data_position + ": ", Arrays.copyOfRange(rx_body, data_position, (data_position + 48)));
+            Log.v(TAG, " RX DATA : " + data_position + " (" + body_size + ") [" + received_remain_bytes + "] (" + received_total_bytes + ")");
+            SimpleLogDumper.dump_bytes(" [zzz] " + data_position + ": ", Arrays.copyOfRange(rx_body, data_position, (data_position + 48)));
 
             if ((data_position + body_size) > length) {
                 // データがすべてバッファ内になかったときは、バッファすべてコピーして残ったサイズを記憶しておく。

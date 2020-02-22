@@ -41,11 +41,10 @@ public class NikonInterfaceProvider implements IPtpIpInterfaceProvider, IDisplay
 {
     private final String TAG = toString();
 
-    private static final int STREAM_PORT = 15742;   // ??
-    private static final int ASYNC_RESPONSE_PORT = 15741;  // ??
+    private static final int ASYNC_RESPONSE_PORT = 15741;
     private static final int CONTROL_PORT = 15740;
     private static final int EVENT_PORT = 15740;
-    private static final String CAMERA_IP = "192.168.0.1";
+    private static final String CAMERA_IP = "192.168.1.1";
 
     private final Activity activity;
     private final PtpIpRunMode runmode;
@@ -65,7 +64,7 @@ public class NikonInterfaceProvider implements IPtpIpInterfaceProvider, IDisplay
     {
         this.activity = context;
         commandPublisher = new PtpIpCommandPublisher(CAMERA_IP, CONTROL_PORT);
-        liveViewControl = new NikonLiveViewControl(context, CAMERA_IP, STREAM_PORT);
+        liveViewControl = new NikonLiveViewControl(context, this, 20);
         asyncReceiver = new PtpIpAsyncResponseReceiver(CAMERA_IP, ASYNC_RESPONSE_PORT);
         statusChecker = new NikonStatusChecker(activity, commandPublisher, CAMERA_IP, EVENT_PORT);
         canonConnection = new NikonConnection(context, provider, this, statusChecker);

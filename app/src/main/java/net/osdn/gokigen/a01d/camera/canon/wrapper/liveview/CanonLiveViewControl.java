@@ -10,6 +10,7 @@ import net.osdn.gokigen.a01d.camera.ptpip.IPtpIpInterfaceProvider;
 import net.osdn.gokigen.a01d.camera.ptpip.wrapper.command.IPtpIpCommandPublisher;
 import net.osdn.gokigen.a01d.camera.ptpip.wrapper.command.IPtpIpCommunication;
 import net.osdn.gokigen.a01d.camera.ptpip.wrapper.command.messages.PtpIpCommandGeneric;
+import net.osdn.gokigen.a01d.camera.ptpip.wrapper.liveview.IPtpIpLiveViewImageCallback;
 import net.osdn.gokigen.a01d.liveview.liveviewlistener.IImageDataReceiver;
 import net.osdn.gokigen.a01d.liveview.liveviewlistener.ILiveViewListener;
 
@@ -18,7 +19,7 @@ import java.util.Map;
 
 import static net.osdn.gokigen.a01d.camera.ptpip.wrapper.command.IPtpIpMessages.SEQ_GET_VIEWFRAME;
 
-public class CanonLiveViewControl implements ILiveViewControl, ILiveViewListener, IPtpIpCommunication, ICanonLiveViewImageCallback
+public class CanonLiveViewControl implements ILiveViewControl, ILiveViewListener, IPtpIpCommunication, IPtpIpLiveViewImageCallback
 {
     private final String TAG = this.toString();
     private final IPtpIpCommandPublisher commandIssuer;

@@ -21,7 +21,10 @@ public interface IPtpIpMessages
     int SEQ_GET_VIEWFRAME = 16;
     int SEQ_SET_DEVICE_PROPERTY_2 = 17;
     int SEQ_SET_DEVICE_PROPERTY_3 = 18;
-
+    int SEQ_START_LIVEVIEW = 19;
+    int SEQ_STOP_LIVEVIEW = 20;
+    int SEQ_DEVICE_READY = 21;
+    int SEQ_AFDRIVE = 22;
 
     int GET_STORAGE_ID = 101;
     int GET_STORAGE_INFO = 102;
