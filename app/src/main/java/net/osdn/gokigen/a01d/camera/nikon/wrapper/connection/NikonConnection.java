@@ -82,10 +82,13 @@ public class NikonConnection implements ICameraConnection
                 Log.v(TAG, "onReceiveBroadcastOfConnection() : CONNECTIVITY_ACTION");
 
                 WifiManager wifiManager = (WifiManager) context.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-                if (wifiManager != null) {
+                if (wifiManager != null)
+                {
                     WifiInfo info = wifiManager.getConnectionInfo();
-                    if (wifiManager.isWifiEnabled() && info != null) {
-                        if (info.getNetworkId() != -1) {
+                    if (wifiManager.isWifiEnabled() && info != null)
+                    {
+                        if (info.getNetworkId() != -1)
+                        {
                             Log.v(TAG, "Network ID is -1, there is no currently connected network.");
                         }
                         // 自動接続が指示されていた場合は、カメラとの接続処理を行う

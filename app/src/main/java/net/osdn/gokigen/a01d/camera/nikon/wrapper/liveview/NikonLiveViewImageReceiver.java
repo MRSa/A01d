@@ -35,16 +35,17 @@ public class NikonLiveViewImageReceiver implements IPtpIpCommandCallback
         try
         {
             // end of receive sequence.
-            //byte [] thumbnail = byteStream.toByteArray();
-            //Log.v(TAG, " TransferComplete() RECEIVED  : " + id + " size : " + target_image_size + " (" + thumbnail.length + ")");
-            //SimpleLogDumper.dump_bytes(" [xxxxx]", Arrays.copyOfRange(thumbnail, 0, (64)));
-            //SimpleLogDumper.dump_bytes(" [zzzzz]", Arrays.copyOfRange(thumbnail, (thumbnail.length - 64), (thumbnail.length)));
+            byte [] thumbnail = byteStream.toByteArray();
+            //byte [] thumbnail = rx_body;
+            Log.v(TAG, " TransferComplete() RECEIVED  id[" + id + "] size : " + target_image_size + " (" + thumbnail.length + ")");
+            //SimpleLogDumper.dump_bytes(" [xxxxx]", Arrays.copyOfRange(thumbnail, 0, (512)));
+            //SimpleLogDumper.dump_bytes(" [zzzzz]", Arrays.copyOfRange(thumbnail, (thumbnail.length - 128), (thumbnail.length)));
             callback.onCompleted(byteStream.toByteArray(), null);
+            //callback.onCompleted(rx_body, null);
             receivedFirstData = false;
             received_remain_bytes = 0;
             received_total_bytes = 0;
             target_image_size = 0;
-
             byteStream.reset();
         }
         catch (Exception e)
@@ -71,6 +72,7 @@ public class NikonLiveViewImageReceiver implements IPtpIpCommandCallback
         {
             return;
         }
+        int first_offset = 416;
         int length = rx_body.length;
         int data_position = 0;
         if (!receivedFirstData)
@@ -79,7 +81,7 @@ public class NikonLiveViewImageReceiver implements IPtpIpCommandCallback
             receivedFirstData = true;
             data_position = (int) rx_body[0] & (0xff);
             Log.v(TAG, " FIRST DATA POS. : " + data_position);
-            SimpleLogDumper.dump_bytes(" [sssss]", Arrays.copyOfRange(rx_body, 0, (512)));
+            //SimpleLogDumper.dump_bytes(" [sssXXXsss]", Arrays.copyOfRange(rx_body, first_offset, (first_offset + 64)));
         }
         else if (received_remain_bytes > 0)
         {
@@ -100,36 +102,61 @@ public class NikonLiveViewImageReceiver implements IPtpIpCommandCallback
             }
         }
 
-        while (data_position <= (length - 12)) {
-            int body_size = (rx_body[data_position] & 0xff) + ((rx_body[data_position + 1] & 0xff) << 8) +
-                    ((rx_body[data_position + 2] & 0xff) << 16) + ((rx_body[data_position + 3] & 0xff) << 24);
-            if (body_size <= 12) {
+        while (data_position <= (length - 12))
+        {
+            int body_size = (rx_body[data_position] & 0xff) + ((rx_body[data_position + 1] & 0xff) << 8) + ((rx_body[data_position + 2] & 0xff) << 16) + ((rx_body[data_position + 3] & 0xff) << 24);
+            if (body_size <= 12)
+            {
                 Log.v(TAG, " --- BODY SIZE IS SMALL : " + data_position + " (" + body_size + ") [" + received_remain_bytes + "] " + rx_body.length + "  (" + target_image_size + ")");
                 //int startpos = (data_position > 48) ? (data_position - 48) : 0;
                 //SimpleLogDumper.dump_bytes(" [xxx]", Arrays.copyOfRange(rx_body, startpos, (data_position + 48)));
                 break;
             }
 
-            // 受信データ(のヘッダ部分)をダンプする
-            //Log.v(TAG, " RX DATA : " + data_position + " (" + body_size + ") [" + received_remain_bytes + "] (" + received_total_bytes + ")");
-            //SimpleLogDumper.dump_bytes(" [zzz] " + data_position + ": ", Arrays.copyOfRange(rx_body, data_position, (data_position + 48)));
+            int forward_length = data_position;
 
-            if ((data_position + body_size) > length) {
+            // 受信データ(のヘッダ部分)をダンプする
+            Log.v(TAG, " RX DATA : " + data_position + " (" + body_size + ") [" + received_remain_bytes + "] (" + received_total_bytes + ")");
+            try
+            {
+                while (forward_length < rx_body.length)
+                {
+
+                    if ((rx_body[forward_length] == (byte) 0xff)&&(rx_body[forward_length + 1] == (byte) 0xd8))
+                    {
+                        break;
+                    }
+                    forward_length++;
+                }
+                if (forward_length >= rx_body.length)
+                {
+                    forward_length = data_position + 12;
+                }
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+
+            if ((data_position + body_size) > length)
+            {
                 // データがすべてバッファ内になかったときは、バッファすべてコピーして残ったサイズを記憶しておく。
-                int copysize = (length - ((data_position + 12)));
-                byteStream.write(rx_body, (data_position + 12), copysize);
-                received_remain_bytes = body_size - copysize - 12;  // マイナス12は、ヘッダ分
+                int copysize = (length - ((data_position + (12))));
+                byteStream.write(rx_body, (data_position + (12)), copysize);
+                received_remain_bytes = body_size - copysize - (12);  // マイナス12は、ヘッダ分
                 received_total_bytes = received_total_bytes + copysize;
-                //Log.v(TAG, " ----- copy : " + (data_position + 12) + " " + copysize + " remain : " + received_remain_bytes + "  body size : " + body_size);
+                Log.v(TAG, " ----- copy : " + (data_position + (12)) + " " + copysize + " remain : " + received_remain_bytes + "  body size : " + body_size);
                 break;
             }
-            try {
-                byteStream.write(rx_body, (data_position + 12), (body_size - 12));
+            try
+            {
+                byteStream.write(rx_body, (data_position + (12)), (body_size - (12)));
                 data_position = data_position + body_size;
-                received_total_bytes = received_total_bytes + 12;
-                //Log.v(TAG, " --- COPY : " + (data_position + 12) + " " + (body_size - 12) + " remain : " + received_remain_bytes);
-
-            } catch (Exception e) {
+                received_total_bytes = received_total_bytes + (12);
+                Log.v(TAG, " --- COPY : " + (data_position + 12) + " " + (body_size - (12)) + " remain : " + received_remain_bytes);
+            }
+            catch (Exception e)
+            {
                 Log.v(TAG, "  pos : " + data_position + "  size : " + body_size + " length : " + length);
                 e.printStackTrace();
             }
@@ -139,7 +166,6 @@ public class NikonLiveViewImageReceiver implements IPtpIpCommandCallback
     @Override
     public boolean isReceiveMulti()
     {
-        return (false);
+        return (true);
     }
-
 }

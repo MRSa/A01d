@@ -136,11 +136,11 @@ public class NikonCameraConnectSequence implements Runnable, IPtpIpCommandCallba
                 interfaceProvider.getInformationReceiver().updateMessage(context.getString(R.string.canon_connect_connecting5), false, false, 0);
                 interfaceProvider.getInformationReceiver().updateMessage(context.getString(R.string.connect_connect_finished), false, false, 0);
                 connectFinished();
-                Log.v(TAG, "CHANGED PLAYBACK MODE : DONE.");
+                Log.v(TAG, "  CONNECT TO CAMERA : DONE.");
                 break;
 
             default:
-                Log.v(TAG, "RECEIVED UNKNOWN ID : " + id);
+                Log.v(TAG, " RECEIVED UNKNOWN ID : " + id);
                 onConnectError(context.getString(R.string.connect_receive_unknown_message));
                 break;
         }

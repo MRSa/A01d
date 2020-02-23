@@ -104,7 +104,7 @@ public class NikonLiveViewControl  implements ILiveViewControl, ILiveViewListene
                             if (!commandIssued)
                             {
                                 commandIssued = true;
-                                commandIssuer.enqueueCommand(new PtpIpCommandGeneric(imageReceiver, SEQ_GET_VIEWFRAME, 20, false, 0, 0x9203, 0, 0x00, 0x00, 0x00, 0x00));
+                                commandIssuer.enqueueCommand(new PtpIpCommandGeneric(imageReceiver, SEQ_GET_VIEWFRAME, 40, true, 0, 0x9203, 0, 0x00, 0x00, 0x00, 0x00));
                             }
                             try
                             {
@@ -181,13 +181,15 @@ public class NikonLiveViewControl  implements ILiveViewControl, ILiveViewListene
         //Log.v(TAG, "  ---+++--- RECEIVED LV IMAGE ---+++--- ");
         try
         {
-            if ((dataReceiver != null)&&(data != null))
+            if ((dataReceiver != null)&&(data != null)&&(data.length > 0))
             {
                 //Log.v(TAG, "  ---+++--- RECEIVED LV IMAGE ---+++--- : " + data.length + " bytes.");
+                //SimpleLogDumper.dump_bytes(" [LVLV] " + ": ", Arrays.copyOfRange(data, 0, (0 + 512)));
                 //dataReceiver.setImageData(data, metadata);
+                int offset = 384;
                 if (data.length > 8)
                 {
-                    dataReceiver.setImageData(Arrays.copyOfRange(data, 8, data.length), metadata);  // ヘッダ部分を切り取って送る
+                    dataReceiver.setImageData(Arrays.copyOfRange(data, offset, data.length), metadata);  // ヘッダ部分を切り取って送る
                 }
             }
         }
