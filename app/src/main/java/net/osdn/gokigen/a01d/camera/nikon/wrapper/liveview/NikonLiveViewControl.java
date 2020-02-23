@@ -6,6 +6,7 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 
 import net.osdn.gokigen.a01d.camera.ILiveViewControl;
+import net.osdn.gokigen.a01d.camera.nikon.wrapper.command.messages.specific.NikonLiveViewRequestMessage;
 import net.osdn.gokigen.a01d.camera.ptpip.IPtpIpInterfaceProvider;
 import net.osdn.gokigen.a01d.camera.ptpip.wrapper.command.IPtpIpCommandPublisher;
 import net.osdn.gokigen.a01d.camera.ptpip.wrapper.command.IPtpIpCommunication;
@@ -21,7 +22,6 @@ import java.util.Map;
 
 import static net.osdn.gokigen.a01d.camera.ptpip.wrapper.command.IPtpIpMessages.SEQ_AFDRIVE;
 import static net.osdn.gokigen.a01d.camera.ptpip.wrapper.command.IPtpIpMessages.SEQ_DEVICE_READY;
-import static net.osdn.gokigen.a01d.camera.ptpip.wrapper.command.IPtpIpMessages.SEQ_GET_VIEWFRAME;
 import static net.osdn.gokigen.a01d.camera.ptpip.wrapper.command.IPtpIpMessages.SEQ_START_LIVEVIEW;
 import static net.osdn.gokigen.a01d.camera.ptpip.wrapper.command.IPtpIpMessages.SEQ_STOP_LIVEVIEW;
 
@@ -34,7 +34,7 @@ public class NikonLiveViewControl  implements ILiveViewControl, ILiveViewListene
     private IImageDataReceiver dataReceiver = null;
     private boolean liveViewIsReceiving = false;
     private boolean commandIssued = false;
-    private boolean isDumpLog = false;
+    private boolean isDumpLog = true;
 
     public NikonLiveViewControl(@NonNull Activity context, @NonNull IPtpIpInterfaceProvider interfaceProvider, int delayMs)
     {
@@ -104,7 +104,7 @@ public class NikonLiveViewControl  implements ILiveViewControl, ILiveViewListene
                             if (!commandIssued)
                             {
                                 commandIssued = true;
-                                commandIssuer.enqueueCommand(new PtpIpCommandGeneric(imageReceiver, SEQ_GET_VIEWFRAME, 80, true, 0, 0x9203, 0, 0x00, 0x00, 0x00, 0x00));
+                                commandIssuer.enqueueCommand(new NikonLiveViewRequestMessage(imageReceiver, 90, isDumpLog));
                             }
                             try
                             {

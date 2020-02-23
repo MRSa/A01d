@@ -4,8 +4,6 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
-import net.osdn.gokigen.a01d.camera.utils.SimpleLogDumper;
-
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
@@ -393,7 +391,7 @@ public class PtpIpCommandPublisher implements IPtpIpCommandPublisher, IPtpIpComm
             }
 
             // 初回データが受信バッファにデータが溜まるまで待つ...
-            int read_bytes = waitForReceive(is, delayMs);
+            int read_bytes = waitForReceive(is, delayMs, command.maxRetryCount());
             if (read_bytes < 0)
             {
                 // リトライオーバー...
@@ -444,7 +442,7 @@ public class PtpIpCommandPublisher implements IPtpIpCommandPublisher, IPtpIpComm
     private boolean receive_multi(@NonNull IPtpIpCommand command, int delayMs)
     {
         //int estimatedSize = command.estimatedReceiveDataSize();
-        int maxRetryCount = 20;
+        int maxRetryCount = command.maxRetryCount();
         int id = command.getId();
         IPtpIpCommandCallback callback = command.responseCallback();
 
@@ -461,7 +459,7 @@ public class PtpIpCommandPublisher implements IPtpIpCommandPublisher, IPtpIpComm
             }
 
             // 初回データが受信バッファにデータが溜まるまで待つ...
-            int read_bytes = waitForReceive(is, delayMs);
+            int read_bytes = waitForReceive(is, delayMs, command.maxRetryCount());
             if (read_bytes < 0)
             {
                 // リトライオーバー...
@@ -522,7 +520,7 @@ public class PtpIpCommandPublisher implements IPtpIpCommandPublisher, IPtpIpComm
                 }
                 //byteStream.write(byte_array, 0, read_bytes);
 
-                maxRetryCount = 20;
+                maxRetryCount = command.maxRetryCount();
                 //do
                 {
                     sleep(delayMs);
@@ -542,7 +540,14 @@ public class PtpIpCommandPublisher implements IPtpIpCommandPublisher, IPtpIpComm
             if (callback != null)
             {
                 Log.v(TAG, "  --- receive_multi : " + id + "  (" + read_bytes + ") [" + maxRetryCount + "] " + receive_message_buffer_size + " (" + received_length + ") ");
-                callback.receivedMessage(id, null);
+                try
+                {
+                    callback.receivedMessage(id, Arrays.copyOfRange(byte_array, 0, received_length));
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
             }
         }
         catch (Throwable e)
@@ -589,7 +594,7 @@ public class PtpIpCommandPublisher implements IPtpIpCommandPublisher, IPtpIpComm
             if (packetType == 0x09)
             {
                 lenlen = ((((int) byte_array[15]) & 0xff) << 24) + ((((int) byte_array[14]) & 0xff) << 16) + ((((int) byte_array[13]) & 0xff) << 8) + (((int) byte_array[12]) & 0xff);
-                packetType = (((int) byte_array[16]) & 0xff);
+                //packetType = (((int) byte_array[16]) & 0xff);
             }
             // Log.v(TAG, " ---  RECEIVED MESSAGE : " + len + " bytes (BUFFER: " + byte_array.length + " bytes)" + " length : " + lenlen + " TYPE : " + packetType + " --- ");
             if (lenlen == 0)
@@ -603,8 +608,8 @@ public class PtpIpCommandPublisher implements IPtpIpCommandPublisher, IPtpIpComm
             while (position < limit)
             {
                 lenlen = ((((int) byte_array[position + 3]) & 0xff) << 24) + ((((int) byte_array[position + 2]) & 0xff) << 16) + ((((int) byte_array[position + 1]) & 0xff) << 8) + (((int) byte_array[position]) & 0xff);
-                packetType = (((int) byte_array[position + 4]) & 0xff);
 /*
+                packetType = (((int) byte_array[position + 4]) & 0xff);
                 if (packetType != 0x0a)
                 {
                     Log.v(TAG, " <><><> PACKET TYPE : " + packetType + " LENGTH : " + lenlen);
@@ -624,10 +629,9 @@ public class PtpIpCommandPublisher implements IPtpIpCommandPublisher, IPtpIpComm
         return (receivedBuffer);
     }
 
-    private int waitForReceive(InputStream is, int delayMs)
+    private int waitForReceive(InputStream is, int delayMs, int retry_count)
     {
         boolean isLogOutput = true;
-        int retry_count = 50;
         int read_bytes = 0;
         try
         {

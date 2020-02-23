@@ -113,4 +113,10 @@ public class PtpIpCommandBase implements IPtpIpCommand, IPtpIpMessages
     {
         return (true);
     }
+
+    @Override
+    public int maxRetryCount()
+    {
+        return (20);
+    }
 }
