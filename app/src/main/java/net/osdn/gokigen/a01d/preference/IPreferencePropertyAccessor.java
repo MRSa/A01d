@@ -76,7 +76,10 @@ public interface IPreferencePropertyAccessor
     String CANON_ZOOM_RESOLUTION = "canon_zoom_resolution";
     String CANON_ZOOM_RESOLUTION_DEFAULT_VALUE = "25";
 
-    /*
+    String NIKON_FOCUS_XY = "nikon_focus_xy";
+    String NIKON_FOCUS_XY_DEFAULT_VALUE = "6000,4000";
+
+ /*
     int CHOICE_SPLASH_SCREEN = 10;
 
     int SELECT_SAMPLE_IMAGE_CODE = 110;
@@ -91,6 +94,6 @@ public interface IPreferencePropertyAccessor
         void stored(boolean result);
         void restored(boolean result);
     }
-*****/
+*/
 
 }

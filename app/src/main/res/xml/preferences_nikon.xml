@@ -25,6 +25,12 @@
     <PreferenceCategory
         android:title="@string/pref_cat_camera">
 
+        <EditTextPreference
+            android:key="nikon_focus_xy"
+            android:title="@string/pref_nikon_focus_xy"
+            android:defaultValue="6000,4000"
+            android:summary="@string/pref_summary_nikon_focus_xy" />
+
         <CheckBoxPreference
             android:key="capture_both_camera_and_live_view"
             android:title="@string/pref_capture_both_camera_and_live_view" />

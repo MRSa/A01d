@@ -466,7 +466,11 @@ public class PtpIpCommandPublisher implements IPtpIpCommandPublisher, IPtpIpComm
             {
                 // リトライオーバー...
                 Log.v(TAG, " RECEIVE : RETRY OVER......");
-                return (true);
+                if (command.isRetrySend())
+                {
+                    // 要求を再送する場合、、、ダメな場合は受信待ちとする
+                    return (true);
+                }
             }
 
             // 初回データの読み込み
@@ -635,7 +639,7 @@ public class PtpIpCommandPublisher implements IPtpIpCommandPublisher, IPtpIpComm
                 {
                     if (isLogOutput)
                     {
-                        Log.v(TAG, " is.available() WAIT... ");
+                        Log.v(TAG, "waitForReceive:: is.available() WAIT... : " + delayMs + "ms");
                         isLogOutput = false;
                     }
                     retry_count--;

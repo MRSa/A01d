@@ -79,7 +79,7 @@ public class NikonLiveViewControl  implements ILiveViewControl, ILiveViewListene
             if (liveViewIsReceiving)
             {
                 liveViewIsReceiving = false;
-                commandIssuer.enqueueCommand(new PtpIpCommandGeneric(new PtpIpResponseReceiver(null), SEQ_STOP_LIVEVIEW, 20, isDumpLog, 0, 0x9202, 0, 0x00, 0x00, 0x00, 0x00));
+                commandIssuer.enqueueCommand(new PtpIpCommandGeneric(new PtpIpResponseReceiver(null), SEQ_STOP_LIVEVIEW, 30, isDumpLog, 0, 0x9202, 0, 0x00, 0x00, 0x00, 0x00));
             }
         }
         catch (Exception e)
@@ -104,7 +104,7 @@ public class NikonLiveViewControl  implements ILiveViewControl, ILiveViewListene
                             if (!commandIssued)
                             {
                                 commandIssued = true;
-                                commandIssuer.enqueueCommand(new PtpIpCommandGeneric(imageReceiver, SEQ_GET_VIEWFRAME, 40, true, 0, 0x9203, 0, 0x00, 0x00, 0x00, 0x00));
+                                commandIssuer.enqueueCommand(new PtpIpCommandGeneric(imageReceiver, SEQ_GET_VIEWFRAME, 80, true, 0, 0x9203, 0, 0x00, 0x00, 0x00, 0x00));
                             }
                             try
                             {

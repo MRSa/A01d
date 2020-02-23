@@ -49,12 +49,17 @@ public class NikonCaptureControl implements ICaptureControl, IPtpIpCommandCallba
     @Override
     public void receivedMessage(int id, byte[] rx_body)
     {
-        Log.v(TAG, " CanonCaptureControl::receivedMessage() : ");
+        Log.v(TAG, " NikonCaptureControl::receivedMessage() : ");
         try
         {
-            if ((rx_body.length > 10)&&((rx_body[8] != (byte) 0x01)||(rx_body[9] != (byte) 0x20)))
+            int responseCode = (rx_body[8] & 0xff) + ((rx_body[9] & 0xff) * 256);
+            if ((rx_body.length > 10) && (responseCode != 0x2001))
             {
-                Log.v(TAG, " --- RECEIVED NG REPLY. : " + id);
+                Log.v(TAG, String.format(" RECEIVED NG REPLY ID : %d, RESPONSE CODE : 0x%04x ", id, responseCode));
+            }
+            else
+            {
+                Log.v(TAG, String.format(" OK REPLY (ID : %d) ", id));
             }
         }
         catch (Exception e)
@@ -66,7 +71,7 @@ public class NikonCaptureControl implements ICaptureControl, IPtpIpCommandCallba
     @Override
     public void onReceiveProgress(int currentBytes, int totalBytes, byte[] rx_body)
     {
-        Log.v(TAG, " CanonCaptureControl::onReceiveProgress() : " + currentBytes + "/" + totalBytes);
+        Log.v(TAG, " NikonCaptureControl::onReceiveProgress() : " + currentBytes + "/" + totalBytes);
     }
 
     @Override

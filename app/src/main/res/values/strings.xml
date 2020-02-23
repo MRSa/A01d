@@ -40,6 +40,8 @@
     <string name="pref_summary_fujix_focus_xy"> </string>
     <string name="pref_canon_focus_xy">Number of Focus Point X,Y (default: 6000,4000)</string>
     <string name="pref_summary_canon_focus_xy"> </string>
+    <string name="pref_nikon_focus_xy">Number of Focus Point X,Y (default: 6000,4000)</string>
+    <string name="pref_summary_nikon_focus_xy"> </string>
     <string name="pref_fujix_liveview_wait">Liveview receive wait (default: 80)</string>
     <string name="pref_summary_fujix_liveview_wait"> </string>
     <string name="pref_fujix_command_polling_wait">Status polling wait (default: 500)</string>

@@ -45,7 +45,7 @@ public class NikonFocusingControl implements IFocusingControl, IPtpIpCommandCall
         try
         {
             SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-            String focusPoint = preferences.getString(IPreferencePropertyAccessor.CANON_FOCUS_XY, IPreferencePropertyAccessor.CANON_FOCUS_XY_DEFAULT_VALUE);
+            String focusPoint = preferences.getString(IPreferencePropertyAccessor.NIKON_FOCUS_XY, IPreferencePropertyAccessor.NIKON_FOCUS_XY_DEFAULT_VALUE);
             String[] focus = focusPoint.split(",");
             if (focus.length == 2)
             {
@@ -70,11 +70,11 @@ public class NikonFocusingControl implements IFocusingControl, IPtpIpCommandCall
     @Override
     public boolean driveAutoFocus(final MotionEvent motionEvent)
     {
-        Log.v(TAG, "driveAutoFocus()");
         if (motionEvent.getAction() != MotionEvent.ACTION_DOWN)
         {
             return (false);
         }
+        Log.v(TAG, "driveAutoFocus()");
         Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {
