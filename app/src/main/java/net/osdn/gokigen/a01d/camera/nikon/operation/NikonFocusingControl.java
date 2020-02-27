@@ -34,7 +34,7 @@ public class NikonFocusingControl implements IFocusingControl, IPtpIpCommandCall
     private float maxPointLimitWidth;
     private float maxPointLimitHeight;
     private RectF preFocusFrameRect = null;
-    private boolean isDumpLog = false;
+    private boolean isDumpLog = true;
 
     public NikonFocusingControl(@NonNull Activity context, @NonNull PtpIpCommandPublisher commandPublisher, IAutoFocusFrameDisplay frameDisplayer, IIndicatorControl indicator)
     {
@@ -194,11 +194,17 @@ public class NikonFocusingControl implements IFocusingControl, IPtpIpCommandCall
     {
         try
         {
-
-
-            if ((rx_body.length > 10)&&((rx_body[8] != (byte) 0x01)||(rx_body[9] != (byte) 0x20)))
+            if (rx_body.length < 10)
             {
-                Log.v(TAG, " --- RECEIVED NG REPLY. : FOCUS OPERATION ---");
+                Log.v(TAG, " --- BODY LENGTH IS SHORT : FOCUS OPERATION ---");
+                hideFocusFrame();
+                preFocusFrameRect = null;
+                return;
+            }
+            int responseCode = (rx_body[8] & 0xff) + ((rx_body[9] & 0xff) * 256);
+            if (responseCode != 0x2001)
+            {
+                Log.v(TAG, String.format(" --- RECEIVED NG REPLY. : FOCUS OPERATION (0x%x) ---", responseCode));
                 hideFocusFrame();
                 preFocusFrameRect = null;
                 return;

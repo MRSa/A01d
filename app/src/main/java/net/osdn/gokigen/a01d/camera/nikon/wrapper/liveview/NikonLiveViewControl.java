@@ -8,6 +8,7 @@ import androidx.annotation.NonNull;
 import net.osdn.gokigen.a01d.camera.ILiveViewControl;
 import net.osdn.gokigen.a01d.camera.nikon.wrapper.command.messages.specific.NikonLiveViewRequestMessage;
 import net.osdn.gokigen.a01d.camera.ptpip.IPtpIpInterfaceProvider;
+import net.osdn.gokigen.a01d.camera.ptpip.wrapper.command.IPtpIpCommandCallback;
 import net.osdn.gokigen.a01d.camera.ptpip.wrapper.command.IPtpIpCommandPublisher;
 import net.osdn.gokigen.a01d.camera.ptpip.wrapper.command.IPtpIpCommunication;
 import net.osdn.gokigen.a01d.camera.ptpip.wrapper.command.IPtpIpResponseReceiver;
@@ -25,7 +26,7 @@ import static net.osdn.gokigen.a01d.camera.ptpip.wrapper.command.IPtpIpMessages.
 import static net.osdn.gokigen.a01d.camera.ptpip.wrapper.command.IPtpIpMessages.SEQ_START_LIVEVIEW;
 import static net.osdn.gokigen.a01d.camera.ptpip.wrapper.command.IPtpIpMessages.SEQ_STOP_LIVEVIEW;
 
-public class NikonLiveViewControl  implements ILiveViewControl, ILiveViewListener, IPtpIpCommunication, IPtpIpLiveViewImageCallback, IPtpIpResponseReceiver
+public class NikonLiveViewControl  implements ILiveViewControl, ILiveViewListener, IPtpIpCommunication, IPtpIpLiveViewImageCallback, IPtpIpCommandCallback
 {
     private final String TAG = this.toString();
     private final IPtpIpCommandPublisher commandIssuer;
@@ -60,9 +61,7 @@ public class NikonLiveViewControl  implements ILiveViewControl, ILiveViewListene
         Log.v(TAG, " startLiveView() ");
         try
         {
-            commandIssuer.enqueueCommand(new PtpIpCommandGeneric(new PtpIpResponseReceiver(null), SEQ_START_LIVEVIEW, 20, isDumpLog, 0, 0x9201, 0, 0x00, 0x00, 0x00, 0x00));
-            commandIssuer.enqueueCommand(new PtpIpCommandGeneric(new PtpIpResponseReceiver(null), SEQ_DEVICE_READY, 20, isDumpLog, 0, 0x90c8, 0, 0x00, 0x00, 0x00, 0x00));
-            commandIssuer.enqueueCommand(new PtpIpCommandGeneric(new PtpIpResponseReceiver(this), SEQ_AFDRIVE, 20, isDumpLog, 0, 0x90c1, 0, 0x00, 0x00, 0x00, 0x00));
+            commandIssuer.enqueueCommand(new PtpIpCommandGeneric(this, SEQ_START_LIVEVIEW, 20, isDumpLog, 0, 0x9201, 0, 0x00, 0x00, 0x00, 0x00));
         }
         catch (Exception e)
         {
@@ -208,16 +207,78 @@ public class NikonLiveViewControl  implements ILiveViewControl, ILiveViewListene
     }
 
     @Override
-    public void response(int id, int responseCode)
+    public void receivedMessage(int id, byte[] rx_body)
     {
-        // 応答OKなら LV開始。
-        if ((id == SEQ_AFDRIVE)&&(responseCode == 0x2001))
+        Log.v(TAG, " NikonLiveViewControl::receivedMessage() : ");
+        try
         {
-            startLiveviewImpl();
+            if (rx_body.length < 10)
+            {
+                retrySendMessage(id);
+                return;
+            }
+            int responseCode = (rx_body[8] & 0xff) + ((rx_body[9] & 0xff) * 256);
+            if (responseCode != 0x2001)
+            {
+                // NG応答を受信...同じコマンドを再送する
+                Log.v(TAG, String.format(" RECEIVED NG REPLY ID : %d, RESPONSE CODE : 0x%04x ", id, responseCode));
+                retrySendMessage(id);
+                return;
+            }
+
+            Log.v(TAG, String.format(" OK REPLY (ID : %d) ", id));
+            if (id == SEQ_START_LIVEVIEW)
+            {
+                commandIssuer.enqueueCommand(new PtpIpCommandGeneric(this, SEQ_DEVICE_READY, 20, isDumpLog, 0, 0x90c8, 0, 0x00, 0x00, 0x00, 0x00));
+            }
+            else if (id == SEQ_DEVICE_READY)
+            {
+                commandIssuer.enqueueCommand(new PtpIpCommandGeneric(this, SEQ_AFDRIVE, 20, isDumpLog, 0, 0x90c1, 0, 0x00, 0x00, 0x00, 0x00));
+            }
+            else
+            {
+                // ライブビューの開始。
+                startLiveviewImpl();
+            }
         }
-        else
+        catch (Exception e)
         {
-            Log.v(TAG, String.format(" ===== NikonLiveViewControl::response() ID : %d, RESPONSE CODE : 0x%04x ", id, responseCode));
+            e.printStackTrace();
         }
+    }
+
+    private void retrySendMessage(int id)
+    {
+        try
+        {
+            if (id == SEQ_START_LIVEVIEW)
+            {
+                commandIssuer.enqueueCommand(new PtpIpCommandGeneric(this, SEQ_START_LIVEVIEW, 20, isDumpLog, 0, 0x9201, 0, 0x00, 0x00, 0x00, 0x00));
+            }
+            else if (id == SEQ_DEVICE_READY)
+            {
+                commandIssuer.enqueueCommand(new PtpIpCommandGeneric(this, SEQ_DEVICE_READY, 20, isDumpLog, 0, 0x90c8, 0, 0x00, 0x00, 0x00, 0x00));
+            }
+            else
+            {
+                commandIssuer.enqueueCommand(new PtpIpCommandGeneric(this, SEQ_AFDRIVE, 20, isDumpLog, 0, 0x90c1, 0, 0x00, 0x00, 0x00, 0x00));
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void onReceiveProgress(int currentBytes, int totalBytes, byte[] rx_body)
+    {
+        //
+    }
+
+    @Override
+    public boolean isReceiveMulti()
+    {
+        return (false);
     }
 }
