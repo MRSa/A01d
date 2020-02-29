@@ -136,7 +136,9 @@ public class NikonFocusingControl implements IFocusingControl, IPtpIpCommandCall
             int x = (0x0000ffff & (Math.round(point.x * maxPointLimitWidth) + 1));
             int y = (0x0000ffff & (Math.round(point.y * maxPointLimitHeight) + 1));
             Log.v(TAG, "Lock AF: [" + x + ","+ y + "]");
-            commandPublisher.enqueueCommand(new PtpIpCommandGeneric(this, FOCUS_LOCK, isDumpLog, 0x9205, 8, x, y));
+            commandPublisher.enqueueCommand(new PtpIpCommandGeneric(this, FOCUS_LOCK, isDumpLog, 0, 0x9205, 8, x, y));
+            commandPublisher.enqueueCommand(new PtpIpCommandGeneric(this, FOCUS_MOVE, isDumpLog, 0, 0x90c1));
+
         }
         catch (Exception e)
         {
@@ -222,10 +224,10 @@ public class NikonFocusingControl implements IFocusingControl, IPtpIpCommandCall
             else if (id == FOCUS_MOVE)
             {
                 Log.v(TAG, "FOCUS MOVED");
-                if (preFocusFrameRect != null)
-                {
-                    hideFocusFrame();
-                }
+                //if (preFocusFrameRect != null)
+                //{
+                //    hideFocusFrame();
+                //}
             }
             else // if (id == FOCUS_UNLOCK)
             {
