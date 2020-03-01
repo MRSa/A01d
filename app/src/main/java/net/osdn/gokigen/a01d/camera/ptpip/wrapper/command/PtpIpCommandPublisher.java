@@ -4,6 +4,8 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
+import net.osdn.gokigen.a01d.camera.utils.SimpleLogDumper;
+
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
@@ -472,7 +474,7 @@ public class PtpIpCommandPublisher implements IPtpIpCommandPublisher, IPtpIpComm
             if (read_bytes < 0)
             {
                 // リトライオーバー...
-                Log.v(TAG, " RECEIVE : RETRY OVER......");
+                Log.v(TAG, " RECEIVE : RETRY OVER...... : " + delayMs + "ms x " + command.maxRetryCount());
                 if (command.isRetrySend())
                 {
                     // 要求を再送する場合、、、ダメな場合は受信待ちとする
@@ -480,23 +482,34 @@ public class PtpIpCommandPublisher implements IPtpIpCommandPublisher, IPtpIpComm
                 }
             }
 
-            // 初回データの読み込み
-            read_bytes = is.read(byte_array, 0, receive_message_buffer_size);
-            int target_length = parseDataLength(byte_array, read_bytes);
-            int received_length = read_bytes;
+            boolean read_retry = false;
+            int target_length = 0;
+            int received_length = 0;
 
-            if (target_length <= 0)
+            do
             {
-                // 受信サイズ異常の場合...
-                Log.v(TAG, " WRONG LENGTH. : " + target_length);
-                callback.receivedMessage(id, null);
-                return (false);
-            }
+                // 初回データの読み込み...
+                read_bytes = is.read(byte_array, 0, receive_message_buffer_size);
+                target_length = parseDataLength(byte_array, read_bytes);
+                received_length = read_bytes;
+                if (target_length <= 0)
+                {
+                    // 受信サイズ異常の場合...
+                    if (received_length > 0)
+                    {
+                        SimpleLogDumper.dump_bytes("WRONG DATA : ", Arrays.copyOfRange(byte_array, 0, (Math.min(received_length, 64))));
+                    }
+                    Log.v(TAG, " WRONG LENGTH. : " + target_length + " READ : " + received_length + " bytes.");
+                    callback.receivedMessage(id, null);
+                    return (false);
+                }
+
+            } while (read_retry);
 
             //  一時的な処理
             if (callback != null)
             {
-                Log.v(TAG, "  --- 1st CALL : read_bytes : "+ read_bytes + "(" + received_length + ") : target_length : " + target_length + "  buffer SIZE : " + byte_array.length);
+                Log.v(TAG, "  -=-=-=- 1st CALL : read_bytes : "+ read_bytes + "(" + received_length + ") : target_length : " + target_length + "  buffer SIZE : " + byte_array.length);
                 callback.onReceiveProgress(received_length, target_length, Arrays.copyOfRange(byte_array, 0, received_length));
             }
 
@@ -568,16 +581,26 @@ public class PtpIpCommandPublisher implements IPtpIpCommandPublisher, IPtpIpComm
 
     private int parseDataLength(byte[] byte_array, int read_bytes)
     {
+        int offset = 0;
         int lenlen = 0;
         //int packetType = 0;
         try
         {
-            if ((read_bytes > 20)&&((int) byte_array[4] == 0x09))
+            if (read_bytes > 20)
             {
-                lenlen = ((((int) byte_array[15]) & 0xff) << 24) + ((((int) byte_array[14]) & 0xff) << 16) + ((((int) byte_array[13]) & 0xff) << 8) + (((int) byte_array[12]) & 0xff);
-                //packetType = (((int)byte_array[16]) & 0xff);
+                if ((int) byte_array[offset + 4] == 0x07)
+                {
+                    // 前の応答が入っていると考える...
+                    offset = 14;
+                }
+
+                if (((int) byte_array[offset + 4] == 0x09))
+                {
+                    lenlen = ((((int) byte_array[offset + 15]) & 0xff) << 24) + ((((int) byte_array[offset + 14]) & 0xff) << 16) + ((((int) byte_array[offset + 13]) & 0xff) << 8) + (((int) byte_array[offset + 12]) & 0xff);
+                    //packetType = (((int)byte_array[offset + 16]) & 0xff);
+                }
             }
-            //Log.v(TAG, " --- parseDataLength() length: " + lenlen + " TYPE: " + packetType + " read_bytes: " + read_bytes);
+            //Log.v(TAG, " --- parseDataLength() length: " + lenlen + " TYPE: " + packetType + " read_bytes: " + read_bytes + "  offset : " + offset);
         }
         catch (Exception e)
         {
@@ -624,7 +647,7 @@ public class PtpIpCommandPublisher implements IPtpIpCommandPublisher, IPtpIpComm
                     Log.v(TAG, " <><><> PACKET TYPE : " + packetType + " LENGTH : " + lenlen);
                 }
 */
-                int copyByte = ((lenlen - 12) > (limit - (position + 12))) ? (limit - (position + 12)) : (lenlen - 12);
+                int copyByte =  Math.min((limit - (position + 12)), (lenlen - 12));
                 outputStream.write(byte_array, (position + 12), copyByte);
                 position = position + lenlen;
             }
@@ -648,7 +671,7 @@ public class PtpIpCommandPublisher implements IPtpIpCommandPublisher, IPtpIpComm
             {
                 sleep(delayMs);
                 read_bytes = is.available();
-                if (read_bytes == 0)
+                if (read_bytes <= 0)
                 {
                     if (isLogOutput)
                     {

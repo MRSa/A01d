@@ -19,7 +19,7 @@ public class NikonLiveViewImageReceiver implements IPtpIpCommandCallback
     private int received_total_bytes = 0;
     private int received_remain_bytes = 0;
 
-    private int target_image_size = 0;
+    //private int target_image_size = 0;
     private boolean receivedFirstData = false;
     private ByteArrayOutputStream byteStream;
 
@@ -90,7 +90,8 @@ public class NikonLiveViewImageReceiver implements IPtpIpCommandCallback
             {
                 body_length = rx_body.length;
             }
-            Log.v(TAG, " receivedMessage_multi()  id[" + id + "] size : " + body_length + " target length : " +  target_image_size + " ");
+            Log.v(TAG, " receivedMessage_multi()  id[" + id + "] size : " + body_length + " ");
+            //Log.v(TAG, " receivedMessage_multi()  id[" + id + "] size : " + body_length + " target length : " +  target_image_size + " ");
 
             // end of receive sequence.
             //byte [] thumbnail = byteStream.toByteArray();
@@ -98,12 +99,12 @@ public class NikonLiveViewImageReceiver implements IPtpIpCommandCallback
             //Log.v(TAG, " TransferComplete() RECEIVED  id[" + id + "] size : " + target_image_size + " (" + thumbnail.length + ")");
             //SimpleLogDumper.dump_bytes(" [xxxxx]", Arrays.copyOfRange(thumbnail, 0, (512)));
             //SimpleLogDumper.dump_bytes(" [zzzzz]", Arrays.copyOfRange(thumbnail, (thumbnail.length - 128), (thumbnail.length)));
-            callback.onCompleted(byteStream.toByteArray(), null);
             //callback.onCompleted(rx_body, null);
+            callback.onCompleted(byteStream.toByteArray(), null);
             receivedFirstData = false;
             received_remain_bytes = 0;
             received_total_bytes = 0;
-            target_image_size = 0;
+            //target_image_size = 0;
             byteStream.reset();
         }
         catch (Exception e)
@@ -155,7 +156,8 @@ public class NikonLiveViewImageReceiver implements IPtpIpCommandCallback
             int body_size = (rx_body[data_position] & 0xff) + ((rx_body[data_position + 1] & 0xff) << 8) + ((rx_body[data_position + 2] & 0xff) << 16) + ((rx_body[data_position + 3] & 0xff) << 24);
             if (body_size <= 12)
             {
-                Log.v(TAG, " --- BODY SIZE IS SMALL : " + data_position + " (" + body_size + ") [" + received_remain_bytes + "] " + rx_body.length + "  (" + target_image_size + ")");
+                Log.v(TAG, " ----- BODY SIZE IS SMALL : " + data_position + " (" + body_size + ") [" + received_remain_bytes + "] " + rx_body.length + " ");
+                //Log.v(TAG, " --- BODY SIZE IS SMALL : " + data_position + " (" + body_size + ") [" + received_remain_bytes + "] " + rx_body.length + "  (" + target_image_size + ")");
                 //int startpos = (data_position > 48) ? (data_position - 48) : 0;
                 //SimpleLogDumper.dump_bytes(" [xxx]", Arrays.copyOfRange(rx_body, startpos, (data_position + 48)));
                 break;

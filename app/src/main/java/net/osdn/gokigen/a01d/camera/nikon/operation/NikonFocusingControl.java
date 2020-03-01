@@ -34,7 +34,7 @@ public class NikonFocusingControl implements IFocusingControl, IPtpIpCommandCall
     private float maxPointLimitWidth;
     private float maxPointLimitHeight;
     private RectF preFocusFrameRect = null;
-    private boolean isDumpLog = true;
+    private boolean isDumpLog = false;
 
     public NikonFocusingControl(@NonNull Activity context, @NonNull PtpIpCommandPublisher commandPublisher, IAutoFocusFrameDisplay frameDisplayer, IIndicatorControl indicator)
     {
@@ -251,6 +251,6 @@ public class NikonFocusingControl implements IFocusingControl, IPtpIpCommandCall
     @Override
     public boolean isReceiveMulti()
     {
-        return (true);
+        return (false);
     }
 }

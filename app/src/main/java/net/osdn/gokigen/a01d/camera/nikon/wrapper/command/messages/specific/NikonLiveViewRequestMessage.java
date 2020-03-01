@@ -70,7 +70,7 @@ public class NikonLiveViewRequestMessage extends PtpIpCommandBase
     @Override
     public int maxRetryCount()
     {
-        return (5);
+        return (1);
     }
 
     @Override
