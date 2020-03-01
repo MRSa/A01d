@@ -275,8 +275,11 @@ public class PtpIpCommandPublisher implements IPtpIpCommandPublisher, IPtpIpComm
                         //  コマンドを再送信しない場合はここで抜ける
                         break;
                     }
-                    // 再送信...のために、シーケンス番号を戻す...
-                    sequenceNumber--;
+                    if (!command.isIncrementSequenceNumberToRetry())
+                    {
+                        // 再送信...のために、シーケンス番号を戻す...
+                        sequenceNumber--;
+                    }
                 }
             }
         }
@@ -387,6 +390,7 @@ public class PtpIpCommandPublisher implements IPtpIpCommandPublisher, IPtpIpComm
             if (is == null)
             {
                 Log.v(TAG, " InputStream is NULL... RECEIVE ABORTED.");
+                receivedAllMessage(isDumpReceiveLog, id, null, callback);
                 return (false);
             }
 
@@ -396,6 +400,11 @@ public class PtpIpCommandPublisher implements IPtpIpCommandPublisher, IPtpIpComm
             {
                 // リトライオーバー...
                 Log.v(TAG, " RECEIVE : RETRY OVER...");
+                if (!command.isRetrySend())
+                {
+                    // 再送しない場合には、応答がないことを通知する
+                    receivedAllMessage(isDumpReceiveLog, id, null, callback);
+                }
                 return (true);
             }
 

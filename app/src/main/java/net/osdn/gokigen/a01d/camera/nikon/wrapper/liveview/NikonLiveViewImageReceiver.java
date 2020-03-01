@@ -5,8 +5,10 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import net.osdn.gokigen.a01d.camera.ptpip.wrapper.command.IPtpIpCommandCallback;
 import net.osdn.gokigen.a01d.camera.ptpip.wrapper.liveview.IPtpIpLiveViewImageCallback;
+import net.osdn.gokigen.a01d.camera.utils.SimpleLogDumper;
 
 import java.io.ByteArrayOutputStream;
+import java.util.Arrays;
 
 public class NikonLiveViewImageReceiver implements IPtpIpCommandCallback
 {
@@ -30,12 +32,70 @@ public class NikonLiveViewImageReceiver implements IPtpIpCommandCallback
     @Override
     public void receivedMessage(int id, byte[] rx_body)
     {
+        if (isReceiveMulti())
+        {
+            receivedMessage_multi(id, rx_body);
+        }
+        else
+        {
+            receivedMessage_single(id, rx_body);
+        }
+    }
+
+    @Override
+    public void onReceiveProgress(final int currentBytes, final int totalBytes, byte[] rx_body)
+    {
+        int body_length = 0;
+        if (rx_body != null)
+        {
+            body_length = rx_body.length;
+        }
+        Log.v(TAG, " onReceiveProgress() " + currentBytes + "/" + totalBytes + " LENGTH: " + body_length + " bytes.");
+
+        // 受信したデータから、通信のヘッダ部分を削除する
+        cutHeader(rx_body);
+    }
+
+    private void receivedMessage_single(int id, byte[] rx_body)
+    {
         try
         {
+            if (rx_body != null)
+            {
+                Log.v(TAG, "receivedMessage_single() : " + rx_body.length + " bytes.");
+                if (rx_body.length > 64)
+                {
+                    SimpleLogDumper.dump_bytes(" LV (FIRST) : ", Arrays.copyOfRange(rx_body, 0, 64));
+                    SimpleLogDumper.dump_bytes(" LV (-END-) : ", Arrays.copyOfRange(rx_body, (rx_body.length - 64), rx_body.length));
+                }
+                callback.onCompleted(rx_body, null);
+            }
+            else
+            {
+                Log.v(TAG, "receivedMessage_single() : NULL");
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    private void receivedMessage_multi(int id, byte[] rx_body)
+    {
+        try
+        {
+            int body_length = 0;
+            if (rx_body != null)
+            {
+                body_length = rx_body.length;
+            }
+            Log.v(TAG, " receivedMessage_multi()  id[" + id + "] size : " + body_length + " target length : " +  target_image_size + " ");
+
             // end of receive sequence.
-            byte [] thumbnail = byteStream.toByteArray();
+            //byte [] thumbnail = byteStream.toByteArray();
             //byte [] thumbnail = rx_body;
-            Log.v(TAG, " TransferComplete() RECEIVED  id[" + id + "] size : " + target_image_size + " (" + thumbnail.length + ")");
+            //Log.v(TAG, " TransferComplete() RECEIVED  id[" + id + "] size : " + target_image_size + " (" + thumbnail.length + ")");
             //SimpleLogDumper.dump_bytes(" [xxxxx]", Arrays.copyOfRange(thumbnail, 0, (512)));
             //SimpleLogDumper.dump_bytes(" [zzzzz]", Arrays.copyOfRange(thumbnail, (thumbnail.length - 128), (thumbnail.length)));
             callback.onCompleted(byteStream.toByteArray(), null);
@@ -53,15 +113,6 @@ public class NikonLiveViewImageReceiver implements IPtpIpCommandCallback
                 callback.onErrorOccurred(e);
             }
         }
-    }
-
-    @Override
-    public void onReceiveProgress(final int currentBytes, final int totalBytes, byte[] rx_body)
-    {
-        //Log.v(TAG, " onReceiveProgress() " + currentBytes + "/" + totalBytes);
-
-        // 受信したデータから、通信のヘッダ部分を削除する
-        cutHeader(rx_body);
     }
 
     private void cutHeader(byte[] rx_body)

@@ -73,4 +73,10 @@ public class NikonLiveViewRequestMessage extends PtpIpCommandBase
         return (5);
     }
 
+    @Override
+    public boolean isIncrementSequenceNumberToRetry()
+    {
+        return (true);
+    }
+
 }

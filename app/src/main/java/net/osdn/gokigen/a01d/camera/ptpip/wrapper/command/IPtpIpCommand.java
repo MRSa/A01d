@@ -58,4 +58,8 @@ public interface IPtpIpCommand
 
     // 受信待ち再試行回数
     int maxRetryCount();
+
+    // リトライオーバーで再送するとき、SeqNoをインクリメントするか
+    boolean isIncrementSequenceNumberToRetry();
+
 }

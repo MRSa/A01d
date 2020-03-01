@@ -137,8 +137,7 @@ public class NikonFocusingControl implements IFocusingControl, IPtpIpCommandCall
             int y = (0x0000ffff & (Math.round(point.y * maxPointLimitHeight) + 1));
             Log.v(TAG, "Lock AF: [" + x + ","+ y + "]");
             commandPublisher.enqueueCommand(new PtpIpCommandGeneric(this, FOCUS_LOCK, isDumpLog, 0, 0x9205, 8, x, y));
-            commandPublisher.enqueueCommand(new PtpIpCommandGeneric(this, FOCUS_MOVE, isDumpLog, 0, 0x90c1));
-
+            //commandPublisher.enqueueCommand(new PtpIpCommandGeneric(this, FOCUS_MOVE, isDumpLog, 0, 0x90c1));
         }
         catch (Exception e)
         {
@@ -215,6 +214,7 @@ public class NikonFocusingControl implements IFocusingControl, IPtpIpCommandCall
             if ((id == FOCUS_LOCK)||(id == FOCUS_LOCK_PRE))
             {
                 Log.v(TAG, "FOCUS LOCKED");
+                commandPublisher.enqueueCommand(new PtpIpCommandGeneric(this, FOCUS_MOVE, isDumpLog, 0, 0x90c1));  // OKのときは駆動
                 if (preFocusFrameRect != null)
                 {
                     // showFocusFrame(preFocusFrameRect, IAutoFocusFrameDisplay.FocusFrameStatus.Focused, 1.0);  // 1秒だけ表示
@@ -251,6 +251,6 @@ public class NikonFocusingControl implements IFocusingControl, IPtpIpCommandCall
     @Override
     public boolean isReceiveMulti()
     {
-        return (false);
+        return (true);
     }
 }

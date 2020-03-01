@@ -119,4 +119,11 @@ public class PtpIpCommandBase implements IPtpIpCommand, IPtpIpMessages
     {
         return (20);
     }
+
+    @Override
+    public boolean isIncrementSequenceNumberToRetry()
+    {
+        return (false);
+    }
+
 }

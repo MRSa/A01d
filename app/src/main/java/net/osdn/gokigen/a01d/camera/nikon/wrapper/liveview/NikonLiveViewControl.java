@@ -11,7 +11,6 @@ import net.osdn.gokigen.a01d.camera.ptpip.IPtpIpInterfaceProvider;
 import net.osdn.gokigen.a01d.camera.ptpip.wrapper.command.IPtpIpCommandCallback;
 import net.osdn.gokigen.a01d.camera.ptpip.wrapper.command.IPtpIpCommandPublisher;
 import net.osdn.gokigen.a01d.camera.ptpip.wrapper.command.IPtpIpCommunication;
-import net.osdn.gokigen.a01d.camera.ptpip.wrapper.command.IPtpIpResponseReceiver;
 import net.osdn.gokigen.a01d.camera.ptpip.wrapper.command.PtpIpResponseReceiver;
 import net.osdn.gokigen.a01d.camera.ptpip.wrapper.command.messages.PtpIpCommandGeneric;
 import net.osdn.gokigen.a01d.camera.ptpip.wrapper.liveview.IPtpIpLiveViewImageCallback;
@@ -103,7 +102,7 @@ public class NikonLiveViewControl  implements ILiveViewControl, ILiveViewListene
                             if (!commandIssued)
                             {
                                 commandIssued = true;
-                                commandIssuer.enqueueCommand(new NikonLiveViewRequestMessage(imageReceiver, 90, isDumpLog));
+                                commandIssuer.enqueueCommand(new NikonLiveViewRequestMessage(imageReceiver, 30, isDumpLog));
                             }
                             try
                             {
@@ -185,7 +184,7 @@ public class NikonLiveViewControl  implements ILiveViewControl, ILiveViewListene
                 //Log.v(TAG, "  ---+++--- RECEIVED LV IMAGE ---+++--- : " + data.length + " bytes.");
                 //SimpleLogDumper.dump_bytes(" [LVLV] " + ": ", Arrays.copyOfRange(data, 0, (0 + 512)));
                 //dataReceiver.setImageData(data, metadata);
-                int offset = 384;
+                int offset = searchJpegHeader(data);
                 if (data.length > 8)
                 {
                     dataReceiver.setImageData(Arrays.copyOfRange(data, offset, data.length), metadata);  // ヘッダ部分を切り取って送る
@@ -198,6 +197,32 @@ public class NikonLiveViewControl  implements ILiveViewControl, ILiveViewListene
         }
         commandIssued = false;
     }
+
+    private int searchJpegHeader(byte[] data)
+    {
+        try
+        {
+            int pos = 0;
+
+            // 先頭の 1024bytesまで
+            int limit = (data.length < 1024) ? (data.length - 1): 1024;
+            while (pos < limit)
+            {
+                if ((data[pos] == (byte) 0xff)&&(data[pos + 1] == (byte) 0xd8))
+                {
+
+                    return (pos);
+                }
+                pos++;
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        return (384);
+    }
+
 
     @Override
     public void onErrorOccurred(Exception e)
