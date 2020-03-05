@@ -32,6 +32,7 @@ public class PtpIpCommandPublisher implements IPtpIpCommandPublisher, IPtpIpComm
 
     private boolean isStart = false;
     private boolean isHold = false;
+    private boolean tcpNoDelay;
     private int holdId = 0;
     private Socket socket = null;
     private DataOutputStream dos = null;
@@ -40,10 +41,11 @@ public class PtpIpCommandPublisher implements IPtpIpCommandPublisher, IPtpIpComm
     private Queue<IPtpIpCommand> commandQueue;
     private Queue<IPtpIpCommand> holdCommandQueue;
 
-    public PtpIpCommandPublisher(@NonNull String ip, int portNumber)
+    public PtpIpCommandPublisher(@NonNull String ip, int portNumber, boolean tcpNoDelay)
     {
         this.ipAddress = ip;
         this.portNumber = portNumber;
+        this.tcpNoDelay = tcpNoDelay;
         this.commandQueue = new ArrayDeque<>();
         this.holdCommandQueue = new ArrayDeque<>();
         commandQueue.clear();
@@ -63,6 +65,10 @@ public class PtpIpCommandPublisher implements IPtpIpCommandPublisher, IPtpIpComm
         {
             Log.v(TAG, " connect()");
             socket = new Socket(ipAddress, portNumber);
+            socket.setTcpNoDelay(tcpNoDelay);
+            socket.setKeepAlive(true);
+            //socket.setReceiveBufferSize(32768);
+            //socket.setTrafficClass(0x10);
             return (true);
         }
         catch (Exception e)

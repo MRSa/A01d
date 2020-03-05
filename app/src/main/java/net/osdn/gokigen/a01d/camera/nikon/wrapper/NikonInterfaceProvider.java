@@ -63,8 +63,8 @@ public class NikonInterfaceProvider implements IPtpIpInterfaceProvider, IDisplay
     public NikonInterfaceProvider(@NonNull Activity context, @NonNull ICameraStatusReceiver provider, @NonNull ICameraStatusUpdateNotify statusListener, @NonNull IInformationReceiver informationReceiver)
     {
         this.activity = context;
-        commandPublisher = new PtpIpCommandPublisher(CAMERA_IP, CONTROL_PORT);
-        liveViewControl = new NikonLiveViewControl(context, this, 40);
+        commandPublisher = new PtpIpCommandPublisher(CAMERA_IP, CONTROL_PORT, false);
+        liveViewControl = new NikonLiveViewControl(context, this, 20);
         asyncReceiver = new PtpIpAsyncResponseReceiver(CAMERA_IP, ASYNC_RESPONSE_PORT);
         statusChecker = new NikonStatusChecker(activity, commandPublisher, CAMERA_IP, EVENT_PORT);
         canonConnection = new NikonConnection(context, provider, this, statusChecker);

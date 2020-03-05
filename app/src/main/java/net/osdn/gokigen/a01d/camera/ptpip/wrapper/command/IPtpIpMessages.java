@@ -25,6 +25,9 @@ public interface IPtpIpMessages
     int SEQ_STOP_LIVEVIEW = 20;
     int SEQ_DEVICE_READY = 21;
     int SEQ_AFDRIVE = 22;
+    int SEQ_CHECK_EVENT = 23;
+    int SEQ_GET_DEVICE_PROP1 = 24;
+    int SEQ_GET_DEVICE_PROP2 = 25;
 
     int GET_STORAGE_ID = 101;
     int GET_STORAGE_INFO = 102;

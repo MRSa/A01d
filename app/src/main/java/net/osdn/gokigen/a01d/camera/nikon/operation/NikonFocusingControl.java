@@ -125,7 +125,8 @@ public class NikonFocusingControl implements IFocusingControl, IPtpIpCommandCall
     @Override
     public void halfPressShutter(boolean isPressed)
     {
-        unlockAutoFocus();
+        //unlockAutoFocus();
+        commandPublisher.enqueueCommand(new PtpIpCommandGeneric(this, FOCUS_MOVE, isDumpLog, 0, 0x90c1));
         //lockAutoFocus(new PointF(0.5f, 0.5f));
     }
 
