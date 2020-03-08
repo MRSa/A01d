@@ -79,6 +79,8 @@ public interface IPreferencePropertyAccessor
     String NIKON_FOCUS_XY = "nikon_focus_xy";
     String NIKON_FOCUS_XY_DEFAULT_VALUE = "6000,4000";
 
+    String NIKON_NOT_SUPPORT_FOCUS_LOCK = "nikon_not_support_focus_lock";
+
  /*
     int CHOICE_SPLASH_SCREEN = 10;
 

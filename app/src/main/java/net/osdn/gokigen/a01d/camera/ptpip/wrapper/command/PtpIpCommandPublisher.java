@@ -10,6 +10,7 @@ import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.InputStream;
+import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.util.ArrayDeque;
 import java.util.Arrays;
@@ -33,6 +34,7 @@ public class PtpIpCommandPublisher implements IPtpIpCommandPublisher, IPtpIpComm
     private boolean isStart = false;
     private boolean isHold = false;
     private boolean tcpNoDelay;
+    private boolean waitForever;
     private int holdId = 0;
     private Socket socket = null;
     private DataOutputStream dos = null;
@@ -41,11 +43,12 @@ public class PtpIpCommandPublisher implements IPtpIpCommandPublisher, IPtpIpComm
     private Queue<IPtpIpCommand> commandQueue;
     private Queue<IPtpIpCommand> holdCommandQueue;
 
-    public PtpIpCommandPublisher(@NonNull String ip, int portNumber, boolean tcpNoDelay)
+    public PtpIpCommandPublisher(@NonNull String ip, int portNumber, boolean tcpNoDelay, boolean waitForever)
     {
         this.ipAddress = ip;
         this.portNumber = portNumber;
         this.tcpNoDelay = tcpNoDelay;
+        this.waitForever = waitForever;
         this.commandQueue = new ArrayDeque<>();
         this.holdCommandQueue = new ArrayDeque<>();
         commandQueue.clear();
@@ -64,11 +67,21 @@ public class PtpIpCommandPublisher implements IPtpIpCommandPublisher, IPtpIpComm
         try
         {
             Log.v(TAG, " connect()");
-            socket = new Socket(ipAddress, portNumber);
+            //socket = new Socket(ipAddress, portNumber);
+            socket = new Socket();
             socket.setTcpNoDelay(tcpNoDelay);
-            socket.setKeepAlive(true);
-            //socket.setReceiveBufferSize(32768);
-            //socket.setTrafficClass(0x10);
+            if (tcpNoDelay)
+            {
+                socket.setKeepAlive(false);
+                socket.setPerformancePreferences(0, 1, 0);
+                //socket.setSoLinger(true, 3000);
+                socket.setOOBInline(true);
+                socket.setReuseAddress(false);
+                //socket.setReceiveBufferSize(2097152);
+                //socket.setSendBufferSize(524288);
+                socket.setTrafficClass(0x80);
+            }
+            socket.connect(new InetSocketAddress(ipAddress, portNumber), 0);
             return (true);
         }
         catch (Exception e)
@@ -280,7 +293,11 @@ public class PtpIpCommandPublisher implements IPtpIpCommandPublisher, IPtpIpComm
                 {
                     if (!command.isRetrySend())
                     {
-                        //  コマンドを再送信しない場合はここで抜ける
+                        while (retry_over)
+                        {
+                            //  コマンドを再送信しない場合はここで応答を待つ...
+                            retry_over = receive_from_camera(command);
+                        }
                         break;
                     }
                     if (!command.isIncrementSequenceNumberToRetry())
@@ -376,6 +393,19 @@ public class PtpIpCommandPublisher implements IPtpIpCommandPublisher, IPtpIpComm
         {
             delayMs = COMMAND_SEND_RECEIVE_DURATION_MS;
         }
+
+        try
+        {
+            if (socket != null)
+            {
+                Log.v(TAG, " SOCKET : send " + socket.getSendBufferSize() + "  recv " + socket.getReceiveBufferSize() + " " + socket.getTcpNoDelay() + " " + socket.getOOBInline() + " " + socket.getKeepAlive() + " " + socket.getReuseAddress() + " " + socket.getSoLinger() + " " + socket.getSoTimeout() + " " + socket.getTrafficClass());
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
         if ((callback != null)&&(callback.isReceiveMulti()))
         {
             // 受信したら逐次「受信したよ」と応答するパターン
@@ -685,7 +715,7 @@ public class PtpIpCommandPublisher implements IPtpIpCommandPublisher, IPtpIpComm
                         isLogOutput = false;
                     }
                     retry_count--;
-                    if (retry_count < 0)
+                    if ((!waitForever)&&(retry_count < 0))
                     {
                         return (-1);
                     }

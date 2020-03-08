@@ -34,7 +34,8 @@ public class NikonFocusingControl implements IFocusingControl, IPtpIpCommandCall
     private float maxPointLimitWidth;
     private float maxPointLimitHeight;
     private RectF preFocusFrameRect = null;
-    private boolean isDumpLog = false;
+    private boolean not_support_focus_lock = false;
+    private boolean isDumpLog = true;
 
     public NikonFocusingControl(@NonNull Activity context, @NonNull PtpIpCommandPublisher commandPublisher, IAutoFocusFrameDisplay frameDisplayer, IIndicatorControl indicator)
     {
@@ -57,7 +58,8 @@ public class NikonFocusingControl implements IFocusingControl, IPtpIpCommandCall
                 maxPointLimitWidth = 6000.0f;
                 maxPointLimitHeight = 4000.0f;
             }
-            Log.v(TAG, "FOCUS RESOLUTION : " + maxPointLimitWidth + "," + maxPointLimitHeight);
+            not_support_focus_lock = preferences.getBoolean(IPreferencePropertyAccessor.NIKON_NOT_SUPPORT_FOCUS_LOCK, false);
+            Log.v(TAG, "FOCUS RESOLUTION : " + maxPointLimitWidth + "," + maxPointLimitHeight + " FOCUS LOCK : " + not_support_focus_lock);
         }
         catch (Exception e)
         {
@@ -137,8 +139,11 @@ public class NikonFocusingControl implements IFocusingControl, IPtpIpCommandCall
             int x = (0x0000ffff & (Math.round(point.x * maxPointLimitWidth) + 1));
             int y = (0x0000ffff & (Math.round(point.y * maxPointLimitHeight) + 1));
             Log.v(TAG, "Lock AF: [" + x + ","+ y + "]");
-            commandPublisher.enqueueCommand(new PtpIpCommandGeneric(this, FOCUS_LOCK, isDumpLog, 0, 0x9205, 8, x, y));
-            //commandPublisher.enqueueCommand(new PtpIpCommandGeneric(this, FOCUS_MOVE, isDumpLog, 0, 0x90c1));
+            if (!not_support_focus_lock) {
+                commandPublisher.enqueueCommand(new PtpIpCommandGeneric(this, FOCUS_LOCK, isDumpLog, 0, 0x9205, 8, x, y));
+            } else {
+                commandPublisher.enqueueCommand(new PtpIpCommandGeneric(this, FOCUS_MOVE, isDumpLog, 0, 0x90c1));
+            }
         }
         catch (Exception e)
         {

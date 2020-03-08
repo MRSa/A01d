@@ -199,10 +199,25 @@ public class NikonLiveViewControl  implements ILiveViewControl, ILiveViewListene
         {
             e.printStackTrace();
         }
-        //commandIssuer.enqueueCommand(new PtpIpCommandGeneric(this, SEQ_GET_DEVICE_PROP1, 30, isDumpLog, 0, 0x1015, 4, 0x5007, 0x00, 0x00, 0x00));
-        commandIssuer.enqueueCommand(new PtpIpCommandGeneric(this, SEQ_CHECK_EVENT, 30, isDumpLog, 0, 0x90c7, 0, 0x00, 0x00, 0x00, 0x00));
         commandIssued = false;
+        sendNextMessage();
     }
+
+    private void sendNextMessage()
+    {
+        try
+        {
+            Thread.sleep(delayMs);
+            //commandIssuer.enqueueCommand(new PtpIpCommandGeneric(this, SEQ_GET_DEVICE_PROP1, 30, isDumpLog, 0, 0x1015, 4, 0x5007, 0x00, 0x00, 0x00));
+            //commandIssuer.enqueueCommand(new PtpIpCommandGeneric(this, SEQ_CHECK_EVENT, 30, isDumpLog, 0, 0x90c7, 0, 0x00, 0x00, 0x00, 0x00));
+            commandIssuer.enqueueCommand(new NikonLiveViewRequestMessage(imageReceiver, 35, isDumpLog));
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+
 
     private int searchJpegHeader(byte[] data)
     {

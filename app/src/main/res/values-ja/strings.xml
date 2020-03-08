@@ -256,5 +256,7 @@
     <string name="pref_canon_zoom_resolution">ズームステップ</string>
     <string name="pref_summary_canon_zoom_resolution">ズームを何段階にするか指定します (標準: 25)</string>
 
+    <string name="pref_nikon_not_support_focus_lock">フォーカスロック未対応機</string>
+    <string name="pref_summary_nikon_not_support_focus_lock">フォーカスロックでライブビューが止まる場合にチェックを入れてください。</string>
 
 </resources>

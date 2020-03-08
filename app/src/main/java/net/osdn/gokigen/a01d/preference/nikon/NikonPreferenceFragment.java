@@ -127,6 +127,12 @@ public class NikonPreferenceFragment extends PreferenceFragmentCompat implements
             if (!items.containsKey(IPreferencePropertyAccessor.CONNECTION_METHOD)) {
                 editor.putString(IPreferencePropertyAccessor.CONNECTION_METHOD, IPreferencePropertyAccessor.CONNECTION_METHOD_DEFAULT_VALUE);
             }
+            if (!items.containsKey(IPreferencePropertyAccessor.NIKON_FOCUS_XY)) {
+                editor.putString(IPreferencePropertyAccessor.NIKON_FOCUS_XY, IPreferencePropertyAccessor.NIKON_FOCUS_XY_DEFAULT_VALUE);
+            }
+            if (!items.containsKey(IPreferencePropertyAccessor.NIKON_NOT_SUPPORT_FOCUS_LOCK)) {
+                editor.putBoolean(IPreferencePropertyAccessor.NIKON_NOT_SUPPORT_FOCUS_LOCK, false);
+            }
             editor.apply();
         }
         catch (Exception e)
@@ -158,6 +164,11 @@ public class NikonPreferenceFragment extends PreferenceFragmentCompat implements
                     Log.v(TAG, " " + key + " , " + value);
                     break;
 
+                case IPreferencePropertyAccessor.NIKON_NOT_SUPPORT_FOCUS_LOCK:
+                    value = preferences.getBoolean(key, false);
+                    Log.v(TAG, " " + key + " , " + value);
+                    break;
+
                 default:
                     String strValue = preferences.getString(key, "");
                     setListPreference(key, key, strValue);
@@ -177,7 +188,7 @@ public class NikonPreferenceFragment extends PreferenceFragmentCompat implements
         try
         {
             //super.onCreate(savedInstanceState);
-            addPreferencesFromResource(R.xml.preferences_olympuspen);
+            addPreferencesFromResource(R.xml.preferences_nikon);
 
             ListPreference connectionMethod = findPreference(IPreferencePropertyAccessor.CONNECTION_METHOD);
             connectionMethod.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
@@ -313,6 +324,7 @@ public class NikonPreferenceFragment extends PreferenceFragmentCompat implements
                         // Preferenceの画面に反映させる
                         setBooleanPreference(IPreferencePropertyAccessor.AUTO_CONNECT_TO_CAMERA, IPreferencePropertyAccessor.AUTO_CONNECT_TO_CAMERA, defaultValue);
                         setBooleanPreference(IPreferencePropertyAccessor.CAPTURE_BOTH_CAMERA_AND_LIVE_VIEW, IPreferencePropertyAccessor.CAPTURE_BOTH_CAMERA_AND_LIVE_VIEW, defaultValue);
+                        setBooleanPreference(IPreferencePropertyAccessor.NIKON_NOT_SUPPORT_FOCUS_LOCK, IPreferencePropertyAccessor.NIKON_NOT_SUPPORT_FOCUS_LOCK, false);
                     }
                     catch (Exception e)
                     {

@@ -63,7 +63,7 @@ public class CanonInterfaceProvider implements IPtpIpInterfaceProvider, IDisplay
     public CanonInterfaceProvider(@NonNull Activity context, @NonNull ICameraStatusReceiver provider, @NonNull ICameraStatusUpdateNotify statusListener, @NonNull IInformationReceiver informationReceiver)
     {
         this.activity = context;
-        commandPublisher = new PtpIpCommandPublisher(CAMERA_IP, CONTROL_PORT, false);
+        commandPublisher = new PtpIpCommandPublisher(CAMERA_IP, CONTROL_PORT, false, false);
         liveViewControl = new CanonLiveViewControl(context, this, 10);  //
         asyncReceiver = new PtpIpAsyncResponseReceiver(CAMERA_IP, ASYNC_RESPONSE_PORT);
         statusChecker = new CanonStatusChecker(context, commandPublisher, CAMERA_IP, EVENT_PORT);

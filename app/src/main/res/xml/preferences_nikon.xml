@@ -32,6 +32,11 @@
             android:summary="@string/pref_summary_nikon_focus_xy" />
 
         <CheckBoxPreference
+            android:key="nikon_not_support_focus_lock"
+            android:title="@string/pref_nikon_not_support_focus_lock"
+            android:summary="@string/pref_summary_nikon_not_support_focus_lock" />
+
+        <CheckBoxPreference
             android:key="capture_both_camera_and_live_view"
             android:title="@string/pref_capture_both_camera_and_live_view" />
 
