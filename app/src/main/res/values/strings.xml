@@ -246,6 +246,10 @@
     <string name="canon_connect_connecting11">Connecting&#8230;(11/12)</string>
     <string name="canon_connect_connecting12">Connecting&#8230;(12/12)</string>
 
+    <string name="nikon_connect_connecting1">Connecting&#8230;(1/5)</string>
+    <string name="nikon_connect_connecting2">Connecting&#8230;(2/5)</string>
+    <string name="nikon_connect_connecting3">Connecting&#8230;(3/5)</string>
+
     <string name="connect_error_message">CONNECTION ERROR</string>
 
     <string name="connect_error_message_olympus">CONNECTION ERROR (OLYMPUS)</string>

@@ -73,13 +73,13 @@ public class PtpIpCommandPublisher implements IPtpIpCommandPublisher, IPtpIpComm
             if (tcpNoDelay)
             {
                 socket.setKeepAlive(false);
-                socket.setPerformancePreferences(0, 1, 0);
-                //socket.setSoLinger(true, 3000);
+                socket.setPerformancePreferences(0, 2, 0);
                 socket.setOOBInline(true);
                 socket.setReuseAddress(false);
+                socket.setTrafficClass(0x80);
+                //socket.setSoLinger(true, 3000);
                 //socket.setReceiveBufferSize(2097152);
                 //socket.setSendBufferSize(524288);
-                socket.setTrafficClass(0x80);
             }
             socket.connect(new InetSocketAddress(ipAddress, portNumber), 0);
             return (true);
@@ -393,7 +393,7 @@ public class PtpIpCommandPublisher implements IPtpIpCommandPublisher, IPtpIpComm
         {
             delayMs = COMMAND_SEND_RECEIVE_DURATION_MS;
         }
-
+/*
         try
         {
             if (socket != null)
@@ -405,6 +405,7 @@ public class PtpIpCommandPublisher implements IPtpIpCommandPublisher, IPtpIpComm
         {
             e.printStackTrace();
         }
+*/
 
         if ((callback != null)&&(callback.isReceiveMulti()))
         {
@@ -518,11 +519,11 @@ public class PtpIpCommandPublisher implements IPtpIpCommandPublisher, IPtpIpComm
                 }
             }
 
-            boolean read_retry = false;
-            int target_length = 0;
-            int received_length = 0;
+            int target_length;
+            int received_length;
 
-            do
+            //boolean read_retry = false;
+            //do
             {
                 // 初回データの読み込み...
                 read_bytes = is.read(byte_array, 0, receive_message_buffer_size);
@@ -540,7 +541,7 @@ public class PtpIpCommandPublisher implements IPtpIpCommandPublisher, IPtpIpComm
                     return (false);
                 }
 
-            } while (read_retry);
+            } //while (read_retry);
 
             //  一時的な処理
             if (callback != null)

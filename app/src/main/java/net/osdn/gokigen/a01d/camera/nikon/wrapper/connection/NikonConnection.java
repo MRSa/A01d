@@ -212,7 +212,7 @@ public class NikonConnection implements ICameraConnection
      */
     private void disconnectFromCamera(final boolean powerOff)
     {
-        Log.v(TAG, " disconnectFromCamera()");
+        Log.v(TAG, " disconnectFromCamera() : " + powerOff);
         try
         {
             cameraExecutor.execute(disconnectSequence);

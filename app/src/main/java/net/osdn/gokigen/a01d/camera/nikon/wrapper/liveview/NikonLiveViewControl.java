@@ -14,7 +14,6 @@ import net.osdn.gokigen.a01d.camera.ptpip.wrapper.command.IPtpIpCommunication;
 import net.osdn.gokigen.a01d.camera.ptpip.wrapper.command.PtpIpResponseReceiver;
 import net.osdn.gokigen.a01d.camera.ptpip.wrapper.command.messages.PtpIpCommandGeneric;
 import net.osdn.gokigen.a01d.camera.ptpip.wrapper.liveview.IPtpIpLiveViewImageCallback;
-import net.osdn.gokigen.a01d.camera.utils.SimpleLogDumper;
 import net.osdn.gokigen.a01d.liveview.liveviewlistener.IImageDataReceiver;
 import net.osdn.gokigen.a01d.liveview.liveviewlistener.ILiveViewListener;
 
@@ -37,7 +36,7 @@ public class NikonLiveViewControl  implements ILiveViewControl, ILiveViewListene
     private NikonLiveViewImageReceiver imageReceiver;
     private IImageDataReceiver dataReceiver = null;
     private boolean liveViewIsReceiving = false;
-    private boolean commandIssued = false;
+    //private boolean commandIssued = false;
     private boolean isDumpLog = false;
 
     public NikonLiveViewControl(@NonNull Activity context, @NonNull IPtpIpInterfaceProvider interfaceProvider, int delayMs)
@@ -64,7 +63,7 @@ public class NikonLiveViewControl  implements ILiveViewControl, ILiveViewListene
         Log.v(TAG, " startLiveView() ");
         try
         {
-            commandIssuer.enqueueCommand(new PtpIpCommandGeneric(this, SEQ_START_LIVEVIEW, 30, isDumpLog, 0, 0x9201, 0, 0x00, 0x00, 0x00, 0x00));
+            commandIssuer.enqueueCommand(new PtpIpCommandGeneric(this, SEQ_START_LIVEVIEW, delayMs, isDumpLog, 0, 0x9201, 0, 0x00, 0x00, 0x00, 0x00));
         }
         catch (Exception e)
         {
@@ -81,7 +80,7 @@ public class NikonLiveViewControl  implements ILiveViewControl, ILiveViewListene
             if (liveViewIsReceiving)
             {
                 liveViewIsReceiving = false;
-                commandIssuer.enqueueCommand(new PtpIpCommandGeneric(new PtpIpResponseReceiver(null), SEQ_STOP_LIVEVIEW, 30, isDumpLog, 0, 0x9202, 0, 0x00, 0x00, 0x00, 0x00));
+                commandIssuer.enqueueCommand(new PtpIpCommandGeneric(new PtpIpResponseReceiver(null), SEQ_STOP_LIVEVIEW, delayMs, isDumpLog, 0, 0x9202, 0, 0x00, 0x00, 0x00, 0x00));
             }
         }
         catch (Exception e)
@@ -90,6 +89,7 @@ public class NikonLiveViewControl  implements ILiveViewControl, ILiveViewListene
         }
     }
 
+/*
     private void startLiveviewImpl()
     {
         liveViewIsReceiving = true;
@@ -131,6 +131,7 @@ public class NikonLiveViewControl  implements ILiveViewControl, ILiveViewListene
             e.printStackTrace();
         }
     }
+*/
 
     @Override
     public void updateDigitalZoom()
@@ -199,7 +200,7 @@ public class NikonLiveViewControl  implements ILiveViewControl, ILiveViewListene
         {
             e.printStackTrace();
         }
-        commandIssued = false;
+        //commandIssued = false;
         sendNextMessage();
     }
 
@@ -210,7 +211,7 @@ public class NikonLiveViewControl  implements ILiveViewControl, ILiveViewListene
             Thread.sleep(delayMs);
             //commandIssuer.enqueueCommand(new PtpIpCommandGeneric(this, SEQ_GET_DEVICE_PROP1, 30, isDumpLog, 0, 0x1015, 4, 0x5007, 0x00, 0x00, 0x00));
             //commandIssuer.enqueueCommand(new PtpIpCommandGeneric(this, SEQ_CHECK_EVENT, 30, isDumpLog, 0, 0x90c7, 0, 0x00, 0x00, 0x00, 0x00));
-            commandIssuer.enqueueCommand(new NikonLiveViewRequestMessage(imageReceiver, 35, isDumpLog));
+            commandIssuer.enqueueCommand(new NikonLiveViewRequestMessage(imageReceiver, delayMs, isDumpLog));
         }
         catch (Exception e)
         {
@@ -249,7 +250,7 @@ public class NikonLiveViewControl  implements ILiveViewControl, ILiveViewListene
     public void onErrorOccurred(Exception e)
     {
         Log.v(TAG, " onErrorOccurred () : " + e.getLocalizedMessage());
-        commandIssued = false;
+        //commandIssued = false;
     }
 
     @Override
@@ -285,29 +286,29 @@ public class NikonLiveViewControl  implements ILiveViewControl, ILiveViewListene
             Log.v(TAG, String.format(" ----- OK REPLY (ID : %d) ----- ", id));
             if (id == SEQ_START_LIVEVIEW)
             {
-                commandIssuer.enqueueCommand(new PtpIpCommandGeneric(this, SEQ_DEVICE_READY, 30, isDumpLog, 0, 0x90c8, 0, 0x00, 0x00, 0x00, 0x00));
+                commandIssuer.enqueueCommand(new PtpIpCommandGeneric(this, SEQ_DEVICE_READY, delayMs, isDumpLog, 0, 0x90c8, 0, 0x00, 0x00, 0x00, 0x00));
             }
             else if (id == SEQ_DEVICE_READY)
             {
-                commandIssuer.enqueueCommand(new PtpIpCommandGeneric(this, SEQ_AFDRIVE, 30, isDumpLog, 0, 0x90c1, 0, 0x00, 0x00, 0x00, 0x00));
+                commandIssuer.enqueueCommand(new PtpIpCommandGeneric(this, SEQ_AFDRIVE, delayMs, isDumpLog, 0, 0x90c1, 0, 0x00, 0x00, 0x00, 0x00));
             }
             else if (id == SEQ_CHECK_EVENT)
             {
-                commandIssuer.enqueueCommand(new NikonLiveViewRequestMessage(imageReceiver, 35, isDumpLog));
+                commandIssuer.enqueueCommand(new NikonLiveViewRequestMessage(imageReceiver, delayMs, isDumpLog));
             }
             else if (id == SEQ_GET_DEVICE_PROP1)
             {
-                commandIssuer.enqueueCommand(new PtpIpCommandGeneric(this, SEQ_GET_DEVICE_PROP2, 30, isDumpLog, 0, 0x1015, 4, 0xd100, 0x00, 0x00, 0x00));
+                commandIssuer.enqueueCommand(new PtpIpCommandGeneric(this, SEQ_GET_DEVICE_PROP2, delayMs, isDumpLog, 0, 0x1015, 4, 0xd100, 0x00, 0x00, 0x00));
             }
             else if (id == SEQ_GET_DEVICE_PROP2)
             {
-                commandIssuer.enqueueCommand(new NikonLiveViewRequestMessage(imageReceiver, 35, isDumpLog));
+                commandIssuer.enqueueCommand(new NikonLiveViewRequestMessage(imageReceiver, delayMs, isDumpLog));
             }
             else  // SEQ_AFDRIVE
             {
                 // ライブビューの開始。
                 //startLiveviewImpl();
-                commandIssuer.enqueueCommand(new NikonLiveViewRequestMessage(imageReceiver, 80, isDumpLog));
+                commandIssuer.enqueueCommand(new NikonLiveViewRequestMessage(imageReceiver, delayMs, isDumpLog));
             }
         }
         catch (Exception e)
@@ -335,27 +336,27 @@ public class NikonLiveViewControl  implements ILiveViewControl, ILiveViewListene
             waitSleep();
             if (id == SEQ_START_LIVEVIEW)
             {
-                commandIssuer.enqueueCommand(new PtpIpCommandGeneric(this, SEQ_START_LIVEVIEW, 30, isDumpLog, 0, 0x9201, 0, 0x00, 0x00, 0x00, 0x00));
+                commandIssuer.enqueueCommand(new PtpIpCommandGeneric(this, SEQ_START_LIVEVIEW, delayMs, isDumpLog, 0, 0x9201, 0, 0x00, 0x00, 0x00, 0x00));
             }
             else if (id == SEQ_DEVICE_READY)
             {
-                commandIssuer.enqueueCommand(new PtpIpCommandGeneric(this, SEQ_DEVICE_READY, 30, isDumpLog, 0, 0x90c8, 0, 0x00, 0x00, 0x00, 0x00));
+                commandIssuer.enqueueCommand(new PtpIpCommandGeneric(this, SEQ_DEVICE_READY, delayMs, isDumpLog, 0, 0x90c8, 0, 0x00, 0x00, 0x00, 0x00));
             }
             else if (id == SEQ_CHECK_EVENT)
             {
-                commandIssuer.enqueueCommand(new PtpIpCommandGeneric(this, SEQ_CHECK_EVENT, 30, isDumpLog, 0, 0x90c7, 0, 0x00, 0x00, 0x00, 0x00));
+                commandIssuer.enqueueCommand(new PtpIpCommandGeneric(this, SEQ_CHECK_EVENT, delayMs, isDumpLog, 0, 0x90c7, 0, 0x00, 0x00, 0x00, 0x00));
             }
             else if (id == SEQ_GET_DEVICE_PROP1)
             {
-                commandIssuer.enqueueCommand(new PtpIpCommandGeneric(this, SEQ_GET_DEVICE_PROP1, 30, isDumpLog, 0, 0x5007, 4, 0x5007, 0x00, 0x00, 0x00));
+                commandIssuer.enqueueCommand(new PtpIpCommandGeneric(this, SEQ_GET_DEVICE_PROP1, delayMs, isDumpLog, 0, 0x5007, 4, 0x5007, 0x00, 0x00, 0x00));
             }
             else if (id == SEQ_GET_DEVICE_PROP2)
             {
-                commandIssuer.enqueueCommand(new PtpIpCommandGeneric(this, SEQ_GET_DEVICE_PROP2, 30, isDumpLog, 0, 0x1015, 4, 0xd100, 0x00, 0x00, 0x00));
+                commandIssuer.enqueueCommand(new PtpIpCommandGeneric(this, SEQ_GET_DEVICE_PROP2, delayMs, isDumpLog, 0, 0x1015, 4, 0xd100, 0x00, 0x00, 0x00));
             }
             else
             {
-                commandIssuer.enqueueCommand(new PtpIpCommandGeneric(this, SEQ_AFDRIVE, 30, isDumpLog, 0, 0x90c1, 0, 0x00, 0x00, 0x00, 0x00));
+                commandIssuer.enqueueCommand(new PtpIpCommandGeneric(this, SEQ_AFDRIVE, delayMs, isDumpLog, 0, 0x90c1, 0, 0x00, 0x00, 0x00, 0x00));
             }
         }
         catch (Exception e)

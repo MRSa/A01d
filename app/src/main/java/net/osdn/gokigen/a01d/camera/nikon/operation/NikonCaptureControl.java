@@ -19,7 +19,6 @@ public class NikonCaptureControl implements ICaptureControl, IPtpIpCommandCallba
     private final String TAG = this.toString();
     private final PtpIpCommandPublisher commandPublisher;
     //private final IAutoFocusFrameDisplay frameDisplayer;
-    private boolean isDumpLog = false;
 
     public NikonCaptureControl(@NonNull PtpIpCommandPublisher commandPublisher, IAutoFocusFrameDisplay frameDisplayer)
     {
@@ -30,6 +29,7 @@ public class NikonCaptureControl implements ICaptureControl, IPtpIpCommandCallba
     @Override
     public void doCapture(int kind)
     {
+        boolean isDumpLog = false;
         try
         {
             // シャッター
