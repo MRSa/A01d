@@ -196,60 +196,74 @@ public class PreferenceFragment extends PreferenceFragmentCompat implements Shar
             sizeTable.put("QUAD_VGA", "(1280x960)");
 
             ListPreference liveViewQuality = (ListPreference) findPreference(IPreferencePropertyAccessor.LIVE_VIEW_QUALITY);
-            liveViewQuality.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
-                @Override
-                public boolean onPreferenceChange(Preference preference, Object newValue) {
-                    String key = (String) newValue;
-                    preference.setSummary(newValue + " " + sizeTable.get(key));
-                    return (true);
-                }
-            });
-            liveViewQuality.setSummary(liveViewQuality.getValue() + " " + sizeTable.get(liveViewQuality.getValue()));
+            if (liveViewQuality != null)
+            {
+                liveViewQuality.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+                    @Override
+                    public boolean onPreferenceChange(Preference preference, Object newValue) {
+                        String key = (String) newValue;
+                        preference.setSummary(newValue + " " + sizeTable.get(key));
+                        return (true);
+                    }
+                });
+                liveViewQuality.setSummary(liveViewQuality.getValue() + " " + sizeTable.get(liveViewQuality.getValue()));
+            }
 
             ListPreference liveViewScale = (ListPreference) findPreference(IPreferencePropertyAccessor.MAGNIFYING_LIVE_VIEW_SCALE);
-            liveViewScale.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
-                @Override
-                public boolean onPreferenceChange(Preference preference, Object newValue) {
-                    preference.setSummary(newValue + " ");
-                    return (true);
-                }
-            });
-            liveViewScale.setSummary(liveViewScale.getValue() + " ");
+            if (liveViewScale != null)
+            {
+                liveViewScale.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+                    @Override
+                    public boolean onPreferenceChange(Preference preference, Object newValue) {
+                        preference.setSummary(newValue + " ");
+                        return (true);
+                    }
+                });
+                liveViewScale.setSummary(liveViewScale.getValue() + " ");
+            }
 
             ListPreference digitalZoom = (ListPreference) findPreference(IPreferencePropertyAccessor.DIGITAL_ZOOM_LEVEL);
-            digitalZoom.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
-                @Override
-                public boolean onPreferenceChange(Preference preference, Object newValue) {
-                    preference.setSummary(newValue + " ");
-                    return (true);
-                }
-            });
-            digitalZoom.setSummary(digitalZoom.getValue() + " ");
+            if (digitalZoom != null)
+            {
+                digitalZoom.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+                    @Override
+                    public boolean onPreferenceChange(Preference preference, Object newValue) {
+                        preference.setSummary(newValue + " ");
+                        return (true);
+                    }
+                });
+                digitalZoom.setSummary(digitalZoom.getValue() + " ");
+            }
 
             ListPreference powerZoom = (ListPreference) findPreference(IPreferencePropertyAccessor.POWER_ZOOM_LEVEL);
-            powerZoom.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
-                @Override
-                public boolean onPreferenceChange(Preference preference, Object newValue) {
-                    preference.setSummary(newValue + " ");
-                    return (true);
-                }
-            });
-            powerZoom.setSummary(powerZoom.getValue() + " ");
+            if (powerZoom != null)
+            {
+                powerZoom.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+                    @Override
+                    public boolean onPreferenceChange(Preference preference, Object newValue) {
+                        preference.setSummary(newValue + " ");
+                        return (true);
+                    }
+                });
+                powerZoom.setSummary(powerZoom.getValue() + " ");
+            }
 
             ListPreference connectionMethod = (ListPreference) findPreference(IPreferencePropertyAccessor.CONNECTION_METHOD);
-            connectionMethod.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
-                @Override
-                public boolean onPreferenceChange(Preference preference, Object newValue) {
-                    preference.setSummary(newValue + " ");
-                    return (true);
-                }
-            });
-            connectionMethod.setSummary(connectionMethod.getValue() + " ");
-
+            if (connectionMethod != null)
+            {
+                connectionMethod.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+                    @Override
+                    public boolean onPreferenceChange(Preference preference, Object newValue) {
+                        preference.setSummary(newValue + " ");
+                        return (true);
+                    }
+                });
+                connectionMethod.setSummary(connectionMethod.getValue() + " ");
+            }
             findPreference("exit_application").setOnPreferenceClickListener(powerOffController);
             findPreference("olympus_air_bt").setOnPreferenceClickListener(powerOnSelector);
-            findPreference("debug_info").setOnPreferenceClickListener(logCatViewer);
-            findPreference(WIFI_SETTINGS).setOnPreferenceClickListener(this);
+            //findPreference("debug_info").setOnPreferenceClickListener(logCatViewer);
+            //findPreference(WIFI_SETTINGS).setOnPreferenceClickListener(this);
         }
         catch (Exception e)
         {
@@ -415,7 +429,7 @@ public class PreferenceFragment extends PreferenceFragmentCompat implements Shar
 
                 case IPreferencePropertyAccessor.CAPTURE_BOTH_CAMERA_AND_LIVE_VIEW:
                     value = preferences.getBoolean(key, true);
-                    Log.v(TAG, " " + key + " , " + value);
+                    Log.v(TAG, "  " + key + " , " + value);
                     break;
 
                 default:

@@ -19,11 +19,11 @@ import androidx.preference.PreferenceManager;
 import net.osdn.gokigen.a01d.IChangeScene;
 import net.osdn.gokigen.a01d.R;
 import net.osdn.gokigen.a01d.camera.olympuspen.operation.OlympusPenCameraPowerOff;
-import net.osdn.gokigen.a01d.logcat.LogCatViewer;
 import net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor;
 
 import java.util.Map;
 
+import static net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor.EXIT_APPLICATION;
 import static net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor.WIFI_SETTINGS;
 
 /**
@@ -36,8 +36,6 @@ public class OlympusPreferenceFragment extends PreferenceFragmentCompat implemen
     private AppCompatActivity context = null;
     private SharedPreferences preferences = null;
     private OlympusPenCameraPowerOff powerOffController = null;
-    private LogCatViewer logCatViewer = null;
-    //private PanasonicCameraApiListViewer cameraApiListViewer = null;
 
     /**
      *
@@ -67,12 +65,6 @@ public class OlympusPreferenceFragment extends PreferenceFragmentCompat implemen
         {
             powerOffController = new OlympusPenCameraPowerOff(context, changeScene);
             powerOffController.prepare();
-
-            logCatViewer = new LogCatViewer(changeScene);
-            logCatViewer.prepare();
-
-            //cameraApiListViewer = new PanasonicCameraApiListViewer(changeScene);
-            //cameraApiListViewer.prepare();
 
             this.context = context;
         }
@@ -119,13 +111,16 @@ public class OlympusPreferenceFragment extends PreferenceFragmentCompat implemen
             Map<String, ?> items = preferences.getAll();
             SharedPreferences.Editor editor = preferences.edit();
 
-            if (!items.containsKey(IPreferencePropertyAccessor.AUTO_CONNECT_TO_CAMERA)) {
+            if (!items.containsKey(IPreferencePropertyAccessor.AUTO_CONNECT_TO_CAMERA))
+            {
                 editor.putBoolean(IPreferencePropertyAccessor.AUTO_CONNECT_TO_CAMERA, true);
             }
-            if (!items.containsKey(IPreferencePropertyAccessor.CAPTURE_BOTH_CAMERA_AND_LIVE_VIEW)) {
+            if (!items.containsKey(IPreferencePropertyAccessor.CAPTURE_BOTH_CAMERA_AND_LIVE_VIEW))
+            {
                 editor.putBoolean(IPreferencePropertyAccessor.CAPTURE_BOTH_CAMERA_AND_LIVE_VIEW, true);
             }
-            if (!items.containsKey(IPreferencePropertyAccessor.CONNECTION_METHOD)) {
+            if (!items.containsKey(IPreferencePropertyAccessor.CONNECTION_METHOD))
+            {
                 editor.putString(IPreferencePropertyAccessor.CONNECTION_METHOD, IPreferencePropertyAccessor.CONNECTION_METHOD_DEFAULT_VALUE);
             }
             editor.apply();
@@ -156,7 +151,7 @@ public class OlympusPreferenceFragment extends PreferenceFragmentCompat implemen
 
                 case IPreferencePropertyAccessor.CAPTURE_BOTH_CAMERA_AND_LIVE_VIEW:
                     value = preferences.getBoolean(key, true);
-                    Log.v(TAG, " " + key + " , " + value);
+                    Log.v(TAG, "  " + key + " , " + value);
                     break;
 
                 default:
@@ -181,19 +176,23 @@ public class OlympusPreferenceFragment extends PreferenceFragmentCompat implemen
             addPreferencesFromResource(R.xml.preferences_olympuspen);
 
             ListPreference connectionMethod = findPreference(IPreferencePropertyAccessor.CONNECTION_METHOD);
-            connectionMethod.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
-                @Override
-                public boolean onPreferenceChange(Preference preference, Object newValue) {
-                    preference.setSummary(newValue + " ");
-                    return (true);
-                }
-            });
-            connectionMethod.setSummary(connectionMethod.getValue() + " ");
+            if (connectionMethod != null)
+            {
+                connectionMethod.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+                    @Override
+                    public boolean onPreferenceChange(Preference preference, Object newValue) {
+                        preference.setSummary(newValue + " ");
+                        return (true);
+                    }
+                });
+                connectionMethod.setSummary(connectionMethod.getValue() + " ");
+            }
 
-            findPreference("exit_application").setOnPreferenceClickListener(powerOffController);
-            findPreference("debug_info").setOnPreferenceClickListener(logCatViewer);
-            //findPreference("panasonic_api_list").setOnPreferenceClickListener(cameraApiListViewer);
-            findPreference(WIFI_SETTINGS).setOnPreferenceClickListener(this);
+            Preference exitApplication = findPreference(EXIT_APPLICATION);
+            if (exitApplication != null)
+            {
+                exitApplication.setOnPreferenceClickListener(powerOffController);
+            }
         }
         catch (Exception e)
         {
@@ -209,8 +208,8 @@ public class OlympusPreferenceFragment extends PreferenceFragmentCompat implemen
     public void onResume()
     {
         super.onResume();
-        Log.v(TAG, "onResume() Start");
 
+        Log.v(TAG, "onResume() Start");
         try
         {
             synchronizedProperty();
@@ -219,9 +218,7 @@ public class OlympusPreferenceFragment extends PreferenceFragmentCompat implemen
         {
             e.printStackTrace();
         }
-
         Log.v(TAG, "onResume() End");
-
     }
 
     /**
@@ -258,9 +255,8 @@ public class OlympusPreferenceFragment extends PreferenceFragmentCompat implemen
     {
         try
         {
-            ListPreference pref;
-            pref = (ListPreference) findPreference(pref_key);
             String value = preferences.getString(key, defaultValue);
+            ListPreference pref = findPreference(pref_key);
             if (pref != null)
             {
                 pref.setValue(value);
@@ -285,7 +281,8 @@ public class OlympusPreferenceFragment extends PreferenceFragmentCompat implemen
         try
         {
             CheckBoxPreference pref = findPreference(pref_key);
-            if (pref != null) {
+            if (pref != null)
+            {
                 boolean value = preferences.getBoolean(key, defaultValue);
                 pref.setChecked(value);
             }

@@ -11,7 +11,6 @@ import net.osdn.gokigen.a01d.IChangeScene;
 import net.osdn.gokigen.a01d.R;
 import net.osdn.gokigen.a01d.camera.sony.cameraproperty.SonyCameraApiListViewer;
 import net.osdn.gokigen.a01d.camera.sony.operation.CameraPowerOffSony;
-import net.osdn.gokigen.a01d.logcat.LogCatViewer;
 import net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor;
 
 import java.util.Map;
@@ -25,6 +24,7 @@ import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.PreferenceManager;
 
+import static net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor.EXIT_APPLICATION;
 import static net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor.WIFI_SETTINGS;
 
 /**
@@ -37,7 +37,6 @@ public class SonyPreferenceFragment  extends PreferenceFragmentCompat implements
     private AppCompatActivity context = null;
     private SharedPreferences preferences = null;
     private CameraPowerOffSony powerOffController = null;
-    private LogCatViewer logCatViewer = null;
     private SonyCameraApiListViewer cameraApiListViewer = null;
 
     /**
@@ -70,9 +69,6 @@ public class SonyPreferenceFragment  extends PreferenceFragmentCompat implements
             powerOffController = new CameraPowerOffSony(context, changeScene);
             powerOffController.prepare();
 
-            logCatViewer = new LogCatViewer(changeScene);
-            logCatViewer.prepare();
-
             cameraApiListViewer = new SonyCameraApiListViewer(changeScene);
             cameraApiListViewer.prepare();
 
@@ -89,7 +85,7 @@ public class SonyPreferenceFragment  extends PreferenceFragmentCompat implements
      *
      */
     @Override
-    public void onAttach(Context activity)
+    public void onAttach(@NonNull Context activity)
     {
         super.onAttach(activity);
         Log.v(TAG, "onAttach()");
@@ -153,7 +149,7 @@ public class SonyPreferenceFragment  extends PreferenceFragmentCompat implements
             {
                 case IPreferencePropertyAccessor.AUTO_CONNECT_TO_CAMERA:
                     value = preferences.getBoolean(key, true);
-                    Log.v(TAG, " " + key + " , " + value);
+                    Log.v(TAG, "  " + key + " , " + value);
                     break;
 
                 case IPreferencePropertyAccessor.CAPTURE_BOTH_CAMERA_AND_LIVE_VIEW:
@@ -182,20 +178,30 @@ public class SonyPreferenceFragment  extends PreferenceFragmentCompat implements
             //super.onCreate(savedInstanceState);
             addPreferencesFromResource(R.xml.preferences_sony);
 
-            ListPreference connectionMethod = (ListPreference) findPreference(IPreferencePropertyAccessor.CONNECTION_METHOD);
-            connectionMethod.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
-                @Override
-                public boolean onPreferenceChange(Preference preference, Object newValue) {
-                    preference.setSummary(newValue + " ");
-                    return (true);
-                }
-            });
-            connectionMethod.setSummary(connectionMethod.getValue() + " ");
+            ListPreference connectionMethod = findPreference(IPreferencePropertyAccessor.CONNECTION_METHOD);
+            if (connectionMethod != null)
+            {
+                connectionMethod.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+                    @Override
+                    public boolean onPreferenceChange(Preference preference, Object newValue) {
+                        preference.setSummary(newValue + " ");
+                        return (true);
+                    }
+                });
+                connectionMethod.setSummary(connectionMethod.getValue() + " ");
+            }
 
-            findPreference("exit_application").setOnPreferenceClickListener(powerOffController);
-            findPreference("debug_info").setOnPreferenceClickListener(logCatViewer);
-            findPreference("sony_api_list").setOnPreferenceClickListener(cameraApiListViewer);
-            findPreference(WIFI_SETTINGS).setOnPreferenceClickListener(this);
+            Preference extApplication = findPreference(EXIT_APPLICATION);
+            if (extApplication != null)
+            {
+                extApplication.setOnPreferenceClickListener(powerOffController);
+            }
+
+            Preference sonyApi = findPreference("sony_api_list");
+            if (sonyApi != null)
+            {
+                sonyApi.setOnPreferenceClickListener(cameraApiListViewer);
+            }
         }
         catch (Exception e)
         {
@@ -211,8 +217,8 @@ public class SonyPreferenceFragment  extends PreferenceFragmentCompat implements
     public void onResume()
     {
         super.onResume();
-        Log.v(TAG, "onResume() Start");
 
+        Log.v(TAG, "onResume() Start");
         try
         {
             synchronizedProperty();
@@ -221,9 +227,7 @@ public class SonyPreferenceFragment  extends PreferenceFragmentCompat implements
         {
             e.printStackTrace();
         }
-
         Log.v(TAG, "onResume() End");
-
     }
 
     /**
@@ -260,8 +264,7 @@ public class SonyPreferenceFragment  extends PreferenceFragmentCompat implements
     {
         try
         {
-            ListPreference pref;
-            pref = (ListPreference) findPreference(pref_key);
+            ListPreference pref = findPreference(pref_key);
             String value = preferences.getString(key, defaultValue);
             if (pref != null)
             {
@@ -286,8 +289,9 @@ public class SonyPreferenceFragment  extends PreferenceFragmentCompat implements
     {
         try
         {
-            CheckBoxPreference pref = (CheckBoxPreference) findPreference(pref_key);
-            if (pref != null) {
+            CheckBoxPreference pref = findPreference(pref_key);
+            if (pref != null)
+            {
                 boolean value = preferences.getBoolean(key, defaultValue);
                 pref.setChecked(value);
             }

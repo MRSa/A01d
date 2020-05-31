@@ -263,4 +263,35 @@
     <string name="pref_nikon_not_support_focus_lock">フォーカスロック未対応機</string>
     <string name="pref_summary_nikon_not_support_focus_lock">フォーカスロックでライブビューが止まる場合にチェックを入れてください。</string>
 
+    <string name="pref_cat_detail_settings">詳細設定</string>
+
+    <string name="pref_opc_settings">OPC (Olympus Air)</string>
+    <string name="pref_summary_opc_settings"> </string>
+
+    <string name="pref_olympus_settings">Olympus PEN/OM-D</string>
+    <string name="pref_summary_olympus_settings"> </string>
+
+    <string name="pref_sony_settings">Sony</string>
+    <string name="pref_summary_sony_settings"> </string>
+
+    <string name="pref_ricoh_settings">PENTAX/Ricoh GR Series</string>
+    <string name="pref_summary_ricoh_settings"> </string>
+
+    <string name="pref_theta_settings">Ricoh Theta</string>
+    <string name="pref_summary_theta_settings"> </string>
+
+    <string name="pref_fuji_x_settings">Fujifilm X Series</string>
+    <string name="pref_summary_fuji_x_settings"> </string>
+
+    <string name="pref_panasonic_settings">Panasonic</string>
+    <string name="pref_summary_panasonic_settings"> </string>
+
+    <string name="pref_canon_settings">Canon</string>
+    <string name="pref_summary_canon_settings"> </string>
+
+    <string name="pref_nikon_settings">Nikon</string>
+    <string name="pref_summary_nikon_settings"> </string>
+
+    <string name="pref_exit_power_off_summary">アプリ終了</string>
+
 </resources>

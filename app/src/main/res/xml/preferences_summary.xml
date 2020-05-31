@@ -6,8 +6,8 @@
         <PreferenceScreen
             android:key="exit_application"
             android:icon="@drawable/ic_power_settings_new_black_24dp"
-            android:title="@string/pref_exit_power_off" />
-<!--
+            android:title="@string/pref_exit_power_off_summary" />
+
         <ListPreference
             android:title="@string/pref_connection_method"
             android:entryValues="@array/connection_method_value"
@@ -19,10 +19,9 @@
             android:key="wifi_settings"
             android:title="@string/pref_wifi_settings"
             android:summary="@string/pref_summary_wifi_settings" />
--->
+
     </PreferenceCategory>
 
-<!--
     <PreferenceCategory
         android:title="@string/pref_cat_camera">
 
@@ -31,41 +30,66 @@
             android:title="@string/pref_capture_both_camera_and_live_view" />
 
     </PreferenceCategory>
--->
 
     <PreferenceCategory
         android:title="@string/pref_cat_initialize">
 
         <CheckBoxPreference
-            android:key="use_pentax_autofocus_mode"
-            android:title="@string/pref_use_pentax_autofocus"
-            android:summary="@string/pref_use_pentax_autofocus_summary"/>
-
-        <CheckBoxPreference
-            android:key="gr2_display_camera_view"
-            android:title="@string/pref_gr2_display_camera_view"
-            android:summary="@string/pref_gr2_display_camera_view_summary"/>
-
-        <CheckBoxPreference
-            android:key="gr2_lcd_sleep"
-            android:title="@string/pref_gr2_lcd_sleep" />
-
-        <ListPreference
-            android:title="@string/pref_gr2_display_mode"
-            android:entryValues="@array/gr2_display_mode_value"
-            android:entries="@array/gr2_display_mode"
-            android:key="gr2_display_mode"
-            android:defaultValue="0"/>
-
-<!--
-        <CheckBoxPreference
             android:key="auto_connect_to_camera"
             android:title="@string/pref_auto_connect_camera"
             android:summary="@string/pref_summary_auto_connect_camera" />
--->
     </PreferenceCategory>
 
-<!--
+    <PreferenceCategory
+        android:title="@string/pref_cat_detail_settings">
+
+        <PreferenceScreen
+            android:key="opc_settings"
+            android:title="@string/pref_opc_settings"
+            android:summary="@string/pref_summary_opc_settings" />
+
+        <PreferenceScreen
+            android:key="olympus_settings"
+            android:title="@string/pref_olympus_settings"
+            android:summary="@string/pref_summary_olympus_settings" />
+
+        <PreferenceScreen
+            android:key="ricoh_settings"
+            android:title="@string/pref_ricoh_settings"
+            android:summary="@string/pref_summary_ricoh_settings" />
+
+        <PreferenceScreen
+            android:key="theta_settings"
+            android:title="@string/pref_theta_settings"
+            android:summary="@string/pref_summary_theta_settings" />
+
+        <PreferenceScreen
+            android:key="fuji_x_settings"
+            android:title="@string/pref_fuji_x_settings"
+            android:summary="@string/pref_summary_fuji_x_settings" />
+
+        <PreferenceScreen
+            android:key="panasonic_settings"
+            android:title="@string/pref_panasonic_settings"
+            android:summary="@string/pref_summary_panasonic_settings" />
+
+        <PreferenceScreen
+            android:key="sony_settings"
+            android:title="@string/pref_sony_settings"
+            android:summary="@string/pref_summary_sony_settings" />
+
+        <PreferenceScreen
+            android:key="canon_settings"
+            android:title="@string/pref_canon_settings"
+            android:summary="@string/pref_summary_canon_settings" />
+
+        <PreferenceScreen
+            android:key="nikon_settings"
+            android:title="@string/pref_nikon_settings"
+            android:summary="@string/pref_summary_nikon_settings" />
+
+    </PreferenceCategory>
+
     <PreferenceCategory
         android:title="@string/pref_cat_gokigen">
 
@@ -93,5 +117,4 @@
             android:summary="@string/pref_summary_debug_info" />
 
     </PreferenceCategory>
--->
 </PreferenceScreen>

@@ -19,11 +19,11 @@ import androidx.preference.PreferenceManager;
 import net.osdn.gokigen.a01d.IChangeScene;
 import net.osdn.gokigen.a01d.R;
 import net.osdn.gokigen.a01d.camera.ptpip.operation.PtpIpCameraPowerOff;
-import net.osdn.gokigen.a01d.logcat.LogCatViewer;
 import net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor;
 
 import java.util.Map;
 
+import static net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor.EXIT_APPLICATION;
 import static net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor.WIFI_SETTINGS;
 
 /**
@@ -36,7 +36,6 @@ public class NikonPreferenceFragment extends PreferenceFragmentCompat implements
     private AppCompatActivity context = null;
     private SharedPreferences preferences = null;
     private PtpIpCameraPowerOff powerOffController = null;
-    private LogCatViewer logCatViewer = null;
 
     /**
      *
@@ -66,12 +65,6 @@ public class NikonPreferenceFragment extends PreferenceFragmentCompat implements
         {
             powerOffController = new PtpIpCameraPowerOff(context, changeScene);
             powerOffController.prepare();
-
-            logCatViewer = new LogCatViewer(changeScene);
-            logCatViewer.prepare();
-
-            //cameraApiListViewer = new PanasonicCameraApiListViewer(changeScene);
-            //cameraApiListViewer.prepare();
 
             this.context = context;
         }
@@ -161,7 +154,7 @@ public class NikonPreferenceFragment extends PreferenceFragmentCompat implements
 
                 case IPreferencePropertyAccessor.CAPTURE_BOTH_CAMERA_AND_LIVE_VIEW:
                     value = preferences.getBoolean(key, true);
-                    Log.v(TAG, " " + key + " , " + value);
+                    Log.v(TAG, "  " + key + " , " + value);
                     break;
 
                 case IPreferencePropertyAccessor.NIKON_NOT_SUPPORT_FOCUS_LOCK:
@@ -191,19 +184,23 @@ public class NikonPreferenceFragment extends PreferenceFragmentCompat implements
             addPreferencesFromResource(R.xml.preferences_nikon);
 
             ListPreference connectionMethod = findPreference(IPreferencePropertyAccessor.CONNECTION_METHOD);
-            connectionMethod.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
-                @Override
-                public boolean onPreferenceChange(Preference preference, Object newValue) {
-                    preference.setSummary(newValue + " ");
-                    return (true);
-                }
-            });
-            connectionMethod.setSummary(connectionMethod.getValue() + " ");
+            if (connectionMethod != null)
+            {
+                connectionMethod.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+                    @Override
+                    public boolean onPreferenceChange(Preference preference, Object newValue) {
+                        preference.setSummary(newValue + " ");
+                        return (true);
+                    }
+                });
+                connectionMethod.setSummary(connectionMethod.getValue() + " ");
+            }
 
-            findPreference("exit_application").setOnPreferenceClickListener(powerOffController);
-            findPreference("debug_info").setOnPreferenceClickListener(logCatViewer);
-            //findPreference("panasonic_api_list").setOnPreferenceClickListener(cameraApiListViewer);
-            findPreference(WIFI_SETTINGS).setOnPreferenceClickListener(this);
+            Preference exitApplication = findPreference(EXIT_APPLICATION);
+            if (exitApplication != null)
+            {
+                exitApplication.setOnPreferenceClickListener(powerOffController);
+            }
         }
         catch (Exception e)
         {
@@ -220,7 +217,6 @@ public class NikonPreferenceFragment extends PreferenceFragmentCompat implements
     {
         super.onResume();
         Log.v(TAG, "onResume() Start");
-
         try
         {
             synchronizedProperty();
@@ -229,9 +225,7 @@ public class NikonPreferenceFragment extends PreferenceFragmentCompat implements
         {
             e.printStackTrace();
         }
-
         Log.v(TAG, "onResume() End");
-
     }
 
     /**
@@ -268,9 +262,8 @@ public class NikonPreferenceFragment extends PreferenceFragmentCompat implements
     {
         try
         {
-            ListPreference pref;
-            pref = (ListPreference) findPreference(pref_key);
             String value = preferences.getString(key, defaultValue);
+            ListPreference pref = findPreference(pref_key);
             if (pref != null)
             {
                 pref.setValue(value);

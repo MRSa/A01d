@@ -10,7 +10,6 @@ import android.util.Log;
 import net.osdn.gokigen.a01d.IChangeScene;
 import net.osdn.gokigen.a01d.R;
 import net.osdn.gokigen.a01d.camera.panasonic.operation.CameraPowerOffPanasonic;
-import net.osdn.gokigen.a01d.logcat.LogCatViewer;
 import net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor;
 
 import java.util.Map;
@@ -36,8 +35,6 @@ public class PanasonicPreferenceFragment  extends PreferenceFragmentCompat imple
     private AppCompatActivity context = null;
     private SharedPreferences preferences = null;
     private CameraPowerOffPanasonic powerOffController = null;
-    private LogCatViewer logCatViewer = null;
-    //private PanasonicCameraApiListViewer cameraApiListViewer = null;
 
     /**
      *
@@ -68,12 +65,6 @@ public class PanasonicPreferenceFragment  extends PreferenceFragmentCompat imple
             powerOffController = new CameraPowerOffPanasonic(context, changeScene);
             powerOffController.prepare();
 
-            logCatViewer = new LogCatViewer(changeScene);
-            logCatViewer.prepare();
-
-            //cameraApiListViewer = new PanasonicCameraApiListViewer(changeScene);
-            //cameraApiListViewer.prepare();
-
             this.context = context;
         }
         catch (Exception e)
@@ -87,7 +78,7 @@ public class PanasonicPreferenceFragment  extends PreferenceFragmentCompat imple
      *
      */
     @Override
-    public void onAttach(Context activity)
+    public void onAttach(@NonNull Context activity)
     {
         super.onAttach(activity);
         Log.v(TAG, "onAttach()");
@@ -156,7 +147,7 @@ public class PanasonicPreferenceFragment  extends PreferenceFragmentCompat imple
 
                 case IPreferencePropertyAccessor.CAPTURE_BOTH_CAMERA_AND_LIVE_VIEW:
                     value = preferences.getBoolean(key, true);
-                    Log.v(TAG, " " + key + " , " + value);
+                    Log.v(TAG, "  " + key + " , " + value);
                     break;
 
                 default:
@@ -180,20 +171,24 @@ public class PanasonicPreferenceFragment  extends PreferenceFragmentCompat imple
             //super.onCreate(savedInstanceState);
             addPreferencesFromResource(R.xml.preferences_panasonic);
 
-            ListPreference connectionMethod = (ListPreference) findPreference(IPreferencePropertyAccessor.CONNECTION_METHOD);
-            connectionMethod.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
-                @Override
-                public boolean onPreferenceChange(Preference preference, Object newValue) {
-                    preference.setSummary(newValue + " ");
-                    return (true);
-                }
-            });
-            connectionMethod.setSummary(connectionMethod.getValue() + " ");
+            ListPreference connectionMethod = findPreference(IPreferencePropertyAccessor.CONNECTION_METHOD);
+            if (connectionMethod != null)
+            {
+                connectionMethod.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+                    @Override
+                    public boolean onPreferenceChange(Preference preference, Object newValue) {
+                        preference.setSummary(newValue + " ");
+                        return (true);
+                    }
+                });
+                connectionMethod.setSummary(connectionMethod.getValue() + " ");
+            }
 
-            findPreference("exit_application").setOnPreferenceClickListener(powerOffController);
-            findPreference("debug_info").setOnPreferenceClickListener(logCatViewer);
-            //findPreference("panasonic_api_list").setOnPreferenceClickListener(cameraApiListViewer);
-            findPreference(WIFI_SETTINGS).setOnPreferenceClickListener(this);
+            Preference exitApplication = findPreference("exit_application");
+            if (exitApplication != null)
+            {
+                exitApplication.setOnPreferenceClickListener(powerOffController);
+            }
         }
         catch (Exception e)
         {
@@ -209,8 +204,8 @@ public class PanasonicPreferenceFragment  extends PreferenceFragmentCompat imple
     public void onResume()
     {
         super.onResume();
-        Log.v(TAG, "onResume() Start");
 
+        Log.v(TAG, "onResume() Start");
         try
         {
             synchronizedProperty();
@@ -219,9 +214,7 @@ public class PanasonicPreferenceFragment  extends PreferenceFragmentCompat imple
         {
             e.printStackTrace();
         }
-
         Log.v(TAG, "onResume() End");
-
     }
 
     /**
@@ -258,9 +251,8 @@ public class PanasonicPreferenceFragment  extends PreferenceFragmentCompat imple
     {
         try
         {
-            ListPreference pref;
-            pref = (ListPreference) findPreference(pref_key);
             String value = preferences.getString(key, defaultValue);
+            ListPreference pref = findPreference(pref_key);
             if (pref != null)
             {
                 pref.setValue(value);
@@ -284,8 +276,9 @@ public class PanasonicPreferenceFragment  extends PreferenceFragmentCompat imple
     {
         try
         {
-            CheckBoxPreference pref = (CheckBoxPreference) findPreference(pref_key);
-            if (pref != null) {
+            CheckBoxPreference pref = findPreference(pref_key);
+            if (pref != null)
+            {
                 boolean value = preferences.getBoolean(key, defaultValue);
                 pref.setChecked(value);
             }
@@ -323,7 +316,6 @@ public class PanasonicPreferenceFragment  extends PreferenceFragmentCompat imple
             });
         }
     }
-
 
     @Override
     public boolean onPreferenceClick(Preference preference)

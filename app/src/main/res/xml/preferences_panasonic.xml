@@ -7,7 +7,7 @@
             android:key="exit_application"
             android:icon="@drawable/ic_power_settings_new_black_24dp"
             android:title="@string/pref_exit_power_off_panasonic" />
-
+<!--
         <ListPreference
             android:title="@string/pref_connection_method"
             android:entryValues="@array/connection_method_value"
@@ -19,9 +19,10 @@
             android:key="wifi_settings"
             android:title="@string/pref_wifi_settings"
             android:summary="@string/pref_summary_wifi_settings" />
-
+-->
     </PreferenceCategory>
 
+<!--
     <PreferenceCategory
         android:title="@string/pref_cat_camera">
 
@@ -67,4 +68,5 @@
             android:summary="@string/pref_summary_debug_info" />
 
     </PreferenceCategory>
+-->
 </PreferenceScreen>

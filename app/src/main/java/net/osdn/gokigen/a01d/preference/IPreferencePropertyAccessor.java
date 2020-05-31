@@ -81,6 +81,18 @@ public interface IPreferencePropertyAccessor
 
     String NIKON_NOT_SUPPORT_FOCUS_LOCK = "nikon_not_support_focus_lock";
 
+    String DEBUG_INFO = "debug_info";
+
+    String PREFERENCE_OPC_SETTINGS = "opc_settings";
+    String PREFERENCE_OLYMPUS_SETTINGS = "olympus_settings";
+    String PREFERENCE_SONY_SETTINGS = "sony_settings";
+    String PREFERENCE_RICOH_SETTINGS = "ricoh_settings";
+    String PREFERENCE_THETA_SETTINGS = "theta_settings";
+    String PREFERENCE_FUJI_X_SETTINGS = "fuji_x_settings";
+    String PREFERENCE_PANASONIC_SETTINGS = "panasonic_settings";
+    String PREFERENCE_CANON_SETTINGS = "canon_settings";
+    String PREFERENCE_NIKON_SETTINGS = "nikon_settings";
+
  /*
     int CHOICE_SPLASH_SCREEN = 10;
 

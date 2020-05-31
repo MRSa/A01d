@@ -11,7 +11,6 @@ import android.util.Log;
 import net.osdn.gokigen.a01d.IChangeScene;
 import net.osdn.gokigen.a01d.R;
 import net.osdn.gokigen.a01d.camera.ricohgr2.operation.CameraPowerOffRicohGr2;
-import net.osdn.gokigen.a01d.logcat.LogCatViewer;
 import net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor;
 
 import java.util.Map;
@@ -25,6 +24,7 @@ import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.PreferenceManager;
 
+import static net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor.EXIT_APPLICATION;
 import static net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor.WIFI_SETTINGS;
 
 public class RicohGr2PreferenceFragment  extends PreferenceFragmentCompat implements SharedPreferences.OnSharedPreferenceChangeListener, Preference.OnPreferenceClickListener
@@ -33,7 +33,6 @@ public class RicohGr2PreferenceFragment  extends PreferenceFragmentCompat implem
     private AppCompatActivity context = null;
     private SharedPreferences preferences = null;
     private CameraPowerOffRicohGr2 powerOffController = null;
-    private LogCatViewer logCatViewer = null;
 
     /**
      *
@@ -64,9 +63,6 @@ public class RicohGr2PreferenceFragment  extends PreferenceFragmentCompat implem
             powerOffController = new CameraPowerOffRicohGr2(context, changeScene);
             powerOffController.prepare();
 
-            logCatViewer = new LogCatViewer(changeScene);
-            logCatViewer.prepare();
-
             this.context = context;
         }
         catch (Exception e)
@@ -80,7 +76,7 @@ public class RicohGr2PreferenceFragment  extends PreferenceFragmentCompat implem
      *
      */
     @Override
-    public void onAttach(Context activity)
+    public void onAttach(@NonNull Context activity)
     {
         super.onAttach(activity);
         Log.v(TAG, "onAttach()");
@@ -112,25 +108,32 @@ public class RicohGr2PreferenceFragment  extends PreferenceFragmentCompat implem
             Map<String, ?> items = preferences.getAll();
             SharedPreferences.Editor editor = preferences.edit();
 
-            if (!items.containsKey(IPreferencePropertyAccessor.AUTO_CONNECT_TO_CAMERA)) {
+            if (!items.containsKey(IPreferencePropertyAccessor.AUTO_CONNECT_TO_CAMERA))
+            {
                 editor.putBoolean(IPreferencePropertyAccessor.AUTO_CONNECT_TO_CAMERA, true);
             }
-            if (!items.containsKey(IPreferencePropertyAccessor.CAPTURE_BOTH_CAMERA_AND_LIVE_VIEW)) {
+            if (!items.containsKey(IPreferencePropertyAccessor.CAPTURE_BOTH_CAMERA_AND_LIVE_VIEW))
+            {
                 editor.putBoolean(IPreferencePropertyAccessor.CAPTURE_BOTH_CAMERA_AND_LIVE_VIEW, true);
             }
-            if (!items.containsKey(IPreferencePropertyAccessor.CONNECTION_METHOD)) {
+            if (!items.containsKey(IPreferencePropertyAccessor.CONNECTION_METHOD))
+            {
                 editor.putString(IPreferencePropertyAccessor.CONNECTION_METHOD, IPreferencePropertyAccessor.CONNECTION_METHOD_DEFAULT_VALUE);
             }
-            if (!items.containsKey(IPreferencePropertyAccessor.GR2_LCD_SLEEP)) {
+            if (!items.containsKey(IPreferencePropertyAccessor.GR2_LCD_SLEEP))
+            {
                 editor.putBoolean(IPreferencePropertyAccessor.GR2_LCD_SLEEP, false);
             }
-            if (!items.containsKey(IPreferencePropertyAccessor.GR2_LIVE_VIEW)) {
+            if (!items.containsKey(IPreferencePropertyAccessor.GR2_LIVE_VIEW))
+            {
                 editor.putBoolean(IPreferencePropertyAccessor.GR2_LIVE_VIEW, true);
             }
-            if (!items.containsKey(IPreferencePropertyAccessor.USE_PENTAX_AUTOFOCUS)) {
+            if (!items.containsKey(IPreferencePropertyAccessor.USE_PENTAX_AUTOFOCUS))
+            {
                 editor.putBoolean(IPreferencePropertyAccessor.USE_PENTAX_AUTOFOCUS, false);
             }
-            if (!items.containsKey(IPreferencePropertyAccessor.GR2_DISPLAY_MODE)) {
+            if (!items.containsKey(IPreferencePropertyAccessor.GR2_DISPLAY_MODE))
+            {
                 editor.putString(IPreferencePropertyAccessor.GR2_DISPLAY_MODE, IPreferencePropertyAccessor.GR2_DISPLAY_MODE_DEFAULT_VALUE);
             }
             editor.apply();
@@ -161,17 +164,17 @@ public class RicohGr2PreferenceFragment  extends PreferenceFragmentCompat implem
 
                 case IPreferencePropertyAccessor.CAPTURE_BOTH_CAMERA_AND_LIVE_VIEW:
                     value = preferences.getBoolean(key, true);
-                    Log.v(TAG, " " + key + " , " + value);
+                    Log.v(TAG, "  " + key + " , " + value);
                     break;
 
                 case IPreferencePropertyAccessor.GR2_LCD_SLEEP:
                     value = preferences.getBoolean(key, false);
-                    Log.v(TAG, " " + key + " , " + value);
+                    Log.v(TAG, "  " + key + " , " + value);
                     break;
 
                 case IPreferencePropertyAccessor.GR2_LIVE_VIEW:
                     value = preferences.getBoolean(key, true);
-                    Log.v(TAG, " " + key + " , " + value);
+                    Log.v(TAG, "    " + key + " , " + value);
                     break;
 
                 case IPreferencePropertyAccessor.USE_PENTAX_AUTOFOCUS:
@@ -200,29 +203,37 @@ public class RicohGr2PreferenceFragment  extends PreferenceFragmentCompat implem
             //super.onCreate(savedInstanceState);
             addPreferencesFromResource(R.xml.preferences_ricoh_gr2);
 
-            ListPreference connectionMethod = (ListPreference) findPreference(IPreferencePropertyAccessor.CONNECTION_METHOD);
-            connectionMethod.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
-                @Override
-                public boolean onPreferenceChange(Preference preference, Object newValue) {
-                    preference.setSummary(newValue + " ");
-                    return (true);
-                }
-            });
-            connectionMethod.setSummary(connectionMethod.getValue() + " ");
+            ListPreference connectionMethod = findPreference(IPreferencePropertyAccessor.CONNECTION_METHOD);
+            if (connectionMethod != null)
+            {
+                connectionMethod.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+                    @Override
+                    public boolean onPreferenceChange(Preference preference, Object newValue) {
+                        preference.setSummary(newValue + " ");
+                        return (true);
+                    }
+                });
+                connectionMethod.setSummary(connectionMethod.getValue() + " ");
+            }
 
-            ListPreference displayMode = (ListPreference) findPreference(IPreferencePropertyAccessor.GR2_DISPLAY_MODE);
-            displayMode.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
-                @Override
-                public boolean onPreferenceChange(Preference preference, Object newValue) {
-                    preference.setSummary(newValue + " ");
-                    return (true);
-                }
-            });
-            displayMode.setSummary(displayMode.getValue() + " ");
+            ListPreference displayMode = findPreference(IPreferencePropertyAccessor.GR2_DISPLAY_MODE);
+            if (displayMode != null)
+            {
+                displayMode.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+                    @Override
+                    public boolean onPreferenceChange(Preference preference, Object newValue) {
+                        preference.setSummary(newValue + " ");
+                        return (true);
+                    }
+                });
+                displayMode.setSummary(displayMode.getValue() + " ");
+            }
 
-            findPreference("exit_application").setOnPreferenceClickListener(powerOffController);
-            findPreference("debug_info").setOnPreferenceClickListener(logCatViewer);
-            findPreference(WIFI_SETTINGS).setOnPreferenceClickListener(this);
+            Preference exitApplication = findPreference(EXIT_APPLICATION);
+            if (exitApplication != null)
+            {
+                exitApplication.setOnPreferenceClickListener(powerOffController);
+            }
         }
         catch (Exception e)
         {
@@ -288,7 +299,7 @@ public class RicohGr2PreferenceFragment  extends PreferenceFragmentCompat implem
         try
         {
             ListPreference pref;
-            pref = (ListPreference) findPreference(pref_key);
+            pref = findPreference(pref_key);
             String value = preferences.getString(key, defaultValue);
             if (pref != null)
             {
@@ -313,7 +324,7 @@ public class RicohGr2PreferenceFragment  extends PreferenceFragmentCompat implem
     {
         try
         {
-            CheckBoxPreference pref = (CheckBoxPreference) findPreference(pref_key);
+            CheckBoxPreference pref = findPreference(pref_key);
             if (pref != null) {
                 boolean value = preferences.getBoolean(key, defaultValue);
                 pref.setChecked(value);
@@ -355,7 +366,6 @@ public class RicohGr2PreferenceFragment  extends PreferenceFragmentCompat implem
             });
         }
     }
-
 
     @Override
     public boolean onPreferenceClick(Preference preference)

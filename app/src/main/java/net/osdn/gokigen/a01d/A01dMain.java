@@ -35,6 +35,7 @@ import net.osdn.gokigen.a01d.preference.panasonic.PanasonicPreferenceFragment;
 import net.osdn.gokigen.a01d.preference.olympuspen.OlympusPreferenceFragment;
 import net.osdn.gokigen.a01d.preference.ricohgr2.RicohGr2PreferenceFragment;
 import net.osdn.gokigen.a01d.preference.sony.SonyPreferenceFragment;
+import net.osdn.gokigen.a01d.preference.summary.PreferenceFragmentSummary;
 import net.osdn.gokigen.a01d.preference.theta.ThetaPreferenceFragment;
 
 import androidx.annotation.NonNull;
@@ -60,6 +61,16 @@ public class A01dMain extends AppCompatActivity implements ICameraStatusReceiver
     private IStatusViewDrawer statusViewDrawer = null;
 
     private PreferenceFragmentCompat preferenceFragment = null;
+    private PreferenceFragmentCompat preferenceFragmentOPC = null;
+    private PreferenceFragmentCompat preferenceFragmentOlympus = null;
+    private PreferenceFragmentCompat preferenceFragmentSony = null;
+    private PreferenceFragmentCompat preferenceFragmentRicoh = null;
+    private PreferenceFragmentCompat preferenceFragmentTheta = null;
+    private PreferenceFragmentCompat preferenceFragmentFuji = null;
+    private PreferenceFragmentCompat preferenceFragmentPanasonic = null;
+    private PreferenceFragmentCompat preferenceFragmentCanon = null;
+    private PreferenceFragmentCompat preferenceFragmentNikon = null;
+
     private OlyCameraPropertyListFragment propertyListFragment = null;
     private SonyCameraApiListFragment sonyApiListFragmentSony = null;
     private LogCatFragment logCatFragment = null;
@@ -369,40 +380,92 @@ public class A01dMain extends AppCompatActivity implements ICameraStatusReceiver
             {
                 try
                 {
-                    ICameraConnection.CameraConnectionMethod connectionMethod = interfaceProvider.getCammeraConnectionMethod();
-                    if (connectionMethod == ICameraConnection.CameraConnectionMethod.RICOH_GR2) {
-                        preferenceFragment = RicohGr2PreferenceFragment.newInstance(this, this);
-                    } else if (connectionMethod == ICameraConnection.CameraConnectionMethod.SONY) {
-                        preferenceFragment = SonyPreferenceFragment.newInstance(this, this);
-                    } else if (connectionMethod == ICameraConnection.CameraConnectionMethod.PANASONIC) {
-                        preferenceFragment = PanasonicPreferenceFragment.newInstance(this, this);
-                    } else if (connectionMethod == ICameraConnection.CameraConnectionMethod.OLYMPUS) {
-                        preferenceFragment = OlympusPreferenceFragment.newInstance(this, this);
-                    } else if (connectionMethod == ICameraConnection.CameraConnectionMethod.FUJI_X) {
-                        preferenceFragment = FujiXPreferenceFragment.newInstance(this, this);
-                    } else if (connectionMethod == ICameraConnection.CameraConnectionMethod.THETA) {
-                        preferenceFragment = ThetaPreferenceFragment.newInstance(this, this);
-                    } else if (connectionMethod == ICameraConnection.CameraConnectionMethod.CANON) {
-                        preferenceFragment = CanonPreferenceFragment.newInstance(this, this);
-                    } else if (connectionMethod == ICameraConnection.CameraConnectionMethod.NIKON) {
-                        preferenceFragment = NikonPreferenceFragment.newInstance(this, this);
-                    } else //  if (connectionMethod == ICameraConnection.CameraConnectionMethod.OPC)
-                    {
-                        preferenceFragment = PreferenceFragment.newInstance(this, interfaceProvider, this);
-                    }
+                    preferenceFragment = PreferenceFragmentSummary.newInstance(this, this);
                 }
                 catch (Exception e)
                 {
                     e.printStackTrace();
-                    preferenceFragment = SonyPreferenceFragment.newInstance(this, this);
                 }
             }
-
             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
             transaction.replace(R.id.fragment1, preferenceFragment);
-            // backstackに追加
-            transaction.addToBackStack(null);
+            transaction.addToBackStack(null);    // backstackに追加
             transaction.commit();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void changeSceneToConfiguration(ICameraConnection.CameraConnectionMethod connectionMethod)
+    {
+        try
+        {
+            PreferenceFragmentCompat targetFragment = null;
+            if (connectionMethod == ICameraConnection.CameraConnectionMethod.RICOH_GR2) {
+                if (preferenceFragmentRicoh == null)
+                {
+                    preferenceFragmentRicoh = RicohGr2PreferenceFragment.newInstance(this, this);
+                }
+                targetFragment = preferenceFragmentRicoh;
+            } else if (connectionMethod == ICameraConnection.CameraConnectionMethod.SONY) {
+                if (preferenceFragmentSony == null)
+                {
+                    preferenceFragmentSony = SonyPreferenceFragment.newInstance(this, this);
+                }
+                targetFragment = preferenceFragmentSony;
+            } else if (connectionMethod == ICameraConnection.CameraConnectionMethod.PANASONIC) {
+                if (preferenceFragmentPanasonic == null)
+                {
+                    preferenceFragmentPanasonic = PanasonicPreferenceFragment.newInstance(this, this);
+                }
+                targetFragment = preferenceFragmentPanasonic;
+            } else if (connectionMethod == ICameraConnection.CameraConnectionMethod.OLYMPUS) {
+                if (preferenceFragmentOlympus == null)
+                {
+                    preferenceFragmentOlympus = OlympusPreferenceFragment.newInstance(this, this);
+                }
+                targetFragment = preferenceFragmentOlympus;
+            } else if (connectionMethod == ICameraConnection.CameraConnectionMethod.FUJI_X) {
+                if (preferenceFragmentFuji == null)
+                {
+                    preferenceFragmentFuji = FujiXPreferenceFragment.newInstance(this, this);
+                }
+                targetFragment = preferenceFragmentFuji;
+            } else if (connectionMethod == ICameraConnection.CameraConnectionMethod.THETA) {
+                if (preferenceFragmentTheta == null)
+                {
+                    preferenceFragmentTheta = ThetaPreferenceFragment.newInstance(this, this);
+                }
+                targetFragment = preferenceFragmentTheta;
+            } else if (connectionMethod == ICameraConnection.CameraConnectionMethod.CANON) {
+                if (preferenceFragmentCanon == null)
+                {
+                    preferenceFragmentCanon = CanonPreferenceFragment.newInstance(this, this);
+                }
+                targetFragment = preferenceFragmentCanon;
+            } else if (connectionMethod == ICameraConnection.CameraConnectionMethod.NIKON) {
+                if (preferenceFragmentNikon == null)
+                {
+                    preferenceFragmentNikon = NikonPreferenceFragment.newInstance(this, this);
+                }
+                targetFragment = preferenceFragmentNikon;
+            } else if (connectionMethod == ICameraConnection.CameraConnectionMethod.OPC) {
+                if (preferenceFragmentOPC == null)
+                {
+                    preferenceFragmentOPC = PreferenceFragment.newInstance(this, interfaceProvider, this);
+                }
+                targetFragment = preferenceFragmentOPC;
+            }
+            if (targetFragment != null)
+            {
+                FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+                transaction.replace(R.id.fragment1, targetFragment);
+                transaction.addToBackStack(null);   // backstackに追加
+                transaction.commit();
+            }
         }
         catch (Exception e)
         {
