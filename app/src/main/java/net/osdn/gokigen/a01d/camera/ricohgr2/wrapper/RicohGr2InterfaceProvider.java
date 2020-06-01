@@ -1,6 +1,8 @@
 package net.osdn.gokigen.a01d.camera.ricohgr2.wrapper;
 
 import android.app.Activity;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.util.Log;
 
 import net.osdn.gokigen.a01d.camera.ICameraConnection;
@@ -20,6 +22,7 @@ import net.osdn.gokigen.a01d.camera.IDisplayInjector;
 import net.osdn.gokigen.a01d.liveview.IAutoFocusFrameDisplay;
 import net.osdn.gokigen.a01d.liveview.IIndicatorControl;
 import net.osdn.gokigen.a01d.liveview.liveviewlistener.ILiveViewListener;
+import net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor;
 
 import androidx.annotation.NonNull;
 
@@ -27,7 +30,7 @@ import androidx.annotation.NonNull;
  *
  *
  */
-public class RicohGr2InterfaceProvider implements IRicohGr2InterfaceProvider, IDisplayInjector
+public class RicohGr2InterfaceProvider implements IRicohGr2InterfaceProvider, IDisplayInjector, IUsePentaxCommand
 {
     private final String TAG = toString();
     private final Activity activity;
@@ -38,6 +41,8 @@ public class RicohGr2InterfaceProvider implements IRicohGr2InterfaceProvider, ID
     private RicohGr2CameraZoomLensControl zoomControl;
     private RicohGr2CameraFocusControl focusControl;
 
+    private boolean usePentaxCommand = false;
+
     /**
      *
      *
@@ -46,8 +51,8 @@ public class RicohGr2InterfaceProvider implements IRicohGr2InterfaceProvider, ID
     {
         this.activity = context;
         //this.provider = provider;
-        gr2Connection = new RicohGr2Connection(context, provider);
-        liveViewControl = new RicohGr2LiveViewControl(context);
+        gr2Connection = new RicohGr2Connection(context, provider, this);
+        liveViewControl = new RicohGr2LiveViewControl(context, this);
         zoomControl = new RicohGr2CameraZoomLensControl();
     }
 
@@ -68,8 +73,8 @@ public class RicohGr2InterfaceProvider implements IRicohGr2InterfaceProvider, ID
     public void injectDisplay(IAutoFocusFrameDisplay frameDisplayer, IIndicatorControl indicator, IFocusingModeNotify focusingModeNotify)
     {
         Log.v(TAG, "injectDisplay()");
-        focusControl = new RicohGr2CameraFocusControl(activity, frameDisplayer, indicator);
-        captureControl = new RicohGr2CameraCaptureControl(activity, frameDisplayer);
+        focusControl = new RicohGr2CameraFocusControl(frameDisplayer, indicator, this);
+        captureControl = new RicohGr2CameraCaptureControl(frameDisplayer, this);
     }
 
     /**
@@ -133,5 +138,29 @@ public class RicohGr2InterfaceProvider implements IRicohGr2InterfaceProvider, ID
     @Override
     public IDisplayInjector getDisplayInjector() {
         return (this);
+    }
+
+    @Override
+    public void setUsePentaxCommand(boolean usePentaxCommand)
+    {
+        this.usePentaxCommand = usePentaxCommand;
+        try
+        {
+            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(activity);
+            SharedPreferences.Editor editor = preferences.edit();
+            editor.putBoolean(IPreferencePropertyAccessor.USE_PENTAX_AUTOFOCUS, usePentaxCommand);
+            editor.apply();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        Log.v(TAG, " setUsePentaxCommand : " + usePentaxCommand);
+    }
+
+    @Override
+    public boolean getUsePentaxCommand()
+    {
+        return (usePentaxCommand);
     }
 }

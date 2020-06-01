@@ -1,16 +1,13 @@
 package net.osdn.gokigen.a01d.camera.ricohgr2.operation.takepicture;
 
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.graphics.PointF;
 import android.graphics.RectF;
-import android.preference.PreferenceManager;
 import android.util.Log;
 
+import net.osdn.gokigen.a01d.camera.ricohgr2.wrapper.IUsePentaxCommand;
 import net.osdn.gokigen.a01d.camera.utils.SimpleHttpClient;
 import net.osdn.gokigen.a01d.liveview.IAutoFocusFrameDisplay;
 import net.osdn.gokigen.a01d.liveview.IIndicatorControl;
-import net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor;
 
 import org.json.JSONObject;
 
@@ -25,7 +22,7 @@ public class RicohGr2AutoFocusControl
     private static final String TAG = RicohGr2AutoFocusControl.class.getSimpleName();
     private final IIndicatorControl indicator;
     private final IAutoFocusFrameDisplay frameDisplayer;
-    private String lockAutoFocusUrl = "http://192.168.0.1/v1/lens/focus/lock";    // Pentax機の場合は /v1/lens/focus
+    private final IUsePentaxCommand usePentaxCommand;
     private String unlockAutoFocusUrl = "http://192.168.0.1/v1/lens/focus/unlock";
     private String halfPressShutterUrl = "http://192.168.0.1/_gr";
     private int timeoutMs = 6000;
@@ -35,34 +32,11 @@ public class RicohGr2AutoFocusControl
      *
      *
      */
-    public RicohGr2AutoFocusControl(@NonNull Context context, @NonNull final IAutoFocusFrameDisplay frameDisplayer, final IIndicatorControl indicator)
+    public RicohGr2AutoFocusControl(@NonNull final IAutoFocusFrameDisplay frameDisplayer, final IIndicatorControl indicator, @NonNull IUsePentaxCommand usePentaxCommand)
     {
         this.frameDisplayer = frameDisplayer;
         this.indicator = indicator;
-
-        prepare(context);
-    }
-
-    /**
-     *
-     *
-     */
-    private void prepare(@NonNull Context context)
-    {
-        lockAutoFocusUrl = "http://192.168.0.1/v1/lens/focus/lock";
-        try
-        {
-            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-            if (preferences.getBoolean(IPreferencePropertyAccessor.USE_PENTAX_AUTOFOCUS, false))
-            {
-                lockAutoFocusUrl = "http://192.168.0.1/v1/lens/focus";
-            }
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-        Log.v(TAG, "FOCUS LOCK URL : " + lockAutoFocusUrl);
+        this.usePentaxCommand = usePentaxCommand;
     }
 
     /**
@@ -84,6 +58,7 @@ public class RicohGr2AutoFocusControl
                     {
                         showFocusFrame(preFocusFrameRect, IAutoFocusFrameDisplay.FocusFrameStatus.Running, 0.0);
 
+                        String lockAutoFocusUrl = (usePentaxCommand.getUsePentaxCommand()) ? "http://192.168.0.1/v1/lens/focus" : "http://192.168.0.1/v1/lens/focus/lock";
                         //int posX = (int) (Math.round(point.x * 100.0));
                         //int posY = (int) (Math.round(point.y * 100.0));
                         String postData = "pos=" + ( (int) (Math.round(point.x * 100.0))) + "," + ((int) (Math.round(point.y * 100.0)));

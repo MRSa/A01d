@@ -22,19 +22,22 @@ public class RicohGr2LiveViewControl implements ILiveViewControl
 {
     private final String TAG = toString();
     private final Context context;
+    private final IUsePentaxCommand usePentaxCommand;
     private final CameraLiveViewListenerImpl liveViewListener;
-    private String liveViewUrl = "http://192.168.0.1/v1/display";  // "http://192.168.0.1/v1/liveview";
+    //private String liveViewUrl = "http://192.168.0.1/v1/display";  // "http://192.168.0.1/v1/liveview";
     private float cropScale = 1.0f;
     private boolean whileFetching = false;
+    private boolean mirrorMode = false;
     private static final int FETCH_ERROR_MAX = 30;
 
     /**
      *
      *
      */
-    RicohGr2LiveViewControl(final Context context)
+    RicohGr2LiveViewControl(final Context context, @NonNull IUsePentaxCommand usePentaxCommand)
     {
         this.context = context;
+        this.usePentaxCommand = usePentaxCommand;
         prepare();
         liveViewListener = new CameraLiveViewListenerImpl();
     }
@@ -45,22 +48,15 @@ public class RicohGr2LiveViewControl implements ILiveViewControl
      */
     private void prepare()
     {
-        liveViewUrl = "http://192.168.0.1/v1/display";
         try
         {
             SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-            boolean mirrorMode = preferences.getBoolean(IPreferencePropertyAccessor.GR2_LIVE_VIEW, true);
-            boolean pentaxMode = preferences.getBoolean(IPreferencePropertyAccessor.USE_PENTAX_AUTOFOCUS, false);
-            if ((pentaxMode)||(!mirrorMode))
-            {
-                liveViewUrl = "http://192.168.0.1/v1/liveview";
-            }
+            mirrorMode = preferences.getBoolean(IPreferencePropertyAccessor.GR2_LIVE_VIEW, true);
         }
         catch (Exception e)
         {
             e.printStackTrace();
         }
-        Log.v(TAG, "LIVE VIEW URL : " + liveViewUrl);
     }
 
 
@@ -92,6 +88,7 @@ public class RicohGr2LiveViewControl implements ILiveViewControl
                 {
                     try
                     {
+                        String liveViewUrl = ((usePentaxCommand.getUsePentaxCommand())||(!mirrorMode)) ? "http://192.168.0.1/v1/liveview" : "http://192.168.0.1/v1/display";
                         start(liveViewUrl);
                     }
                     catch (Exception e)

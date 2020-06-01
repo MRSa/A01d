@@ -1,12 +1,12 @@
 package net.osdn.gokigen.a01d.camera.ricohgr2.operation;
 
-import android.content.Context;
 import android.graphics.PointF;
 import android.util.Log;
 import android.view.MotionEvent;
 
 import net.osdn.gokigen.a01d.camera.IFocusingControl;
 import net.osdn.gokigen.a01d.camera.ricohgr2.operation.takepicture.RicohGr2AutoFocusControl;
+import net.osdn.gokigen.a01d.camera.ricohgr2.wrapper.IUsePentaxCommand;
 import net.osdn.gokigen.a01d.liveview.IAutoFocusFrameDisplay;
 import net.osdn.gokigen.a01d.liveview.IIndicatorControl;
 
@@ -18,10 +18,10 @@ public class RicohGr2CameraFocusControl implements IFocusingControl
     private final RicohGr2AutoFocusControl afControl;
     private final IAutoFocusFrameDisplay frameDisplay;
 
-    public RicohGr2CameraFocusControl(@NonNull Context context, @NonNull final IAutoFocusFrameDisplay frameDisplayer, @NonNull final IIndicatorControl indicator)
+    public RicohGr2CameraFocusControl(@NonNull final IAutoFocusFrameDisplay frameDisplayer, @NonNull final IIndicatorControl indicator, @NonNull IUsePentaxCommand usePentaxCommand)
     {
         this.frameDisplay = frameDisplayer;
-        this.afControl = new RicohGr2AutoFocusControl(context, frameDisplayer, indicator);
+        this.afControl = new RicohGr2AutoFocusControl(frameDisplayer, indicator, usePentaxCommand);
     }
 
     @Override

@@ -15,6 +15,7 @@ import android.util.Log;
 import net.osdn.gokigen.a01d.R;
 import net.osdn.gokigen.a01d.camera.ICameraConnection;
 import net.osdn.gokigen.a01d.camera.ICameraStatusReceiver;
+import net.osdn.gokigen.a01d.camera.ricohgr2.wrapper.IUsePentaxCommand;
 
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -32,6 +33,7 @@ public class RicohGr2Connection implements ICameraConnection
     private final String TAG = toString();
     private final Activity context;
     private final ICameraStatusReceiver statusReceiver;
+    private final IUsePentaxCommand usePentaxCommand;
     private final BroadcastReceiver connectionReceiver;
     //private final ConnectivityManager connectivityManager;
     private final Executor cameraExecutor = Executors.newFixedThreadPool(1);
@@ -44,11 +46,12 @@ public class RicohGr2Connection implements ICameraConnection
      *
      *
      */
-    public RicohGr2Connection(@NonNull final Activity context, @NonNull final ICameraStatusReceiver statusReceiver)
+    public RicohGr2Connection(@NonNull final Activity context, @NonNull final ICameraStatusReceiver statusReceiver, @NonNull IUsePentaxCommand usePentaxCommand)
     {
         Log.v(TAG, "RicohGr2Connection()");
         this.context = context;
         this.statusReceiver = statusReceiver;
+        this.usePentaxCommand = usePentaxCommand;
         connectionReceiver = new BroadcastReceiver()
         {
             @Override
@@ -259,7 +262,7 @@ public class RicohGr2Connection implements ICameraConnection
         connectionStatus = CameraConnectionStatus.CONNECTING;
         try
         {
-            cameraExecutor.execute(new RicohGr2CameraConnectSequence(context, statusReceiver, this));
+            cameraExecutor.execute(new RicohGr2CameraConnectSequence(context, statusReceiver, this, usePentaxCommand));
         }
         catch (Exception e)
         {
