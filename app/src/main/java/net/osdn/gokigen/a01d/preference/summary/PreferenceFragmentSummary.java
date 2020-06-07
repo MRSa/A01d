@@ -137,6 +137,14 @@ public class PreferenceFragmentSummary extends PreferenceFragmentCompat implemen
             {
                 editor.putString(IPreferencePropertyAccessor.CONNECTION_METHOD, IPreferencePropertyAccessor.CONNECTION_METHOD_DEFAULT_VALUE);
             }
+            if (!items.containsKey(IPreferencePropertyAccessor.CACHE_LIVEVIEW_PICTURES))
+            {
+                editor.putBoolean(IPreferencePropertyAccessor.CACHE_LIVEVIEW_PICTURES, false);
+            }
+            if (!items.containsKey(IPreferencePropertyAccessor.NUMBER_OF_CACHE_PICTURES))
+            {
+                editor.putString(IPreferencePropertyAccessor.NUMBER_OF_CACHE_PICTURES, IPreferencePropertyAccessor.NUMBER_OF_CACHE_PICTURES_DEFAULT_VALUE);
+            }
             editor.apply();
         }
         catch (Exception e)
@@ -166,6 +174,11 @@ public class PreferenceFragmentSummary extends PreferenceFragmentCompat implemen
                 case IPreferencePropertyAccessor.CAPTURE_BOTH_CAMERA_AND_LIVE_VIEW:
                     value = preferences.getBoolean(key, true);
                     Log.v(TAG, " " + key + " , " + value);
+                    break;
+
+                case IPreferencePropertyAccessor.CACHE_LIVEVIEW_PICTURES:
+                    value = preferences.getBoolean(key, true);
+                    Log.v(TAG, " " + key + "  , " + value);
                     break;
 
                 default:
@@ -386,6 +399,7 @@ public class PreferenceFragmentSummary extends PreferenceFragmentCompat implemen
                         // Preferenceの画面に反映させる
                         setBooleanPreference(IPreferencePropertyAccessor.AUTO_CONNECT_TO_CAMERA, IPreferencePropertyAccessor.AUTO_CONNECT_TO_CAMERA, defaultValue);
                         setBooleanPreference(IPreferencePropertyAccessor.CAPTURE_BOTH_CAMERA_AND_LIVE_VIEW, IPreferencePropertyAccessor.CAPTURE_BOTH_CAMERA_AND_LIVE_VIEW, defaultValue);
+                        setBooleanPreference(IPreferencePropertyAccessor.CACHE_LIVEVIEW_PICTURES, IPreferencePropertyAccessor.CACHE_LIVEVIEW_PICTURES, false);
                     }
                     catch (Exception e)
                     {

@@ -294,4 +294,9 @@
 
     <string name="pref_exit_power_off_summary">アプリ終了</string>
 
+    <string name="pref_cache_liveview_pictures">ライブビュー画像の表示を遅延</string>
+    <string name="pref_summary_cache_liveview_pictures">ライブビュー画像を溜めて表示します。（再起動後に有効）</string>
+    <string name="pref_number_of_cache_pictures">ライブビュー画像の遅延最大数</string>
+    <string name="pref_summary_number_of_cache_pictures">ライブビューを遅らせる画像の最大枚数を指定します。(初期値:500、再起動後に有効)</string>
+
 </resources>

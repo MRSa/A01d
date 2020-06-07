@@ -93,6 +93,10 @@ public interface IPreferencePropertyAccessor
     String PREFERENCE_CANON_SETTINGS = "canon_settings";
     String PREFERENCE_NIKON_SETTINGS = "nikon_settings";
 
+    String CACHE_LIVEVIEW_PICTURES = "cache_liveview_pictures";
+    String NUMBER_OF_CACHE_PICTURES = "number_of_cache_pictures";
+    String NUMBER_OF_CACHE_PICTURES_DEFAULT_VALUE = "500";
+
  /*
     int CHOICE_SPLASH_SCREEN = 10;
 

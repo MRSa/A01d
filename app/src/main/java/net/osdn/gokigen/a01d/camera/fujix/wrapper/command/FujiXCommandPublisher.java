@@ -69,7 +69,10 @@ public class FujiXCommandPublisher implements IFujiXCommandPublisher, IFujiXComm
         // ストリームを全部閉じる
         try
         {
-            dos.close();
+            if (dos != null)
+            {
+                dos.close();
+            }
         }
         catch (Exception e)
         {
@@ -79,7 +82,10 @@ public class FujiXCommandPublisher implements IFujiXCommandPublisher, IFujiXComm
 
         try
         {
-            bufferedReader.close();
+            if (bufferedReader != null)
+            {
+                bufferedReader.close();
+            }
         }
         catch (Exception e)
         {
@@ -89,7 +95,10 @@ public class FujiXCommandPublisher implements IFujiXCommandPublisher, IFujiXComm
 
         try
         {
-            socket.close();
+            if (socket != null)
+            {
+                socket.close();
+            }
         }
         catch (Exception e)
         {
@@ -215,6 +224,13 @@ public class FujiXCommandPublisher implements IFujiXCommandPublisher, IFujiXComm
     {
         try
         {
+            if (socket == null)
+            {
+                Log.v(TAG, "SEND: SOCKET NULL ");
+                dump_bytes("MSG[" + byte_array.length + "] ", byte_array);
+                return;
+            }
+
             dos = new DataOutputStream(socket.getOutputStream());
 
             // メッセージボディを加工： 最初に４バイトのレングス長をつける
@@ -277,6 +293,11 @@ public class FujiXCommandPublisher implements IFujiXCommandPublisher, IFujiXComm
         {
             sleep(delayMs);
             byte[] byte_array = new byte[BUFFER_SIZE];
+            if (socket == null)
+            {
+                Log.v(TAG, " RECV: SOCKET NULL (ID: " + id + ")");
+                return;
+            }
             InputStream is = socket.getInputStream();
             if (is != null)
             {

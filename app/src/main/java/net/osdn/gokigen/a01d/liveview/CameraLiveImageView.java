@@ -34,11 +34,15 @@ import net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import androidx.exifinterface.media.ExifInterface;
+
+import static net.osdn.gokigen.a01d.liveview.message.IMessageDrawer.MessageArea.LOWRIGHT;
+import static net.osdn.gokigen.a01d.liveview.message.IMessageDrawer.SIZE_STD;
 
 /**
  *   CameraLiveImageView :
@@ -51,6 +55,7 @@ public class CameraLiveImageView extends View implements IImageDataReceiver, IAu
 
     private static final String EXIF_ORIENTATION = "Orientation";
 
+    private Context context = null;
     private boolean focusAssistFeature = false;
     private boolean showGridFeature = false;
     private ImageView.ScaleType imageScaleType;
@@ -64,12 +69,16 @@ public class CameraLiveImageView extends View implements IImageDataReceiver, IAu
     private IGridFrameDrawer gridFrameDrawer = null;
     private IPreviewImageConverter bitmapConverter = null;
     private IMessageHolder messageHolder;
+    private IMessageDrawer messageDrawer;
     private IStoreImage storeImage = null;
     private IFocusLockIndicator focusLockIndicator = null;
 
     private FileOutputStream outputStream = null;
     private static final int LIMIT_SAVE_COUNT = 0;  // 0なら、ダミーファイルを作らない
-    private int saveCount = 10;       // LIMIT_SAVE_COUNTより大きければダミーファイルに書かない
+    private int saveCount = 10;                     // LIMIT_SAVE_COUNTより大きければダミーファイルに書かない
+
+    private int maxCachePics = 500;
+    private ArrayList<byte[]> cachePics = null;
 
     public CameraLiveImageView(Context context)
     {
@@ -93,17 +102,24 @@ public class CameraLiveImageView extends View implements IImageDataReceiver, IAu
     {
         prepareFile();
         storeImage = new StoreImage(context);
-        messageHolder = new ShowMessageHolder();
+        ShowMessageHolder messageHolder =  new ShowMessageHolder();
+        this.messageHolder = messageHolder;
+        messageDrawer = messageHolder;
         imageScaleType = ImageView.ScaleType.FIT_CENTER;
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        this.context = context;
 
         // Gridの表示/非表示
         int framingGridStatus = 0;
         gridFrameDrawer = GridFrameFactory.getGridFrameDrawer(framingGridStatus);
+
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
         showGridFeature = preferences.getBoolean(IPreferencePropertyAccessor.SHOW_GRID_STATUS, false);
 
         int converterType = 0;
         bitmapConverter = ImageConvertFactory.getImageConverter(converterType);
+
+        // liveview画面の表示遅延
+        setupLiveviewCache();
 
         // ダミーのビットマップデータ読み込み...画面表示のテスト用ロジック
         try
@@ -116,6 +132,40 @@ public class CameraLiveImageView extends View implements IImageDataReceiver, IAu
             imageBitmap = null;
         }
     }
+
+    /**
+     *   ライブビュー表示の遅延機能を有効にするかどうか。
+     *
+     */
+    private void setupLiveviewCache()
+    {
+        try
+        {
+            SharedPreferences preference = androidx.preference.PreferenceManager.getDefaultSharedPreferences(context);
+            if (preference != null)
+            {
+                if (preference.getBoolean(IPreferencePropertyAccessor.CACHE_LIVEVIEW_PICTURES, false))
+                {
+                    // 画像のキャッシュをする場合に new する
+                    cachePics = new ArrayList<>();
+                    String nofCachePics = preference.getString(IPreferencePropertyAccessor.NUMBER_OF_CACHE_PICTURES, IPreferencePropertyAccessor.NUMBER_OF_CACHE_PICTURES_DEFAULT_VALUE);
+                    maxCachePics = Integer.parseInt(nofCachePics);
+                }
+                else
+                {
+                    // cache 機能を無効化する。
+                    cachePics = null;
+                    System.gc();
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            maxCachePics = 500;
+        }
+    }
+
 
     @Override
     protected void onAttachedToWindow() {
@@ -188,19 +238,59 @@ public class CameraLiveImageView extends View implements IImageDataReceiver, IAu
      * Sets a image to view.
      * (OlympusCameraLiveViewListenerImpl.IImageDataReceiver の実装)
      *
-     * @param data     A image of live-view.
-     * @param metadata A metadata of the image.
+     * @param receivedData  A image of live-view.
+     * @param metadata      A metadata of the image.
      */
-    public void setImageData(byte[] data, Map<String, Object> metadata)
+    public void setImageData(byte[] receivedData, Map<String, Object> metadata)
     {
         Bitmap bitmap;
         int rotationDegrees;
 
-        if (data != null)
+        if (receivedData != null)
         {
             // Create a bitmap.
             try
             {
+                byte[] data = receivedData;
+                if (cachePics != null)
+                {
+                    boolean cacheIsFull = false;
+                    try
+                    {
+                        cachePics.add(receivedData);
+                        if (cachePics.size() > maxCachePics)
+                        {
+                            cacheIsFull = true;
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                        cacheIsFull = true;
+                    }
+                    messageDrawer.setMessageToShow(LOWRIGHT, Color.LTGRAY, SIZE_STD, "CACHE : " + (cachePics.size() - 1) + " / " + maxCachePics);
+                    if (cacheIsFull)
+                    {
+                        try
+                        {
+                            // リストから一つ取り除く
+                            int index = 0; // cachePics.size() - 1;
+                            data = cachePics.get(index);
+                            cachePics.remove(index);
+                        }
+                        catch (Exception e)
+                        {
+                            e.printStackTrace();
+                        }
+                    }
+                    else
+                    {
+                        // キャッシュがたまっていない場合は、カウントだけ上げる
+                        refreshCanvas();
+                        return;
+                    }
+                }
+
                 //ByteArrayInputStream bais = new ByteArrayInputStream(data);
                 //bitmap = BitmapFactory.decodeStream(bais);
                 //bais.close();
@@ -659,12 +749,12 @@ public class CameraLiveImageView extends View implements IImageDataReceiver, IAu
         }
 
         // 画面下部右側に表示する
-        message = messageHolder.getMessage(ShowMessageHolder.MessageArea.LOWRIGHT);
+        message = messageHolder.getMessage(LOWRIGHT);
         if ((message != null)&&(message.length() > 0))
         {
             Paint paint = new Paint();
-            paint.setColor(messageHolder.getColor(ShowMessageHolder.MessageArea.LOWRIGHT));
-            paint.setTextSize(messageHolder.getSize(ShowMessageHolder.MessageArea.LOWRIGHT));
+            paint.setColor(messageHolder.getColor(LOWRIGHT));
+            paint.setTextSize(messageHolder.getSize(LOWRIGHT));
             paint.setAntiAlias(true);
             float width = paint.measureText(message);
             Paint.FontMetrics fontMetrics = paint.getFontMetrics();

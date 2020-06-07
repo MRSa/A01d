@@ -299,4 +299,9 @@
 
     <string name="pref_exit_power_off_summary">Exit Application</string>
 
+    <string name="pref_cache_liveview_pictures">Delay liveview picture</string>
+    <string name="pref_summary_cache_liveview_pictures">This switch effects after restart. </string>
+    <string name="pref_number_of_cache_pictures">Max number of cache pictures</string>
+    <string name="pref_summary_number_of_cache_pictures">Set number of cache pictures. (Default:500, enables after restart.)</string>
+
 </resources>
