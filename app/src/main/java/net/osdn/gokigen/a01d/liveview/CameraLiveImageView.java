@@ -20,6 +20,7 @@ import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.SeekBar;
 
 import net.osdn.gokigen.a01d.R;
 import net.osdn.gokigen.a01d.liveview.bitmapconvert.IPreviewImageConverter;
@@ -49,7 +50,7 @@ import static net.osdn.gokigen.a01d.liveview.message.IMessageDrawer.SIZE_STD;
  *    (OLYMPUS の ImageCaptureSample そのまま)
  *
  */
-public class CameraLiveImageView extends View implements IImageDataReceiver, IAutoFocusFrameDisplay, ILiveImageStatusNotify, IIndicatorControl
+public class CameraLiveImageView extends View implements IImageDataReceiver, IAutoFocusFrameDisplay, ILiveImageStatusNotify, IIndicatorControl, SeekBar.OnSeekBarChangeListener
 {
     private final String TAG = this.toString();
 
@@ -1211,5 +1212,23 @@ public class CameraLiveImageView extends View implements IImageDataReceiver, IAu
             e.printStackTrace();
             outputStream = null;
         }
+    }
+
+    @Override
+    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser)
+    {
+        Log.v(TAG, " SeekBar::onProgressChanged() : " + progress);
+    }
+
+    @Override
+    public void onStartTrackingTouch(SeekBar seekBar)
+    {
+
+    }
+
+    @Override
+    public void onStopTrackingTouch(SeekBar seekBar)
+    {
+
     }
 }

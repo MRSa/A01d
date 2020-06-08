@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -158,10 +157,15 @@
                 android:contentDescription="@string/button"
                 android:visibility="visible"
                 />
-
         </RelativeLayout>
-
     </LinearLayout>
+
+    <SeekBar
+        android:id="@+id/liveview_cache_seekbar"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:max="100"
+        android:visibility="gone" />
 
     <RelativeLayout
         android:id="@+id/informationPanelLayout"

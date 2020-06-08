@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.SeekBar;
 import android.widget.TextView;
 
 import net.osdn.gokigen.a01d.IChangeScene;
@@ -45,8 +46,7 @@ import androidx.preference.PreferenceManager;
  *  撮影用ライブビュー画面
  *
  */
-public class LiveViewFragment extends Fragment implements IStatusViewDrawer, IFocusingModeNotify, IDialogKicker, ICameraStatusUpdateNotify, IFocusLockIndicator
-{
+public class LiveViewFragment extends Fragment implements IStatusViewDrawer, IFocusingModeNotify, IDialogKicker, ICameraStatusUpdateNotify, IFocusLockIndicator {
     private final String TAG = this.toString();
     private static final int COMMAND_MY_PROPERTY = 0x00000100;
 
@@ -74,10 +74,9 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer, IFo
     private String messageValue = "";
     private boolean focusLocked = false;
 
-    private ICameraConnection.CameraConnectionStatus currentConnectionStatus =  ICameraConnection.CameraConnectionStatus.UNKNOWN;
+    private ICameraConnection.CameraConnectionStatus currentConnectionStatus = ICameraConnection.CameraConnectionStatus.UNKNOWN;
 
-    public static LiveViewFragment newInstance(IChangeScene sceneSelector, @NonNull IInterfaceProvider provider)
-    {
+    public static LiveViewFragment newInstance(IChangeScene sceneSelector, @NonNull IInterfaceProvider provider) {
         LiveViewFragment instance = new LiveViewFragment();
         instance.prepare(sceneSelector, provider);
 
@@ -92,42 +91,34 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer, IFo
 
     /**
      *
-     *
      */
     @Override
-    public void onCreate(Bundle savedInstanceState)
-    {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.v(TAG, "onCreate()");
-        if (liveViewListener == null)
-        {
+        if (liveViewListener == null) {
             liveViewListener = new OlympusCameraLiveViewListenerImpl();
         }
     }
 
     /**
      *
-     *
      */
     @Override
-    public void onAttach(@NonNull Context context)
-    {
+    public void onAttach(@NonNull Context context) {
         super.onAttach(context);
         Log.v(TAG, "onAttach()");
     }
 
     /**
      *
-     *
      */
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
-    {
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
 
         Log.v(TAG, "onCreateView()");
-        if ((imageViewCreated)&&(myView != null))
-        {
+        if ((imageViewCreated) && (myView != null)) {
             // Viewを再利用。。。
             Log.v(TAG, "onCreateView() : called again, so do nothing... : " + myView);
             return (myView);
@@ -136,24 +127,22 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer, IFo
         View view = inflater.inflate(R.layout.fragment_live_view, container, false);
         myView = view;
         imageViewCreated = true;
-        try
-        {
+        try {
             imageView = view.findViewById(R.id.cameraLiveImageView);
-            if (interfaceInjector != null)
-            {
+            if (interfaceInjector != null) {
                 interfaceInjector.injectDisplay(imageView, imageView, this);
-            }
-            else
-            {
+            } else {
                 Log.v(TAG, "interfaceInjector is NULL...");
             }
-            if (onClickTouchListener == null)
-            {
+            if (onClickTouchListener == null) {
                 onClickTouchListener = new LiveViewClickTouchListener(this.getContext(), imageView, this, changeScene, interfaceProvider, this);
             }
             imageView.setOnClickListener(onClickTouchListener);
             imageView.setOnTouchListener(onClickTouchListener);
             imageView.setFocuslockIndicator(this);
+
+            // SeekBar のセットアップ
+            setupCacheSeekBar(view, imageView);
 
             // キーイベントを拾う処理を追加
             view.setOnKeyListener(onClickTouchListener);
@@ -165,9 +154,8 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer, IFo
             view.findViewById(R.id.btn_zoomin).setOnClickListener(onClickTouchListener);
             view.findViewById(R.id.btn_zoomout).setOnClickListener(onClickTouchListener);
 
-            focusIndicator =  view.findViewById(R.id.focus_indicator);
-            if (focusIndicator != null)
-            {
+            focusIndicator = view.findViewById(R.id.focus_indicator);
+            if (focusIndicator != null) {
                 focusIndicator.setOnClickListener(onClickTouchListener);
             }
             manualFocus = view.findViewById(R.id.focusing_button);
@@ -175,232 +163,168 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer, IFo
 
             ICameraConnection.CameraConnectionMethod connectionMethod = interfaceProvider.getCammeraConnectionMethod();
 
-            if (connectionMethod == ICameraConnection.CameraConnectionMethod.OPC)
-            {
+            if (connectionMethod == ICameraConnection.CameraConnectionMethod.OPC) {
                 view.findViewById(R.id.show_favorite_settings_button).setOnClickListener(onClickTouchListener);
 
                 // OPCのときには、フォーカスインジケータのマークを消す。
-                if (focusIndicator != null)
-                {
+                if (focusIndicator != null) {
                     focusIndicator.setVisibility(View.INVISIBLE);
                 }
-            }
-            else
-            {
+            } else {
                 // お気に入りボタン(とMFボタン)は、SONYモード, RICOH GR2モードのときには表示しない
                 final View favoriteButton = view.findViewById(R.id.show_favorite_settings_button);
                 final View propertyButton = view.findViewById(R.id.camera_property_settings_button);
-                if (connectionMethod == ICameraConnection.CameraConnectionMethod.SONY)
-                {
-                    if ((favoriteButton != null)&&(manualFocus != null))
-                    {
-                        runOnUiThread(new Runnable()
-                        {
+                if (connectionMethod == ICameraConnection.CameraConnectionMethod.SONY) {
+                    if ((favoriteButton != null) && (manualFocus != null)) {
+                        runOnUiThread(new Runnable() {
                             @Override
-                            public void run()
-                            {
+                            public void run() {
                                 favoriteButton.setVisibility(View.INVISIBLE);
-                                if (manualFocus != null)
-                                {
+                                if (manualFocus != null) {
                                     manualFocus.setVisibility(View.INVISIBLE);
                                 }
                                 propertyButton.setVisibility(View.VISIBLE);  // 押すとAPI一覧に遷移
                             }
                         });
                     }
-                    if (changeLiveViewScale != null)
-                    {
+                    if (changeLiveViewScale != null) {
                         changeLiveViewScale.setVisibility(View.INVISIBLE);
                     }
-                    if (focusIndicator != null)
-                    {
+                    if (focusIndicator != null) {
                         focusIndicator.setVisibility(View.VISIBLE);
                     }
-                }
-                else if (connectionMethod == ICameraConnection.CameraConnectionMethod.RICOH_GR2)
-                {
-                    if ((favoriteButton != null)&&(manualFocus != null))
-                    {
-                        runOnUiThread(new Runnable()
-                        {
+                } else if (connectionMethod == ICameraConnection.CameraConnectionMethod.RICOH_GR2) {
+                    if ((favoriteButton != null) && (manualFocus != null)) {
+                        runOnUiThread(new Runnable() {
                             @Override
-                            public void run()
-                            {
+                            public void run() {
                                 favoriteButton.setVisibility(View.INVISIBLE);
-                                if (manualFocus != null)
-                                {
+                                if (manualFocus != null) {
                                     manualFocus.setVisibility(View.INVISIBLE);
                                 }
                                 propertyButton.setVisibility(View.VISIBLE);
                             }
                         });
                     }
-                    if (changeLiveViewScale != null)
-                    {
+                    if (changeLiveViewScale != null) {
                         changeLiveViewScale.setVisibility(View.VISIBLE);
                     }
-                    if (focusIndicator != null)
-                    {
+                    if (focusIndicator != null) {
                         focusIndicator.setVisibility(View.INVISIBLE);
                     }
-                }
-                else if (connectionMethod == ICameraConnection.CameraConnectionMethod.PANASONIC)
-                {
-                    if ((favoriteButton != null)&&(manualFocus != null))
-                    {
-                        runOnUiThread(new Runnable()
-                        {
+                } else if (connectionMethod == ICameraConnection.CameraConnectionMethod.PANASONIC) {
+                    if ((favoriteButton != null) && (manualFocus != null)) {
+                        runOnUiThread(new Runnable() {
                             @Override
-                            public void run()
-                            {
+                            public void run() {
                                 favoriteButton.setVisibility(View.INVISIBLE);
-                                if (manualFocus != null)
-                                {
+                                if (manualFocus != null) {
                                     manualFocus.setVisibility(View.INVISIBLE);
                                 }
                                 propertyButton.setVisibility(View.VISIBLE);  // 押すとAPI一覧に遷移
                             }
                         });
                     }
-                    if (changeLiveViewScale != null)
-                    {
+                    if (changeLiveViewScale != null) {
                         changeLiveViewScale.setVisibility(View.INVISIBLE);
                     }
-                    if (focusIndicator != null)
-                    {
+                    if (focusIndicator != null) {
                         focusIndicator.setVisibility(View.VISIBLE);
                     }
-                }
-                else if (connectionMethod == ICameraConnection.CameraConnectionMethod.FUJI_X)
-                {
-                    if (favoriteButton != null)
-                    {
+                } else if (connectionMethod == ICameraConnection.CameraConnectionMethod.FUJI_X) {
+                    if (favoriteButton != null) {
                         favoriteButton.setVisibility(View.VISIBLE);
                         favoriteButton.setOnClickListener(onClickTouchListener);
                     }
-                    if (manualFocus != null)
-                    {
+                    if (manualFocus != null) {
                         manualFocus.setVisibility(View.INVISIBLE);
                     }
-                    if (changeLiveViewScale != null)
-                    {
+                    if (changeLiveViewScale != null) {
                         changeLiveViewScale.setVisibility(View.INVISIBLE);
                     }
-                    if (focusIndicator != null)
-                    {
+                    if (focusIndicator != null) {
                         focusIndicator.setVisibility(View.VISIBLE);
                     }
-                    if (propertyButton != null)
-                    {
+                    if (propertyButton != null) {
                         propertyButton.setOnClickListener(onClickTouchListener);
                     }
-                }
-                else if (connectionMethod == ICameraConnection.CameraConnectionMethod.OLYMPUS)
-                {
-                    if (manualFocus != null)
-                    {
+                } else if (connectionMethod == ICameraConnection.CameraConnectionMethod.OLYMPUS) {
+                    if (manualFocus != null) {
                         manualFocus.setVisibility(View.INVISIBLE);
                     }
-                    if (favoriteButton != null)
-                    {
+                    if (favoriteButton != null) {
                         favoriteButton.setVisibility(View.INVISIBLE);
                         //favoriteButton.setOnClickListener(onClickTouchListener);
                     }
-                    if (focusIndicator != null)
-                    {
+                    if (focusIndicator != null) {
                         focusIndicator.setVisibility(View.VISIBLE);
                     }
-                    if (propertyButton != null)
-                    {
+                    if (propertyButton != null) {
                         propertyButton.setVisibility(View.VISIBLE);
                         propertyButton.setOnClickListener(onClickTouchListener);
                     }
-                    if (changeLiveViewScale != null)
-                    {
+                    if (changeLiveViewScale != null) {
                         changeLiveViewScale.setVisibility(View.INVISIBLE);
                     }
-                }
-                else if (connectionMethod == ICameraConnection.CameraConnectionMethod.THETA)
-                {
-                    if (favoriteButton != null)
-                    {
+                } else if (connectionMethod == ICameraConnection.CameraConnectionMethod.THETA) {
+                    if (favoriteButton != null) {
                         favoriteButton.setVisibility(View.VISIBLE);
                         favoriteButton.setOnClickListener(onClickTouchListener);
                     }
-                    if (manualFocus != null)
-                    {
+                    if (manualFocus != null) {
                         manualFocus.setVisibility(View.INVISIBLE);
                     }
-                    if (changeLiveViewScale != null)
-                    {
+                    if (changeLiveViewScale != null) {
                         changeLiveViewScale.setVisibility(View.INVISIBLE);
                     }
-                    if (focusIndicator != null)
-                    {
+                    if (focusIndicator != null) {
                         focusIndicator.setVisibility(View.INVISIBLE);
                     }
-                    if (propertyButton != null)
-                    {
+                    if (propertyButton != null) {
                         propertyButton.setOnClickListener(onClickTouchListener);
                     }
-                }
-                else if (connectionMethod == ICameraConnection.CameraConnectionMethod.CANON)
-                {
-                    if (favoriteButton != null)
-                    {
+                } else if (connectionMethod == ICameraConnection.CameraConnectionMethod.CANON) {
+                    if (favoriteButton != null) {
                         favoriteButton.setVisibility(View.VISIBLE);
                         favoriteButton.setOnClickListener(onClickTouchListener);
                     }
-                    if (manualFocus != null)
-                    {
+                    if (manualFocus != null) {
                         manualFocus.setVisibility(View.INVISIBLE);
                     }
-                    if (changeLiveViewScale != null)
-                    {
+                    if (changeLiveViewScale != null) {
                         changeLiveViewScale.setVisibility(View.INVISIBLE);
                     }
-                    if (focusIndicator != null)
-                    {
+                    if (focusIndicator != null) {
                         focusIndicator.setVisibility(View.VISIBLE);
                     }
-                    if (propertyButton != null)
-                    {
+                    if (propertyButton != null) {
                         propertyButton.setOnClickListener(onClickTouchListener);
                     }
-                }
-                else if (connectionMethod == ICameraConnection.CameraConnectionMethod.NIKON)
-                {
-                    if (favoriteButton != null)
-                    {
+                } else if (connectionMethod == ICameraConnection.CameraConnectionMethod.NIKON) {
+                    if (favoriteButton != null) {
                         favoriteButton.setVisibility(View.VISIBLE);
                         favoriteButton.setOnClickListener(onClickTouchListener);
                     }
-                    if (manualFocus != null)
-                    {
+                    if (manualFocus != null) {
                         manualFocus.setVisibility(View.INVISIBLE);
                     }
-                    if (changeLiveViewScale != null)
-                    {
+                    if (changeLiveViewScale != null) {
                         changeLiveViewScale.setVisibility(View.INVISIBLE);
                     }
-                    if (focusIndicator != null)
-                    {
+                    if (focusIndicator != null) {
                         focusIndicator.setVisibility(View.VISIBLE);
                     }
-                    if (propertyButton != null)
-                    {
+                    if (propertyButton != null) {
                         propertyButton.setOnClickListener(onClickTouchListener);
                     }
                 }
             }
-            if (manualFocus != null)
-            {
+            if (manualFocus != null) {
                 manualFocus.setOnClickListener(onClickTouchListener);
             }
             changedFocusingMode();
 
-            if (changeLiveViewScale != null)
-            {
+            if (changeLiveViewScale != null) {
                 changeLiveViewScale.setOnClickListener(onClickTouchListener);
             }
 
@@ -415,13 +339,37 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer, IFo
             statusArea = view.findViewById(R.id.informationMessageTextView);
             focalLengthArea = view.findViewById(R.id.focal_length_with_digital_zoom_view);
 
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
         return (view);
+    }
+
+    private void setupCacheSeekBar(View view, CameraLiveImageView liveImageView)
+    {
+        SeekBar seekBar = view.findViewById(R.id.liveview_cache_seekbar);
+        if (seekBar != null)
+        {
+            try
+            {
+                SharedPreferences preference = android.preference.PreferenceManager.getDefaultSharedPreferences(getActivity());
+                if ((preference != null)&&(preference.getBoolean(IPreferencePropertyAccessor.CACHE_LIVEVIEW_PICTURES, false)))
+                {
+                    seekBar.setVisibility(View.VISIBLE);
+                    seekBar.setMax(100);
+                    seekBar.setOnSeekBarChangeListener(liveImageView);
+                }
+                else
+                {
+                    seekBar.setVisibility(View.GONE);
+                }
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+        }
     }
 
     /**
