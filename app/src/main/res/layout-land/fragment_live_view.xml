@@ -164,7 +164,9 @@
         android:id="@+id/liveview_cache_seekbar"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:max="100"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="5dp"
+        android:max="1000"
         android:visibility="gone" />
 
     <RelativeLayout

@@ -42,6 +42,7 @@ import java.util.TimerTask;
 
 import androidx.exifinterface.media.ExifInterface;
 
+import static net.osdn.gokigen.a01d.liveview.LiveViewFragment.SEEKBAR_MAX_SCALE;
 import static net.osdn.gokigen.a01d.liveview.message.IMessageDrawer.MessageArea.LOWRIGHT;
 import static net.osdn.gokigen.a01d.liveview.message.IMessageDrawer.SIZE_STD;
 
@@ -78,6 +79,7 @@ public class CameraLiveImageView extends View implements IImageDataReceiver, IAu
     private static final int LIMIT_SAVE_COUNT = 0;  // 0なら、ダミーファイルを作らない
     private int saveCount = 10;                     // LIMIT_SAVE_COUNTより大きければダミーファイルに書かない
 
+    private int getCachePicsPosition = 0;
     private int maxCachePics = 500;
     private ArrayList<byte[]> cachePics = null;
 
@@ -269,24 +271,35 @@ public class CameraLiveImageView extends View implements IImageDataReceiver, IAu
                         e.printStackTrace();
                         cacheIsFull = true;
                     }
-                    messageDrawer.setMessageToShow(LOWRIGHT, Color.LTGRAY, SIZE_STD, "CACHE : " + (cachePics.size() - 1) + " / " + maxCachePics);
-                    if (cacheIsFull)
+
+                    messageDrawer.setMessageToShow(LOWRIGHT, Color.LTGRAY, SIZE_STD, "BUFFER : " + (cachePics.size() - 1) + " / " + maxCachePics);
+
+                    try
                     {
-                        try
+                        int indexToGet = maxCachePics - (int) Math.floor((float) getCachePicsPosition / (float) SEEKBAR_MAX_SCALE * (float) maxCachePics);
+                        if (indexToGet < cachePics.size())
+                        {
+                            data = cachePics.get(indexToGet);
+                        }
+                        else
+                        {
+                            data = null;
+                        }
+
+                        if (cacheIsFull)
                         {
                             // リストから一つ取り除く
-                            int index = 0; // cachePics.size() - 1;
-                            data = cachePics.get(index);
-                            cachePics.remove(index);
-                        }
-                        catch (Exception e)
-                        {
-                            e.printStackTrace();
+                            cachePics.remove(0);
                         }
                     }
-                    else
+                    catch (Exception e)
                     {
-                        // キャッシュがたまっていない場合は、カウントだけ上げる
+                        e.printStackTrace();
+                        data = null;
+                    }
+                    if (data == null)
+                    {
+                        // キャッシュがたまっていない場合は、カウントだけ更新する
                         refreshCanvas();
                         return;
                     }
@@ -360,9 +373,6 @@ public class CameraLiveImageView extends View implements IImageDataReceiver, IAu
             }
             switch (orientation)
             {
-                case ExifInterface.ORIENTATION_NORMAL:
-                    rotationDegrees = 0;
-                    break;
                 case ExifInterface.ORIENTATION_ROTATE_90:
                     rotationDegrees = 90;
                     break;
@@ -372,6 +382,7 @@ public class CameraLiveImageView extends View implements IImageDataReceiver, IAu
                 case ExifInterface.ORIENTATION_ROTATE_270:
                     rotationDegrees = 270;
                     break;
+                case ExifInterface.ORIENTATION_NORMAL:
                 default:
                     rotationDegrees = 0;
                     break;
@@ -542,7 +553,6 @@ public class CameraLiveImageView extends View implements IImageDataReceiver, IAu
                 drawFocusFrame(canvas, bitmapToShow.getHeight(), bitmapToShow.getWidth());
             }
         }
-
         // グリッド（撮影補助線）の表示
         if ((viewRect != null)&&(showGridFeature)&&(gridFrameDrawer != null))
         {
@@ -902,7 +912,8 @@ public class CameraLiveImageView extends View implements IImageDataReceiver, IAu
      */
     private PointF convertPointFromImageArea(PointF point)
     {
-        if (imageBitmap == null) {
+        if (imageBitmap == null)
+        {
             return new PointF();
         }
 
@@ -926,7 +937,8 @@ public class CameraLiveImageView extends View implements IImageDataReceiver, IAu
         float ratioY = viewSizeHeight / imageSizeHeight;
         float scale;
 
-        switch (imageScaleType) {
+        switch (imageScaleType)
+        {
             case FIT_XY:
                 viewPointX *= ratioX;
                 viewPointY *= ratioY;
@@ -953,7 +965,6 @@ public class CameraLiveImageView extends View implements IImageDataReceiver, IAu
             default:
                 break;
         }
-
         return new PointF(viewPointX, viewPointY);
     }
 
@@ -974,7 +985,8 @@ public class CameraLiveImageView extends View implements IImageDataReceiver, IAu
         float imagePointY = point.y;
         float imageSizeWidth;
         float imageSizeHeight;
-        if (imageRotationDegrees == 0 || imageRotationDegrees == 180) {
+        if (imageRotationDegrees == 0 || imageRotationDegrees == 180)
+        {
             imageSizeWidth = imageBitmap.getWidth();
             imageSizeHeight = imageBitmap.getHeight();
         } else {
@@ -987,7 +999,8 @@ public class CameraLiveImageView extends View implements IImageDataReceiver, IAu
         float ratioY = viewSizeHeight / imageSizeHeight;
         float scale;// = 1.0f;
 
-        switch (imageScaleType) {
+        switch (imageScaleType)
+        {
             case FIT_XY:
                 imagePointX /= ratioX;
                 imagePointY /= ratioY;
@@ -1014,13 +1027,11 @@ public class CameraLiveImageView extends View implements IImageDataReceiver, IAu
             default:
                 break;
         }
-
         return new PointF(imagePointX, imagePointY);
     }
 
     /**
      *　　ライブビュー座標系の点座標をビューファインダー座標系の点座標に変換
-     *
      *
      */
     private PointF convertPointOnLiveImageIntoViewfinder(PointF point, float width, float height, int rotatedDegrees)
@@ -1029,7 +1040,8 @@ public class CameraLiveImageView extends View implements IImageDataReceiver, IAu
         float viewFinderPointY = 0.5f;
         try
         {
-            if (rotatedDegrees == 0 || rotatedDegrees == 180) {
+            if (rotatedDegrees == 0 || rotatedDegrees == 180)
+            {
                 viewFinderPointX = point.x / width;
                 viewFinderPointY = point.y / height;
             } else {
@@ -1057,7 +1069,8 @@ public class CameraLiveImageView extends View implements IImageDataReceiver, IAu
         float right = 1.0f;
         try
         {
-            if (rotatedDegrees == 0 || rotatedDegrees == 180) {
+            if (rotatedDegrees == 0 || rotatedDegrees == 180)
+            {
                 top = rect.top * height;
                 bottom = rect.bottom * height;
                 left = rect.left * width;
@@ -1075,7 +1088,6 @@ public class CameraLiveImageView extends View implements IImageDataReceiver, IAu
         }
         return (new RectF(left, top, right, bottom));
     }
-
 
     /**
      * Converts a rectangle on image area to a rectangle on view area.
@@ -1118,7 +1130,6 @@ public class CameraLiveImageView extends View implements IImageDataReceiver, IAu
     /**
      *   現在のライブビュー画像を保管する
      *
-     *
      */
     @Override
     public void takePicture()
@@ -1143,11 +1154,8 @@ public class CameraLiveImageView extends View implements IImageDataReceiver, IAu
         return (messageHolder.getMessageDrawer());
     }
 
-
     /**
      *    IIndicatorControl の実装
-     *
-     *
      *
      */
     @Override
@@ -1217,18 +1225,20 @@ public class CameraLiveImageView extends View implements IImageDataReceiver, IAu
     @Override
     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser)
     {
-        Log.v(TAG, " SeekBar::onProgressChanged() : " + progress);
+        //Log.v(TAG, " SeekBar::onProgressChanged() : " + progress);
+        getCachePicsPosition = progress;
+        refreshCanvas();
     }
 
     @Override
     public void onStartTrackingTouch(SeekBar seekBar)
     {
-
+        // なにもしない
     }
 
     @Override
     public void onStopTrackingTouch(SeekBar seekBar)
     {
-
+        // なにもしない
     }
 }

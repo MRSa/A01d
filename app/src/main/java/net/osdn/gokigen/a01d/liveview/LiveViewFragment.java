@@ -49,6 +49,7 @@ import androidx.preference.PreferenceManager;
 public class LiveViewFragment extends Fragment implements IStatusViewDrawer, IFocusingModeNotify, IDialogKicker, ICameraStatusUpdateNotify, IFocusLockIndicator {
     private final String TAG = this.toString();
     private static final int COMMAND_MY_PROPERTY = 0x00000100;
+    public static final int SEEKBAR_MAX_SCALE = 1000;
 
     private ILiveViewControl liveViewControl = null;
     private IZoomLensControl zoomLensControl = null;
@@ -357,7 +358,7 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer, IFo
                 if ((preference != null)&&(preference.getBoolean(IPreferencePropertyAccessor.CACHE_LIVEVIEW_PICTURES, false)))
                 {
                     seekBar.setVisibility(View.VISIBLE);
-                    seekBar.setMax(100);
+                    seekBar.setMax(SEEKBAR_MAX_SCALE);
                     seekBar.setOnSeekBarChangeListener(liveImageView);
                 }
                 else
