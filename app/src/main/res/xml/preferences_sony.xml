@@ -20,22 +20,22 @@
             android:title="@string/pref_wifi_settings"
             android:summary="@string/pref_summary_wifi_settings" />
 -->
-    </PreferenceCategory>
-
-    <PreferenceCategory
-        android:title="@string/pref_cat_camera">
-
         <PreferenceScreen
             android:key="sony_api_list"
             android:title="@string/pref_sony_api_list"
             android:summary="@string/pref_summary_sony_api_list" />
+
+    </PreferenceCategory>
 <!--
+    <PreferenceCategory
+        android:title="@string/pref_cat_camera">
+
         <CheckBoxPreference
             android:key="capture_both_camera_and_live_view"
             android:title="@string/pref_capture_both_camera_and_live_view" />
--->
-    </PreferenceCategory>
 
+    </PreferenceCategory>
+-->
 <!--
     <PreferenceCategory
         android:title="@string/pref_cat_initialize">

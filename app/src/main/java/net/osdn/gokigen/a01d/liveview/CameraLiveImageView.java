@@ -266,7 +266,7 @@ public class CameraLiveImageView extends View implements IImageDataReceiver, IAu
                             cacheIsFull = true;
                         }
                     }
-                    catch (Exception e)
+                    catch (Throwable e)
                     {
                         e.printStackTrace();
                         cacheIsFull = true;
@@ -292,7 +292,7 @@ public class CameraLiveImageView extends View implements IImageDataReceiver, IAu
                             cachePics.remove(0);
                         }
                     }
-                    catch (Exception e)
+                    catch (Throwable e)
                     {
                         e.printStackTrace();
                         data = null;
@@ -327,7 +327,7 @@ public class CameraLiveImageView extends View implements IImageDataReceiver, IAu
                             outputStream = null;
                             System.gc();
                         }
-                        catch (Exception eee)
+                        catch (Throwable eee)
                         {
                             eee.printStackTrace();
                         }

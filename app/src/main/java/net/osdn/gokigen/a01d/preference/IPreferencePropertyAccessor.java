@@ -99,6 +99,10 @@ public interface IPreferencePropertyAccessor
     String NUMBER_OF_CACHE_PICTURES = "number_of_cache_pictures";
     String NUMBER_OF_CACHE_PICTURES_DEFAULT_VALUE = "500";
 
+    String SEND_MESSAGE_DIALOG = "dialog_message_send";
+
+
+
  /*
     int CHOICE_SPLASH_SCREEN = 10;
 

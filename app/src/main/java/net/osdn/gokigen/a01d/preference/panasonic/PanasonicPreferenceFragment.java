@@ -23,6 +23,7 @@ import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.PreferenceManager;
 
+import static net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor.SEND_MESSAGE_DIALOG;
 import static net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor.WIFI_SETTINGS;
 
 /**
@@ -33,6 +34,7 @@ public class PanasonicPreferenceFragment  extends PreferenceFragmentCompat imple
 {
     private final String TAG = toString();
     private AppCompatActivity context = null;
+    private IChangeScene changeScene = null;
     private SharedPreferences preferences = null;
     private CameraPowerOffPanasonic powerOffController = null;
 
@@ -66,6 +68,7 @@ public class PanasonicPreferenceFragment  extends PreferenceFragmentCompat imple
             powerOffController.prepare();
 
             this.context = context;
+            this.changeScene = changeScene;
         }
         catch (Exception e)
         {
@@ -188,6 +191,12 @@ public class PanasonicPreferenceFragment  extends PreferenceFragmentCompat imple
             if (exitApplication != null)
             {
                 exitApplication.setOnPreferenceClickListener(powerOffController);
+            }
+
+            Preference httpDialog = findPreference(SEND_MESSAGE_DIALOG);
+            if (httpDialog != null)
+            {
+                httpDialog.setOnPreferenceClickListener(this);
             }
         }
         catch (Exception e)
@@ -330,6 +339,14 @@ public class PanasonicPreferenceFragment  extends PreferenceFragmentCompat imple
                 if (context != null)
                 {
                     context.startActivity(new Intent(Settings.ACTION_WIFI_SETTINGS));
+                }
+            }
+            else if (preferenceKey.contains(SEND_MESSAGE_DIALOG))
+            {
+                // コマンド送信ダイアログを表示する
+                if (changeScene != null)
+                {
+                    changeScene.changeSceneToCameraPropertyList();
                 }
             }
             return (true);

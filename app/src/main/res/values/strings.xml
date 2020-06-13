@@ -307,4 +307,7 @@
 
     <string name="pref_capture_only_live_view">DO NOT USE REMOTE SHUTTER</string>
     <string name="pref_summary_capture_only_live_view"> </string>
+
+    <string name="pref_open_send_command_dialog">SEND COMMAND DIALOG</string>
+
 </resources>

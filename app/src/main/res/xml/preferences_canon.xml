@@ -20,6 +20,11 @@
             android:title="@string/pref_wifi_settings"
             android:summary="@string/pref_summary_wifi_settings" />
 -->
+        <PreferenceScreen
+            android:key="dialog_message_send"
+            android:icon="@drawable/ic_linked_camera_black_24dp"
+            android:title="@string/pref_open_send_command_dialog"
+            />
     </PreferenceCategory>
 
     <PreferenceCategory

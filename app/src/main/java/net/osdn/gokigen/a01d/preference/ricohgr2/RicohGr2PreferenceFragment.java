@@ -25,12 +25,14 @@ import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.PreferenceManager;
 
 import static net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor.EXIT_APPLICATION;
+import static net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor.SEND_MESSAGE_DIALOG;
 import static net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor.WIFI_SETTINGS;
 
 public class RicohGr2PreferenceFragment  extends PreferenceFragmentCompat implements SharedPreferences.OnSharedPreferenceChangeListener, Preference.OnPreferenceClickListener
 {
     private final String TAG = toString();
     private AppCompatActivity context = null;
+    private IChangeScene changeScene = null;
     private SharedPreferences preferences = null;
     private CameraPowerOffRicohGr2 powerOffController = null;
 
@@ -64,6 +66,7 @@ public class RicohGr2PreferenceFragment  extends PreferenceFragmentCompat implem
             powerOffController.prepare();
 
             this.context = context;
+            this.changeScene = changeScene;
         }
         catch (Exception e)
         {
@@ -234,6 +237,12 @@ public class RicohGr2PreferenceFragment  extends PreferenceFragmentCompat implem
             {
                 exitApplication.setOnPreferenceClickListener(powerOffController);
             }
+
+            Preference httpDialog = findPreference(SEND_MESSAGE_DIALOG);
+            if (httpDialog != null)
+            {
+                httpDialog.setOnPreferenceClickListener(this);
+            }
         }
         catch (Exception e)
         {
@@ -380,6 +389,14 @@ public class RicohGr2PreferenceFragment  extends PreferenceFragmentCompat implem
                 if (context != null)
                 {
                     context.startActivity(new Intent(Settings.ACTION_WIFI_SETTINGS));
+                }
+            }
+            else if (preferenceKey.contains(SEND_MESSAGE_DIALOG))
+            {
+                // HTTP送信ダイアログを表示する
+                if (changeScene != null)
+                {
+                    changeScene.changeSceneToCameraPropertyList();
                 }
             }
             return (true);

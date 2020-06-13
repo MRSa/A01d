@@ -39,6 +39,7 @@ import androidx.annotation.NonNull;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.preference.PreferenceManager;
 
@@ -913,9 +914,10 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer, IFo
             LoadSaveMyCameraPropertyDialog dialog = new LoadSaveMyCameraPropertyDialog();
             dialog.setTargetFragment(this, COMMAND_MY_PROPERTY);
             dialog.setPropertyOperationsHolder(new LoadSaveCameraProperties(getActivity(), interfaceProvider.getOlympusInterface()));
-            FragmentManager manager = getFragmentManager();
-            if (manager != null)
+            FragmentActivity activity = getActivity();
+            if (activity != null)
             {
+                FragmentManager manager = activity.getSupportFragmentManager();
                 dialog.show(manager, "my_dialog");
             }
         }
@@ -930,10 +932,11 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer, IFo
     {
         try
         {
-            // FUJI X用のステータス表示ダイアログを表示する
-            FragmentManager manager = getFragmentManager();
-            if (manager != null)
+            FragmentActivity activity = getActivity();
+            if (activity != null)
             {
+                // FUJI X用のステータス表示ダイアログを表示する
+                FragmentManager manager = activity.getSupportFragmentManager();
                 FujiXCameraStatusDialog.newInstance(interfaceProvider.getFujiXInterface()).show(manager, "statusDialog");
             }
         }

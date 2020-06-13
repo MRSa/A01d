@@ -281,7 +281,6 @@ public class PreferenceFragmentSummary extends PreferenceFragmentCompat implemen
             {
                 nikon_settings.setOnPreferenceClickListener(this);
             }
-
             Preference exitApplication = findPreference(EXIT_APPLICATION);
             if (exitApplication != null)
             {

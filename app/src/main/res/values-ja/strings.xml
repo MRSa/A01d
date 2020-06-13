@@ -303,4 +303,6 @@
     <string name="pref_capture_only_live_view">カメラのシャッターを使用しない</string>
     <string name="pref_summary_capture_only_live_view">チェックを入れると、シャッターを押してもリモート(カメラ)側で撮影を行いません。</string>
 
+    <string name="pref_open_send_command_dialog">メッセージ送信</string>
+
 </resources>
