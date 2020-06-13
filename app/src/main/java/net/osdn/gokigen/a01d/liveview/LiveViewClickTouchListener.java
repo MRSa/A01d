@@ -263,13 +263,16 @@ class LiveViewClickTouchListener implements View.OnClickListener, View.OnTouchLi
         Log.v(TAG, "pushedShutterButton()");
         try
         {
-            // カメラで撮影する
-            captureControl.doCapture(0);
-
             SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+
+            if (!preferences.getBoolean(IPreferencePropertyAccessor.CAPTURE_ONLY_LIVE_VIEW, false))
+            {
+                // カメラで撮影する
+                captureControl.doCapture(0);
+            }
             if (preferences.getBoolean(IPreferencePropertyAccessor.CAPTURE_BOTH_CAMERA_AND_LIVE_VIEW, true))
             {
-                // ライブビュー画像も保管する
+                // ライブビュー画像を保管する
                 statusNotify.takePicture();
             }
         }

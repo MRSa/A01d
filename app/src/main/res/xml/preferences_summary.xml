@@ -27,7 +27,13 @@
 
         <CheckBoxPreference
             android:key="capture_both_camera_and_live_view"
-            android:title="@string/pref_capture_both_camera_and_live_view" />
+            android:title="@string/pref_capture_both_camera_and_live_view"
+            android:summary="@string/pref_summary_capture_both_live_view"/>
+
+        <CheckBoxPreference
+            android:key="capture_only_live_view"
+            android:title="@string/pref_capture_only_live_view"
+            android:summary="@string/pref_summary_capture_only_live_view" />
 
         <CheckBoxPreference
             android:key="cache_liveview_pictures"

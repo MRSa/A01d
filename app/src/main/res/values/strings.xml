@@ -22,7 +22,8 @@
     <string name="pref_camera_sound_volume">Shutter Sound</string>
     <string name="pref_take_raw">Take Raw</string>
 
-    <string name="pref_capture_both_camera_and_live_view">Capture both camera and Live View</string>
+    <string name="pref_capture_both_camera_and_live_view">Capture LiveView Image</string>
+    <string name="pref_summary_capture_both_live_view">Captutes a liveview image.</string>
 
     <string name="pref_cat_application_control">App. Control</string>
     <string name="pref_exit_power_off">Exit Application(and Camera OFF)</string>
@@ -304,4 +305,6 @@
     <string name="pref_number_of_cache_pictures">Max number of cache pictures</string>
     <string name="pref_summary_number_of_cache_pictures">Set number of cache pictures. (Default:500, enables after restart.)</string>
 
+    <string name="pref_capture_only_live_view">DO NOT USE REMOTE SHUTTER</string>
+    <string name="pref_summary_capture_only_live_view"> </string>
 </resources>

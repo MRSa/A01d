@@ -21,7 +21,8 @@
     <string name="pref_camera_sound_volume">シャッター音</string>
     <string name="pref_take_raw">RAW撮影</string>
 
-    <string name="pref_capture_both_camera_and_live_view">ライブビュー画像も同時に撮影</string>
+    <string name="pref_capture_both_camera_and_live_view">ライブビュー画像を撮影する</string>
+    <string name="pref_summary_capture_both_live_view">シャッターボタンを押すとライブビュー画像を保存します。</string>
 
     <string name="pref_cat_application_control">アプリ制御</string>
     <string name="pref_exit_power_off">アプリ終了(とカメラOFF)</string>
@@ -298,5 +299,8 @@
     <string name="pref_summary_cache_liveview_pictures">ライブビュー画像を溜めて表示します。（再起動後に有効）</string>
     <string name="pref_number_of_cache_pictures">ライブビュー画像の遅延最大数</string>
     <string name="pref_summary_number_of_cache_pictures">ライブビューを遅らせる画像の最大枚数を指定します。(初期値:500、再起動後に有効)</string>
+
+    <string name="pref_capture_only_live_view">カメラのシャッターを使用しない</string>
+    <string name="pref_summary_capture_only_live_view">チェックを入れると、シャッターを押してもリモート(カメラ)側で撮影を行いません。</string>
 
 </resources>

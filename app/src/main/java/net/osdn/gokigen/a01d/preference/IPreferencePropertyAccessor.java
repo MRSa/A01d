@@ -39,6 +39,8 @@ public interface IPreferencePropertyAccessor
     String MAGNIFYING_LIVE_VIEW_SCALE_DEFAULT_VALUE = "10.0";
 
     String CAPTURE_BOTH_CAMERA_AND_LIVE_VIEW = "capture_both_camera_and_live_view";
+    String CAPTURE_ONLY_LIVE_VIEW = "capture_only_live_view";
+
 
     String OLYCAMERA_BLUETOOTH_SETTINGS = "olympus_air_bt";
 

@@ -128,7 +128,8 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer, IFo
         View view = inflater.inflate(R.layout.fragment_live_view, container, false);
         myView = view;
         imageViewCreated = true;
-        try {
+        try
+        {
             imageView = view.findViewById(R.id.cameraLiveImageView);
             if (interfaceInjector != null) {
                 interfaceInjector.injectDisplay(imageView, imageView, this);
@@ -149,14 +150,35 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer, IFo
             view.setOnKeyListener(onClickTouchListener);
             view.setFocusableInTouchMode(true);
 
+            boolean captureLv = true;
+            boolean captureRemote = false;
+            Activity activity = this.getActivity();
+            if (activity != null)
+            {
+                SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(activity);
+                captureLv = preferences.getBoolean(IPreferencePropertyAccessor.CAPTURE_BOTH_CAMERA_AND_LIVE_VIEW, true);
+                captureRemote = preferences.getBoolean(IPreferencePropertyAccessor.CAPTURE_ONLY_LIVE_VIEW, false);
+            }
+
+            ImageButton shutterButton = view.findViewById(R.id.shutter_button);
+            if ((!captureLv)&&(captureRemote))
+            {
+                // シャッターボタンを消す
+                shutterButton.setVisibility(View.INVISIBLE);
+            }
+            else
+            {
+                // シャッターボタンのクリックイベントを拾うよう設定
+                shutterButton.setOnClickListener(onClickTouchListener);
+            }
             view.findViewById(R.id.show_preference_button).setOnClickListener(onClickTouchListener);
             view.findViewById(R.id.camera_property_settings_button).setOnClickListener(onClickTouchListener);
-            view.findViewById(R.id.shutter_button).setOnClickListener(onClickTouchListener);
             view.findViewById(R.id.btn_zoomin).setOnClickListener(onClickTouchListener);
             view.findViewById(R.id.btn_zoomout).setOnClickListener(onClickTouchListener);
 
             focusIndicator = view.findViewById(R.id.focus_indicator);
-            if (focusIndicator != null) {
+            if (focusIndicator != null)
+            {
                 focusIndicator.setOnClickListener(onClickTouchListener);
             }
             manualFocus = view.findViewById(R.id.focusing_button);
@@ -164,11 +186,13 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer, IFo
 
             ICameraConnection.CameraConnectionMethod connectionMethod = interfaceProvider.getCammeraConnectionMethod();
 
-            if (connectionMethod == ICameraConnection.CameraConnectionMethod.OPC) {
+            if (connectionMethod == ICameraConnection.CameraConnectionMethod.OPC)
+            {
                 view.findViewById(R.id.show_favorite_settings_button).setOnClickListener(onClickTouchListener);
 
                 // OPCのときには、フォーカスインジケータのマークを消す。
-                if (focusIndicator != null) {
+                if (focusIndicator != null)
+                {
                     focusIndicator.setVisibility(View.INVISIBLE);
                 }
             } else {
