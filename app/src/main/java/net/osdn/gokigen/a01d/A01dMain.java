@@ -236,6 +236,7 @@ public class A01dMain extends AppCompatActivity implements ICameraStatusReceiver
         }
     }
 
+
     /**
      * カメラのプロパティ一覧画面を開く
      * （カメラと接続中のときのみ、接続方式が Olympusのときのみ）
@@ -246,8 +247,24 @@ public class A01dMain extends AppCompatActivity implements ICameraStatusReceiver
         try
         {
             ICameraConnection.CameraConnectionMethod method = interfaceProvider.getCammeraConnectionMethod();
-            ICameraConnection connection = getCameraConnection(method);
-            if (method == ICameraConnection.CameraConnectionMethod.RICOH_GR2)
+
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * カメラのプロパティ一覧画面を開く
+     * （カメラと接続中のときのみ、接続方式が Olympusのときのみ）
+     */
+    @Override
+    public void changeSceneToCameraPropertyList(ICameraConnection.CameraConnectionMethod connectionMethod)
+    {
+        try
+        {
+            if (connectionMethod == ICameraConnection.CameraConnectionMethod.RICOH_GR2)
             {
                 try
                 {
@@ -259,12 +276,12 @@ public class A01dMain extends AppCompatActivity implements ICameraStatusReceiver
                     e.printStackTrace();
                 }
             }
-            else if (method == ICameraConnection.CameraConnectionMethod.SONY)
+            else if (connectionMethod == ICameraConnection.CameraConnectionMethod.SONY)
             {
                 // SONYの場合は、API一覧画面へ遷移させる
                 changeSceneToApiList();
             }
-            else if (method == ICameraConnection.CameraConnectionMethod.PANASONIC)
+            else if (connectionMethod == ICameraConnection.CameraConnectionMethod.PANASONIC)
             {
                 try
                 {
@@ -276,7 +293,7 @@ public class A01dMain extends AppCompatActivity implements ICameraStatusReceiver
                     e.printStackTrace();
                 }
             }
-            else if (method == ICameraConnection.CameraConnectionMethod.FUJI_X)
+            else if (connectionMethod == ICameraConnection.CameraConnectionMethod.FUJI_X)
             {
                 try
                 {
@@ -288,7 +305,7 @@ public class A01dMain extends AppCompatActivity implements ICameraStatusReceiver
                     e.printStackTrace();
                 }
             }
-            else if (method == ICameraConnection.CameraConnectionMethod.OLYMPUS)
+            else if (connectionMethod == ICameraConnection.CameraConnectionMethod.OLYMPUS)
             {
                 try
                 {
@@ -304,7 +321,7 @@ public class A01dMain extends AppCompatActivity implements ICameraStatusReceiver
                     e.printStackTrace();
                 }
             }
-            else if (method == ICameraConnection.CameraConnectionMethod.THETA)
+            else if (connectionMethod == ICameraConnection.CameraConnectionMethod.THETA)
             {
                 try
                 {
@@ -316,7 +333,7 @@ public class A01dMain extends AppCompatActivity implements ICameraStatusReceiver
                     e.printStackTrace();
                 }
             }
-            else if (method == ICameraConnection.CameraConnectionMethod.CANON)
+            else if (connectionMethod == ICameraConnection.CameraConnectionMethod.CANON)
             {
                 try
                 {
@@ -328,7 +345,7 @@ public class A01dMain extends AppCompatActivity implements ICameraStatusReceiver
                     e.printStackTrace();
                 }
             }
-            else if (method == ICameraConnection.CameraConnectionMethod.NIKON)
+            else if (connectionMethod == ICameraConnection.CameraConnectionMethod.NIKON)
             {
                 try
                 {
@@ -343,6 +360,7 @@ public class A01dMain extends AppCompatActivity implements ICameraStatusReceiver
             else
             {
                 // OPC カメラの場合...
+                ICameraConnection connection = getCameraConnection(connectionMethod);
                 if (connection != null)
                 {
                     ICameraConnection.CameraConnectionStatus status = connection.getConnectionStatus();

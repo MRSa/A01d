@@ -18,6 +18,7 @@ import androidx.preference.PreferenceManager;
 
 import net.osdn.gokigen.a01d.IChangeScene;
 import net.osdn.gokigen.a01d.R;
+import net.osdn.gokigen.a01d.camera.ICameraConnection;
 import net.osdn.gokigen.a01d.camera.ptpip.operation.PtpIpCameraPowerOff;
 import net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor;
 
@@ -357,7 +358,7 @@ public class NikonPreferenceFragment extends PreferenceFragmentCompat implements
                 // コマンド送信ダイアログを表示する
                 if (changeScene != null)
                 {
-                    changeScene.changeSceneToCameraPropertyList();
+                    changeScene.changeSceneToCameraPropertyList(ICameraConnection.CameraConnectionMethod.NIKON);
                 }
             }
             return (true);

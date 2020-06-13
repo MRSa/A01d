@@ -18,6 +18,7 @@ import androidx.preference.PreferenceManager;
 
 import net.osdn.gokigen.a01d.IChangeScene;
 import net.osdn.gokigen.a01d.R;
+import net.osdn.gokigen.a01d.camera.ICameraConnection;
 import net.osdn.gokigen.a01d.camera.olympuspen.operation.OlympusPenCameraPowerOff;
 import net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor;
 
@@ -350,7 +351,7 @@ public class OlympusPreferenceFragment extends PreferenceFragmentCompat implemen
                 // HTTP送信ダイアログを表示する
                 if (changeScene != null)
                 {
-                    changeScene.changeSceneToCameraPropertyList();
+                    changeScene.changeSceneToCameraPropertyList(ICameraConnection.CameraConnectionMethod.OLYMPUS);
                 }
             }
             return (true);

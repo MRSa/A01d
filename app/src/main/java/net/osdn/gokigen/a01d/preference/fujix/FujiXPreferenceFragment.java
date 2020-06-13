@@ -9,6 +9,7 @@ import android.util.Log;
 
 import net.osdn.gokigen.a01d.IChangeScene;
 import net.osdn.gokigen.a01d.R;
+import net.osdn.gokigen.a01d.camera.ICameraConnection;
 import net.osdn.gokigen.a01d.camera.fujix.operation.CameraPowerOffFujiX;
 import net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor;
 
@@ -374,7 +375,7 @@ public class FujiXPreferenceFragment  extends PreferenceFragmentCompat implement
                 // コマンド送信ダイアログを表示する
                 if (changeScene != null)
                 {
-                    changeScene.changeSceneToCameraPropertyList();
+                    changeScene.changeSceneToCameraPropertyList(ICameraConnection.CameraConnectionMethod.FUJI_X);
                 }
             }
             return (true);

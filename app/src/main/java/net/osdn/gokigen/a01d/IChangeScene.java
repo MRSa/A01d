@@ -8,6 +8,7 @@ import net.osdn.gokigen.a01d.camera.ICameraConnection;
 public interface IChangeScene
 {
     void changeSceneToCameraPropertyList();
+    void changeSceneToCameraPropertyList(ICameraConnection.CameraConnectionMethod connectionMethod);
     void changeSceneToConfiguration();
     void changeSceneToConfiguration(ICameraConnection.CameraConnectionMethod connectionMethod);
     void changeCameraConnection();

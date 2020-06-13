@@ -9,6 +9,7 @@ import android.util.Log;
 
 import net.osdn.gokigen.a01d.IChangeScene;
 import net.osdn.gokigen.a01d.R;
+import net.osdn.gokigen.a01d.camera.ICameraConnection;
 import net.osdn.gokigen.a01d.camera.panasonic.operation.CameraPowerOffPanasonic;
 import net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor;
 
@@ -346,7 +347,7 @@ public class PanasonicPreferenceFragment  extends PreferenceFragmentCompat imple
                 // コマンド送信ダイアログを表示する
                 if (changeScene != null)
                 {
-                    changeScene.changeSceneToCameraPropertyList();
+                    changeScene.changeSceneToCameraPropertyList(ICameraConnection.CameraConnectionMethod.PANASONIC);
                 }
             }
             return (true);
