@@ -1,6 +1,7 @@
 package net.osdn.gokigen.a01d;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
@@ -39,6 +40,7 @@ import net.osdn.gokigen.a01d.preference.summary.PreferenceFragmentSummary;
 import net.osdn.gokigen.a01d.preference.theta.ThetaPreferenceFragment;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -54,7 +56,7 @@ import java.util.Map;
  *   A01d ;
  *
  */
-public class A01dMain extends AppCompatActivity implements ICameraStatusReceiver, IChangeScene, ICameraPowerOn.PowerOnCameraCallback, IInformationReceiver
+public class A01dMain extends AppCompatActivity implements ICameraStatusReceiver, IChangeScene, ICameraPowerOn.PowerOnCameraCallback, IInformationReceiver, ICardSlotSelector
 {
     private final String TAG = toString();
     private IInterfaceProvider interfaceProvider = null;
@@ -76,7 +78,9 @@ public class A01dMain extends AppCompatActivity implements ICameraStatusReceiver
     private LogCatFragment logCatFragment = null;
     private LiveViewFragment liveViewFragment = null;
 
+
     @Override
+    @SuppressLint("InlinedApi")
     protected void onCreate(Bundle savedInstanceState)
     {
         final int REQUEST_NEED_PERMISSIONS = 1010;
@@ -117,7 +121,9 @@ public class A01dMain extends AppCompatActivity implements ICameraStatusReceiver
                 (ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_ADMIN) != PackageManager.PERMISSION_GRANTED) ||
                 (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) ||
                 (ContextCompat.checkSelfPermission(this, Manifest.permission.INTERNET) != PackageManager.PERMISSION_GRANTED)) {
+
             ActivityCompat.requestPermissions(this,
+
                     new String[]{
                             Manifest.permission.WRITE_EXTERNAL_STORAGE,
                             Manifest.permission.READ_EXTERNAL_STORAGE,
@@ -154,7 +160,7 @@ public class A01dMain extends AppCompatActivity implements ICameraStatusReceiver
     {
         try
         {
-            interfaceProvider = new CameraInterfaceProvider(this, this, this);
+            interfaceProvider = new CameraInterfaceProvider(this, this, this, this);
         }
         catch (Exception e)
         {
@@ -244,15 +250,16 @@ public class A01dMain extends AppCompatActivity implements ICameraStatusReceiver
     @Override
     public void changeSceneToCameraPropertyList()
     {
+/*
         try
         {
             ICameraConnection.CameraConnectionMethod method = interfaceProvider.getCammeraConnectionMethod();
-
         }
         catch (Exception e)
         {
             e.printStackTrace();
         }
+*/
     }
 
     /**
@@ -855,5 +862,23 @@ public class A01dMain extends AppCompatActivity implements ICameraStatusReceiver
             e.printStackTrace();
         }
 /**/
+    }
+
+    @Override
+    public void setupSlotSelector(boolean isEnable, @Nullable ICardSlotSelectionReceiver slotSelectionReceiver)
+    {
+        // 特に何もしない
+    }
+
+    @Override
+    public void selectSlot(@NonNull String slotId)
+    {
+        // 特に何もしない
+    }
+
+    @Override
+    public void changedCardSlot(@NonNull String slotId)
+    {
+        // 特に何もしない
     }
 }

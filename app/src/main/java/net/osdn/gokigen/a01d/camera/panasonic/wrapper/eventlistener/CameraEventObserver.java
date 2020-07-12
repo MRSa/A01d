@@ -4,8 +4,10 @@ import android.content.Context;
 import android.os.Handler;
 import android.util.Log;
 
+import net.osdn.gokigen.a01d.ICardSlotSelector;
 import net.osdn.gokigen.a01d.camera.ICameraChangeListener;
 import net.osdn.gokigen.a01d.camera.panasonic.wrapper.IPanasonicCamera;
+import net.osdn.gokigen.a01d.camera.utils.SimpleHttpClient;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -19,23 +21,23 @@ import androidx.annotation.NonNull;
 public class CameraEventObserver implements ICameraEventObserver
 {
     private static final String TAG = CameraEventObserver.class.getSimpleName();
+    private static final int TIMEOUT_MS = 3000;
+    private final CameraStatusHolder statusHolder;
     private boolean isEventMonitoring;
     private boolean isActive;
 
     private final IPanasonicCamera remote;
-    // private final ReplyJsonParser replyParser;
-    private String eventVersion = "1.1";  // 初期値を "1.0" から "1.1" に更新
 
-    public static ICameraEventObserver newInstance(@NonNull Context context, @NonNull IPanasonicCamera apiClient)
+    public static ICameraEventObserver newInstance(@NonNull Context context, @NonNull IPanasonicCamera apiClient, @NonNull ICardSlotSelector cardSlotSelector)
     {
-        return (new CameraEventObserver(context, apiClient));
+        return (new CameraEventObserver(context, apiClient, cardSlotSelector));
     }
 
-    private CameraEventObserver(@NonNull Context context, @NonNull IPanasonicCamera apiClient)
+    private CameraEventObserver(@NonNull Context context, @NonNull IPanasonicCamera apiClient, @NonNull ICardSlotSelector cardSlotSelector)
     {
         super();
         remote = apiClient;
-        //replyParser = new ReplyJsonParser(new Handler(context.getMainLooper()));
+        statusHolder = new CameraStatusHolder(context, apiClient, cardSlotSelector);
         isEventMonitoring = false;
         isActive = false;
     }
@@ -48,14 +50,13 @@ public class CameraEventObserver implements ICameraEventObserver
             Log.w(TAG, "start() observer is not active.");
             return (false);
         }
-
         if (isEventMonitoring)
         {
             Log.w(TAG, "start() already starting.");
             return (false);
         }
+        isEventMonitoring = true;
 
-        isEventMonitoring = false;
         try
         {
             Thread thread = new Thread()
@@ -64,64 +65,26 @@ public class CameraEventObserver implements ICameraEventObserver
                 public void run()
                 {
                     Log.d(TAG, "start() exec.");
-                    boolean firstCall = true;
-                    MONITORLOOP: while (isEventMonitoring)
+                    while (isEventMonitoring)
                     {
-                        // At first, call as non-Long Polling.
-                        boolean longPolling = !firstCall;
                         try
                         {
-/*
-                            // Call getEvent API.
-                            JSONObject replyJson = remoteApi.getEvent(eventVersion, longPolling);
-
-                            // Check error code at first.
-                            int errorCode = findErrorCode(replyJson);
-                            Log.d(TAG, "getEvent errorCode: " + errorCode);
-                            switch (errorCode) {
-                                case 0: // no error
-                                    // Pass through.
-                                    break;
-                                case 1: // "Any" error
-                                case 12: // "No such method" error
-                                    if (eventVersion.equals("1.1"))
-                                    {
-                                        // "1.1" でエラーが発生した時には "1.0" にダウングレードして再実行
-                                        eventVersion = "1.0";
-                                        continue MONITORLOOP;
-                                    }
-                                    replyParser.fireResponseErrorListener();
-                                    break MONITORLOOP; // end monitoring.
-
-                                case 2: // "Timeout" error
-                                    // Re-call immediately.
-                                    continue MONITORLOOP;
-
-                                case 40402: // "Already polling" error
-                                    // Retry after 5 sec.
-                                    try {
-                                        Thread.sleep(5000);
-                                    } catch (InterruptedException e) {
-                                        // do nothing.
-                                    }
-                                    continue MONITORLOOP;
-
-                                default:
-                                    Log.w(TAG, "SimpleCameraEventObserver: Unexpected error: " + errorCode);
-                                    replyParser.fireResponseErrorListener();
-                                    break MONITORLOOP; // end monitoring.
-                            }
-
-                            //  parse
-                            replyParser.parse(replyJson);
-*/
+                            // parse reply message
+                            statusHolder.parse(SimpleHttpClient.httpGet(remote.getCmdUrl() + "cam.cgi?mode=getstate", TIMEOUT_MS));
                         }
                         catch (Exception e)
                         {
                             e.printStackTrace();
                         }
-                        firstCall = false;
-                    } // MONITORLOOP end.
+                        try
+                        {
+                            Thread.sleep(1000);
+                        }
+                        catch (Exception e)
+                        {
+                            e.printStackTrace();
+                        }
+                    }
                     isEventMonitoring = false;
                 }
             };
@@ -152,7 +115,7 @@ public class CameraEventObserver implements ICameraEventObserver
     {
         try
         {
-            //replyParser.setEventChangeListener(listener);
+            statusHolder.setEventChangeListener(listener);
         }
         catch (Exception e)
         {
@@ -165,7 +128,7 @@ public class CameraEventObserver implements ICameraEventObserver
     {
         try
         {
-            //replyParser.clearEventChangeListener();
+            statusHolder.clearEventChangeListener();
         }
         catch (Exception e)
         {
@@ -176,8 +139,7 @@ public class CameraEventObserver implements ICameraEventObserver
     @Override
     public ICameraStatusHolder getCameraStatusHolder()
     {
-        return (null);
-        //return (replyParser);
+        return (statusHolder);
     }
 
     @Override
@@ -186,22 +148,4 @@ public class CameraEventObserver implements ICameraEventObserver
         isActive = true;
     }
 
-    private static int findErrorCode(JSONObject replyJson)
-    {
-        int code = 0; // 0 means no error.
-        try
-        {
-            if (replyJson.has("error"))
-            {
-                JSONArray errorObj = replyJson.getJSONArray("error");
-                code = errorObj.getInt(0);
-            }
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-            code = -1;
-        }
-        return (code);
-    }
 }

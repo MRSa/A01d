@@ -3,6 +3,7 @@ package net.osdn.gokigen.a01d.camera;
 import android.app.Activity;
 import android.content.SharedPreferences;
 
+import net.osdn.gokigen.a01d.ICardSlotSelector;
 import net.osdn.gokigen.a01d.IInformationReceiver;
 import net.osdn.gokigen.a01d.camera.canon.wrapper.CanonInterfaceProvider;
 import net.osdn.gokigen.a01d.camera.fujix.IFujiXInterfaceProvider;
@@ -42,7 +43,7 @@ public class CameraInterfaceProvider implements IInterfaceProvider
     private final NikonInterfaceProvider nikon;
     private final CameraStatusListener statusListener;
 
-    public CameraInterfaceProvider(@NonNull Activity context, @NonNull ICameraStatusReceiver provider, @NonNull IInformationReceiver informationReceiver)
+    public CameraInterfaceProvider(@NonNull Activity context, @NonNull ICameraStatusReceiver provider, @NonNull IInformationReceiver informationReceiver, @NonNull ICardSlotSelector cardSlotSelector)
     {
         this.context = context;
         this.statusListener = new CameraStatusListener();
@@ -50,7 +51,7 @@ public class CameraInterfaceProvider implements IInterfaceProvider
         olympusPen = new OlympusPenInterfaceProvider(context, provider, statusListener);
         sony = new SonyCameraWrapper(context, provider, statusListener);
         fujiX = new FujiXInterfaceProvider(context, provider, statusListener);
-        panasonic = new PanasonicCameraWrapper(context, provider, statusListener);
+        panasonic = new PanasonicCameraWrapper(context, provider, statusListener, cardSlotSelector);
         ricohGr2 = new RicohGr2InterfaceProvider(context, provider);
         theta = new ThetaInterfaceProvider(context, provider, statusListener);
         canon = new CanonInterfaceProvider(context, provider, statusListener, informationReceiver);

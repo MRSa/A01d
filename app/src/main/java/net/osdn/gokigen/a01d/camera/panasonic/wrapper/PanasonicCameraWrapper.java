@@ -3,6 +3,7 @@ package net.osdn.gokigen.a01d.camera.panasonic.wrapper;
 import android.app.Activity;
 import android.util.Log;
 
+import net.osdn.gokigen.a01d.ICardSlotSelector;
 import net.osdn.gokigen.a01d.camera.ICameraChangeListener;
 import net.osdn.gokigen.a01d.camera.ICameraConnection;
 import net.osdn.gokigen.a01d.camera.ICameraInformation;
@@ -36,6 +37,7 @@ public class PanasonicCameraWrapper implements IPanasonicCameraHolder, IPanasoni
     private static final int TIMEOUT_MS = 3000;
     private final ICameraStatusReceiver provider;
     private final ICameraChangeListener listener;
+    private final ICardSlotSelector cardSlotSelector;
     private IPanasonicCamera panasonicCamera = null;
     //private IPanasonicCameraApi panasonicCameraApi = null;
     private ICameraEventObserver eventObserver = null;
@@ -45,11 +47,12 @@ public class PanasonicCameraWrapper implements IPanasonicCameraHolder, IPanasoni
     private PanasonicCameraZoomLensControl zoomControl = null;
     private PanasonicCameraConnection cameraConnection = null;
 
-    public PanasonicCameraWrapper(final Activity context, final ICameraStatusReceiver statusReceiver , final @NonNull ICameraChangeListener listener)
+    public PanasonicCameraWrapper(final Activity context, final ICameraStatusReceiver statusReceiver , final @NonNull ICameraChangeListener listener, @NonNull ICardSlotSelector cardSlotSelector)
     {
         this.context = context;
         this.provider = statusReceiver;
         this.listener = listener;
+        this.cardSlotSelector = cardSlotSelector;
     }
 
     @Override
@@ -61,7 +64,7 @@ public class PanasonicCameraWrapper implements IPanasonicCameraHolder, IPanasoni
             //this.panasonicCameraApi = PanasonicCameraApi.newInstance(panasonicCamera);
             if (eventObserver == null)
             {
-                eventObserver = CameraEventObserver.newInstance(context, panasonicCamera);
+                eventObserver = CameraEventObserver.newInstance(context, panasonicCamera, cardSlotSelector);
             }
             if (liveViewControl == null)
             {
