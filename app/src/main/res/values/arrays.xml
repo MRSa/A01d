@@ -107,6 +107,7 @@
         <item >Ricoh THETA Series</item>
         <item >Fuji X Series</item>
         <item >Panasonic</item>
+        <item >PIXPRO WPZ2</item>
         <item >Canon</item>
         <item >NIKON</item>
     </string-array>
@@ -119,6 +120,7 @@
         <item >THETA</item>
         <item >FUJI_X</item>
         <item >PANASONIC</item>
+        <item >KODAK</item>
         <item >CANON</item>
         <item >NIKON</item>
     </string-array>

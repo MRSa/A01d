@@ -343,6 +343,23 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer, IFo
                     if (propertyButton != null) {
                         propertyButton.setOnClickListener(onClickTouchListener);
                     }
+                } else if (connectionMethod == ICameraConnection.CameraConnectionMethod.KODAK) {
+                    if (favoriteButton != null) {
+                        favoriteButton.setVisibility(View.VISIBLE);
+                        favoriteButton.setOnClickListener(onClickTouchListener);
+                    }
+                    if (manualFocus != null) {
+                        manualFocus.setVisibility(View.INVISIBLE);
+                    }
+                    if (changeLiveViewScale != null) {
+                        changeLiveViewScale.setVisibility(View.INVISIBLE);
+                    }
+                    if (focusIndicator != null) {
+                        focusIndicator.setVisibility(View.VISIBLE);
+                    }
+                    if (propertyButton != null) {
+                        propertyButton.setOnClickListener(onClickTouchListener);
+                    }
                 }
             }
             if (manualFocus != null) {
@@ -439,6 +456,10 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer, IFo
         {
             interfaceInjector = interfaceProvider.getNikonInterface().getDisplayInjector();
         }
+        else if (connectionMethod == ICameraConnection.CameraConnectionMethod.KODAK)
+        {
+            interfaceInjector = interfaceProvider.getKodakInterface().getDisplayInjector();
+        }
         else // if (connectionMethod == ICameraConnection.CameraConnectionMethod.OPC)
         {
             interfaceInjector = interfaceProvider.getOlympusInterface().getDisplayInjector();
@@ -494,6 +515,12 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer, IFo
             this.liveViewControl = interfaceProvider.getNikonInterface().getLiveViewControl();
             this.zoomLensControl = interfaceProvider.getNikonInterface().getZoomLensControl();
             this.cameraInformation = interfaceProvider.getNikonInterface().getCameraInformation();
+        }
+        else  if (connectionMethod == ICameraConnection.CameraConnectionMethod.KODAK)
+        {
+            this.liveViewControl = interfaceProvider.getKodakInterface().getLiveViewControl();
+            this.zoomLensControl = interfaceProvider.getKodakInterface().getZoomLensControl();
+            this.cameraInformation = interfaceProvider.getKodakInterface().getCameraInformation();
         }
         else //  if (connectionMethod == ICameraConnection.CameraConnectionMethod.OPC)
         {
@@ -808,6 +835,10 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer, IFo
             else if (connectionMethod == ICameraConnection.CameraConnectionMethod.NIKON)
             {
                 lvListener = interfaceProvider.getNikonInterface().getLiveViewListener();
+            }
+            else if (connectionMethod == ICameraConnection.CameraConnectionMethod.KODAK)
+            {
+                lvListener = interfaceProvider.getKodakInterface().getLiveViewListener();
             }
             else  // if (connectionMethod == ICameraConnection.CameraConnectionMethod.OPC)
             {

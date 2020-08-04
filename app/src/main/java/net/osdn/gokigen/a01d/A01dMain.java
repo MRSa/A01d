@@ -30,6 +30,7 @@ import net.osdn.gokigen.a01d.logcat.LogCatFragment;
 import net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor;
 import net.osdn.gokigen.a01d.preference.canon.CanonPreferenceFragment;
 import net.osdn.gokigen.a01d.preference.fujix.FujiXPreferenceFragment;
+import net.osdn.gokigen.a01d.preference.kodak.KodakPreferenceFragment;
 import net.osdn.gokigen.a01d.preference.nikon.NikonPreferenceFragment;
 import net.osdn.gokigen.a01d.preference.olympus.PreferenceFragment;
 import net.osdn.gokigen.a01d.preference.panasonic.PanasonicPreferenceFragment;
@@ -72,6 +73,7 @@ public class A01dMain extends AppCompatActivity implements ICameraStatusReceiver
     private PreferenceFragmentCompat preferenceFragmentPanasonic = null;
     private PreferenceFragmentCompat preferenceFragmentCanon = null;
     private PreferenceFragmentCompat preferenceFragmentNikon = null;
+    private PreferenceFragmentCompat preferenceFragmentKodak = null;
 
     private OlyCameraPropertyListFragment propertyListFragment = null;
     private SonyCameraApiListFragment sonyApiListFragmentSony = null;
@@ -477,6 +479,12 @@ public class A01dMain extends AppCompatActivity implements ICameraStatusReceiver
                     preferenceFragmentNikon = NikonPreferenceFragment.newInstance(this, this);
                 }
                 targetFragment = preferenceFragmentNikon;
+            } else if (connectionMethod == ICameraConnection.CameraConnectionMethod.KODAK) {
+                if (preferenceFragmentKodak == null)
+                {
+                    preferenceFragmentKodak = KodakPreferenceFragment.newInstance(this, this);
+                }
+                targetFragment = preferenceFragmentKodak;
             } else if (connectionMethod == ICameraConnection.CameraConnectionMethod.OPC) {
                 if (preferenceFragmentOPC == null)
                 {
@@ -774,6 +782,10 @@ public class A01dMain extends AppCompatActivity implements ICameraStatusReceiver
         else if  (connectionMethod == ICameraConnection.CameraConnectionMethod.NIKON)
         {
             connection = interfaceProvider.getNikonInterface().getCameraConnection();
+        }
+        else if  (connectionMethod == ICameraConnection.CameraConnectionMethod.KODAK)
+        {
+            connection = interfaceProvider.getKodakInterface().getCameraConnection();
         }
         else // if (connectionMethod == ICameraConnection.CameraConnectionMethod.OPC)
         {

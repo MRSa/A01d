@@ -93,6 +93,11 @@
             android:summary="@string/pref_summary_panasonic_settings" />
 
         <PreferenceScreen
+            android:key="kodak_settings"
+            android:title="@string/pref_kodak_settings" />
+            android:summary="@string/pref_summary_kodak_settings" />
+
+        <PreferenceScreen
             android:key="sony_settings"
             android:title="@string/pref_sony_settings"
             android:summary="@string/pref_summary_sony_settings" />

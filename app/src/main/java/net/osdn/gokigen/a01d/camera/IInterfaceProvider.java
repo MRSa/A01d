@@ -1,6 +1,7 @@
 package net.osdn.gokigen.a01d.camera;
 
 import net.osdn.gokigen.a01d.camera.fujix.IFujiXInterfaceProvider;
+import net.osdn.gokigen.a01d.camera.kodak.IKodakInterfaceProvider;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.IOlympusLiveViewListener;
 import net.osdn.gokigen.a01d.camera.olympus.IOlympusInterfaceProvider;
 import net.osdn.gokigen.a01d.camera.olympuspen.IOlympusPenInterfaceProvider;
@@ -27,6 +28,7 @@ public interface IInterfaceProvider
     IPanasonicInterfaceProvider getPanasonicInterface();
     IPtpIpInterfaceProvider getCanonInterface();
     IPtpIpInterfaceProvider getNikonInterface();
+    IKodakInterfaceProvider getKodakInterface();
 
     IOlympusPenInterfaceProvider getOlympusPenInterface();
 

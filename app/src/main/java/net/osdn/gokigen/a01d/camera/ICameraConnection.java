@@ -19,6 +19,7 @@ public interface ICameraConnection
         THETA,
         CANON,
         NIKON,
+        KODAK,
     }
 
     enum CameraConnectionStatus

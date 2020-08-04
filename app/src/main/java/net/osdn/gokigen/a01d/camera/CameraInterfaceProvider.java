@@ -8,6 +8,8 @@ import net.osdn.gokigen.a01d.IInformationReceiver;
 import net.osdn.gokigen.a01d.camera.canon.wrapper.CanonInterfaceProvider;
 import net.osdn.gokigen.a01d.camera.fujix.IFujiXInterfaceProvider;
 import net.osdn.gokigen.a01d.camera.fujix.wrapper.FujiXInterfaceProvider;
+import net.osdn.gokigen.a01d.camera.kodak.IKodakInterfaceProvider;
+import net.osdn.gokigen.a01d.camera.kodak.wrapper.KodakInterfaceProvider;
 import net.osdn.gokigen.a01d.camera.nikon.wrapper.NikonInterfaceProvider;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.IOlympusLiveViewListener;
 import net.osdn.gokigen.a01d.camera.olympus.IOlympusInterfaceProvider;
@@ -41,6 +43,7 @@ public class CameraInterfaceProvider implements IInterfaceProvider
     private final ThetaInterfaceProvider theta;
     private final CanonInterfaceProvider canon;
     private final NikonInterfaceProvider nikon;
+    private final KodakInterfaceProvider kodak;
     private final CameraStatusListener statusListener;
 
     public CameraInterfaceProvider(@NonNull Activity context, @NonNull ICameraStatusReceiver provider, @NonNull IInformationReceiver informationReceiver, @NonNull ICardSlotSelector cardSlotSelector)
@@ -56,6 +59,7 @@ public class CameraInterfaceProvider implements IInterfaceProvider
         theta = new ThetaInterfaceProvider(context, provider, statusListener);
         canon = new CanonInterfaceProvider(context, provider, statusListener, informationReceiver);
         nikon = new NikonInterfaceProvider(context, provider, statusListener, informationReceiver);
+        kodak = new KodakInterfaceProvider(context, provider, statusListener, informationReceiver);
     }
 
     @Override
@@ -120,6 +124,12 @@ public class CameraInterfaceProvider implements IInterfaceProvider
     }
 
     @Override
+    public IKodakInterfaceProvider getKodakInterface()
+    {
+        return (kodak);
+    }
+
+    @Override
     public IOlympusPenInterfaceProvider getOlympusPenInterface()
     {
         return (olympusPen);
@@ -174,6 +184,10 @@ public class CameraInterfaceProvider implements IInterfaceProvider
             else if (connectionMethod.contains("NIKON"))
             {
                 ret = ICameraConnection.CameraConnectionMethod.NIKON;
+            }
+            else if (connectionMethod.contains("KODAK"))
+            {
+                ret = ICameraConnection.CameraConnectionMethod.KODAK;
             }
         }
         catch (Exception e)

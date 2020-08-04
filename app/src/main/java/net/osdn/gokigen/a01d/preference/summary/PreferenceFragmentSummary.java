@@ -36,6 +36,7 @@ import static net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor.PREFE
 import static net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor.PREFERENCE_RICOH_SETTINGS;
 import static net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor.PREFERENCE_SONY_SETTINGS;
 import static net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor.PREFERENCE_THETA_SETTINGS;
+import static net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor.PREFERENCE_KODAK_SETTINGS;
 import static net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor.WIFI_SETTINGS;
 
 
@@ -281,6 +282,11 @@ public class PreferenceFragmentSummary extends PreferenceFragmentCompat implemen
             {
                 nikon_settings.setOnPreferenceClickListener(this);
             }
+            Preference kodak_settings = findPreference(PREFERENCE_KODAK_SETTINGS);
+            if (kodak_settings != null)
+            {
+                kodak_settings.setOnPreferenceClickListener(this);
+            }
             Preference exitApplication = findPreference(EXIT_APPLICATION);
             if (exitApplication != null)
             {
@@ -469,6 +475,10 @@ public class PreferenceFragmentSummary extends PreferenceFragmentCompat implemen
             else if (preferenceKey.contains(PREFERENCE_NIKON_SETTINGS))
             {
                 changeScene.changeSceneToConfiguration(ICameraConnection.CameraConnectionMethod.NIKON);
+            }
+            else if (preferenceKey.contains(PREFERENCE_KODAK_SETTINGS))
+            {
+                changeScene.changeSceneToConfiguration(ICameraConnection.CameraConnectionMethod.KODAK);
             }
             else if (preferenceKey.contains(EXIT_APPLICATION))
             {

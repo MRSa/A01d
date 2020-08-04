@@ -124,6 +124,15 @@ class LiveViewClickTouchListener implements View.OnClickListener, View.OnTouchLi
             this.cameraConnection = interfaceProvider.getNikonInterface().getCameraConnection();
             this.zoomLensControl = interfaceProvider.getNikonInterface().getZoomLensControl();
         }
+        else if (connectionMethod == ICameraConnection.CameraConnectionMethod.KODAK)
+        {
+            this.focusingControl = interfaceProvider.getKodakInterface().getFocusingControl();
+            this.captureControl = interfaceProvider.getKodakInterface().getCaptureControl();
+            this.propertyProvider = interfaceProvider.getOlympusInterface().getCameraPropertyProvider();  // 要変更
+            this.cameraInformation = interfaceProvider.getKodakInterface().getCameraInformation();
+            this.cameraConnection = interfaceProvider.getKodakInterface().getCameraConnection();
+            this.zoomLensControl = interfaceProvider.getKodakInterface().getZoomLensControl();
+        }
         else  // if (connectionMethod == ICameraConnection.CameraConnectionMethod.OPC)
         {
             this.focusingControl = interfaceProvider.getOlympusInterface().getFocusingControl();
