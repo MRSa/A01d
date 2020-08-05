@@ -113,10 +113,12 @@ public class KodakLiveViewControl  implements ILiveViewControl
                     Log.d(TAG, "Starting retrieving streaming data from server.");
                     SimpleLiveviewSlicer slicer = null;
                     int continuousNullDataReceived = 0;
+                    int [] startMarker = { 0x0a, 0x0a, 0xff, 0xd8 };
                     try
                     {
                         // Create Slicer to open the stream and parse it.
                         slicer = new SimpleLiveviewSlicer();
+                        slicer.setMJpegStartMarker(startMarker);
                         slicer.open(streamUrl);
 
                         while (whileFetching)

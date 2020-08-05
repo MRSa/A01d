@@ -2,6 +2,8 @@ package net.osdn.gokigen.a01d.camera.utils;
 
 import android.util.Log;
 
+import androidx.annotation.NonNull;
+
 import java.io.ByteArrayOutputStream;
 import java.io.EOFException;
 import java.io.IOException;
@@ -9,7 +11,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
-import java.net.Socket;
 import java.net.URL;
 
 public class SimpleLiveviewSlicer
@@ -38,13 +39,21 @@ public class SimpleLiveviewSlicer
     }
 
     private static final int CONNECTION_TIMEOUT = 2000; // [msec]
+    private int[] mJpegStartMarker = { 0x0d, 0x0a, 0x0d, 0x0a, 0xff, 0xd8 };
     private HttpURLConnection mHttpConn;
     private InputStream mInputStream;
 
+    public void setMJpegStartMarker(@NonNull int[] startMarker)
+    {
+        mJpegStartMarker = startMarker;
+    }
+
+/*
     public void open(InputStream inputStream)
     {
             mInputStream = inputStream;
     }
+*/
 
     public void open(String liveviewUrl, String postData)
     {
@@ -66,6 +75,7 @@ public class SimpleLiveviewSlicer
                 mHttpConn.setDoInput(true);
                 mHttpConn.setDoOutput(true);
                 outputStream = mHttpConn.getOutputStream();
+                //noinspection CharsetObjectCanBeUsed
                 writer = new OutputStreamWriter(outputStream, "UTF-8");
                 writer.write(postData);
                 writer.flush();
@@ -310,16 +320,15 @@ public class SimpleLiveviewSlicer
     private void skipJpegMarkStart(InputStream stream)
     {
         int searchIndex = 0;
-        int[] startmarker = { 0x0d, 0x0a, 0x0d, 0x0a, 0xff, 0xd8 };
         while (true)
         {
             try
             {
                 int data = stream.read();
-                if (data == startmarker[searchIndex])
+                if (data == mJpegStartMarker[searchIndex])
                 {
                     searchIndex++;
-                    if (searchIndex >= startmarker.length)
+                    if (searchIndex >= mJpegStartMarker.length)
                     {
                         break;
                     }
