@@ -24,8 +24,6 @@ import net.osdn.gokigen.a01d.camera.kodak.wrapper.command.messages.connection.Ko
 import net.osdn.gokigen.a01d.camera.kodak.wrapper.command.messages.connection.KodakConnectSequence09;
 import net.osdn.gokigen.a01d.camera.kodak.wrapper.command.messages.connection.KodakConnectSequence10;
 import net.osdn.gokigen.a01d.camera.kodak.wrapper.command.messages.connection.KodakConnectSequence11;
-import net.osdn.gokigen.a01d.camera.kodak.wrapper.command.messages.connection.KodakConnectSequence12;
-import net.osdn.gokigen.a01d.camera.kodak.wrapper.command.messages.connection.KodakConnectSequence13;
 import net.osdn.gokigen.a01d.camera.kodak.wrapper.command.messages.specific.KodakFlashOff;
 import net.osdn.gokigen.a01d.camera.kodak.wrapper.status.KodakStatusChecker;
 
@@ -141,15 +139,6 @@ public class KodakCameraConnectSequence implements Runnable, IKodakCommandCallba
                 break;
             case SEQ_CONNECT_11:
                 interfaceProvider.getInformationReceiver().updateMessage(context.getString(R.string.kodak_connect_connecting11), false, false, 0);
-                commandIssuer.enqueueCommand(new KodakConnectSequence12(this));
-                break;
-            //case SEQ_CONNECT_12:
-            //    interfaceProvider.getInformationReceiver().updateMessage(context.getString(R.string.kodak_connect_connecting12), false, false, 0);
-            //    commandIssuer.enqueueCommand(new KodakConnectSequence13(this));
-            //    break;
-            case SEQ_CONNECT_12:
-            case SEQ_CONNECT_13:
-                interfaceProvider.getInformationReceiver().updateMessage(context.getString(R.string.kodak_connect_flash), false, false, 0);
                 commandIssuer.enqueueCommand(new KodakFlashOff(this));
                 break;
             case SEQ_FLASH_AUTO:

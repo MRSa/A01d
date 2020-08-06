@@ -16,7 +16,7 @@ public class KodakCommandBase  implements IKodakCommand
     @Override
     public int receiveDelayMs()
     {
-        return (20);
+        return (30);
     }
 
     @Override
