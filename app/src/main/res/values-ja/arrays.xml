@@ -139,4 +139,16 @@
         <item >3</item>
     </string-array>
 
+    <string-array name="kodak_flash_mode">
+        <item>OFF</item>
+        <item>ON</item>
+        <item>AUTO</item>
+    </string-array>
+
+    <string-array name="kodak_flash_mode_value">
+        <item>OFF</item>
+        <item>ON</item>
+        <item>AUTO</item>
+    </string-array>
+
 </resources>

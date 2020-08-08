@@ -328,4 +328,7 @@
 
     <string name="pref_open_send_command_dialog">SEND COMMAND DIALOG</string>
 
+    <string name="pref_kodak_flash_mode">Flash Mode</string>
+    <string name="pref_summary_kodak_flash_mode">Currently, sets only when connecting to camera.</string>
+
 </resources>

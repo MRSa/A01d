@@ -76,7 +76,8 @@ public class KodakInterfaceProvider implements IKodakInterfaceProvider, IDisplay
     {
         Log.v(TAG, "injectDisplay()");
         captureControl = new KodakCaptureControl(commandPublisher, frameDisplayer);
-        focusingControl = new KodakFocusingControl(activity, commandPublisher, frameDisplayer, indicator);
+        focusingControl = new KodakFocusingControl(commandPublisher, frameDisplayer);
+        //focusingControl = new KodakFocusingControl(activity, commandPublisher, frameDisplayer, indicator);
     }
 
     @Override

@@ -402,7 +402,7 @@ public class KodakCommandCommunicator implements IKodakCommandPublisher, IKodakC
         Log.v(TAG, "send_secondary_message : [" + received_body[8] + "] [" + received_body[9] + "] ");
         try {
             byte[] message_to_send = null;
-            if ((received_body[8] == (byte) 0xd2) && (received_body[9] == (byte) 0xd2)) {
+            if ((received_body[8] == (byte) 0xd2) && (received_body[9] == (byte) 0xd7)) {
                 message_to_send = new byte[]{
                         (byte) 0x2e, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
                         (byte) 0xd2, (byte) 0x07, (byte) 0x00, (byte) 0x00, (byte) 0x01, (byte) 0x10, (byte) 0x00, (byte) 0x80,
@@ -415,7 +415,19 @@ public class KodakCommandCommunicator implements IKodakCommandPublisher, IKodakC
                         (byte) 0xff, (byte) 0xff, (byte) 0xff, (byte) 0xff, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
                 };
             }
-
+            if ((received_body[8] == (byte) 0xb9) && (received_body[9] == (byte) 0x0b)) {
+                message_to_send = new byte[]{
+                        (byte) 0x2e , (byte) 0x00 , (byte) 0x00 , (byte) 0x00 , (byte) 0x00 , (byte) 0x00 , (byte) 0x00 , (byte) 0x00,
+                        (byte) 0xb9 , (byte) 0x0b , (byte) 0x00 , (byte) 0x00 , (byte) 0x01 , (byte) 0x10 , (byte) 0x00 , (byte) 0x80,
+                        (byte) 0x00 , (byte) 0x00 , (byte) 0x00 , (byte) 0x00 , (byte) 0x01 , (byte) 0x00 , (byte) 0x00 , (byte) 0x00,
+                        (byte) 0x00 , (byte) 0x00 , (byte) 0x00 , (byte) 0x00 , (byte) 0x00 , (byte) 0x00 , (byte) 0x00 , (byte) 0x00,
+                        (byte) 0x00 , (byte) 0x00 , (byte) 0x00 , (byte) 0x00 , (byte) 0x00 , (byte) 0x00 , (byte) 0x00 , (byte) 0x00,
+                        (byte) 0x00 , (byte) 0x00 , (byte) 0x00 , (byte) 0x00 , (byte) 0x00 , (byte) 0x00 , (byte) 0x00 , (byte) 0x00,
+                        (byte) 0x00 , (byte) 0x00 , (byte) 0x00 , (byte) 0x00 , (byte) 0x00 , (byte) 0x00 , (byte) 0x00 , (byte) 0x00,
+                        (byte) 0x00 , (byte) 0x00 , (byte) 0x00 , (byte) 0x00 , (byte) 0x00 , (byte) 0x00 , (byte) 0x00 , (byte) 0x00 ,
+                        (byte) 0xff, (byte) 0xff, (byte) 0xff, (byte) 0xff, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00
+                };
+            }
             if ((received_body[8] == (byte) 0xba) && (received_body[9] == (byte) 0x0b)) {
                 message_to_send = new byte[]
                         {
@@ -478,6 +490,7 @@ public class KodakCommandCommunicator implements IKodakCommandPublisher, IKodakC
                 return (false);
             }
             if (((receive_body[8] == (byte) 0xd2)&&(receive_body[9] == (byte) 0x07))||
+                    ((receive_body[8] == (byte) 0xb9)&&(receive_body[9] == (byte) 0x0b))||
                     ((receive_body[8] == (byte) 0xba)&&(receive_body[9] == (byte) 0x0b))||
                     ((receive_body[8] == (byte) 0xbb)&&(receive_body[9] == (byte) 0x0b)))
 

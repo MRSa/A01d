@@ -1,10 +1,12 @@
 package net.osdn.gokigen.a01d.camera.kodak.wrapper.connection;
 
 import android.app.Activity;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
+import androidx.preference.PreferenceManager;
 
 import net.osdn.gokigen.a01d.R;
 import net.osdn.gokigen.a01d.camera.ICameraConnection;
@@ -24,8 +26,13 @@ import net.osdn.gokigen.a01d.camera.kodak.wrapper.command.messages.connection.Ko
 import net.osdn.gokigen.a01d.camera.kodak.wrapper.command.messages.connection.KodakConnectSequence09;
 import net.osdn.gokigen.a01d.camera.kodak.wrapper.command.messages.connection.KodakConnectSequence10;
 import net.osdn.gokigen.a01d.camera.kodak.wrapper.command.messages.connection.KodakConnectSequence11;
+import net.osdn.gokigen.a01d.camera.kodak.wrapper.command.messages.specific.KodakFlashAuto;
 import net.osdn.gokigen.a01d.camera.kodak.wrapper.command.messages.specific.KodakFlashOff;
+import net.osdn.gokigen.a01d.camera.kodak.wrapper.command.messages.specific.KodakFlashOn;
 import net.osdn.gokigen.a01d.camera.kodak.wrapper.status.KodakStatusChecker;
+
+import static net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor.KODAK_FLASH_MODE;
+import static net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor.KODAK_FLASH_MODE_DEFAULT_VALUE;
 
 public class KodakCameraConnectSequence implements Runnable, IKodakCommandCallback, IKodakMessages
 {
@@ -37,6 +44,8 @@ public class KodakCameraConnectSequence implements Runnable, IKodakCommandCallba
     private final IKodakInterfaceProvider interfaceProvider;
     private final IKodakCommandPublisher commandIssuer;
     private final KodakStatusChecker statusChecker;
+
+    private String flashMode = "OFF";
 
     KodakCameraConnectSequence(@NonNull Activity context, @NonNull ICameraStatusReceiver statusReceiver, @NonNull final ICameraConnection cameraConnection, @NonNull IKodakInterfaceProvider interfaceProvider, @NonNull KodakStatusChecker statusChecker)
     {
@@ -52,6 +61,20 @@ public class KodakCameraConnectSequence implements Runnable, IKodakCommandCallba
     @Override
     public void run()
     {
+        try
+        {
+            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+            if (preferences != null)
+            {
+                flashMode = preferences.getString(KODAK_FLASH_MODE, KODAK_FLASH_MODE_DEFAULT_VALUE);
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            flashMode = "OFF";
+        }
+
         try
         {
             // カメラとTCP接続
@@ -139,7 +162,18 @@ public class KodakCameraConnectSequence implements Runnable, IKodakCommandCallba
                 break;
             case SEQ_CONNECT_11:
                 interfaceProvider.getInformationReceiver().updateMessage(context.getString(R.string.kodak_connect_connecting11), false, false, 0);
-                commandIssuer.enqueueCommand(new KodakFlashOff(this));
+                if (flashMode.contains("AUTO"))
+                {
+                    commandIssuer.enqueueCommand(new KodakFlashAuto(this));
+                }
+                else if (flashMode.contains("ON"))
+                {
+                    commandIssuer.enqueueCommand(new KodakFlashOn(this));
+                }
+                else
+                {
+                    commandIssuer.enqueueCommand(new KodakFlashOff(this));
+                }
                 break;
             case SEQ_FLASH_AUTO:
             case SEQ_FLASH_OFF:

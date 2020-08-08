@@ -150,6 +150,10 @@ public class PreferenceFragmentSummary extends PreferenceFragmentCompat implemen
             {
                 editor.putString(IPreferencePropertyAccessor.NUMBER_OF_CACHE_PICTURES, IPreferencePropertyAccessor.NUMBER_OF_CACHE_PICTURES_DEFAULT_VALUE);
             }
+            if (!items.containsKey(IPreferencePropertyAccessor.KODAK_FLASH_MODE))
+            {
+                editor.putString(IPreferencePropertyAccessor.KODAK_FLASH_MODE, IPreferencePropertyAccessor.KODAK_FLASH_MODE_DEFAULT_VALUE);
+            }
             editor.apply();
         }
         catch (Exception e)

@@ -123,6 +123,10 @@ public class KodakPreferenceFragment extends PreferenceFragmentCompat implements
             if (!items.containsKey(IPreferencePropertyAccessor.CONNECTION_METHOD)) {
                 editor.putString(IPreferencePropertyAccessor.CONNECTION_METHOD, IPreferencePropertyAccessor.CONNECTION_METHOD_DEFAULT_VALUE);
             }
+            if (!items.containsKey(IPreferencePropertyAccessor.KODAK_FLASH_MODE))
+            {
+                editor.putString(IPreferencePropertyAccessor.KODAK_FLASH_MODE, IPreferencePropertyAccessor.KODAK_FLASH_MODE_DEFAULT_VALUE);
+            }
             editor.apply();
         }
         catch (Exception e)
@@ -175,17 +179,17 @@ public class KodakPreferenceFragment extends PreferenceFragmentCompat implements
             //super.onCreate(savedInstanceState);
             addPreferencesFromResource(R.xml.preferences_kodak);
 
-            ListPreference connectionMethod = findPreference(IPreferencePropertyAccessor.CONNECTION_METHOD);
-            if (connectionMethod != null)
+            ListPreference flashMode = findPreference(IPreferencePropertyAccessor.KODAK_FLASH_MODE);
+            if (flashMode != null)
             {
-                connectionMethod.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+                flashMode.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
                     @Override
                     public boolean onPreferenceChange(Preference preference, Object newValue) {
                         preference.setSummary(newValue + " ");
                         return (true);
                     }
                 });
-                connectionMethod.setSummary(connectionMethod.getValue() + " ");
+                flashMode.setSummary(flashMode.getValue() + " ");
             }
 
             Preference exitApplication = findPreference("exit_application");
@@ -193,12 +197,13 @@ public class KodakPreferenceFragment extends PreferenceFragmentCompat implements
             {
                 exitApplication.setOnPreferenceClickListener(powerOffController);
             }
-
+/*
             Preference httpDialog = findPreference(SEND_MESSAGE_DIALOG);
             if (httpDialog != null)
             {
                 httpDialog.setOnPreferenceClickListener(this);
             }
+*/
         }
         catch (Exception e)
         {

@@ -102,7 +102,8 @@ public interface IPreferencePropertyAccessor
 
     String SEND_MESSAGE_DIALOG = "dialog_message_send";
 
-
+    String KODAK_FLASH_MODE = "kodak_flash_mode";
+    String KODAK_FLASH_MODE_DEFAULT_VALUE = "OFF";
 
  /*
     int CHOICE_SPLASH_SCREEN = 10;

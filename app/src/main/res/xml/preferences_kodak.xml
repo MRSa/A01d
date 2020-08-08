@@ -29,16 +29,21 @@
 -->
     </PreferenceCategory>
 
-<!--
     <PreferenceCategory
         android:title="@string/pref_cat_camera">
 
-        <CheckBoxPreference
-            android:key="capture_both_camera_and_live_view"
-            android:title="@string/pref_capture_both_camera_and_live_view" />
+        <ListPreference
+            android:key="kodak_flash_mode"
+            android:title="@string/pref_kodak_flash_mode"
+            android:summary="@string/pref_summary_kodak_flash_mode"
+            android:entryValues="@array/kodak_flash_mode_value"
+            android:entries="@array/kodak_flash_mode"
+            android:defaultValue="OFF"
+            />
 
     </PreferenceCategory>
 
+<!--
     <PreferenceCategory
         android:title="@string/pref_cat_initialize">
 
