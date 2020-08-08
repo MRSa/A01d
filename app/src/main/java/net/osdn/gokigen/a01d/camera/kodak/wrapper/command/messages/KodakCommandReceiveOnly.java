@@ -36,7 +36,7 @@ public class KodakCommandReceiveOnly extends KodakCommandBase
     @Override
     public boolean dumpLog()
     {
-        return (true);
+        return (false);
     }
 
 }

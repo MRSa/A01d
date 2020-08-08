@@ -5,6 +5,9 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import net.osdn.gokigen.a01d.R;
+import net.osdn.gokigen.a01d.camera.ICameraConnection;
+import net.osdn.gokigen.a01d.camera.kodak.IKodakInterfaceProvider;
 import net.osdn.gokigen.a01d.camera.kodak.wrapper.command.messages.KodakCommandReceiveOnly;
 
 import java.io.BufferedReader;
@@ -28,6 +31,7 @@ public class KodakCommandCommunicator implements IKodakCommandPublisher, IKodakC
     private static final int COMMAND_SEND_RECEIVE_DURATION_MAX = 3000;
     private static final int COMMAND_POLL_QUEUE_MS = 5;
 
+    private final IKodakInterfaceProvider interfaceProvider;
     private final String ipAddress;
     private final int portNumber;
 
@@ -39,8 +43,9 @@ public class KodakCommandCommunicator implements IKodakCommandPublisher, IKodakC
     private BufferedReader bufferedReader = null;
     private Queue<IKodakCommand> commandQueue;
 
-    public KodakCommandCommunicator(@NonNull String ip, int portNumber, boolean tcpNoDelay, boolean waitForever)
+    public KodakCommandCommunicator(@NonNull IKodakInterfaceProvider interfaceProvider, @NonNull String ip, int portNumber, boolean tcpNoDelay, boolean waitForever)
     {
+        this.interfaceProvider = interfaceProvider;
         this.ipAddress = ip;
         this.portNumber = portNumber;
         this.tcpNoDelay = tcpNoDelay;
@@ -288,11 +293,36 @@ public class KodakCommandCommunicator implements IKodakCommandPublisher, IKodakC
             dos.write(byte_array);
             dos.flush();
         }
+        catch (java.net.SocketException socketException)
+        {
+            socketException.printStackTrace();
+            try
+            {
+                // 回線切断を通知する
+                detectDisconnect();
+            }
+            catch (Exception ee)
+            {
+                ee.printStackTrace();
+            }
+        }
         catch (Exception e)
         {
             e.printStackTrace();
         }
     }
+
+    private void detectDisconnect()
+    {
+        ICameraConnection connection = interfaceProvider.getCameraConnection();
+        if (connection != null)
+        {
+            // 回線状態を「切断」にしてダイアログを表示する
+            connection.forceUpdateConnectionStatus(ICameraConnection.CameraConnectionStatus.DISCONNECTED);
+            connection.alertConnectingFailed(interfaceProvider.getStringFromResource(R.string.kodak_command_line_disconnected));
+        }
+    }
+
 
     private void sleep(int delayMs)
     {
@@ -344,7 +374,7 @@ public class KodakCommandCommunicator implements IKodakCommandPublisher, IKodakC
             if (read_bytes < 0)
             {
                 // リトライオーバー検出
-                Log.v(TAG, " DETECT RETRY OVER...");
+                Log.v(TAG, "  ----- DETECT RECEIVE RETRY OVER... -----");
                 return (true);
             }
 
@@ -375,7 +405,7 @@ public class KodakCommandCommunicator implements IKodakCommandPublisher, IKodakC
 
     private void receivedAllMessage(boolean isDumpReceiveLog, int id, byte[] body, IKodakCommandCallback callback)
     {
-        Log.v(TAG, "receivedAllMessage() : " + ((body == null) ? 0 : body.length) + " bytes.");
+        Log.v(TAG, " receivedAllMessage() : " + ((body == null) ? 0 : body.length) + " bytes.");
         if ((isDumpReceiveLog)&&(body != null))
         {
             // ログに受信メッセージを出力する
@@ -396,10 +426,10 @@ public class KodakCommandCommunicator implements IKodakCommandPublisher, IKodakC
     {
         if (received_body == null)
         {
-            Log.v(TAG, "send_secondary_message : NULL ");
+            Log.v(TAG, " send_secondary_message : NULL ");
             return;
         }
-        Log.v(TAG, "send_secondary_message : [" + received_body[8] + "] [" + received_body[9] + "] ");
+        Log.v(TAG, " send_secondary_message : [" + received_body[8] + "] [" + received_body[9] + "] ");
         try {
             byte[] message_to_send = null;
             if ((received_body[8] == (byte) 0xd2) && (received_body[9] == (byte) 0xd7)) {
@@ -514,7 +544,7 @@ public class KodakCommandCommunicator implements IKodakCommandPublisher, IKodakC
         {
             while (read_bytes <= 0)
             {
-                Log.v(TAG, "  --- waitForReceive : " + retry_count + " delay : " + delayMs + "ms");
+                // Log.v(TAG, "  --- waitForReceive : " + retry_count + " delay : " + delayMs + "ms");
                 sleep(delayMs);
                 read_bytes = is.available();
                 if (read_bytes <= 0)

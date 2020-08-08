@@ -60,7 +60,7 @@ public class KodakInterfaceProvider implements IKodakInterfaceProvider, IDisplay
     public KodakInterfaceProvider(@NonNull Activity context, @NonNull ICameraStatusReceiver provider, @NonNull ICameraStatusUpdateNotify statusListener, @NonNull IInformationReceiver informationReceiver)
     {
         this.activity = context;
-        commandPublisher = new KodakCommandCommunicator(CAMERA_IP, CONTROL_PORT, true, false);
+        commandPublisher = new KodakCommandCommunicator(this, CAMERA_IP, CONTROL_PORT, true, false);
         liveViewControl = new KodakLiveViewControl(context, CAMERA_IP, LIVEVIEW_PORT);
         statusChecker = new KodakStatusChecker();
         canonConnection = new KodakConnection(context, provider, this, statusChecker);
@@ -169,6 +169,12 @@ public class KodakInterfaceProvider implements IKodakInterfaceProvider, IDisplay
     }
 
     @Override
+    public String getStringFromResource(int resId)
+    {
+        return (activity.getString(resId));
+    }
+
+    @Override
     public IInformationReceiver getInformationReceiver()
     {
         // ちょっとこの引き回しは気持ちがよくない...
@@ -180,4 +186,7 @@ public class KodakInterfaceProvider implements IKodakInterfaceProvider, IDisplay
     {
         return (statusChecker);
     }
+
+
+
 }

@@ -326,4 +326,6 @@
     <string name="pref_kodak_flash_mode">フラッシュモード</string>
     <string name="pref_summary_kodak_flash_mode">現在は、カメラと接続する時に設定します。</string>
 
+    <string name="kodak_command_line_disconnected">カメラへのコマンド送信回線が切断されました。再試行してください。</string>
+
 </resources>

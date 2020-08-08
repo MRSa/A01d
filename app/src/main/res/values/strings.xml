@@ -331,4 +331,5 @@
     <string name="pref_kodak_flash_mode">Flash Mode</string>
     <string name="pref_summary_kodak_flash_mode">Currently, sets only when connecting to camera.</string>
 
+    <string name="kodak_command_line_disconnected">The command communication line is disconnected. (RETRY please.)</string>
 </resources>

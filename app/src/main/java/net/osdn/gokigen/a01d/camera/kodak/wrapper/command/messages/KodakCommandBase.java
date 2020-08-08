@@ -52,6 +52,6 @@ public class KodakCommandBase  implements IKodakCommand
     @Override
     public boolean dumpLog()
     {
-        return (true);
+        return (false);
     }
 }

@@ -24,9 +24,5 @@ public interface IKodakMessages
     int SEQ_CONNECT_09 = 109;
     int SEQ_CONNECT_10 = 110;
     int SEQ_CONNECT_11 = 111;
-    int SEQ_CONNECT_12 = 112;
-    int SEQ_CONNECT_13 = 113;
-    int SEQ_CONNECT_14 = 114;
-    int SEQ_CONNECT_15 = 115;
 
 }

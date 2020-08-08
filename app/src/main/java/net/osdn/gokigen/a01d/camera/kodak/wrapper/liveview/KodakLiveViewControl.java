@@ -39,6 +39,7 @@ public class KodakLiveViewControl  implements ILiveViewControl
      */
     private void prepare()
     {
+/*
         try
         {
             //SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
@@ -48,6 +49,7 @@ public class KodakLiveViewControl  implements ILiveViewControl
         {
             e.printStackTrace();
         }
+*/
     }
 
     @Override
@@ -99,6 +101,7 @@ public class KodakLiveViewControl  implements ILiveViewControl
         if (whileFetching)
         {
             Log.v(TAG, "start() already starting.");
+            return;  // すでにスタートしているので、LVの再スタートはしない。
         }
         whileFetching = true;
 
@@ -165,7 +168,7 @@ public class KodakLiveViewControl  implements ILiveViewControl
                         if ((!whileFetching)&&(continuousNullDataReceived > FETCH_ERROR_MAX))
                         {
                             // 再度ライブビューのスタートをやってみる。
-                            whileFetching = false;
+                            //whileFetching = false;
                             //continuousNullDataReceived = 0;
                             start(streamUrl);
                         }

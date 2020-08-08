@@ -39,4 +39,6 @@ public interface IKodakInterfaceProvider
 
     ICameraStatusWatcher getCameraStatusWatcher();
     ICameraStatus getCameraStatusListHolder();
+
+    String getStringFromResource(int resId);
 }
