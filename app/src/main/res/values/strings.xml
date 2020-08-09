@@ -332,4 +332,14 @@
     <string name="pref_summary_kodak_flash_mode">Currently, sets only when connecting to camera.</string>
 
     <string name="kodak_command_line_disconnected">The command communication line is disconnected. (RETRY please.)</string>
+
+    <string name="pref_kodak_host_ip">Camera IP Address</string>
+    <string name="pref_summary_kodak_host_ip">default: 172.16.0.254 </string>
+
+    <string name="pref_kodak_control_port">Camera Command Port</string>
+    <string name="pref_summary_kodak_control_port">default: 9175 </string>
+
+    <string name="pref_kodak_liveview_port">Camera Liveview Port</string>
+    <string name="pref_summary_kodak_liveview_port">default: 9176 </string>
+
 </resources>

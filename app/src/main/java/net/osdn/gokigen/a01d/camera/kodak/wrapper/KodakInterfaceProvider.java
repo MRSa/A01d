@@ -1,9 +1,11 @@
 package net.osdn.gokigen.a01d.camera.kodak.wrapper;
 
 import android.app.Activity;
+import android.content.SharedPreferences;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
+import androidx.preference.PreferenceManager;
 
 import net.osdn.gokigen.a01d.IInformationReceiver;
 import net.osdn.gokigen.a01d.camera.ICameraConnection;
@@ -36,13 +38,16 @@ import net.osdn.gokigen.a01d.liveview.ICameraStatusUpdateNotify;
 import net.osdn.gokigen.a01d.liveview.IIndicatorControl;
 import net.osdn.gokigen.a01d.liveview.liveviewlistener.ILiveViewListener;
 
+import static net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor.KODAK_COMMAND_PORT;
+import static net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor.KODAK_COMMAND_PORT_DEFAULT_VALUE;
+import static net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor.KODAK_HOST_IP;
+import static net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor.KODAK_HOST_IP_DEFAULT_VALUE;
+import static net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor.KODAK_LIVEVIEW_PORT;
+import static net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor.KODAK_LIVEVIEW_PORT_DEFAULT_VALUE;
+
 public class KodakInterfaceProvider implements IKodakInterfaceProvider, IDisplayInjector
 {
     private final String TAG = toString();
-
-    private static final int CONTROL_PORT = 9175;
-    private static final int LIVEVIEW_PORT = 9176;
-    private static final String CAMERA_IP = "172.16.0.254";
 
     private final Activity activity;
     private final KodakRunMode runmode;
@@ -59,9 +64,29 @@ public class KodakInterfaceProvider implements IKodakInterfaceProvider, IDisplay
 
     public KodakInterfaceProvider(@NonNull Activity context, @NonNull ICameraStatusReceiver provider, @NonNull ICameraStatusUpdateNotify statusListener, @NonNull IInformationReceiver informationReceiver)
     {
+        String ipAddress;
+        String controlPortStr;
+        String liveviewPortStr;
+        try
+        {
+            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+            ipAddress = preferences.getString(KODAK_HOST_IP, KODAK_HOST_IP_DEFAULT_VALUE);
+            controlPortStr = preferences.getString(KODAK_COMMAND_PORT, KODAK_COMMAND_PORT_DEFAULT_VALUE);
+            liveviewPortStr = preferences.getString(KODAK_LIVEVIEW_PORT, KODAK_LIVEVIEW_PORT_DEFAULT_VALUE);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            ipAddress = "172.16.0.254";
+            controlPortStr = "9175";
+            liveviewPortStr = "9176";
+        }
+        int controlPort = parseInt(controlPortStr, 9175);
+        int liveviewPort = parseInt(liveviewPortStr, 9176);
+
         this.activity = context;
-        commandPublisher = new KodakCommandCommunicator(this, CAMERA_IP, CONTROL_PORT, true, false);
-        liveViewControl = new KodakLiveViewControl(context, CAMERA_IP, LIVEVIEW_PORT);
+        commandPublisher = new KodakCommandCommunicator(this, ipAddress, controlPort, true, false);
+        liveViewControl = new KodakLiveViewControl(context, ipAddress, liveviewPort);
         statusChecker = new KodakStatusChecker();
         canonConnection = new KodakConnection(context, provider, this, statusChecker);
         cameraInformation = new KodakCameraInformation();
@@ -69,6 +94,20 @@ public class KodakInterfaceProvider implements IKodakInterfaceProvider, IDisplay
         this.statusListener = statusListener;
         this.runmode = new KodakRunMode();
         this.informationReceiver = informationReceiver;
+    }
+
+    private int parseInt(@NonNull String key, int defaultValue)
+    {
+        int value = defaultValue;
+        try
+        {
+            value = Integer.parseInt(key);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        return (value);
     }
 
     @Override

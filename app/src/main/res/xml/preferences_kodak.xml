@@ -43,16 +43,30 @@
 
     </PreferenceCategory>
 
-<!--
     <PreferenceCategory
         android:title="@string/pref_cat_initialize">
 
-        <CheckBoxPreference
-        android:key="auto_connect_to_camera"
-        android:title="@string/pref_auto_connect_camera"
-        android:summary="@string/pref_summary_auto_connect_camera" />
+
+        <EditTextPreference
+            android:key="kodak_host_ip"
+            android:title="@string/pref_kodak_host_ip"
+            android:defaultValue="172.16.0.254"
+            android:summary="@string/pref_summary_kodak_host_ip" />
+
+        <EditTextPreference
+            android:key="kodak_command_port"
+            android:title="@string/pref_kodak_control_port"
+            android:defaultValue="9175"
+            android:summary="@string/pref_summary_kodak_control_port" />
+
+        <EditTextPreference
+            android:key="kodak_liveview_port"
+            android:title="@string/pref_kodak_liveview_port"
+            android:defaultValue="9176"
+            android:summary="@string/pref_summary_kodak_liveview_port" />
     </PreferenceCategory>
 
+<!--
     <PreferenceCategory
         android:title="@string/pref_cat_gokigen">
 

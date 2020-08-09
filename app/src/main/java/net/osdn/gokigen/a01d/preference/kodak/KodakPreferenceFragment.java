@@ -127,6 +127,18 @@ public class KodakPreferenceFragment extends PreferenceFragmentCompat implements
             {
                 editor.putString(IPreferencePropertyAccessor.KODAK_FLASH_MODE, IPreferencePropertyAccessor.KODAK_FLASH_MODE_DEFAULT_VALUE);
             }
+            if (!items.containsKey(IPreferencePropertyAccessor.KODAK_HOST_IP))
+            {
+                editor.putString(IPreferencePropertyAccessor.KODAK_HOST_IP, IPreferencePropertyAccessor.KODAK_HOST_IP_DEFAULT_VALUE);
+            }
+            if (!items.containsKey(IPreferencePropertyAccessor.KODAK_COMMAND_PORT))
+            {
+                editor.putString(IPreferencePropertyAccessor.KODAK_COMMAND_PORT, IPreferencePropertyAccessor.KODAK_COMMAND_PORT_DEFAULT_VALUE);
+            }
+            if (!items.containsKey(IPreferencePropertyAccessor.KODAK_LIVEVIEW_PORT))
+            {
+                editor.putString(IPreferencePropertyAccessor.KODAK_LIVEVIEW_PORT, IPreferencePropertyAccessor.KODAK_LIVEVIEW_PORT_DEFAULT_VALUE);
+            }
             editor.apply();
         }
         catch (Exception e)

@@ -328,4 +328,13 @@
 
     <string name="kodak_command_line_disconnected">カメラへのコマンド送信回線が切断されました。再試行してください。</string>
 
+    <string name="pref_kodak_host_ip">カメラIPアドレス</string>
+    <string name="pref_summary_kodak_host_ip">通常、変更は不要です (初期値:172.16.0.254)</string>
+
+    <string name="pref_kodak_control_port">カメラ制御ポート番号</string>
+    <string name="pref_summary_kodak_control_port">通常、変更は不要です (初期値:9175)</string>
+
+    <string name="pref_kodak_liveview_port">カメラライブビューポート番号</string>
+    <string name="pref_summary_kodak_liveview_port">通常、変更は不要です (初期値:9176)</string>
+
 </resources>

@@ -105,6 +105,15 @@ public interface IPreferencePropertyAccessor
     String KODAK_FLASH_MODE = "kodak_flash_mode";
     String KODAK_FLASH_MODE_DEFAULT_VALUE = "OFF";
 
+    String KODAK_HOST_IP = "kodak_host_ip";
+    String KODAK_HOST_IP_DEFAULT_VALUE = "172.16.0.254";
+
+    String KODAK_COMMAND_PORT = "kodak_command_port";
+    String KODAK_COMMAND_PORT_DEFAULT_VALUE = "9175";
+
+    String KODAK_LIVEVIEW_PORT = "kodak_liveview_port";
+    String KODAK_LIVEVIEW_PORT_DEFAULT_VALUE = "9176";
+
  /*
     int CHOICE_SPLASH_SCREEN = 10;
 
