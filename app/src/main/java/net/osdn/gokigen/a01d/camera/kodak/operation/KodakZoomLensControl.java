@@ -1,18 +1,29 @@
 package net.osdn.gokigen.a01d.camera.kodak.operation;
 
+import android.util.Log;
+
+import androidx.annotation.NonNull;
+
 import net.osdn.gokigen.a01d.camera.IZoomLensControl;
+import net.osdn.gokigen.a01d.camera.kodak.wrapper.command.IKodakCommandCallback;
+import net.osdn.gokigen.a01d.camera.kodak.wrapper.command.IKodakCommandPublisher;
+import net.osdn.gokigen.a01d.camera.kodak.wrapper.command.messages.specific.KodakExecuteZoom;
 
-public class KodakZoomLensControl implements IZoomLensControl
+public class KodakZoomLensControl implements IZoomLensControl, IKodakCommandCallback
 {
-    public KodakZoomLensControl()
-    {
+    private final String TAG = this.toString();
 
+    private final IKodakCommandPublisher commandPublisher;
+
+    public KodakZoomLensControl(@NonNull IKodakCommandPublisher commandPublisher)
+    {
+        this.commandPublisher = commandPublisher;
     }
 
     @Override
     public boolean canZoom()
     {
-        return (false);
+        return (true);
     }
 
     @Override
@@ -48,7 +59,15 @@ public class KodakZoomLensControl implements IZoomLensControl
     @Override
     public void driveZoomLens(boolean isZoomIn)
     {
-
+        try
+        {
+            Log.v(TAG, " Zoom in : " + isZoomIn);
+            commandPublisher.enqueueCommand(new KodakExecuteZoom(this, (isZoomIn) ? 1 : -1));
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -61,5 +80,12 @@ public class KodakZoomLensControl implements IZoomLensControl
     public boolean isDrivingZoomLens()
     {
         return (false);
+    }
+
+
+    @Override
+    public void receivedMessage(int id, byte[] rx_body)
+    {
+        Log.v(TAG, " KodakFocusingControl::receivedMessage() : ");
     }
 }

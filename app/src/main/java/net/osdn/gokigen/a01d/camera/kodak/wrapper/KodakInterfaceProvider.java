@@ -65,7 +65,7 @@ public class KodakInterfaceProvider implements IKodakInterfaceProvider, IDisplay
         statusChecker = new KodakStatusChecker();
         canonConnection = new KodakConnection(context, provider, this, statusChecker);
         cameraInformation = new KodakCameraInformation();
-        zoomControl = new KodakZoomLensControl();
+        zoomControl = new KodakZoomLensControl(commandPublisher);
         this.statusListener = statusListener;
         this.runmode = new KodakRunMode();
         this.informationReceiver = informationReceiver;

@@ -7,6 +7,8 @@ public interface IKodakMessages
 
     int SEQ_SHUTTER = 10;
     int SEQ_FOCUS = 11;
+    int SEQ_ZOOM = 12;
+
 
     int SEQ_FLASH_OFF = 20;
     int SEQ_FLASH_ON = 21;
