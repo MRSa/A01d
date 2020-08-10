@@ -345,7 +345,7 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer, IFo
                     }
                 } else if (connectionMethod == ICameraConnection.CameraConnectionMethod.KODAK) {
                     if (favoriteButton != null) {
-                        favoriteButton.setVisibility(View.VISIBLE);
+                        favoriteButton.setVisibility(View.INVISIBLE);
                         favoriteButton.setOnClickListener(onClickTouchListener);
                     }
                     if (manualFocus != null) {
@@ -358,6 +358,7 @@ public class LiveViewFragment extends Fragment implements IStatusViewDrawer, IFo
                         focusIndicator.setVisibility(View.VISIBLE);
                     }
                     if (propertyButton != null) {
+                        propertyButton.setVisibility(View.INVISIBLE);
                         propertyButton.setOnClickListener(onClickTouchListener);
                     }
                 }

@@ -302,8 +302,8 @@
     <string name="pref_panasonic_settings">Panasonic</string>
     <string name="pref_summary_panasonic_settings"> </string>
 
-    <string name="pref_kodak_settings">PIXPRO WPZ2</string>
-    <string name="pref_summary_kodak_settings">WPZ2用設定</string>
+    <string name="pref_kodak_settings">KODAK PIXPRO WPZ2</string>
+    <string name="pref_summary_kodak_settings"> </string>
 
     <string name="pref_canon_settings">Canon</string>
     <string name="pref_summary_canon_settings"> </string>

@@ -313,7 +313,7 @@
     <string name="pref_nikon_settings">Nikon</string>
     <string name="pref_summary_nikon_settings">Special Settings for Nikon</string>
 
-    <string name="pref_kodak_settings">PIXPRO WPZ2</string>
+    <string name="pref_kodak_settings">KODAK PIXPRO WPZ2</string>
     <string name="pref_summary_kodak_settings">Special Settings for PIXPRO WPZ2</string>
 
     <string name="pref_exit_power_off_summary">Exit Application</string>
