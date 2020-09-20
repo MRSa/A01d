@@ -154,6 +154,10 @@ public class PreferenceFragmentSummary extends PreferenceFragmentCompat implemen
             {
                 editor.putString(IPreferencePropertyAccessor.KODAK_FLASH_MODE, IPreferencePropertyAccessor.KODAK_FLASH_MODE_DEFAULT_VALUE);
             }
+            if (!items.containsKey(IPreferencePropertyAccessor.SAVE_LOCAL_LOCATION))
+            {
+                editor.putBoolean(IPreferencePropertyAccessor.SAVE_LOCAL_LOCATION, IPreferencePropertyAccessor.SAVE_LOCAL_LOCATION_DEFAULT_VALUE);
+            }
             editor.apply();
         }
         catch (Exception e)
@@ -192,6 +196,11 @@ public class PreferenceFragmentSummary extends PreferenceFragmentCompat implemen
 
                 case IPreferencePropertyAccessor.CACHE_LIVEVIEW_PICTURES:
                     value = preferences.getBoolean(key, false);
+                    Log.v(TAG, " " + key + "  , " + value);
+                    break;
+
+                case IPreferencePropertyAccessor.SAVE_LOCAL_LOCATION:
+                    value = preferences.getBoolean(key, IPreferencePropertyAccessor.SAVE_LOCAL_LOCATION_DEFAULT_VALUE);
                     Log.v(TAG, " " + key + "  , " + value);
                     break;
 
@@ -419,6 +428,7 @@ public class PreferenceFragmentSummary extends PreferenceFragmentCompat implemen
                         setBooleanPreference(IPreferencePropertyAccessor.CAPTURE_BOTH_CAMERA_AND_LIVE_VIEW, IPreferencePropertyAccessor.CAPTURE_BOTH_CAMERA_AND_LIVE_VIEW, defaultValue);
                         setBooleanPreference(IPreferencePropertyAccessor.CAPTURE_ONLY_LIVE_VIEW, IPreferencePropertyAccessor.CAPTURE_ONLY_LIVE_VIEW, false);
                         setBooleanPreference(IPreferencePropertyAccessor.CACHE_LIVEVIEW_PICTURES, IPreferencePropertyAccessor.CACHE_LIVEVIEW_PICTURES, false);
+                        setBooleanPreference(IPreferencePropertyAccessor.SAVE_LOCAL_LOCATION, IPreferencePropertyAccessor.SAVE_LOCAL_LOCATION, IPreferencePropertyAccessor.SAVE_LOCAL_LOCATION_DEFAULT_VALUE);
                     }
                     catch (Exception e)
                     {

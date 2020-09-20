@@ -22,12 +22,12 @@ import java.util.Locale;
  *   画像の保管クラス
  *
  */
-class StoreImage implements IStoreImage
+class StoreImageOld implements IStoreImage
 {
     private final String TAG = toString();
     private final Context context;
 
-    StoreImage(Context context)
+    StoreImageOld(Context context)
     {
         this.context = context;
     }

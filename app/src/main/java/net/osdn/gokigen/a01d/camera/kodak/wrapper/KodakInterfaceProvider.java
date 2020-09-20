@@ -54,7 +54,7 @@ public class KodakInterfaceProvider implements IKodakInterfaceProvider, IDisplay
     private final KodakCameraInformation cameraInformation;
     private KodakCaptureControl captureControl;
     private KodakFocusingControl focusingControl;
-    private KodakConnection canonConnection;
+    private KodakConnection kodakConnection;
     private KodakCommandCommunicator commandPublisher;
     private KodakLiveViewControl liveViewControl;
     private KodakZoomLensControl zoomControl;
@@ -88,7 +88,7 @@ public class KodakInterfaceProvider implements IKodakInterfaceProvider, IDisplay
         commandPublisher = new KodakCommandCommunicator(this, ipAddress, controlPort, true, false);
         liveViewControl = new KodakLiveViewControl(context, ipAddress, liveviewPort);
         statusChecker = new KodakStatusChecker();
-        canonConnection = new KodakConnection(context, provider, this, statusChecker);
+        kodakConnection = new KodakConnection(context, provider, this, statusChecker);
         cameraInformation = new KodakCameraInformation();
         zoomControl = new KodakZoomLensControl(commandPublisher);
         this.statusListener = statusListener;
@@ -122,7 +122,7 @@ public class KodakInterfaceProvider implements IKodakInterfaceProvider, IDisplay
     @Override
     public ICameraConnection getCameraConnection()
     {
-        return (canonConnection);
+        return (kodakConnection);
     }
 
     @Override

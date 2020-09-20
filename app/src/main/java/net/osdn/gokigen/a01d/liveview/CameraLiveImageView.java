@@ -104,7 +104,7 @@ public class CameraLiveImageView extends View implements IImageDataReceiver, IAu
     private void initComponent(Context context)
     {
         prepareFile();
-        storeImage = new StoreImage(context);
+        storeImage = new StoreImage(context, false);
         ShowMessageHolder messageHolder =  new ShowMessageHolder();
         this.messageHolder = messageHolder;
         messageDrawer = messageHolder;

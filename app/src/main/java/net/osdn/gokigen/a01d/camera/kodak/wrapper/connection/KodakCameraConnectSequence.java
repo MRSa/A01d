@@ -134,10 +134,12 @@ public class KodakCameraConnectSequence implements Runnable, IKodakCommandCallba
                 break;
             case SEQ_CONNECT_04:
                 interfaceProvider.getInformationReceiver().updateMessage(context.getString(R.string.kodak_connect_connecting4), false, false, 0);
+                // ここで、パスワードの Base64情報を切り出す(FC 03 の応答、 0x0058 ～ 64バイトの文字列を切り出して、Base64エンコードする)
                 commandIssuer.enqueueCommand(new KodakConnectSequence05(this));
                 break;
             case SEQ_CONNECT_05:
                 interfaceProvider.getInformationReceiver().updateMessage(context.getString(R.string.kodak_connect_connecting5), false, false, 0);
+                // ここで、パスワードの情報を切り出す (FE 03 の応答、 0x0078 ～ 文字列を切り出す。)
                 commandIssuer.enqueueCommand(new KodakConnectSequence06(this));
                 break;
             case SEQ_CONNECT_06:

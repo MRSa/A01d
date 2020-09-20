@@ -337,4 +337,7 @@
     <string name="pref_kodak_liveview_port">カメラライブビューポート番号</string>
     <string name="pref_summary_kodak_liveview_port">通常、変更は不要です (初期値:9176)</string>
 
+    <string name="pref_save_local_location">ライブビュー画像をアプリ固有領域に保存</string>
+    <string name="pref_summary_save_local_location">ライブビューイメージの保存先をアプリ固有領域にします。</string>
+
 </resources>

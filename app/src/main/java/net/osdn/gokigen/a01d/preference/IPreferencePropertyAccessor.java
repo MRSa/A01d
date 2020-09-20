@@ -114,6 +114,8 @@ public interface IPreferencePropertyAccessor
     String KODAK_LIVEVIEW_PORT = "kodak_liveview_port";
     String KODAK_LIVEVIEW_PORT_DEFAULT_VALUE = "9176";
 
+    String SAVE_LOCAL_LOCATION = "save_local_location";
+    boolean SAVE_LOCAL_LOCATION_DEFAULT_VALUE = false;
  /*
     int CHOICE_SPLASH_SCREEN = 10;
 

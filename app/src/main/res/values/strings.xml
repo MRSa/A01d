@@ -342,4 +342,7 @@
     <string name="pref_kodak_liveview_port">Camera Liveview Port</string>
     <string name="pref_summary_kodak_liveview_port">default: 9176 </string>
 
+    <string name="pref_save_local_location">Save local location(Liveview Image)</string>
+    <string name="pref_summary_save_local_location">The liveview image saves in application local location.</string>
+
 </resources>
