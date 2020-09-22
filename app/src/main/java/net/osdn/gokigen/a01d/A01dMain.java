@@ -252,16 +252,18 @@ public class A01dMain extends AppCompatActivity implements ICameraStatusReceiver
     @Override
     public void changeSceneToCameraPropertyList()
     {
-/*
         try
         {
             ICameraConnection.CameraConnectionMethod method = interfaceProvider.getCammeraConnectionMethod();
+            if (method == ICameraConnection.CameraConnectionMethod.OPC)
+            {
+                changeSceneToCameraPropertyList(method);
+            }
         }
         catch (Exception e)
         {
             e.printStackTrace();
         }
-*/
     }
 
     /**
@@ -368,7 +370,8 @@ public class A01dMain extends AppCompatActivity implements ICameraStatusReceiver
             }
             else
             {
-                // OPC カメラの場合...
+                // OPC カメラの場合...;
+                Log.v(TAG, " Change Scene to propertyList :");
                 ICameraConnection connection = getCameraConnection(connectionMethod);
                 if (connection != null)
                 {
