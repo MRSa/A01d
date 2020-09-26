@@ -406,42 +406,49 @@ public class PreferenceFragment extends PreferenceFragmentCompat implements Shar
         Log.v(TAG, "onSharedPreferenceChanged() : " + key);
         String propertyValue;
         boolean value;
-        if (key != null)
+        try
         {
-            switch (key)
+            if (key != null)
             {
-                case IPreferencePropertyAccessor.RAW:
-                    value = preferences.getBoolean(key, true);
-                    setBooleanPreference(key, key, value);
-                    propertyValue = (value) ? "ON" : "OFF";
-                    setCameraProperty(IOlyCameraProperty.RAW, propertyValue);
-                    break;
+                switch (key)
+                {
+                    case IPreferencePropertyAccessor.RAW:
+                        value = preferences.getBoolean(key, true);
+                        setBooleanPreference(key, key, value);
+                        propertyValue = (value) ? "ON" : "OFF";
+                        setCameraProperty(IOlyCameraProperty.RAW, propertyValue);
+                        break;
 
-                case IPreferencePropertyAccessor.BLE_POWER_ON:
-                    value = preferences.getBoolean(key, false);
-                    Log.v(TAG, " " + key + " , " + value);
-                    break;
+                    case IPreferencePropertyAccessor.BLE_POWER_ON:
+                        value = preferences.getBoolean(key, false);
+                        Log.v(TAG, " " + key + " , " + value);
+                        break;
 
-                case IPreferencePropertyAccessor.AUTO_CONNECT_TO_CAMERA:
-                    value = preferences.getBoolean(key, true);
-                    Log.v(TAG, " " + key + " , " + value);
-                    break;
+                    case IPreferencePropertyAccessor.AUTO_CONNECT_TO_CAMERA:
+                        value = preferences.getBoolean(key, true);
+                        Log.v(TAG, " " + key + " , " + value);
+                        break;
 
-                case IPreferencePropertyAccessor.CAPTURE_BOTH_CAMERA_AND_LIVE_VIEW:
-                    value = preferences.getBoolean(key, true);
-                    Log.v(TAG, "  " + key + " , " + value);
-                    break;
+                    case IPreferencePropertyAccessor.CAPTURE_BOTH_CAMERA_AND_LIVE_VIEW:
+                        value = preferences.getBoolean(key, true);
+                        Log.v(TAG, "  " + key + " , " + value);
+                        break;
 
-                default:
-                    String strValue = preferences.getString(key, "");
-                    setListPreference(key, key, strValue);
-                    String propertyKey = convertKeyFromPreferenceToCameraPropertyKey(key);
-                    if (propertyKey != null)
-                    {
-                        setCameraProperty(propertyKey, strValue);
-                    }
-                    break;
+                    default:
+                        String strValue = preferences.getString(key, "");
+                        setListPreference(key, key, strValue);
+                        String propertyKey = convertKeyFromPreferenceToCameraPropertyKey(key);
+                        if (propertyKey != null)
+                        {
+                            setCameraProperty(propertyKey, strValue);
+                        }
+                        break;
+                }
             }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
         }
     }
 

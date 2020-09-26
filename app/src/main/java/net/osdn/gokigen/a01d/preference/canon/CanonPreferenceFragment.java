@@ -150,25 +150,32 @@ public class CanonPreferenceFragment extends PreferenceFragmentCompat implements
     {
         Log.v(TAG, "onSharedPreferenceChanged() : " + key);
         boolean value;
-        if (key != null)
+        try
         {
-            switch (key)
+            if (key != null)
             {
-                case IPreferencePropertyAccessor.AUTO_CONNECT_TO_CAMERA:
-                    value = preferences.getBoolean(key, true);
-                    Log.v(TAG, " " + key + " , " + value);
-                    break;
+                switch (key)
+                {
+                    case IPreferencePropertyAccessor.AUTO_CONNECT_TO_CAMERA:
+                        value = preferences.getBoolean(key, true);
+                        Log.v(TAG, " " + key + " , " + value);
+                        break;
 
-                case IPreferencePropertyAccessor.CAPTURE_BOTH_CAMERA_AND_LIVE_VIEW:
-                    value = preferences.getBoolean(key, true);
-                    Log.v(TAG, "  " + key + " , " + value);
-                    break;
+                    case IPreferencePropertyAccessor.CAPTURE_BOTH_CAMERA_AND_LIVE_VIEW:
+                        value = preferences.getBoolean(key, true);
+                        Log.v(TAG, "  " + key + " , " + value);
+                        break;
 
-                default:
-                    String strValue = preferences.getString(key, "");
-                    setListPreference(key, key, strValue);
-                    break;
+                    default:
+                        String strValue = preferences.getString(key, "");
+                        setListPreference(key, key, strValue);
+                        break;
+                }
             }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
         }
     }
 
