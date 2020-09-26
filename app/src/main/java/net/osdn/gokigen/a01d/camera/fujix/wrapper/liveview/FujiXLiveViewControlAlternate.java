@@ -19,7 +19,7 @@ import static net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor.FUJIX
 import static net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor.FUJIX_LIVEVIEW_WAIT_DEFAULT_VALUE;
 
 
-public class FujiXLiveViewControl implements ILiveViewControl, IFujiXCommunication
+public class FujiXLiveViewControlAlternate implements ILiveViewControl, IFujiXCommunication
 {
     private final String TAG = toString();
     private final String ipAddress;
@@ -30,9 +30,9 @@ public class FujiXLiveViewControl implements ILiveViewControl, IFujiXCommunicati
     private static final int BUFFER_SIZE = 2048 * 1280;
     private static final int ERROR_LIMIT = 30;
     private boolean isStart = false;
-    private boolean logcat = false;
+    private boolean logcat = true;
 
-    public FujiXLiveViewControl(@NonNull Activity activity, String ip, int portNumber)
+    public FujiXLiveViewControlAlternate(@NonNull Activity activity, String ip, int portNumber)
     {
         this.ipAddress = ip;
         this.portNumber = portNumber;
@@ -43,10 +43,13 @@ public class FujiXLiveViewControl implements ILiveViewControl, IFujiXCommunicati
             SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(activity);
             String waitMsStr = preferences.getString(FUJIX_LIVEVIEW_WAIT, FUJIX_LIVEVIEW_WAIT_DEFAULT_VALUE);
             logcat("waitMS : " + waitMsStr);
-            int wait = Integer.parseInt(waitMsStr);
-            if ((wait >= 20)&&(wait <= 800))
+            if (waitMsStr != null)
             {
-                waitMs = wait;
+                int wait = Integer.parseInt(waitMsStr);
+                if ((wait >= 20) && (wait <= 800))
+                {
+                    waitMs = wait;
+                }
             }
         }
         catch (Exception e)
@@ -63,6 +66,7 @@ public class FujiXLiveViewControl implements ILiveViewControl, IFujiXCommunicati
         if (isStart)
         {
             // すでに受信スレッド動作中なので抜ける
+            Log.v(TAG, " LiveView IS ALREADY STARTED");
             return;
         }
         isStart = true;
@@ -125,6 +129,10 @@ public class FujiXLiveViewControl implements ILiveViewControl, IFujiXCommunicati
                 boolean findJpeg = false;
                 int length_bytes;
                 int read_bytes = isr.read(byteArray, 0, BUFFER_SIZE);
+
+                // 先頭データ(48バイト分)をダンプ
+                dump_bytes("[lv]", byteArray, 48);
+
                 if (read_bytes > DATA_HEADER_OFFSET)
                 {
                     // メッセージボディの先頭にあるメッセージ長分は読み込む
@@ -148,6 +156,7 @@ public class FujiXLiveViewControl implements ILiveViewControl, IFujiXCommunicati
                     {
                         // ウェイトを短めに入れてマーカーを拾うまで待つ
                         Thread.sleep(waitMs/4);
+                        logcat(" --- wait LiveView ---");
                         continue;
                     }
                 }
