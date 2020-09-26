@@ -5,17 +5,15 @@ import android.util.Log
 import androidx.preference.PreferenceManager
 import net.osdn.gokigen.a01d.camera.ILiveViewControl
 import net.osdn.gokigen.a01d.camera.fujix.wrapper.command.IFujiXCommunication
-import net.osdn.gokigen.a01d.camera.utils.SimpleLogDumper
 import net.osdn.gokigen.a01d.liveview.liveviewlistener.CameraLiveViewListenerImpl
 import net.osdn.gokigen.a01d.liveview.liveviewlistener.ILiveViewListener
 import net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor
 import java.io.ByteArrayOutputStream
 import java.net.Socket
-import java.util.*
 
 class FujiXLiveViewControl(activity: Activity, private val ipAddress: String, private val portNumber: Int) : ILiveViewControl, IFujiXCommunication
 {
-    private val TAG = toString()
+    private val classTag = toString()
     private val liveViewListener = CameraLiveViewListenerImpl()
     private var waitMs = 0
     private var isStart = false
@@ -42,7 +40,7 @@ class FujiXLiveViewControl(activity: Activity, private val ipAddress: String, pr
             e.printStackTrace()
             waitMs = 100
         }
-        Log.v(TAG, " LOOP WAIT : $waitMs ms")
+        Log.v(classTag, " LOOP WAIT : $waitMs ms")
     }
 
     override fun startLiveView()
@@ -50,7 +48,7 @@ class FujiXLiveViewControl(activity: Activity, private val ipAddress: String, pr
         if (isStart)
         {
             // すでに受信スレッド動作中なので抜ける
-            Log.v(TAG, " LiveView IS ALREADY STARTED")
+            Log.v(classTag, " LiveView IS ALREADY STARTED")
             return
         }
         isStart = true
@@ -64,7 +62,7 @@ class FujiXLiveViewControl(activity: Activity, private val ipAddress: String, pr
                 }
                 catch (e: Exception)
                 {
-                    Log.v(TAG, " IP : $ipAddress port : $portNumber")
+                    Log.v(classTag, " IP : $ipAddress port : $portNumber")
                     e.printStackTrace()
                 }
             }.start()
@@ -124,120 +122,19 @@ class FujiXLiveViewControl(activity: Activity, private val ipAddress: String, pr
     {
         if (logcat)
         {
-            Log.v(TAG, message)
+            Log.v(classTag, message)
         }
     }
 
-    private fun dump_bytes(header : String, byteArray: ByteArray, size : Int = 24)
-    {
-        if (logcat)
-        {
-            SimpleLogDumper.dump_bytes(header, byteArray.copyOf(size))
-        }
-    }
-
-    private fun startReceiveAlter(socket: Socket)
-    {
-        var errorCount = 0
-        val isr = socket.getInputStream()
-        val byteArray = ByteArray(BUFFER_SIZE + 32)
-
-        while (isStart)
-        {
-            try
-            {
-                var findJpeg = false
-                var length_bytes: Int
-                var read_bytes = isr.read(byteArray, 0, BUFFER_SIZE)
-                if (read_bytes > DATA_HEADER_OFFSET)
-                {
-                    // メッセージボディの先頭にあるメッセージ長分は読み込む
-                    length_bytes = (byteArray[3].toInt() and 0xff shl 24) + (byteArray[2].toInt() and 0xff shl 16) + (byteArray[1].toInt() and 0xff shl 8) + (byteArray[0].toInt() and 0xff)
-                    if (byteArray[18] == 0xff.toByte() && byteArray[19] == 0xd8.toByte())
-                    {
-                        findJpeg = true
-                        while (read_bytes < length_bytes && read_bytes < BUFFER_SIZE && length_bytes <= BUFFER_SIZE)
-                        {
-                            val append_bytes = isr.read(byteArray, read_bytes, length_bytes - read_bytes)
-                            logcat("READ AGAIN : $append_bytes [$read_bytes]")
-                            if (append_bytes < 0)
-                            {
-                                break
-                            }
-                            read_bytes = read_bytes + append_bytes
-                        }
-                        logcat("READ BYTES : " + read_bytes + "  (" + length_bytes + " bytes, " + waitMs + "ms)")
-                    }
-                    else
-                    {
-                        // ウェイトを短めに入れてマーカーを拾うまで待つ
-                        Thread.sleep(waitMs / 4.toLong())
-                        logcat(" --- wait LiveView ---")
-                        continue
-                    }
-                }
-
-                // 先頭データをダンプする
-                dump_bytes("[LV]", byteArray)
-                if (findJpeg)
-                {
-                    liveViewListener.onUpdateLiveView(Arrays.copyOfRange(byteArray, DATA_HEADER_OFFSET, read_bytes - DATA_HEADER_OFFSET), null)
-                    errorCount = 0
-                }
-                Thread.sleep(waitMs.toLong())
-            }
-            catch (e: Exception)
-            {
-                e.printStackTrace()
-                errorCount++
-            }
-
-            if (errorCount > ERROR_LIMIT)
-            {
-                // エラーが連続でたくさん出たらループをストップ(ライブビューを停止)させる
-                isStart = false
-            }
-        }
-
-        try
-        {
-            isr.close()
-            socket.close()
-        }
-        catch (e: Exception)
-        {
-            e.printStackTrace()
-        }
-    }
-
-    private fun findJpegStartTag(byteArray : ByteArray, arraySize : Int) : Int
+    private fun findJpegTag(byteArray : ByteArray, arraySize : Int, charTag : Byte) : Int
     {
         var index = 0
         while (index < arraySize)
         {
-            val value1 = byteArray.get(index)
+            val value1 = byteArray[index]
             if (value1 == 0xff.toByte())
             {
-                if (byteArray.get(index + 1) == 0xd8.toByte())
-                {
-                    return (index)
-                }
-            }
-            index++
-        }
-        return (-1)
-    }
-
-    private fun findJpegFinishTag(byteArray : ByteArray, arraySize : Int) : Int
-    {
-        var index = 0
-
-        while (index < arraySize)
-        {
-            val value1 = byteArray.get(index)
-            if (value1 == 0xff.toByte())
-            {
-                if (byteArray.get(index + 1) == 0xd9.toByte())
+                if (byteArray[index + 1] == charTag)
                 {
                     return (index)
                 }
@@ -270,7 +167,7 @@ class FujiXLiveViewControl(activity: Activity, private val ipAddress: String, pr
 
                 if (!findJpeg)
                 {
-                    val startPosition = findJpegStartTag(byteArray, readBytes)
+                    val startPosition = findJpegTag(byteArray, readBytes, 0xd8.toByte())
                     if (startPosition < 0)
                     {
                         Thread.sleep(waitMs / 4.toLong())
@@ -278,6 +175,7 @@ class FujiXLiveViewControl(activity: Activity, private val ipAddress: String, pr
                         continue
                     }
 
+                    // JPEGのスタートタグが見つかっていた場合
                     findJpeg = true
                     if (startPosition < readBytes)
                     {
@@ -289,8 +187,8 @@ class FujiXLiveViewControl(activity: Activity, private val ipAddress: String, pr
                     }
                 }
 
-                // JPEGのスタートタグが見つかっていた場合...
-                val endPosition = findJpegFinishTag(byteArray, readBytes)
+                // JPEGのエンドタグを探す
+                val endPosition = findJpegTag(byteArray, readBytes, 0xd9.toByte())
                 if (endPosition < 0)
                 {
                     // エンドマーカーがなかった...全部streamに流しておく
@@ -333,7 +231,6 @@ class FujiXLiveViewControl(activity: Activity, private val ipAddress: String, pr
 
     companion object
     {
-        private const val DATA_HEADER_OFFSET = 18
         private const val BUFFER_SIZE = 2048 * 1280
         private const val ERROR_LIMIT = 30
     }
