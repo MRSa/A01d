@@ -177,37 +177,44 @@ public class PreferenceFragmentSummary extends PreferenceFragmentCompat implemen
         boolean value;
         if (key != null)
         {
-            switch (key)
+            try
             {
-                case IPreferencePropertyAccessor.AUTO_CONNECT_TO_CAMERA:
-                    value = preferences.getBoolean(key, true);
-                    Log.v(TAG, "  " + key + " , " + value);
-                    break;
+                switch (key)
+                {
+                    case IPreferencePropertyAccessor.AUTO_CONNECT_TO_CAMERA:
+                        value = preferences.getBoolean(key, true);
+                        Log.v(TAG, "  " + key + " , " + value);
+                        break;
 
-                case IPreferencePropertyAccessor.CAPTURE_BOTH_CAMERA_AND_LIVE_VIEW:
-                    value = preferences.getBoolean(key, true);
-                    Log.v(TAG, " " + key + " , " + value);
-                    break;
+                    case IPreferencePropertyAccessor.CAPTURE_BOTH_CAMERA_AND_LIVE_VIEW:
+                        value = preferences.getBoolean(key, true);
+                        Log.v(TAG, " " + key + " , " + value);
+                        break;
 
-                case IPreferencePropertyAccessor.CAPTURE_ONLY_LIVE_VIEW:
-                    value = preferences.getBoolean(key, false);
-                    Log.v(TAG, "  " + key + "  , " + value);
-                    break;
+                    case IPreferencePropertyAccessor.CAPTURE_ONLY_LIVE_VIEW:
+                        value = preferences.getBoolean(key, false);
+                        Log.v(TAG, "  " + key + "  , " + value);
+                        break;
 
-                case IPreferencePropertyAccessor.CACHE_LIVEVIEW_PICTURES:
-                    value = preferences.getBoolean(key, false);
-                    Log.v(TAG, " " + key + "  , " + value);
-                    break;
+                    case IPreferencePropertyAccessor.CACHE_LIVEVIEW_PICTURES:
+                        value = preferences.getBoolean(key, false);
+                        Log.v(TAG, " " + key + "  , " + value);
+                        break;
 
-                case IPreferencePropertyAccessor.SAVE_LOCAL_LOCATION:
-                    value = preferences.getBoolean(key, IPreferencePropertyAccessor.SAVE_LOCAL_LOCATION_DEFAULT_VALUE);
-                    Log.v(TAG, " " + key + "  , " + value);
-                    break;
+                    case IPreferencePropertyAccessor.SAVE_LOCAL_LOCATION:
+                        value = preferences.getBoolean(key, IPreferencePropertyAccessor.SAVE_LOCAL_LOCATION_DEFAULT_VALUE);
+                        Log.v(TAG, " " + key + "  , " + value);
+                        break;
 
-                default:
-                    String strValue = preferences.getString(key, "");
-                    setListPreference(key, key, strValue);
-                    break;
+                    default:
+                        String strValue = preferences.getString(key, "");
+                        setListPreference(key, key, strValue);
+                        break;
+                }
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
             }
         }
     }

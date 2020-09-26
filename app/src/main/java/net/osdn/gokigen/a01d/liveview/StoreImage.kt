@@ -151,7 +151,7 @@ class StoreImage(private val context: Context, private val dumpLog : Boolean = f
                 }
                 ////////////////////////////////////////////////////////////////
 
-                val outputStream = resolver.openOutputStream(imageUri)
+                val outputStream = resolver.openOutputStream(imageUri, "wa")
                 if (outputStream != null)
                 {
                     targetImage.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
