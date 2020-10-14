@@ -202,7 +202,14 @@ public class KodakConnection implements ICameraConnection
             @Override
             public void run()
             {
-                builder.show();
+                try
+                {
+                    builder.show();
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
             }
         });
     }

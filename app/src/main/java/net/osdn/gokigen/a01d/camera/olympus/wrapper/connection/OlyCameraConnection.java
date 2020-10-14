@@ -295,7 +295,14 @@ public class OlyCameraConnection implements ICameraConnection, OLYCameraConnecti
             @Override
             public void run()
             {
-                builder.show();
+                try
+                {
+                    builder.show();
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
             }
         });
     }

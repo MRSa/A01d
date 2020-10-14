@@ -213,7 +213,14 @@ public class OlympusPenConnection implements ICameraConnection
             {
                 try
                 {
-                    builder.show();
+                    try
+                    {
+                        builder.show();
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                    }
                 }
                 catch (Exception e)
                 {
