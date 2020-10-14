@@ -18,19 +18,17 @@ import java.util.*
 
 class StoreImage(private val context: Context, private val dumpLog : Boolean = false) : IStoreImage
 {
-    private val TAG = toString()
-    private val FILENAME_FORMAT = "yyyyMMdd_HHmmss"
 
     override fun doStore(bitmapToStore: Bitmap)
     {
         try
         {
-            // 保存処理(プログレスダイアログ（「保存中...」）を表示
+            // ここで 保存処理(プログレスダイアログ（「保存中...」）を表示
 
             val preference = PreferenceManager.getDefaultSharedPreferences(context)
-            val isLocalLocation  = preference.getBoolean(
-                IPreferencePropertyAccessor.SAVE_LOCAL_LOCATION,
-                IPreferencePropertyAccessor.SAVE_LOCAL_LOCATION_DEFAULT_VALUE
+            val isLocalLocation = preference.getBoolean(
+                    IPreferencePropertyAccessor.SAVE_LOCAL_LOCATION,
+                    IPreferencePropertyAccessor.SAVE_LOCAL_LOCATION_DEFAULT_VALUE
             )
             if (isLocalLocation)
             {
@@ -41,7 +39,7 @@ class StoreImage(private val context: Context, private val dumpLog : Boolean = f
                 saveImageExternal(bitmapToStore)
             }
 
-            // 保存処理(プログレスダイアログ（「保存中...」）を削除
+            // ここで 保存処理(プログレスダイアログ（「保存中...」）を削除
         }
         catch (t: Throwable)
         {
@@ -117,11 +115,10 @@ class StoreImage(private val context: Context, private val dumpLog : Boolean = f
             val outputDir = getExternalOutputDirectory()
             val resolver = context.contentResolver
             val mimeType = "image/jpeg"
-            //val now = System.currentTimeMillis()
             val path = Environment.DIRECTORY_DCIM + File.separator + context.getString(R.string.app_name2)
             val fileName = SimpleDateFormat(FILENAME_FORMAT, Locale.US).format(Calendar.getInstance().time) + ".jpg"
 
-            val extStorageUri : Uri
+            val extStorageUri: Uri
             val values = ContentValues()
             values.put(MediaStore.Images.Media.TITLE, fileName)
             values.put(MediaStore.Images.Media.DISPLAY_NAME, fileName)
@@ -137,11 +134,10 @@ class StoreImage(private val context: Context, private val dumpLog : Boolean = f
                 values.put(MediaStore.Images.Media.DATA, outputDir.absolutePath + File.separator + fileName)
                 extStorageUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
             }
+
             val imageUri = resolver.insert(extStorageUri, values)
             if (imageUri != null)
             {
-                resolver.update(imageUri, values, null, null)
-
                 ////////////////////////////////////////////////////////////////
                 if (dumpLog)
                 {
@@ -165,6 +161,10 @@ class StoreImage(private val context: Context, private val dumpLog : Boolean = f
 
                 }
             }
+            else
+            {
+                Log.v(TAG, " cannot get imageUri...")
+            }
         }
         catch (t: Throwable)
         {
@@ -177,4 +177,9 @@ class StoreImage(private val context: Context, private val dumpLog : Boolean = f
         return (Environment.getExternalStorageState() == Environment.MEDIA_MOUNTED)
     }
 
+    companion object
+    {
+        private val TAG = this.toString()
+        private const val FILENAME_FORMAT = "yyyyMMdd_HHmmss"
+    }
 }
