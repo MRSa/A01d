@@ -12,22 +12,15 @@ import java.util.*
 
 class PtpIpCommandPublisher(private val ipAddress : String, private val portNumber : Int, private val tcpNoDelay : Boolean, private val waitForever: Boolean) : IPtpIpCommandPublisher, IPtpIpCommunication
 {
-    private val TAG = PtpIpCommandPublisher::class.java.simpleName
-
-    private val SEQUENCE_START_NUMBER = 1
-    private val BUFFER_SIZE = 1024 * 1024 + 16 // 受信バッファは 1MB
-
-    private val COMMAND_SEND_RECEIVE_DURATION_MS = 5
-    private val COMMAND_SEND_RECEIVE_DURATION_MAX = 3000
-    private val COMMAND_POLL_QUEUE_MS = 5
-
     private var isConnected = false
     private var isStart = false
     private var isHold = false
     private var holdId = 0
+
     private var socket : Socket? = null
     private var dos: DataOutputStream? = null
     private var bufferedReader: BufferedReader? = null
+
     private var sequenceNumber = SEQUENCE_START_NUMBER
     private var commandQueue: Queue<IPtpIpCommand> = ArrayDeque()
     private var holdCommandQueue: Queue<IPtpIpCommand> = ArrayDeque()
@@ -215,8 +208,8 @@ class PtpIpCommandPublisher(private val ipAddress : String, private val portNumb
     {
         try
         {
-            var retry_over = true
-            while (retry_over)
+            var retryOver = true
+            while (retryOver)
             {
                 //Log.v(TAG, "issueCommand : " + command.getId());
                 val commandBody = command.commandBody()
@@ -242,15 +235,15 @@ class PtpIpCommandPublisher(private val ipAddress : String, private val portNumb
                         sequenceNumber++
                     }
                 }
-                retry_over = receiveFromCamera(command)
-                if ((retry_over)&&(commandBody != null))
+                retryOver = receiveFromCamera(command)
+                if ((retryOver)&&(commandBody != null))
                 {
                     if (!command.isRetrySend)
                     {
-                        while (retry_over)
+                        while (retryOver)
                         {
                             //  コマンドを再送信しない場合はここで応答を待つ...
-                            retry_over = receiveFromCamera(command)
+                            retryOver = receiveFromCamera(command)
                         }
                         break
                     }
@@ -431,8 +424,8 @@ class PtpIpCommandPublisher(private val ipAddress : String, private val portNumb
         try
         {
             Log.v(TAG, " ===== receive_multi() =====")
-            val receive_message_buffer_size = BUFFER_SIZE
-            val byte_array = ByteArray(receive_message_buffer_size)
+            val receiveMessageBufferSize = BUFFER_SIZE
+            val byteArray = ByteArray(receiveMessageBufferSize)
             val inputStream = socket?.getInputStream()
             if (inputStream == null)
             {
@@ -441,8 +434,8 @@ class PtpIpCommandPublisher(private val ipAddress : String, private val portNumb
             }
 
             // 初回データが受信バッファにデータが溜まるまで待つ...
-            var read_bytes = waitForReceive(inputStream, delayMs, command.maxRetryCount())
-            if (read_bytes < 0)
+            var readBytes = waitForReceive(inputStream, delayMs, command.maxRetryCount())
+            if (readBytes < 0)
             {
                 // リトライオーバー...
                 Log.v(TAG, " RECEIVE : RETRY OVER...... : " + delayMs + "ms x " + command.maxRetryCount())
@@ -452,72 +445,66 @@ class PtpIpCommandPublisher(private val ipAddress : String, private val portNumb
                     return (true)
                 }
             }
-            var target_length: Int
-            var received_length: Int
+            var targetLength: Int
+            var receivedLength: Int
 
-            //boolean read_retry = false;
-            //do
             run {
 
                 // 初回データの読み込み...
-                read_bytes = inputStream.read(byte_array, 0, receive_message_buffer_size)
-                target_length = parseDataLength(byte_array, read_bytes)
-                received_length = read_bytes
-                if (target_length <= 0)
+                readBytes = inputStream.read(byteArray, 0, receiveMessageBufferSize)
+                targetLength = parseDataLength(byteArray, readBytes)
+                receivedLength = readBytes
+                if (targetLength <= 0)
                 {
                     // 受信サイズ異常の場合...
-                    if (received_length > 0)
+                    if (receivedLength > 0)
                     {
-                        SimpleLogDumper.dump_bytes("WRONG DATA : ", Arrays.copyOfRange(byte_array, 0, Math.min(received_length, 64)))
+                        SimpleLogDumper.dump_bytes("WRONG DATA : ", Arrays.copyOfRange(byteArray, 0, Math.min(receivedLength, 64)))
                     }
-                    Log.v(TAG, " WRONG LENGTH. : $target_length READ : $received_length bytes.")
+                    Log.v(TAG, " WRONG LENGTH. : $targetLength READ : $receivedLength bytes.")
                     callback?.receivedMessage(id, null)
                     return false
                 }
-            } //while (read_retry);
+            }
 
-            Log.v(TAG, "  -=-=-=- 1st CALL : read_bytes : " + read_bytes + "(" + received_length + ") : target_length : " + target_length + "  buffer SIZE : " + byte_array.size)
-            callback?.onReceiveProgress(received_length, target_length, Arrays.copyOfRange(byte_array, 0, received_length))
+            Log.v(TAG, "  -=-=-=- 1st CALL : read_bytes : " + readBytes + "(" + receivedLength + ") : target_length : " + targetLength + "  buffer SIZE : " + byteArray.size)
+            callback?.onReceiveProgress(receivedLength, targetLength, Arrays.copyOfRange(byteArray, 0, receivedLength))
 
-            //do
             run {
                 sleep(delayMs)
-                read_bytes = inputStream.available()
-                if (read_bytes == 0)
+                readBytes = inputStream.available()
+                if (readBytes == 0)
                 {
-                    //Log.v(TAG, " WAIT is.available() ... [" + received_length + ", " + target_length + "] retry : " + maxRetryCount);
                     maxRetryCount--
                 }
-            } // while ((read_bytes == 0)&&(maxRetryCount > 0)&&(received_length < target_length)); // ((read_bytes == 0)&&(estimatedSize > 0)&&(received_length < estimatedSize));
-            while (read_bytes >= 0 && received_length < target_length)
+            }
+            while (readBytes >= 0 && receivedLength < targetLength)
             {
-                read_bytes = inputStream.read(byte_array, 0, receive_message_buffer_size)
-                if (read_bytes <= 0)
+                readBytes = inputStream.read(byteArray, 0, receiveMessageBufferSize)
+                if (readBytes <= 0)
                 {
-                    Log.v(TAG, "  RECEIVED MESSAGE FINISHED ($read_bytes)")
+                    Log.v(TAG, "  RECEIVED MESSAGE FINISHED ($readBytes)")
                     break
                 }
-                received_length = received_length + read_bytes
+                receivedLength += readBytes
 
-                //  一時的な処理
-                callback?.onReceiveProgress(received_length, target_length, Arrays.copyOfRange(byte_array, 0, read_bytes))
-                //byteStream.write(byte_array, 0, read_bytes);
+                callback?.onReceiveProgress(receivedLength, targetLength, Arrays.copyOfRange(byteArray, 0, readBytes))
                 maxRetryCount = command.maxRetryCount()
-                //do
+
                 run {
                     sleep(delayMs)
-                    read_bytes = inputStream.available()
-                    //Log.v(TAG, "  is.available() read_bytes : " + read_bytes + " " + received_length + " < " + estimatedSize);
-                    if (read_bytes == 0) {
-                        Log.v(TAG, " WAIT is.available() ... [$received_length, $target_length] $read_bytes retry : $maxRetryCount")
+                    readBytes = inputStream.available()
+                    if (readBytes == 0)
+                    {
+                        Log.v(TAG, " WAIT is.available() ... [$receivedLength, $targetLength] $readBytes retry : $maxRetryCount")
                         maxRetryCount--
                     }
-                } // while ((read_bytes == 0)&&(maxRetryCount > 0)&&(received_length < target_length)); // while ((read_bytes == 0)&&(estimatedSize > 0)&&(received_length < estimatedSize));
+                }
             }
 
             //  終了報告...一時的？
-            Log.v(TAG, "  --- receive_multi : $id  ($read_bytes) [$maxRetryCount] $receive_message_buffer_size ($received_length) ")
-            callback?.receivedMessage(id, Arrays.copyOfRange(byte_array, 0, received_length))
+            Log.v(TAG, "  --- receive_multi : $id  ($readBytes) [$maxRetryCount] $receiveMessageBufferSize ($receivedLength) ")
+            callback?.receivedMessage(id, Arrays.copyOfRange(byteArray, 0, receivedLength))
         }
         catch (e: Throwable)
         {
@@ -530,7 +517,6 @@ class PtpIpCommandPublisher(private val ipAddress : String, private val portNumb
     {
         var offset = 0
         var lenlen = 0
-        //int packetType = 0;
         try
         {
             if (read_bytes > 20)
@@ -543,10 +529,8 @@ class PtpIpCommandPublisher(private val ipAddress : String, private val portNumb
                 if (byte_array[offset + 4].toUByte().toInt() == 0x09)
                 {
                     lenlen = (byte_array[offset + 15].toUByte().toInt() and 0xff shl 24) + (byte_array[offset + 14].toUByte().toInt() and 0xff shl 16) + (byte_array[offset + 13].toUByte().toInt() and 0xff shl 8) + (byte_array[offset + 12].toUByte().toInt() and 0xff)
-                    //packetType = (((int)byte_array[offset + 16]) & 0xff);
                 }
             }
-            //Log.v(TAG, " --- parseDataLength() length: " + lenlen + " TYPE: " + packetType + " read_bytes: " + read_bytes + "  offset : " + offset);
         }
         catch (e: Exception)
         {
@@ -559,37 +543,36 @@ class PtpIpCommandPublisher(private val ipAddress : String, private val portNumb
     {
         try
         {
-            val byte_array = receivedBuffer.toByteArray()
-            val limit = byte_array.size
+            val byteArray = receivedBuffer.toByteArray()
+            val limit = byteArray.size
             var lenlen = 0
-            val len = (byte_array[3].toUByte().toInt() and 0xff shl 24) + (byte_array[2].toUByte().toInt() and 0xff shl 16) + (byte_array[1].toUByte().toInt() and 0xff shl 8) + (byte_array[0].toUByte().toInt() and 0xff)
-            val packetType = byte_array[4].toUByte().toInt() and 0xff
-            if (limit == len || limit < 16384)
+            val len = (byteArray[3].toUByte().toInt() and 0xff shl 24) + (byteArray[2].toUByte().toInt() and 0xff shl 16) + (byteArray[1].toUByte().toInt() and 0xff shl 8) + (byteArray[0].toUByte().toInt() and 0xff)
+            val packetType = byteArray[4].toUByte().toInt() and 0xff
+            if ((limit == len)||(limit < 16384))
             {
                 // 応答は１つしか入っていない。もしくは受信データサイズが16kBの場合は、そのまま返す。
                 return (receivedBuffer)
             }
+
             if (packetType == 0x09)
             {
-                lenlen = (byte_array[15].toUByte().toInt() and 0xff shl 24) + (byte_array[14].toUByte().toInt() and 0xff shl 16) + (byte_array[13].toUByte().toInt() and 0xff shl 8) + (byte_array[12].toUByte().toInt() and 0xff)
-                //packetType = (((int) byte_array[16]) & 0xff);
+                lenlen = (byteArray[15].toUByte().toInt() and 0xff shl 24) + (byteArray[14].toUByte().toInt() and 0xff shl 16) + (byteArray[13].toUByte().toInt() and 0xff shl 8) + (byteArray[12].toUByte().toInt() and 0xff)
             }
-            // Log.v(TAG, " ---  RECEIVED MESSAGE : " + len + " bytes (BUFFER: " + byte_array.length + " bytes)" + " length : " + lenlen + " TYPE : " + packetType + " --- ");
+
             if (lenlen == 0)
             {
                 // データとしては変なので、なにもしない
                 return receivedBuffer
             }
             val outputStream = ByteArrayOutputStream()
-            //outputStream.write(byte_array, 0, 20);  //
             var position = 20 // ヘッダ込の先頭
             while (position < limit)
             {
-                lenlen = (byte_array[position + 3].toUByte().toInt() and 0xff shl 24) + (byte_array[position + 2].toUByte().toInt() and 0xff shl 16) + (byte_array[position + 1].toUByte().toInt() and 0xff shl 8) + (byte_array[position].toUByte().toInt() and 0xff)
+                lenlen = (byteArray[position + 3].toUByte().toInt() and 0xff shl 24) + (byteArray[position + 2].toUByte().toInt() and 0xff shl 16) + (byteArray[position + 1].toUByte().toInt() and 0xff shl 8) + (byteArray[position].toUByte().toInt() and 0xff)
 
                 val copyByte = Math.min(limit - (position + 12), lenlen - 12)
-                outputStream.write(byte_array, position + 12, copyByte)
-                position = position + lenlen
+                outputStream.write(byteArray, position + 12, copyByte)
+                position += lenlen
             }
             return (outputStream)
         }
@@ -601,28 +584,28 @@ class PtpIpCommandPublisher(private val ipAddress : String, private val portNumb
         return (receivedBuffer)
     }
 
-    private fun waitForReceive(inputStream : InputStream, delayMs: Int, retryCount : Int): Int
+    private fun waitForReceive(inputStream : InputStream, delayMs: Int, retryCnt : Int): Int
     {
-        var retry_count = retryCount
+        var retryCount = retryCnt
         var isLogOutput = true
-        var read_bytes = 0
+        var readBytes = 0
         try
         {
-            while (read_bytes <= 0)
+            while (readBytes <= 0)
             {
                 sleep(delayMs)
-                read_bytes = inputStream.available()
-                if (read_bytes <= 0)
+                readBytes = inputStream.available()
+                if (readBytes <= 0)
                 {
                     if (isLogOutput)
                     {
                         Log.v(TAG, "waitForReceive:: is.available() WAIT... : " + delayMs + "ms")
                         isLogOutput = false
                     }
-                    retry_count--
-                    if (!waitForever && retry_count < 0)
+                    retryCount--
+                    if ((!waitForever)&&(retryCount < 0))
                     {
-                        return -1
+                        return (-1)
                     }
                 }
             }
@@ -631,6 +614,17 @@ class PtpIpCommandPublisher(private val ipAddress : String, private val portNumb
         {
             e.printStackTrace()
         }
-        return read_bytes
+        return (readBytes)
+    }
+
+    companion object
+    {
+        private val TAG = PtpIpCommandPublisher::class.java.simpleName
+
+        private const val SEQUENCE_START_NUMBER = 1
+        private const val BUFFER_SIZE = 1024 * 1024 + 16 // 受信バッファは 1MB
+        private const val COMMAND_SEND_RECEIVE_DURATION_MS = 5
+        private const val COMMAND_SEND_RECEIVE_DURATION_MAX = 3000
+        private const val COMMAND_POLL_QUEUE_MS = 5
     }
 }
