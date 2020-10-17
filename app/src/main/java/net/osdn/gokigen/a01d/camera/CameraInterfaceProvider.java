@@ -29,6 +29,7 @@ import net.osdn.gokigen.a01d.liveview.ICameraStatusUpdateNotify;
 import net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.preference.PreferenceManager;
 
 public class CameraInterfaceProvider implements IInterfaceProvider
@@ -46,7 +47,7 @@ public class CameraInterfaceProvider implements IInterfaceProvider
     private final KodakInterfaceProvider kodak;
     private final CameraStatusListener statusListener;
 
-    public CameraInterfaceProvider(@NonNull Activity context, @NonNull ICameraStatusReceiver provider, @NonNull IInformationReceiver informationReceiver, @NonNull ICardSlotSelector cardSlotSelector)
+    public CameraInterfaceProvider(@NonNull AppCompatActivity context, @NonNull ICameraStatusReceiver provider, @NonNull IInformationReceiver informationReceiver, @NonNull ICardSlotSelector cardSlotSelector)
     {
         this.context = context;
         this.statusListener = new CameraStatusListener();

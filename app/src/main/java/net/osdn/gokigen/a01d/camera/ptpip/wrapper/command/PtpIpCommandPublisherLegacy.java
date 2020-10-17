@@ -18,7 +18,7 @@ import java.util.Queue;
 
 import static net.osdn.gokigen.a01d.camera.utils.SimpleLogDumper.dump_bytes;
 
-public class PtpIpCommandPublisher implements IPtpIpCommandPublisher, IPtpIpCommunication
+public class PtpIpCommandPublisherLegacy implements IPtpIpCommandPublisher, IPtpIpCommunication
 {
     private static final String TAG = PtpIpCommandPublisher.class.getSimpleName();
 
@@ -43,7 +43,7 @@ public class PtpIpCommandPublisher implements IPtpIpCommandPublisher, IPtpIpComm
     private Queue<IPtpIpCommand> commandQueue;
     private Queue<IPtpIpCommand> holdCommandQueue;
 
-    public PtpIpCommandPublisher(@NonNull String ip, int portNumber, boolean tcpNoDelay, boolean waitForever)
+    public PtpIpCommandPublisherLegacy(@NonNull String ip, int portNumber, boolean tcpNoDelay, boolean waitForever)
     {
         this.ipAddress = ip;
         this.portNumber = portNumber;

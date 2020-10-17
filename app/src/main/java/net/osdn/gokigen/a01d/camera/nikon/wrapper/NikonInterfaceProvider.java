@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 
 import net.osdn.gokigen.a01d.IInformationReceiver;
 import net.osdn.gokigen.a01d.camera.ICameraConnection;
@@ -60,7 +61,7 @@ public class NikonInterfaceProvider implements IPtpIpInterfaceProvider, IDisplay
     private ICameraStatusUpdateNotify statusListener;
     private IInformationReceiver informationReceiver;
 
-    public NikonInterfaceProvider(@NonNull Activity context, @NonNull ICameraStatusReceiver provider, @NonNull ICameraStatusUpdateNotify statusListener, @NonNull IInformationReceiver informationReceiver)
+    public NikonInterfaceProvider(@NonNull AppCompatActivity context, @NonNull ICameraStatusReceiver provider, @NonNull ICameraStatusUpdateNotify statusListener, @NonNull IInformationReceiver informationReceiver)
     {
         this.activity = context;
         commandPublisher = new PtpIpCommandPublisher(CAMERA_IP, CONTROL_PORT, true, false);

@@ -1,0 +1,636 @@
+package net.osdn.gokigen.a01d.camera.ptpip.wrapper.command
+
+import android.util.Log
+import net.osdn.gokigen.a01d.camera.utils.SimpleLogDumper
+import java.io.BufferedReader
+import java.io.ByteArrayOutputStream
+import java.io.DataOutputStream
+import java.io.InputStream
+import java.net.InetSocketAddress
+import java.net.Socket
+import java.util.*
+
+class PtpIpCommandPublisher(private val ipAddress : String, private val portNumber : Int, private val tcpNoDelay : Boolean, private val waitForever: Boolean) : IPtpIpCommandPublisher, IPtpIpCommunication
+{
+    private val TAG = PtpIpCommandPublisher::class.java.simpleName
+
+    private val SEQUENCE_START_NUMBER = 1
+    private val BUFFER_SIZE = 1024 * 1024 + 16 // 受信バッファは 1MB
+
+    private val COMMAND_SEND_RECEIVE_DURATION_MS = 5
+    private val COMMAND_SEND_RECEIVE_DURATION_MAX = 3000
+    private val COMMAND_POLL_QUEUE_MS = 5
+
+    private var isConnected = false
+    private var isStart = false
+    private var isHold = false
+    private var holdId = 0
+    private var socket : Socket? = null
+    private var dos: DataOutputStream? = null
+    private var bufferedReader: BufferedReader? = null
+    private var sequenceNumber = SEQUENCE_START_NUMBER
+    private var commandQueue: Queue<IPtpIpCommand> = ArrayDeque()
+    private var holdCommandQueue: Queue<IPtpIpCommand> = ArrayDeque()
+
+    init
+    {
+        commandQueue.clear()
+        holdCommandQueue.clear()
+    }
+
+    override fun isConnected(): Boolean
+    {
+        return (isConnected)
+    }
+
+    override fun connect(): Boolean
+    {
+        try
+        {
+            Log.v(TAG, " connect()")
+            socket = Socket()
+            socket?.tcpNoDelay = tcpNoDelay
+            if (tcpNoDelay)
+            {
+                socket?.keepAlive = false
+                socket?.setPerformancePreferences(0, 2, 0)
+                socket?.oobInline = true
+                socket?.reuseAddress = false
+                socket?.trafficClass = 0x80
+                //socket?.setSoLinger(true, 3000);
+                //socket?.setReceiveBufferSize(2097152);
+                //socket?.setSendBufferSize(524288);
+            }
+            socket?.connect(InetSocketAddress(ipAddress, portNumber), 0)
+            isConnected = true
+        }
+        catch (e: Exception)
+        {
+            e.printStackTrace()
+            isConnected = false
+            socket = null
+        }
+        return (isConnected)
+    }
+
+    override fun disconnect()
+    {
+        try
+        {
+            dos?.close()
+            bufferedReader?.close()
+            socket?.close()
+            commandQueue.clear()
+        }
+        catch (e : Exception)
+        {
+            e.printStackTrace()
+        }
+        System.gc()
+
+        sequenceNumber = SEQUENCE_START_NUMBER
+        isConnected = false
+        isStart = false
+        dos = null
+        bufferedReader = null
+        socket = null
+    }
+
+    override fun start()
+    {
+        if (isStart)
+        {
+            // すでにコマンドのスレッド動作中なので抜ける
+            return
+        }
+        if (socket == null)
+        {
+            isStart = false
+            Log.v(TAG, " SOCKET IS NULL. (cannot start)")
+            return
+        }
+
+        isStart = true
+        Log.v(TAG, " start()")
+        val thread = Thread {
+            try
+            {
+                dos = DataOutputStream(socket?.getOutputStream())
+                while (isStart)
+                {
+                    try
+                    {
+                        val command = commandQueue.poll()
+                        command?.let { issueCommand(it) }
+                        Thread.sleep(COMMAND_POLL_QUEUE_MS.toLong())
+                    }
+                    catch (e: Exception)
+                    {
+                        e.printStackTrace()
+                    }
+                }
+            }
+            catch (e: Exception)
+            {
+                Log.v(TAG, "<<<<< IP : $ipAddress port : $portNumber >>>>>")
+                e.printStackTrace()
+            }
+        }
+        try
+        {
+            thread.start()
+        }
+        catch (e: Exception)
+        {
+            e.printStackTrace()
+        }
+    }
+
+    override fun stop()
+    {
+        isStart = false
+        commandQueue.clear()
+    }
+
+    override fun enqueueCommand(command: IPtpIpCommand): Boolean
+    {
+        try
+        {
+            if (isHold)
+            {
+                return (if (holdId == command.holdId) {
+                    if (command.isRelease)
+                    {
+                        // コマンドをキューに積んだ後、リリースする
+                        val ret = commandQueue.offer(command)
+                        isHold = false
+
+                        //  溜まっているキューを積みなおす
+                        while (holdCommandQueue.size != 0)
+                        {
+                            val queuedCommand = holdCommandQueue.poll()
+                            commandQueue.offer(queuedCommand)
+                            if (queuedCommand != null && queuedCommand.isHold)
+                            {
+                                // 特定シーケンスに入った場合は、そこで積みなおすのをやめる
+                                isHold = true
+                                holdId = queuedCommand.holdId
+                                break
+                            }
+                        }
+                        return ret
+                    }
+                    commandQueue.offer(command)
+                }
+                else
+                {
+                    // 特定シーケンスではなかったので HOLD
+                    holdCommandQueue.offer(command)
+                })
+            }
+            if (command.isHold)
+            {
+                isHold = true
+                holdId = command.holdId
+            }
+            //Log.v(TAG, "Enqueue : "  + command.getId());
+            return (commandQueue.offer(command))
+        }
+        catch (e: Exception)
+        {
+            e.printStackTrace()
+        }
+        return (false)
+    }
+
+    override fun flushHoldQueue(): Boolean
+    {
+        Log.v(TAG, "  flushHoldQueue()")
+        holdCommandQueue.clear()
+        System.gc()
+        return (true)
+    }
+
+    private fun issueCommand(command: IPtpIpCommand)
+    {
+        try
+        {
+            var retry_over = true
+            while (retry_over)
+            {
+                //Log.v(TAG, "issueCommand : " + command.getId());
+                val commandBody = command.commandBody()
+                if (commandBody != null)
+                {
+                    // コマンドボディが入っていた場合には、コマンド送信（入っていない場合は受信待ち）
+                    sendToCamera(command.dumpLog(), commandBody, command.useSequenceNumber(), command.embeddedSequenceNumberIndex())
+                    val commandBody2 = command.commandBody2()
+                    if (commandBody2 != null)
+                    {
+                        // コマンドボディの２つめが入っていた場合には、コマンドを連続送信する
+                        sendToCamera(command.dumpLog(), commandBody2, command.useSequenceNumber(), command.embeddedSequenceNumberIndex2())
+                    }
+                    val commandBody3 = command.commandBody3()
+                    if (commandBody3 != null)
+                    {
+                        // コマンドボディの３つめが入っていた場合には、コマンドを連続送信する
+                        sendToCamera(command.dumpLog(), commandBody3, command.useSequenceNumber(), command.embeddedSequenceNumberIndex3())
+                    }
+                    if (command.isIncrementSeqNumber)
+                    {
+                        // シーケンス番号を更新する
+                        sequenceNumber++
+                    }
+                }
+                retry_over = receiveFromCamera(command)
+                if ((retry_over)&&(commandBody != null))
+                {
+                    if (!command.isRetrySend)
+                    {
+                        while (retry_over)
+                        {
+                            //  コマンドを再送信しない場合はここで応答を待つ...
+                            retry_over = receiveFromCamera(command)
+                        }
+                        break
+                    }
+                    if (!command.isIncrementSequenceNumberToRetry)
+                    {
+                        // 再送信...のために、シーケンス番号を戻す...
+                        sequenceNumber--
+                    }
+                }
+            }
+        }
+        catch (e: Exception)
+        {
+            e.printStackTrace()
+        }
+    }
+
+    /**
+     * カメラにコマンドを送信する（メイン部分）
+     *
+     */
+    private fun sendToCamera(isDumpReceiveLog: Boolean, byte_array: ByteArray, useSequenceNumber: Boolean, embeddedSequenceIndex: Int)
+    {
+        try
+        {
+            if (dos == null)
+            {
+                Log.v(TAG, " DataOutputStream is null.")
+                return
+            }
+
+            // メッセージボディを加工： 最初に４バイトのレングス長をつける
+            val sendData = ByteArray(byte_array.size + 4)
+            sendData[0] = (byte_array.size + 4).toByte()
+            sendData[1] = 0x00
+            sendData[2] = 0x00
+            sendData[3] = 0x00
+            System.arraycopy(byte_array, 0, sendData, 4, byte_array.size)
+            if (useSequenceNumber)
+            {
+                // Sequence Number を反映させる
+                sendData[embeddedSequenceIndex    ] = (0x000000ff and sequenceNumber).toByte()
+                sendData[embeddedSequenceIndex + 1] = (0x0000ff00 and sequenceNumber ushr 8 and 0x000000ff).toByte()
+                sendData[embeddedSequenceIndex + 2] = (0x00ff0000 and sequenceNumber ushr 16 and 0x000000ff).toByte()
+                sendData[embeddedSequenceIndex + 3] = (-0x1000000 and sequenceNumber ushr 24 and 0x000000ff).toByte()
+                if (isDumpReceiveLog)
+                {
+                    Log.v(TAG, "----- SEQ No. : $sequenceNumber -----")
+                }
+            }
+            if (isDumpReceiveLog)
+            {
+                // ログに送信メッセージを出力する
+                SimpleLogDumper.dump_bytes("SEND[" + sendData.size + "] ", sendData)
+            }
+
+            // (データを)送信
+            dos?.write(sendData)
+            dos?.flush()
+        }
+        catch (e: Exception)
+        {
+            e.printStackTrace()
+        }
+    }
+
+    private fun sleep(delayMs: Int)
+    {
+        try
+        {
+            Thread.sleep(delayMs.toLong())
+        }
+        catch (e: Exception)
+        {
+            e.printStackTrace()
+        }
+    }
+
+    /**
+     * カメラからにコマンドの結果を受信する（メイン部分）
+     *
+     */
+    private fun receiveFromCamera(command: IPtpIpCommand): Boolean
+    {
+        val callback = command.responseCallback()
+        var delayMs = command.receiveDelayMs()
+        if (delayMs < 0 || delayMs > COMMAND_SEND_RECEIVE_DURATION_MAX)
+        {
+            delayMs = COMMAND_SEND_RECEIVE_DURATION_MS
+        }
+
+        return (if (callback != null && callback.isReceiveMulti)
+        {
+            // 受信したら逐次「受信したよ」と応答するパターン
+            receive_multi(command, delayMs)
+        }
+        else
+        {
+            receive_single(command, delayMs)
+        })
+        //  受信した後、すべてをまとめて「受信したよ」と応答するパターン
+    }
+
+    private fun receive_single(command: IPtpIpCommand, delayMs: Int): Boolean
+    {
+        val isDumpReceiveLog = command.dumpLog()
+        val id = command.id
+        val callback = command.responseCallback()
+        try
+        {
+            val receive_message_buffer_size = BUFFER_SIZE
+            val byte_array = ByteArray(receive_message_buffer_size)
+            val inputStream = socket?.getInputStream()
+            if (inputStream == null)
+            {
+                Log.v(TAG, " InputStream is NULL... RECEIVE ABORTED.")
+                receivedAllMessage(isDumpReceiveLog, id, null, callback)
+                return (false)
+            }
+
+            // 初回データが受信バッファにデータが溜まるまで待つ...
+            var read_bytes = waitForReceive(inputStream, delayMs, command.maxRetryCount())
+            if (read_bytes < 0)
+            {
+                // リトライオーバー...
+                Log.v(TAG, " RECEIVE : RETRY OVER...")
+                if (!command.isRetrySend)
+                {
+                    // 再送しない場合には、応答がないことを通知する
+                    receivedAllMessage(isDumpReceiveLog, id, null, callback)
+                }
+                return (true)
+            }
+
+            // 受信したデータをバッファに突っ込む
+            val byteStream = ByteArrayOutputStream()
+            while (read_bytes > 0)
+            {
+                read_bytes = inputStream.read(byte_array, 0, receive_message_buffer_size)
+                if (read_bytes <= 0)
+                {
+                    Log.v(TAG, " RECEIVED MESSAGE FINISHED ($read_bytes)")
+                    break
+                }
+                byteStream.write(byte_array, 0, read_bytes)
+                sleep(delayMs)
+                read_bytes = inputStream.available()
+            }
+            val outputStream = cutHeader(byteStream)
+            receivedAllMessage(isDumpReceiveLog, id, outputStream.toByteArray(), callback)
+            System.gc()
+        }
+        catch (e: Throwable)
+        {
+            e.printStackTrace()
+            System.gc()
+        }
+        return false
+    }
+
+    private fun receivedAllMessage(isDumpReceiveLog: Boolean, id: Int, body: ByteArray?, callback: IPtpIpCommandCallback?)
+    {
+        Log.v(TAG, "receivedAllMessage() : " + (body?.size ?: 0) + " bytes.")
+        if (isDumpReceiveLog && body != null)
+        {
+            // ログに受信メッセージを出力する
+            SimpleLogDumper.dump_bytes("RECV[" + body.size + "] ", body)
+        }
+        callback?.receivedMessage(id, body)
+    }
+
+    private fun receive_multi(command: IPtpIpCommand, delayMs: Int): Boolean
+    {
+        //int estimatedSize = command.estimatedReceiveDataSize();
+        var maxRetryCount = command.maxRetryCount()
+        val id = command.id
+        val callback = command.responseCallback()
+        try
+        {
+            Log.v(TAG, " ===== receive_multi() =====")
+            val receive_message_buffer_size = BUFFER_SIZE
+            val byte_array = ByteArray(receive_message_buffer_size)
+            val inputStream = socket?.getInputStream()
+            if (inputStream == null)
+            {
+                Log.v(TAG, " InputStream is NULL... RECEIVE ABORTED.")
+                return (false)
+            }
+
+            // 初回データが受信バッファにデータが溜まるまで待つ...
+            var read_bytes = waitForReceive(inputStream, delayMs, command.maxRetryCount())
+            if (read_bytes < 0)
+            {
+                // リトライオーバー...
+                Log.v(TAG, " RECEIVE : RETRY OVER...... : " + delayMs + "ms x " + command.maxRetryCount())
+                if (command.isRetrySend)
+                {
+                    // 要求を再送する場合、、、ダメな場合は受信待ちとする
+                    return (true)
+                }
+            }
+            var target_length: Int
+            var received_length: Int
+
+            //boolean read_retry = false;
+            //do
+            run {
+
+                // 初回データの読み込み...
+                read_bytes = inputStream.read(byte_array, 0, receive_message_buffer_size)
+                target_length = parseDataLength(byte_array, read_bytes)
+                received_length = read_bytes
+                if (target_length <= 0)
+                {
+                    // 受信サイズ異常の場合...
+                    if (received_length > 0)
+                    {
+                        SimpleLogDumper.dump_bytes("WRONG DATA : ", Arrays.copyOfRange(byte_array, 0, Math.min(received_length, 64)))
+                    }
+                    Log.v(TAG, " WRONG LENGTH. : $target_length READ : $received_length bytes.")
+                    callback?.receivedMessage(id, null)
+                    return false
+                }
+            } //while (read_retry);
+
+            Log.v(TAG, "  -=-=-=- 1st CALL : read_bytes : " + read_bytes + "(" + received_length + ") : target_length : " + target_length + "  buffer SIZE : " + byte_array.size)
+            callback?.onReceiveProgress(received_length, target_length, Arrays.copyOfRange(byte_array, 0, received_length))
+
+            //do
+            run {
+                sleep(delayMs)
+                read_bytes = inputStream.available()
+                if (read_bytes == 0)
+                {
+                    //Log.v(TAG, " WAIT is.available() ... [" + received_length + ", " + target_length + "] retry : " + maxRetryCount);
+                    maxRetryCount--
+                }
+            } // while ((read_bytes == 0)&&(maxRetryCount > 0)&&(received_length < target_length)); // ((read_bytes == 0)&&(estimatedSize > 0)&&(received_length < estimatedSize));
+            while (read_bytes >= 0 && received_length < target_length)
+            {
+                read_bytes = inputStream.read(byte_array, 0, receive_message_buffer_size)
+                if (read_bytes <= 0)
+                {
+                    Log.v(TAG, "  RECEIVED MESSAGE FINISHED ($read_bytes)")
+                    break
+                }
+                received_length = received_length + read_bytes
+
+                //  一時的な処理
+                callback?.onReceiveProgress(received_length, target_length, Arrays.copyOfRange(byte_array, 0, read_bytes))
+                //byteStream.write(byte_array, 0, read_bytes);
+                maxRetryCount = command.maxRetryCount()
+                //do
+                run {
+                    sleep(delayMs)
+                    read_bytes = inputStream.available()
+                    //Log.v(TAG, "  is.available() read_bytes : " + read_bytes + " " + received_length + " < " + estimatedSize);
+                    if (read_bytes == 0) {
+                        Log.v(TAG, " WAIT is.available() ... [$received_length, $target_length] $read_bytes retry : $maxRetryCount")
+                        maxRetryCount--
+                    }
+                } // while ((read_bytes == 0)&&(maxRetryCount > 0)&&(received_length < target_length)); // while ((read_bytes == 0)&&(estimatedSize > 0)&&(received_length < estimatedSize));
+            }
+
+            //  終了報告...一時的？
+            Log.v(TAG, "  --- receive_multi : $id  ($read_bytes) [$maxRetryCount] $receive_message_buffer_size ($received_length) ")
+            callback?.receivedMessage(id, Arrays.copyOfRange(byte_array, 0, received_length))
+        }
+        catch (e: Throwable)
+        {
+            e.printStackTrace()
+        }
+        return false
+    }
+
+    private fun parseDataLength(byte_array: ByteArray, read_bytes: Int): Int
+    {
+        var offset = 0
+        var lenlen = 0
+        //int packetType = 0;
+        try
+        {
+            if (read_bytes > 20)
+            {
+                if (byte_array[offset + 4].toUByte().toInt() == 0x07)
+                {
+                    // 前の応答が入っていると考える...
+                    offset = 14
+                }
+                if (byte_array[offset + 4].toUByte().toInt() == 0x09)
+                {
+                    lenlen = (byte_array[offset + 15].toUByte().toInt() and 0xff shl 24) + (byte_array[offset + 14].toUByte().toInt() and 0xff shl 16) + (byte_array[offset + 13].toUByte().toInt() and 0xff shl 8) + (byte_array[offset + 12].toUByte().toInt() and 0xff)
+                    //packetType = (((int)byte_array[offset + 16]) & 0xff);
+                }
+            }
+            //Log.v(TAG, " --- parseDataLength() length: " + lenlen + " TYPE: " + packetType + " read_bytes: " + read_bytes + "  offset : " + offset);
+        }
+        catch (e: Exception)
+        {
+            e.printStackTrace()
+        }
+        return (lenlen)
+    }
+
+    private fun cutHeader(receivedBuffer: ByteArrayOutputStream): ByteArrayOutputStream
+    {
+        try
+        {
+            val byte_array = receivedBuffer.toByteArray()
+            val limit = byte_array.size
+            var lenlen = 0
+            val len = (byte_array[3].toUByte().toInt() and 0xff shl 24) + (byte_array[2].toUByte().toInt() and 0xff shl 16) + (byte_array[1].toUByte().toInt() and 0xff shl 8) + (byte_array[0].toUByte().toInt() and 0xff)
+            val packetType = byte_array[4].toUByte().toInt() and 0xff
+            if (limit == len || limit < 16384)
+            {
+                // 応答は１つしか入っていない。もしくは受信データサイズが16kBの場合は、そのまま返す。
+                return (receivedBuffer)
+            }
+            if (packetType == 0x09)
+            {
+                lenlen = (byte_array[15].toUByte().toInt() and 0xff shl 24) + (byte_array[14].toUByte().toInt() and 0xff shl 16) + (byte_array[13].toUByte().toInt() and 0xff shl 8) + (byte_array[12].toUByte().toInt() and 0xff)
+                //packetType = (((int) byte_array[16]) & 0xff);
+            }
+            // Log.v(TAG, " ---  RECEIVED MESSAGE : " + len + " bytes (BUFFER: " + byte_array.length + " bytes)" + " length : " + lenlen + " TYPE : " + packetType + " --- ");
+            if (lenlen == 0)
+            {
+                // データとしては変なので、なにもしない
+                return receivedBuffer
+            }
+            val outputStream = ByteArrayOutputStream()
+            //outputStream.write(byte_array, 0, 20);  //
+            var position = 20 // ヘッダ込の先頭
+            while (position < limit)
+            {
+                lenlen = (byte_array[position + 3].toUByte().toInt() and 0xff shl 24) + (byte_array[position + 2].toUByte().toInt() and 0xff shl 16) + (byte_array[position + 1].toUByte().toInt() and 0xff shl 8) + (byte_array[position].toUByte().toInt() and 0xff)
+
+                val copyByte = Math.min(limit - (position + 12), lenlen - 12)
+                outputStream.write(byte_array, position + 12, copyByte)
+                position = position + lenlen
+            }
+            return (outputStream)
+        }
+        catch (e: Throwable)
+        {
+            e.printStackTrace()
+            System.gc()
+        }
+        return (receivedBuffer)
+    }
+
+    private fun waitForReceive(inputStream : InputStream, delayMs: Int, retryCount : Int): Int
+    {
+        var retry_count = retryCount
+        var isLogOutput = true
+        var read_bytes = 0
+        try
+        {
+            while (read_bytes <= 0)
+            {
+                sleep(delayMs)
+                read_bytes = inputStream.available()
+                if (read_bytes <= 0)
+                {
+                    if (isLogOutput)
+                    {
+                        Log.v(TAG, "waitForReceive:: is.available() WAIT... : " + delayMs + "ms")
+                        isLogOutput = false
+                    }
+                    retry_count--
+                    if (!waitForever && retry_count < 0)
+                    {
+                        return -1
+                    }
+                }
+            }
+        }
+        catch (e: Exception)
+        {
+            e.printStackTrace()
+        }
+        return read_bytes
+    }
+}
