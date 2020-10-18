@@ -338,24 +338,24 @@ class PtpIpCommandPublisher(private val ipAddress : String, private val portNumb
         return (if (callback != null && callback.isReceiveMulti)
         {
             // 受信したら逐次「受信したよ」と応答するパターン
-            receive_multi(command, delayMs)
+            receiveMulti(command, delayMs)
         }
         else
         {
-            receive_single(command, delayMs)
+            receiveSingle(command, delayMs)
         })
         //  受信した後、すべてをまとめて「受信したよ」と応答するパターン
     }
 
-    private fun receive_single(command: IPtpIpCommand, delayMs: Int): Boolean
+    private fun receiveSingle(command: IPtpIpCommand, delayMs: Int): Boolean
     {
         val isDumpReceiveLog = command.dumpLog()
         val id = command.id
         val callback = command.responseCallback()
         try
         {
-            val receive_message_buffer_size = BUFFER_SIZE
-            val byte_array = ByteArray(receive_message_buffer_size)
+            val receiveMessageBufferSize = BUFFER_SIZE
+            val byteArray = ByteArray(receiveMessageBufferSize)
             val inputStream = socket?.getInputStream()
             if (inputStream == null)
             {
@@ -365,8 +365,8 @@ class PtpIpCommandPublisher(private val ipAddress : String, private val portNumb
             }
 
             // 初回データが受信バッファにデータが溜まるまで待つ...
-            var read_bytes = waitForReceive(inputStream, delayMs, command.maxRetryCount())
-            if (read_bytes < 0)
+            var readBytes = waitForReceive(inputStream, delayMs, command.maxRetryCount())
+            if (readBytes < 0)
             {
                 // リトライオーバー...
                 Log.v(TAG, " RECEIVE : RETRY OVER...")
@@ -380,17 +380,17 @@ class PtpIpCommandPublisher(private val ipAddress : String, private val portNumb
 
             // 受信したデータをバッファに突っ込む
             val byteStream = ByteArrayOutputStream()
-            while (read_bytes > 0)
+            while (readBytes > 0)
             {
-                read_bytes = inputStream.read(byte_array, 0, receive_message_buffer_size)
-                if (read_bytes <= 0)
+                readBytes = inputStream.read(byteArray, 0, receiveMessageBufferSize)
+                if (readBytes <= 0)
                 {
-                    Log.v(TAG, " RECEIVED MESSAGE FINISHED ($read_bytes)")
+                    Log.v(TAG, " RECEIVED MESSAGE FINISHED ($readBytes)")
                     break
                 }
-                byteStream.write(byte_array, 0, read_bytes)
+                byteStream.write(byteArray, 0, readBytes)
                 sleep(delayMs)
-                read_bytes = inputStream.available()
+                readBytes = inputStream.available()
             }
             val outputStream = cutHeader(byteStream)
             receivedAllMessage(isDumpReceiveLog, id, outputStream.toByteArray(), callback)
@@ -415,7 +415,7 @@ class PtpIpCommandPublisher(private val ipAddress : String, private val portNumb
         callback?.receivedMessage(id, body)
     }
 
-    private fun receive_multi(command: IPtpIpCommand, delayMs: Int): Boolean
+    private fun receiveMulti(command: IPtpIpCommand, delayMs: Int): Boolean
     {
         //int estimatedSize = command.estimatedReceiveDataSize();
         var maxRetryCount = command.maxRetryCount()
@@ -459,16 +459,18 @@ class PtpIpCommandPublisher(private val ipAddress : String, private val portNumb
                     // 受信サイズ異常の場合...
                     if (receivedLength > 0)
                     {
-                        SimpleLogDumper.dump_bytes("WRONG DATA : ", Arrays.copyOfRange(byteArray, 0, Math.min(receivedLength, 64)))
+                        SimpleLogDumper.dump_bytes("WRONG DATA : ", byteArray.copyOfRange(0, Math.min(receivedLength, 64)))
                     }
                     Log.v(TAG, " WRONG LENGTH. : $targetLength READ : $receivedLength bytes.")
                     callback?.receivedMessage(id, null)
-                    return false
+                    //return (false)
+                    // データが不足しているので、もう一度受信待ち
+                    return (true)
                 }
             }
 
             Log.v(TAG, "  -=-=-=- 1st CALL : read_bytes : " + readBytes + "(" + receivedLength + ") : target_length : " + targetLength + "  buffer SIZE : " + byteArray.size)
-            callback?.onReceiveProgress(receivedLength, targetLength, Arrays.copyOfRange(byteArray, 0, receivedLength))
+            callback?.onReceiveProgress(receivedLength, targetLength, byteArray.copyOfRange(fromIndex = 0, toIndex = receivedLength))
 
             run {
                 sleep(delayMs)
@@ -488,7 +490,7 @@ class PtpIpCommandPublisher(private val ipAddress : String, private val portNumb
                 }
                 receivedLength += readBytes
 
-                callback?.onReceiveProgress(receivedLength, targetLength, Arrays.copyOfRange(byteArray, 0, readBytes))
+                callback?.onReceiveProgress(receivedLength, targetLength, byteArray.copyOfRange(0, readBytes))
                 maxRetryCount = command.maxRetryCount()
 
                 run {
@@ -510,7 +512,7 @@ class PtpIpCommandPublisher(private val ipAddress : String, private val portNumb
         {
             e.printStackTrace()
         }
-        return false
+        return (false)
     }
 
     private fun parseDataLength(byte_array: ByteArray, read_bytes: Int): Int
@@ -523,11 +525,12 @@ class PtpIpCommandPublisher(private val ipAddress : String, private val portNumb
             {
                 if (byte_array[offset + 4].toUByte().toInt() == 0x07)
                 {
-                    // 前の応答が入っていると考える...
-                    offset = 14
+                    // 前の応答が入っていると考える... レングスバイト分読み飛ばす
+                    offset = byte_array[offset].toUByte().toInt()
                 }
                 if (byte_array[offset + 4].toUByte().toInt() == 0x09)
                 {
+                    // データバイト...
                     lenlen = (byte_array[offset + 15].toUByte().toInt() and 0xff shl 24) + (byte_array[offset + 14].toUByte().toInt() and 0xff shl 16) + (byte_array[offset + 13].toUByte().toInt() and 0xff shl 8) + (byte_array[offset + 12].toUByte().toInt() and 0xff)
                 }
             }

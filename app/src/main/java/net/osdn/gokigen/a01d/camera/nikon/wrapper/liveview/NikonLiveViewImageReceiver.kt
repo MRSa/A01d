@@ -10,8 +10,8 @@ import java.util.*
 class NikonLiveViewImageReceiver(private var callback: IPtpIpLiveViewImageCallback) : IPtpIpCommandCallback
 {
     private val isDumpLog = true
-    private var received_total_bytes = 0
-    private var received_remain_bytes = 0
+    private var receivedTotalBytes = 0
+    private var receivedRemainBytes = 0
     private var receivedFirstData = false
     private var byteStream = ByteArrayOutputStream()
 
@@ -19,16 +19,16 @@ class NikonLiveViewImageReceiver(private var callback: IPtpIpLiveViewImageCallba
     {
         if (rx_body == null)
         {
-            Log.v(TAG, " MSG BODY IS NULL.")
+            Log.v(TAG, " MSG BODY IS NULL. $id")
             return
         }
         if (isReceiveMulti)
         {
-            receivedMessage_multi(id, rx_body)
+            receivedMessageMulti(id, rx_body)
         }
         else
         {
-            receivedMessage_single(id, rx_body)
+            receivedMessageSingle(id, rx_body)
         }
     }
 
@@ -45,15 +45,15 @@ class NikonLiveViewImageReceiver(private var callback: IPtpIpLiveViewImageCallba
         cutHeader(rx_body)
     }
 
-    private fun receivedMessage_single(id: Int, rx_body: ByteArray)
+    private fun receivedMessageSingle(id: Int, rx_body: ByteArray)
     {
         try
         {
-            Log.v(TAG, "receivedMessage_single() : " + rx_body.size + " bytes.")
+            Log.v(TAG, "receivedMessage_single() : " + rx_body.size + " bytes. id:$id")
             if ((isDumpLog)&&(rx_body.size > 64))
             {
-                SimpleLogDumper.dump_bytes(" LV (FIRST) : ", Arrays.copyOfRange(rx_body, 0, 64))
-                SimpleLogDumper.dump_bytes(" LV (-END-) : ", Arrays.copyOfRange(rx_body, rx_body.size - 64, rx_body.size))
+                SimpleLogDumper.dump_bytes(" LV (FIRST) : ", rx_body.copyOfRange(0, 64))
+                SimpleLogDumper.dump_bytes(" LV (-END-) : ", rx_body.copyOfRange(rx_body.size - 64, rx_body.size))
             }
             callback.onCompleted(rx_body, null)
         }
@@ -63,16 +63,16 @@ class NikonLiveViewImageReceiver(private var callback: IPtpIpLiveViewImageCallba
         }
     }
 
-    private fun receivedMessage_multi(id: Int, rx_body: ByteArray)
+    private fun receivedMessageMulti(id: Int, rx_body: ByteArray)
     {
         try
         {
-            Log.v(TAG, " receivedMessage_multi()  id[$id] size : ${rx_body.size} ")
+            Log.v(TAG, " receivedMessage_multi()  id[$id] size : ${rx_body.size}  id:$id")
 
             callback.onCompleted(byteStream.toByteArray(), null)
             receivedFirstData = false
-            received_remain_bytes = 0
-            received_total_bytes = 0
+            receivedRemainBytes = 0
+            receivedTotalBytes = 0
             byteStream.reset()
         }
         catch (e: Exception)
@@ -85,74 +85,74 @@ class NikonLiveViewImageReceiver(private var callback: IPtpIpLiveViewImageCallba
     private fun cutHeader(rx_body: ByteArray)
     {
         val length = rx_body.size
-        var data_position = 0
+        var dataPosition = 0
         if (!receivedFirstData)
         {
             // データを最初に読んだとき。ヘッダ部分を読み飛ばす
             receivedFirstData = true
-            data_position = rx_body[0].toUByte().toInt()
+            dataPosition = rx_body[0].toUByte().toInt()
             if (isDumpLog)
             {
-                Log.v(TAG, " FIRST DATA POS. : $data_position len: $length ");
-                SimpleLogDumper.dump_bytes(" [sXXs]", Arrays.copyOfRange(rx_body, 0, (32)));
+                Log.v(TAG, " FIRST DATA POS. : $dataPosition len: $length ");
+                SimpleLogDumper.dump_bytes(" [sXXs]", rx_body.copyOfRange(0, (32)))
             }
         }
         else
         {
             // 2回目以降の受信データ
-            if (received_remain_bytes > 0)
+            if (receivedRemainBytes > 0)
             {
                 // データの読み込みが途中だった場合...
-                if (length < received_remain_bytes)
+                if (length < receivedRemainBytes)
                 {
                     // 全部コピーする、足りないバイト数は残す
-                    received_remain_bytes = received_remain_bytes - length
-                    received_total_bytes = received_total_bytes + rx_body.size
+                    receivedRemainBytes -= length
+                    receivedTotalBytes += rx_body.size
                     byteStream.write(rx_body, 0, rx_body.size)
                     return
                 }
                 else
                 {
-                    byteStream.write(rx_body, data_position, received_remain_bytes)
-                    data_position = received_remain_bytes
-                    received_remain_bytes = 0
+                    byteStream.write(rx_body, dataPosition, receivedRemainBytes)
+                    dataPosition = receivedRemainBytes
+                    receivedRemainBytes = 0
                 }
             }
         }
-        while (data_position <= length - 12)
+        while (dataPosition <= length - 12)
         {
-            val body_size = (rx_body[data_position].toUByte()).toInt() + ((rx_body[data_position + 1].toUByte()).toInt() * 256) + ((rx_body[data_position + 2].toUByte()).toInt() * 256 * 256) + ((rx_body[data_position + 3].toUByte()).toInt() * 256 * 256 * 256)
+            val body_size = (rx_body[dataPosition].toUByte()).toInt() + ((rx_body[dataPosition + 1].toUByte()).toInt() * 256) + ((rx_body[dataPosition + 2].toUByte()).toInt() * 256 * 256) + ((rx_body[dataPosition + 3].toUByte()).toInt() * 256 * 256 * 256)
 
-            Log.v(TAG, " XX body_size : ${body_size} [$data_position] ($length)  aa: ${rx_body[data_position].toUByte().toInt()}  ${rx_body[data_position + 1].toUByte().toInt()} + ${rx_body[data_position + 2].toUByte().toInt()}")
+            Log.v(TAG, " XX body_size : ${body_size} [$dataPosition] ($length)  aa: ${rx_body[dataPosition].toUByte().toInt()}  ${rx_body[dataPosition + 1].toUByte().toInt()} + ${rx_body[dataPosition + 2].toUByte().toInt()}")
             SimpleLogDumper.dump_bytes("XX", Arrays.copyOfRange(rx_body, 0, 32))
             if (body_size <= 12)
             {
-                Log.v(TAG, " ----- BODY SIZE IS SMALL : " + data_position + " (" + body_size + ") [" + received_remain_bytes + "] " + rx_body.size + " ")
+                Log.v(TAG, " ----- BODY SIZE IS SMALL : " + dataPosition + " (" + body_size + ") [" + receivedRemainBytes + "] " + rx_body.size + " ")
                 break
             }
 
             // 受信データ(のヘッダ部分)をダンプする
-            Log.v(TAG, " RX DATA : " + data_position + " (" + body_size + ") [" + received_remain_bytes + "] (" + received_total_bytes + ")");
-            if (data_position + body_size > length)
+            Log.v(TAG, " RX DATA : " + dataPosition + " (" + body_size + ") [" + receivedRemainBytes + "] (" + receivedTotalBytes + ")");
+            if (dataPosition + body_size > length)
             {
                 // データがすべてバッファ内になかったときは、バッファすべてコピーして残ったサイズを記憶しておく。
-                val copysize = length - (data_position + 12)
-                byteStream.write(rx_body, data_position + 12, copysize)
-                received_remain_bytes = body_size - copysize - 12 // マイナス12は、ヘッダ分
-                received_total_bytes = received_total_bytes + copysize
+                val copysize = length - (dataPosition + 12)
+                byteStream.write(rx_body, dataPosition + 12, copysize)
+                receivedRemainBytes = body_size - copysize - 12 // マイナス12は、ヘッダ分
+                receivedTotalBytes += copysize
                 //Log.v(TAG, " ----- copy : " + (data_position + (12)) + " " + copysize + " remain : " + received_remain_bytes + "  body size : " + body_size);
                 break
             }
             try
             {
-                byteStream.write(rx_body, data_position + 12, body_size - 12)
-                data_position = data_position + body_size
-                received_total_bytes = received_total_bytes + 12
+                byteStream.write(rx_body, dataPosition + 12, body_size - 12)
+                dataPosition += body_size
+                receivedTotalBytes += 12
                 //Log.v(TAG, " --- COPY : " + (data_position + 12) + " " + (body_size - (12)) + " remain : " + received_remain_bytes);
             }
             catch (e: Exception)
             {
-                Log.v(TAG, "  pos : $data_position  size : $body_size length : $length")
+                Log.v(TAG, "  pos : $dataPosition  size : $body_size length : $length")
                 e.printStackTrace()
             }
         }
