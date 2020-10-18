@@ -9,7 +9,7 @@ import java.util.*
 
 class NikonLiveViewImageReceiver(private var callback: IPtpIpLiveViewImageCallback) : IPtpIpCommandCallback
 {
-    private val isDumpLog = true
+    private val isDumpLog = false
     private var receivedTotalBytes = 0
     private var receivedRemainBytes = 0
     private var receivedFirstData = false
@@ -19,7 +19,8 @@ class NikonLiveViewImageReceiver(private var callback: IPtpIpLiveViewImageCallba
     {
         if (rx_body == null)
         {
-            Log.v(TAG, " MSG BODY IS NULL. $id")
+            Log.v(TAG, " NikonLiveViewImageReceiver: MSG BODY IS NULL. (ID:$id)")
+            callback.onCompleted(rx_body, null)
             return
         }
         if (isReceiveMulti)
@@ -36,7 +37,7 @@ class NikonLiveViewImageReceiver(private var callback: IPtpIpLiveViewImageCallba
     {
         if (rx_body == null)
         {
-            Log.v(TAG, " MSG BODY IS NULL.")
+            Log.v(TAG, " NikonLiveViewImageReceiver: MSG BODY IS NULL.")
             return
         }
         Log.v(TAG, " onReceiveProgress() $currentBytes/$totalBytes LENGTH: ${rx_body.size} bytes.")
@@ -122,17 +123,14 @@ class NikonLiveViewImageReceiver(private var callback: IPtpIpLiveViewImageCallba
         while (dataPosition <= length - 12)
         {
             val body_size = (rx_body[dataPosition].toUByte()).toInt() + ((rx_body[dataPosition + 1].toUByte()).toInt() * 256) + ((rx_body[dataPosition + 2].toUByte()).toInt() * 256 * 256) + ((rx_body[dataPosition + 3].toUByte()).toInt() * 256 * 256 * 256)
-
-            Log.v(TAG, " XX body_size : ${body_size} [$dataPosition] ($length)  aa: ${rx_body[dataPosition].toUByte().toInt()}  ${rx_body[dataPosition + 1].toUByte().toInt()} + ${rx_body[dataPosition + 2].toUByte().toInt()}")
-            SimpleLogDumper.dump_bytes("XX", Arrays.copyOfRange(rx_body, 0, 32))
+            //Log.v(TAG, " <> body_size : ${body_size} [$dataPosition] ($length)  aa: ${rx_body[dataPosition].toUByte().toInt()}  ${rx_body[dataPosition + 1].toUByte().toInt()} + ${rx_body[dataPosition + 2].toUByte().toInt()}")
             if (body_size <= 12)
             {
                 Log.v(TAG, " ----- BODY SIZE IS SMALL : " + dataPosition + " (" + body_size + ") [" + receivedRemainBytes + "] " + rx_body.size + " ")
                 break
             }
 
-            // 受信データ(のヘッダ部分)をダンプする
-            Log.v(TAG, " RX DATA : " + dataPosition + " (" + body_size + ") [" + receivedRemainBytes + "] (" + receivedTotalBytes + ")");
+            //Log.v(TAG, " RX DATA : " + dataPosition + " (" + body_size + ") [" + receivedRemainBytes + "] (" + receivedTotalBytes + ")");
             if (dataPosition + body_size > length)
             {
                 // データがすべてバッファ内になかったときは、バッファすべてコピーして残ったサイズを記憶しておく。

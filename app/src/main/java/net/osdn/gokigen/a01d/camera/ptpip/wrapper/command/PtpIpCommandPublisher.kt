@@ -407,7 +407,7 @@ class PtpIpCommandPublisher(private val ipAddress : String, private val portNumb
     private fun receivedAllMessage(isDumpReceiveLog: Boolean, id: Int, body: ByteArray?, callback: IPtpIpCommandCallback?)
     {
         Log.v(TAG, "receivedAllMessage() : " + (body?.size ?: 0) + " bytes.")
-        if (isDumpReceiveLog && body != null)
+        if ((isDumpReceiveLog)&&(body != null))
         {
             // ログに受信メッセージを出力する
             SimpleLogDumper.dump_bytes("RECV[" + body.size + "] ", body)
@@ -417,13 +417,13 @@ class PtpIpCommandPublisher(private val ipAddress : String, private val portNumb
 
     private fun receiveMulti(command: IPtpIpCommand, delayMs: Int): Boolean
     {
-        //int estimatedSize = command.estimatedReceiveDataSize();
+        val isDumpLog = command.dumpLog()
         var maxRetryCount = command.maxRetryCount()
         val id = command.id
         val callback = command.responseCallback()
         try
         {
-            Log.v(TAG, " ===== receive_multi() =====")
+            // Log.v(TAG, " ===== receive_multi() =====")
             val receiveMessageBufferSize = BUFFER_SIZE
             val byteArray = ByteArray(receiveMessageBufferSize)
             val inputStream = socket?.getInputStream()
@@ -442,6 +442,7 @@ class PtpIpCommandPublisher(private val ipAddress : String, private val portNumb
                 if (command.isRetrySend)
                 {
                     // 要求を再送する場合、、、ダメな場合は受信待ちとする
+                    Log.v(TAG, " --- SEND RETRY ---")
                     return (true)
                 }
             }
@@ -457,19 +458,25 @@ class PtpIpCommandPublisher(private val ipAddress : String, private val portNumb
                 if (targetLength <= 0)
                 {
                     // 受信サイズ異常の場合...
-                    if (receivedLength > 0)
+                    if (isDumpLog)
                     {
-                        SimpleLogDumper.dump_bytes("WRONG DATA : ", byteArray.copyOfRange(0, Math.min(receivedLength, 64)))
+                        if (receivedLength > 0)
+                        {
+                            SimpleLogDumper.dump_bytes("WRONG DATA : ", byteArray.copyOfRange(0, Math.min(receivedLength, 64)))
+                        }
+                        Log.v(TAG, " WRONG LENGTH. : $targetLength READ : $receivedLength bytes.")
                     }
-                    Log.v(TAG, " WRONG LENGTH. : $targetLength READ : $receivedLength bytes.")
                     callback?.receivedMessage(id, null)
-                    //return (false)
+
                     // データが不足しているので、もう一度受信待ち
                     return (true)
                 }
             }
 
-            Log.v(TAG, "  -=-=-=- 1st CALL : read_bytes : " + readBytes + "(" + receivedLength + ") : target_length : " + targetLength + "  buffer SIZE : " + byteArray.size)
+            if (isDumpLog)
+            {
+                Log.v(TAG, "  -=-=-=- 1st CALL : read_bytes : " + readBytes + "(" + receivedLength + ") : target_length : " + targetLength + "  buffer SIZE : " + byteArray.size)
+            }
             callback?.onReceiveProgress(receivedLength, targetLength, byteArray.copyOfRange(fromIndex = 0, toIndex = receivedLength))
 
             run {
@@ -485,11 +492,13 @@ class PtpIpCommandPublisher(private val ipAddress : String, private val portNumb
                 readBytes = inputStream.read(byteArray, 0, receiveMessageBufferSize)
                 if (readBytes <= 0)
                 {
-                    Log.v(TAG, "  RECEIVED MESSAGE FINISHED ($readBytes)")
+                    if (isDumpLog)
+                    {
+                        Log.v(TAG, "  RECEIVED MESSAGE FINISHED ($readBytes)")
+                    }
                     break
                 }
                 receivedLength += readBytes
-
                 callback?.onReceiveProgress(receivedLength, targetLength, byteArray.copyOfRange(0, readBytes))
                 maxRetryCount = command.maxRetryCount()
 
@@ -498,14 +507,17 @@ class PtpIpCommandPublisher(private val ipAddress : String, private val portNumb
                     readBytes = inputStream.available()
                     if (readBytes == 0)
                     {
-                        Log.v(TAG, " WAIT is.available() ... [$receivedLength, $targetLength] $readBytes retry : $maxRetryCount")
+                        Log.v(TAG, " WAIT is.available() ... [length: $receivedLength, target: $targetLength] $readBytes bytes, retry : $maxRetryCount")
                         maxRetryCount--
                     }
                 }
             }
 
-            //  終了報告...一時的？
-            Log.v(TAG, "  --- receive_multi : $id  ($readBytes) [$maxRetryCount] $receiveMessageBufferSize ($receivedLength) ")
+            //  終了報告...
+            if (isDumpLog)
+            {
+                Log.v(TAG, "  --- receive_multi : $id  ($readBytes) [$maxRetryCount] $receiveMessageBufferSize ($receivedLength) ")
+            }
             callback?.receivedMessage(id, Arrays.copyOfRange(byteArray, 0, receivedLength))
         }
         catch (e: Throwable)
@@ -598,11 +610,11 @@ class PtpIpCommandPublisher(private val ipAddress : String, private val portNumb
             {
                 sleep(delayMs)
                 readBytes = inputStream.available()
-                if (readBytes <= 0)
+                if (readBytes <= 0)   // if (readBytes <= 0)
                 {
                     if (isLogOutput)
                     {
-                        Log.v(TAG, "waitForReceive:: is.available() WAIT... : " + delayMs + "ms")
+                        Log.v(TAG, "waitForReceive:: is.available() WAIT... : $delayMs ms (Count : $retryCnt) ")
                         isLogOutput = false
                     }
                     retryCount--
