@@ -338,10 +338,12 @@ class PtpIpCommandPublisher(private val ipAddress : String, private val portNumb
         return (if (callback != null && callback.isReceiveMulti)
         {
             // 受信したら逐次「受信したよ」と応答するパターン
+            Log.v(TAG, " receiveMulti() : $delayMs [id:${command.id}]")
             receiveMulti(command, delayMs)
         }
         else
         {
+            Log.v(TAG, " receiveSingle() : $delayMs [id:${command.id}]")
             receiveSingle(command, delayMs)
         })
         //  受信した後、すべてをまとめて「受信したよ」と応答するパターン
@@ -445,6 +447,8 @@ class PtpIpCommandPublisher(private val ipAddress : String, private val portNumb
                     Log.v(TAG, " --- SEND RETRY ---")
                     return (true)
                 }
+                callback?.receivedMessage(id, null)
+                return (false)
             }
             var targetLength: Int
             var receivedLength: Int
