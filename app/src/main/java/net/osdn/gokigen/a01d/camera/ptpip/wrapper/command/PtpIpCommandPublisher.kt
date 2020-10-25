@@ -338,12 +338,12 @@ class PtpIpCommandPublisher(private val ipAddress : String, private val portNumb
         return (if (callback != null && callback.isReceiveMulti)
         {
             // 受信したら逐次「受信したよ」と応答するパターン
-            Log.v(TAG, " receiveMulti() : $delayMs [id:${command.id}]")
+            Log.v(TAG, " receiveMulti() : $delayMs [id:${command.id}] SEQ: $sequenceNumber")
             receiveMulti(command, delayMs)
         }
         else
         {
-            Log.v(TAG, " receiveSingle() : $delayMs [id:${command.id}]")
+            Log.v(TAG, " receiveSingle() : $delayMs [id:${command.id}] SEQ: $sequenceNumber")
             receiveSingle(command, delayMs)
         })
         //  受信した後、すべてをまとめて「受信したよ」と応答するパターン
@@ -381,6 +381,7 @@ class PtpIpCommandPublisher(private val ipAddress : String, private val portNumb
             }
 
             // 受信したデータをバッファに突っ込む
+            var receivedLength = 0
             val byteStream = ByteArrayOutputStream()
             while (readBytes > 0)
             {
@@ -392,10 +393,20 @@ class PtpIpCommandPublisher(private val ipAddress : String, private val portNumb
                 }
                 byteStream.write(byteArray, 0, readBytes)
                 sleep(delayMs)
+                receivedLength += readBytes
                 readBytes = inputStream.available()
             }
-            val outputStream = cutHeader(byteStream)
-            receivedAllMessage(isDumpReceiveLog, id, outputStream.toByteArray(), callback)
+
+            Log.v(TAG, " receivedLength : $receivedLength")
+            if (receivedLength >= 4)
+            {
+                val outputStream = cutHeader(byteStream)
+                receivedAllMessage(isDumpReceiveLog, id, outputStream.toByteArray(), callback)
+            }
+            else
+            {
+                receivedAllMessage(isDumpReceiveLog, id, byteStream.toByteArray(), callback)
+            }
             System.gc()
         }
         catch (e: Throwable)
@@ -440,7 +451,7 @@ class PtpIpCommandPublisher(private val ipAddress : String, private val portNumb
             if (readBytes < 0)
             {
                 // リトライオーバー...
-                Log.v(TAG, " RECEIVE : RETRY OVER...... : " + delayMs + "ms x " + command.maxRetryCount())
+                Log.v(TAG, " RECEIVE : RETRY OVER...... : " + delayMs + "ms x " + command.maxRetryCount() + " SEQ: $sequenceNumber")
                 if (command.isRetrySend)
                 {
                     // 要求を再送する場合、、、ダメな場合は受信待ちとする
@@ -450,79 +461,116 @@ class PtpIpCommandPublisher(private val ipAddress : String, private val portNumb
                 callback?.receivedMessage(id, null)
                 return (false)
             }
-            var targetLength: Int
-            var receivedLength: Int
 
-            run {
-
-                // 初回データの読み込み...
-                readBytes = inputStream.read(byteArray, 0, receiveMessageBufferSize)
+            // 初回データの読み込み...
+            var targetLength = parseDataLength(byteArray, readBytes)
+            readBytes = inputStream.read(byteArray, 0, receiveMessageBufferSize)
+            var receivedLength = readBytes
+            if (targetLength <= 0)
+            {
+                // もう一回データを読み直す...
                 targetLength = parseDataLength(byteArray, readBytes)
-                receivedLength = readBytes
-                if (targetLength <= 0)
-                {
-                    // 受信サイズ異常の場合...
-                    if (isDumpLog)
-                    {
-                        if (receivedLength > 0)
-                        {
-                            SimpleLogDumper.dump_bytes("WRONG DATA : ", byteArray.copyOfRange(0, Math.min(receivedLength, 64)))
-                        }
-                        Log.v(TAG, " WRONG LENGTH. : $targetLength READ : $receivedLength bytes.")
-                    }
-                    callback?.receivedMessage(id, null)
-
-                    // データが不足しているので、もう一度受信待ち
-                    return (true)
-                }
             }
 
+            if ((targetLength <= 0)||(readBytes <= 0))
+            {
+                // 受信サイズ異常の場合...
+                if (isDumpLog)
+                {
+                    if (receivedLength > 0)
+                    {
+                        SimpleLogDumper.dump_bytes("WRONG DATA : ", byteArray.copyOfRange(0, Math.min(receivedLength, 64)))
+                    }
+                    Log.v(TAG, " WRONG LENGTH. : $targetLength READ : $receivedLength bytes.")
+                }
+                callback?.receivedMessage(id, null)
+
+                // 受信したデータが不足しているので、もう一度受信待ち
+                Log.v(TAG, " 1st receive : AGAIN. [$readBytes][$targetLength]")
+                return (true)
+            }
+
+            //  初回データの受信を報告する。
             if (isDumpLog)
             {
                 Log.v(TAG, "  -=-=-=- 1st CALL : read_bytes : " + readBytes + "(" + receivedLength + ") : target_length : " + targetLength + "  buffer SIZE : " + byteArray.size)
             }
             callback?.onReceiveProgress(receivedLength, targetLength, byteArray.copyOfRange(fromIndex = 0, toIndex = receivedLength))
 
-            run {
+            var isWaitLogging = true
+            while ((maxRetryCount > 0)&&(readBytes >= 0)&&(receivedLength < targetLength))
+            {
                 sleep(delayMs)
                 readBytes = inputStream.available()
-                if (readBytes == 0)
+                if (readBytes <= 0)
                 {
+                    if (isWaitLogging)
+                    {
+                        Log.v(TAG, " WAIT is.available() ... [length: $receivedLength, target: $targetLength] $readBytes bytes, retry : $maxRetryCount  SEQ: $sequenceNumber")
+                        isWaitLogging = false
+                    }
                     maxRetryCount--
+                    continue
                 }
-            }
-            while (readBytes >= 0 && receivedLength < targetLength)
-            {
+                if (!isWaitLogging)
+                {
+                    Log.v(TAG, " WAIT FOR RECEIVE COUNT: $maxRetryCount (SEQ: $sequenceNumber)")
+                }
+
                 readBytes = inputStream.read(byteArray, 0, receiveMessageBufferSize)
                 if (readBytes <= 0)
                 {
                     if (isDumpLog)
                     {
-                        Log.v(TAG, "  RECEIVED MESSAGE FINISHED ($readBytes)")
+                        Log.v(TAG, "  RECEIVED MESSAGE FINISHED ($readBytes) [receivedLength: $receivedLength, targetLength: $targetLength]")
                     }
                     break
                 }
                 receivedLength += readBytes
                 callback?.onReceiveProgress(receivedLength, targetLength, byteArray.copyOfRange(0, readBytes))
                 maxRetryCount = command.maxRetryCount()
+            }
 
-                run {
-                    sleep(delayMs)
-                    readBytes = inputStream.available()
-                    if (readBytes == 0)
+            // 最後のデータを受信した後にもう一度受信が必要な場合の処理...
+            if (command.isLastReceiveRetry)
+            {
+                var responseReceive = true
+                try
+                {
+                    while (responseReceive)
                     {
-                        Log.v(TAG, " WAIT is.available() ... [length: $receivedLength, target: $targetLength] $readBytes bytes, retry : $maxRetryCount")
-                        maxRetryCount--
+                        Log.v(TAG, "   --- isLastReceiveRetry is true ---  SEQ: $sequenceNumber")
+                        sleep(delayMs)
+                        if (inputStream.available() > 0)
+                        {
+                            readBytes = inputStream.read(byteArray, 0, receiveMessageBufferSize)
+                            if (readBytes > 0)
+                            {
+                                receivedLength += readBytes
+                                callback?.onReceiveProgress(receivedLength, targetLength, byteArray.copyOfRange(0, readBytes))
+                                Log.v(TAG, "   --- isLastReceiveRetry: onReceiveProgress() $readBytes bytes. ---  SEQ: $sequenceNumber ")
+                            }
+                            responseReceive = false
+                        }
+                        else
+                        {
+                            Log.v(TAG, "   --- inputStream.available() is <= 0 --- : ${inputStream.available()}  SEQ: $sequenceNumber")
+                            responseReceive = false
+                        }
                     }
+                }
+                catch (ex: Exception)
+                {
+                    ex.printStackTrace()
                 }
             }
 
             //  終了報告...
             if (isDumpLog)
             {
-                Log.v(TAG, "  --- receive_multi : $id  ($readBytes) [$maxRetryCount] $receiveMessageBufferSize ($receivedLength) ")
+                Log.v(TAG, "  --- receive_multi : $id  ($readBytes) [$maxRetryCount] $receiveMessageBufferSize ($receivedLength) SEQ: $sequenceNumber")
             }
-            callback?.receivedMessage(id, Arrays.copyOfRange(byteArray, 0, receivedLength))
+            callback?.receivedMessage(id, byteArray.copyOfRange(0, receivedLength))
         }
         catch (e: Throwable)
         {
@@ -610,7 +658,7 @@ class PtpIpCommandPublisher(private val ipAddress : String, private val portNumb
         var readBytes = 0
         try
         {
-            while (readBytes <= 0)
+            while ((retryCount >= 0) && (readBytes <= 0))
             {
                 sleep(delayMs)
                 readBytes = inputStream.available()
@@ -618,15 +666,23 @@ class PtpIpCommandPublisher(private val ipAddress : String, private val portNumb
                 {
                     if (isLogOutput)
                     {
-                        Log.v(TAG, "waitForReceive:: is.available() WAIT... : $delayMs ms (Count : $retryCnt) ")
+                        Log.v(TAG, "waitForReceive:: is.available() WAIT... : $delayMs ms (Count : $retryCount/$retryCnt) SEQ: $sequenceNumber")
                         isLogOutput = false
                     }
-                    retryCount--
-                    if ((!waitForever)&&(retryCount < 0))
+                    if (!waitForever)
                     {
-                        return (-1)
+                        retryCount--
+                    }
+                    else
+                    {
+                        Log.v(TAG, "waitForReceive: wait forever ")
+                        isLogOutput = false
                     }
                 }
+            }
+            if (!isLogOutput)
+            {
+                Log.v(TAG, " --- waitForReceive : $readBytes bytes. (RetryCount : $retryCount/$retryCnt)")
             }
         }
         catch (e: Exception)

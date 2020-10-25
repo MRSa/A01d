@@ -56,6 +56,9 @@ public interface IPtpIpCommand
     // リトライオーバー発生時、コマンドを再送するか？
     boolean isRetrySend();
 
+    // 最後に1回余計に受信をするか？
+    boolean isLastReceiveRetry();
+
     // 受信待ち再試行回数
     int maxRetryCount();
 

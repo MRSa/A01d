@@ -5,11 +5,10 @@ import net.osdn.gokigen.a01d.camera.ptpip.wrapper.command.IPtpIpCommandCallback
 import net.osdn.gokigen.a01d.camera.ptpip.wrapper.liveview.IPtpIpLiveViewImageCallback
 import net.osdn.gokigen.a01d.camera.utils.SimpleLogDumper
 import java.io.ByteArrayOutputStream
-import java.util.*
 
 class NikonLiveViewImageReceiver(private var callback: IPtpIpLiveViewImageCallback) : IPtpIpCommandCallback
 {
-    private val isDumpLog = false
+    private val isDumpLog = true
     private var receivedTotalBytes = 0
     private var receivedRemainBytes = 0
     private var receivedFirstData = false
@@ -41,6 +40,11 @@ class NikonLiveViewImageReceiver(private var callback: IPtpIpLiveViewImageCallba
             return
         }
         Log.v(TAG, " onReceiveProgress() $currentBytes/$totalBytes LENGTH: ${rx_body.size} bytes.")
+        if ((currentBytes > totalBytes)&&((currentBytes - totalBytes) < (32 + 14)))
+        {
+            // Operation Response Packet を受信していないとき...
+            Log.v(TAG, " ===== DO NOT RECEIVE RESPONSE MESSAGE YET. =====")
+        }
 
         // 受信したデータから、通信のヘッダ部分を削除する
         cutHeader(rx_body)
@@ -95,7 +99,7 @@ class NikonLiveViewImageReceiver(private var callback: IPtpIpLiveViewImageCallba
             if (isDumpLog)
             {
                 Log.v(TAG, " FIRST DATA POS. : $dataPosition len: $length ");
-                SimpleLogDumper.dump_bytes(" [sXXs]", rx_body.copyOfRange(0, (32)))
+                SimpleLogDumper.dump_bytes(" [1stData]", rx_body.copyOfRange(0, (32)))
             }
         }
         else

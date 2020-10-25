@@ -5,13 +5,13 @@ import androidx.annotation.NonNull;
 import net.osdn.gokigen.a01d.camera.ptpip.wrapper.command.IPtpIpCommandCallback;
 import net.osdn.gokigen.a01d.camera.ptpip.wrapper.command.messages.PtpIpCommandBase;
 
-public class NikonLiveViewRequestMessage extends PtpIpCommandBase
+public class NikonStatusRequestMessage extends PtpIpCommandBase
 {
     private final IPtpIpCommandCallback callback;
     private final boolean isDumpLog;
     private final int delayMs;
 
-    public NikonLiveViewRequestMessage(@NonNull IPtpIpCommandCallback callback,int delayMs, boolean isDumpLog)
+    public NikonStatusRequestMessage(@NonNull IPtpIpCommandCallback callback,int delayMs, boolean isDumpLog)
     {
         this.callback = callback;
         this.delayMs = delayMs;
@@ -27,7 +27,7 @@ public class NikonLiveViewRequestMessage extends PtpIpCommandBase
     @Override
     public int getId()
     {
-        return (SEQ_GET_VIEWFRAME);
+        return (SEQ_GET_CAMERASTATUS);
     }
 
     @Override
@@ -42,7 +42,7 @@ public class NikonLiveViewRequestMessage extends PtpIpCommandBase
                 (byte) 0x01, (byte) 0x00, (byte) 0x00, (byte) 0x00,
 
                 // operation code
-                (byte) 0x03, (byte) 0x92,
+                (byte) 0xc2, (byte) 0x90,
 
                 // sequence number
                 (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
@@ -76,7 +76,7 @@ public class NikonLiveViewRequestMessage extends PtpIpCommandBase
     @Override
     public int maxRetryCount()
     {
-        return (300);
+        return (3);
     }
 
     @Override

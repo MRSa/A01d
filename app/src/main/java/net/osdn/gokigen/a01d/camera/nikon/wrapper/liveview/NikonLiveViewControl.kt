@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import net.osdn.gokigen.a01d.camera.ILiveViewControl
 import net.osdn.gokigen.a01d.camera.nikon.wrapper.command.messages.specific.NikonLiveViewRequestMessage
+import net.osdn.gokigen.a01d.camera.nikon.wrapper.command.messages.specific.NikonStatusRequestMessage
 import net.osdn.gokigen.a01d.camera.ptpip.IPtpIpInterfaceProvider
 import net.osdn.gokigen.a01d.camera.ptpip.wrapper.command.*
 import net.osdn.gokigen.a01d.camera.ptpip.wrapper.command.messages.PtpIpCommandGeneric
@@ -14,9 +15,10 @@ import java.util.*
 
 class NikonLiveViewControl(private val context: AppCompatActivity, interfaceProvider: IPtpIpInterfaceProvider, private val delayMs: Int) : ILiveViewControl, ILiveViewListener, IPtpIpCommunication, IPtpIpLiveViewImageCallback, IPtpIpCommandCallback
 {
+    private val isDumpLog = false
     private val commandIssuer = interfaceProvider.commandPublisher
     private val imageReceiver = NikonLiveViewImageReceiver(this)
-    private val isDumpLog = false
+    private val statusReceiver = NikonLiveViewStatusReceiver(true)
     private var dataReceiver: IImageDataReceiver? = null
     private var liveViewIsReceiving = false
 
@@ -121,6 +123,8 @@ class NikonLiveViewControl(private val context: AppCompatActivity, interfaceProv
     {
         try
         {
+            //Thread.sleep(delayMs.toLong())
+            //commandIssuer.enqueueCommand(NikonStatusRequestMessage(statusReceiver, delayMs, isDumpLog))
             Thread.sleep(delayMs.toLong())
             commandIssuer.enqueueCommand(NikonLiveViewRequestMessage(imageReceiver, delayMs, isDumpLog))
         }

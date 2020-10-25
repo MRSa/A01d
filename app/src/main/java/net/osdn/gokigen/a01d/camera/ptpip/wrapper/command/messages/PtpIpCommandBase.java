@@ -115,6 +115,12 @@ public class PtpIpCommandBase implements IPtpIpCommand, IPtpIpMessages
     }
 
     @Override
+    public boolean isLastReceiveRetry()
+    {
+        return (false);
+    }
+
+    @Override
     public int maxRetryCount()
     {
         return (20);
