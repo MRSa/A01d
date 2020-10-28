@@ -8,7 +8,7 @@ import java.io.ByteArrayOutputStream
 
 class NikonLiveViewImageReceiver(private var callback: IPtpIpLiveViewImageCallback) : IPtpIpCommandCallback
 {
-    private val isDumpLog = true
+    private val isDumpLog = false
     private var receivedTotalBytes = 0
     private var receivedRemainBytes = 0
     private var receivedFirstData = false

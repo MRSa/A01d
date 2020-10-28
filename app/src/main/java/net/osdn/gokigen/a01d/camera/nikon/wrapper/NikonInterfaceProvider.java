@@ -52,7 +52,7 @@ public class NikonInterfaceProvider implements IPtpIpInterfaceProvider, IDisplay
     private final NikonCameraInformation cameraInformation;
     private NikonCaptureControl captureControl;
     private NikonFocusingControl focusingControl;
-    private NikonConnection canonConnection;
+    private NikonConnection nikonConnection;
     private PtpIpCommandPublisher commandPublisher;
     private NikonLiveViewControl liveViewControl;
     private PtpIpAsyncResponseReceiver asyncReceiver;
@@ -68,7 +68,7 @@ public class NikonInterfaceProvider implements IPtpIpInterfaceProvider, IDisplay
         liveViewControl = new NikonLiveViewControl(context, this, 30);
         asyncReceiver = new PtpIpAsyncResponseReceiver(CAMERA_IP, ASYNC_RESPONSE_PORT);
         statusChecker = new NikonStatusChecker(activity, commandPublisher, CAMERA_IP, EVENT_PORT);
-        canonConnection = new NikonConnection(context, provider, this, statusChecker);
+        nikonConnection = new NikonConnection(context, provider, this, statusChecker);
         cameraInformation = new NikonCameraInformation();
         zoomControl = new NikonZoomLensControl();
         this.statusListener = statusListener;
@@ -87,7 +87,7 @@ public class NikonInterfaceProvider implements IPtpIpInterfaceProvider, IDisplay
     @Override
     public ICameraConnection getCameraConnection()
     {
-        return (canonConnection);
+        return (nikonConnection);
     }
 
     @Override

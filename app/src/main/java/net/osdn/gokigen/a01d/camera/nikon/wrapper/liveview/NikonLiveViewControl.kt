@@ -141,7 +141,7 @@ class NikonLiveViewControl(private val context: AppCompatActivity, interfaceProv
             var pos = 0
 
             // 先頭の 1024 bytesまで
-            val limit = if (data.size < 1024) data.size - 1 else 1024
+            val limit = if (data.size < 4096) data.size - 1 else 4096
             while (pos < limit)
             {
                 if (((data[pos] == 0xff.toByte())&&(data[pos + 1] == 0xd8.toByte())))

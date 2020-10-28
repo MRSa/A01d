@@ -46,13 +46,22 @@ class PtpIpCommandPublisher(private val ipAddress : String, private val portNumb
             if (tcpNoDelay)
             {
                 socket?.keepAlive = false
-                socket?.setPerformancePreferences(0, 2, 0)
+                socket?.setPerformancePreferences(0, 1, 2)
+                //socket?.setPerformancePreferences(0, 2, 0)
+                //socket?.setPerformancePreferences(0, 1, 2)
+                //socket?.setPerformancePreferences(1, 0, 0)
+                //socket?.setPerformancePreferences(0, 0, 2)
                 socket?.oobInline = true
                 socket?.reuseAddress = false
-                socket?.trafficClass = 0x80
+                socket?.trafficClass = 0x80 // 0x80
+                socket?.soTimeout = 300
+                //socket?.receiveBufferSize = 8192 // 49152 // 65536 // 32768
+                //socket?.sendBufferSize = 8192 // 2048 // 1024 // 2048
                 //socket?.setSoLinger(true, 3000);
                 //socket?.setReceiveBufferSize(2097152);
                 //socket?.setSendBufferSize(524288);
+
+                Log.v(TAG, " SOCKET (SEND:${socket?.sendBufferSize}, RECV:${socket?.receiveBufferSize}) oob:${socket?.oobInline} SO_TIMEOUT:${socket?.soTimeout}ms trafficClass:${socket?.trafficClass}")
             }
             socket?.connect(InetSocketAddress(ipAddress, portNumber), 0)
             isConnected = true
@@ -338,12 +347,12 @@ class PtpIpCommandPublisher(private val ipAddress : String, private val portNumb
         return (if (callback != null && callback.isReceiveMulti)
         {
             // 受信したら逐次「受信したよ」と応答するパターン
-            Log.v(TAG, " receiveMulti() : $delayMs [id:${command.id}] SEQ: $sequenceNumber")
+            //Log.v(TAG, " receiveMulti() : $delayMs [id:${command.id}] SEQ: $sequenceNumber")
             receiveMulti(command, delayMs)
         }
         else
         {
-            Log.v(TAG, " receiveSingle() : $delayMs [id:${command.id}] SEQ: $sequenceNumber")
+            //Log.v(TAG, " receiveSingle() : $delayMs [id:${command.id}] SEQ: $sequenceNumber")
             receiveSingle(command, delayMs)
         })
         //  受信した後、すべてをまとめて「受信したよ」と応答するパターン
