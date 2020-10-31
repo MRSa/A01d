@@ -45,19 +45,21 @@ class PtpIpCommandPublisher(private val ipAddress : String, private val portNumb
             socket?.tcpNoDelay = tcpNoDelay
             if (tcpNoDelay)
             {
+                //socket?.keepAlive = false
                 socket?.keepAlive = false
-                socket?.setPerformancePreferences(0, 1, 2)
+                //socket?.setPerformancePreferences(0, 1, 2)
                 //socket?.setPerformancePreferences(0, 2, 0)
                 //socket?.setPerformancePreferences(0, 1, 2)
                 //socket?.setPerformancePreferences(1, 0, 0)
                 //socket?.setPerformancePreferences(0, 0, 2)
                 socket?.oobInline = true
-                socket?.reuseAddress = false
+                //socket?.reuseAddress = false
                 socket?.trafficClass = 0x80 // 0x80
-                socket?.soTimeout = 300
+                //socket?.soTimeout = 800
+                socket?.soTimeout = 0
                 //socket?.receiveBufferSize = 8192 // 49152 // 65536 // 32768
                 //socket?.sendBufferSize = 8192 // 2048 // 1024 // 2048
-                //socket?.setSoLinger(true, 3000);
+                socket?.setSoLinger(true, 3000);
                 //socket?.setReceiveBufferSize(2097152);
                 //socket?.setSendBufferSize(524288);
 
@@ -377,7 +379,7 @@ class PtpIpCommandPublisher(private val ipAddress : String, private val portNumb
 
             // 初回データが受信バッファにデータが溜まるまで待つ...
             var readBytes = waitForReceive(inputStream, delayMs, command.maxRetryCount())
-            if (readBytes < 0)
+            if (readBytes <= 0)
             {
                 // リトライオーバー...
                 Log.v(TAG, " RECEIVE : RETRY OVER...")
@@ -457,7 +459,7 @@ class PtpIpCommandPublisher(private val ipAddress : String, private val portNumb
 
             // 初回データが受信バッファにデータが溜まるまで待つ...
             var readBytes = waitForReceive(inputStream, delayMs, command.maxRetryCount())
-            if (readBytes < 0)
+            if (readBytes <= 0)
             {
                 // リトライオーバー...
                 Log.v(TAG, " RECEIVE : RETRY OVER...... : " + delayMs + "ms x " + command.maxRetryCount() + " SEQ: $sequenceNumber")
