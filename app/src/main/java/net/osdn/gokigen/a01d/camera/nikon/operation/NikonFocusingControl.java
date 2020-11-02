@@ -14,6 +14,7 @@ import net.osdn.gokigen.a01d.camera.IFocusingControl;
 import net.osdn.gokigen.a01d.camera.ptpip.wrapper.command.IPtpIpCommandCallback;
 import net.osdn.gokigen.a01d.camera.ptpip.wrapper.command.PtpIpCommandPublisher;
 import net.osdn.gokigen.a01d.camera.ptpip.wrapper.command.messages.PtpIpCommandGeneric;
+import net.osdn.gokigen.a01d.camera.ptpip.wrapper.command.messages.PtpIpCommandGenericWithRetry;
 import net.osdn.gokigen.a01d.liveview.IAutoFocusFrameDisplay;
 import net.osdn.gokigen.a01d.liveview.IIndicatorControl;
 import net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor;
@@ -116,7 +117,7 @@ public class NikonFocusingControl implements IFocusingControl, IPtpIpCommandCall
         try
         {
             Log.v(TAG, " Unlock AF ");
-            commandPublisher.enqueueCommand(new PtpIpCommandGeneric(this, FOCUS_UNLOCK, isDumpLog, 0, 0x9206));
+            commandPublisher.enqueueCommand(new PtpIpCommandGenericWithRetry(this, FOCUS_UNLOCK, 30, 100, false, isDumpLog, 0, 0x9206, 0, 0, 0, 0, 0));
         }
         catch (Exception e)
         {
@@ -128,7 +129,7 @@ public class NikonFocusingControl implements IFocusingControl, IPtpIpCommandCall
     public void halfPressShutter(boolean isPressed)
     {
         //unlockAutoFocus();
-        commandPublisher.enqueueCommand(new PtpIpCommandGeneric(this, FOCUS_MOVE, isDumpLog, 0, 0x90c1));
+        commandPublisher.enqueueCommand(new PtpIpCommandGenericWithRetry(this, FOCUS_MOVE, 30, 250, false, isDumpLog, 0, 0x90c1, 0, 0, 0, 0, 0));
         //lockAutoFocus(new PointF(0.5f, 0.5f));
     }
 
@@ -140,9 +141,9 @@ public class NikonFocusingControl implements IFocusingControl, IPtpIpCommandCall
             int y = (0x0000ffff & (Math.round(point.y * maxPointLimitHeight) + 1));
             Log.v(TAG, "Lock AF: [" + x + ","+ y + "]");
             if (!not_support_focus_lock) {
-                commandPublisher.enqueueCommand(new PtpIpCommandGeneric(this, FOCUS_LOCK, isDumpLog, 0, 0x9205, 8, x, y));
+                commandPublisher.enqueueCommand(new PtpIpCommandGenericWithRetry(this, FOCUS_LOCK, 30, 250, false, isDumpLog, 0, 0x9205, 8, x, y, 0, 0));
             } else {
-                commandPublisher.enqueueCommand(new PtpIpCommandGeneric(this, FOCUS_MOVE, isDumpLog, 0, 0x90c1));
+                commandPublisher.enqueueCommand(new PtpIpCommandGenericWithRetry(this, FOCUS_MOVE, 30, 250, false, isDumpLog, 0, 0x90c1, 0, 0, 0, 0, 0));
             }
         }
         catch (Exception e)
@@ -201,6 +202,12 @@ public class NikonFocusingControl implements IFocusingControl, IPtpIpCommandCall
     {
         try
         {
+            if (rx_body == null)
+            {
+                Log.v(TAG, " RECEIVED BODY IS NULL.");
+                return;
+            }
+
             if (rx_body.length < 10)
             {
                 Log.v(TAG, " --- BODY LENGTH IS SHORT : FOCUS OPERATION ---");

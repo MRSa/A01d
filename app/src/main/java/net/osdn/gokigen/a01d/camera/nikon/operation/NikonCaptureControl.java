@@ -8,6 +8,7 @@ import net.osdn.gokigen.a01d.camera.ICaptureControl;
 import net.osdn.gokigen.a01d.camera.ptpip.wrapper.command.IPtpIpCommandCallback;
 import net.osdn.gokigen.a01d.camera.ptpip.wrapper.command.PtpIpCommandPublisher;
 import net.osdn.gokigen.a01d.camera.ptpip.wrapper.command.messages.PtpIpCommandGeneric;
+import net.osdn.gokigen.a01d.camera.ptpip.wrapper.command.messages.PtpIpCommandGenericWithRetry;
 import net.osdn.gokigen.a01d.liveview.IAutoFocusFrameDisplay;
 
 import static net.osdn.gokigen.a01d.camera.ptpip.wrapper.command.IPtpIpMessages.REQUEST_SHUTTER_ON;
@@ -36,9 +37,9 @@ public class NikonCaptureControl implements ICaptureControl, IPtpIpCommandCallba
             Log.v(TAG, " doCapture() ");
 
             // シャッターを切る
-            commandPublisher.enqueueCommand(new PtpIpCommandGeneric(this, REQUEST_SHUTTER_ON, isDumpLog, 0, 0x9207, 8, 0xffffffff, 0x00));
-            commandPublisher.enqueueCommand(new PtpIpCommandGeneric(this, SEQ_DEVICE_READY, isDumpLog, 0, 0x90c8));
-            commandPublisher.enqueueCommand(new PtpIpCommandGeneric(this, SEQ_GET_EVENT, isDumpLog, 0, 0x90c7));
+            commandPublisher.enqueueCommand(new PtpIpCommandGenericWithRetry(this, REQUEST_SHUTTER_ON, 50, 300, false, isDumpLog, 0, 0x9207, 8, 0xffffffff, 0x00, 0, 0));
+            commandPublisher.enqueueCommand(new PtpIpCommandGenericWithRetry(this, SEQ_DEVICE_READY, 50, 300, false, isDumpLog, 0, 0x90c8, 0, 0, 0, 0, 0));
+            commandPublisher.enqueueCommand(new PtpIpCommandGenericWithRetry(this, SEQ_GET_EVENT, 50, 300, false, isDumpLog, 0, 0x90c7, 0, 0, 0, 0, 0));
         }
         catch (Exception e)
         {

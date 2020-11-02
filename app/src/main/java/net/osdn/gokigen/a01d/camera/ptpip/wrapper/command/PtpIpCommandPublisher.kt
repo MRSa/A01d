@@ -45,10 +45,11 @@ class PtpIpCommandPublisher(private val ipAddress : String, private val portNumb
             socket?.tcpNoDelay = tcpNoDelay
             if (tcpNoDelay)
             {
+                socket?.tcpNoDelay = true
                 //socket?.keepAlive = false
                 socket?.keepAlive = false
                 //socket?.setPerformancePreferences(0, 1, 2)
-                //socket?.setPerformancePreferences(0, 2, 0)
+                socket?.setPerformancePreferences(0, 1, 2)
                 //socket?.setPerformancePreferences(0, 1, 2)
                 //socket?.setPerformancePreferences(1, 0, 0)
                 //socket?.setPerformancePreferences(0, 0, 2)
@@ -57,8 +58,8 @@ class PtpIpCommandPublisher(private val ipAddress : String, private val portNumb
                 socket?.trafficClass = 0x80 // 0x80
                 //socket?.soTimeout = 800
                 socket?.soTimeout = 0
-                //socket?.receiveBufferSize = 8192 // 49152 // 65536 // 32768
-                //socket?.sendBufferSize = 8192 // 2048 // 1024 // 2048
+                //socket?.receiveBufferSize = 8192  // 10240 // 16384 // 6144// 8192 // 49152 // 65536 // 32768
+                //socket?.sendBufferSize = 8192 // 4096 // 2048 // 10248
                 socket?.setSoLinger(true, 3000);
                 //socket?.setReceiveBufferSize(2097152);
                 //socket?.setSendBufferSize(524288);
@@ -382,11 +383,12 @@ class PtpIpCommandPublisher(private val ipAddress : String, private val portNumb
             if (readBytes <= 0)
             {
                 // リトライオーバー...
-                Log.v(TAG, " RECEIVE : RETRY OVER...")
+                Log.v(TAG, " RECEIVE : RETRY OVER...... : $delayMs ms x ${command.maxRetryCount()}  SEQ: $sequenceNumber isRetry: ${command.isRetrySend}")
                 if (!command.isRetrySend)
                 {
                     // 再送しない場合には、応答がないことを通知する
                     receivedAllMessage(isDumpReceiveLog, id, null, callback)
+                    return (false)
                 }
                 return (true)
             }
@@ -462,7 +464,7 @@ class PtpIpCommandPublisher(private val ipAddress : String, private val portNumb
             if (readBytes <= 0)
             {
                 // リトライオーバー...
-                Log.v(TAG, " RECEIVE : RETRY OVER...... : " + delayMs + "ms x " + command.maxRetryCount() + " SEQ: $sequenceNumber")
+                Log.v(TAG, " RECEIVE : RETRY OVER...... : $delayMs ms x ${command.maxRetryCount()}  SEQ: $sequenceNumber ")
                 if (command.isRetrySend)
                 {
                     // 要求を再送する場合、、、ダメな場合は受信待ちとする
