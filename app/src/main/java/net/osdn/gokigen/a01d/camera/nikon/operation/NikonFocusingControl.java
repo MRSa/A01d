@@ -117,7 +117,7 @@ public class NikonFocusingControl implements IFocusingControl, IPtpIpCommandCall
         try
         {
             Log.v(TAG, " Unlock AF ");
-            commandPublisher.enqueueCommand(new PtpIpCommandGenericWithRetry(this, FOCUS_UNLOCK, 30, 100, false, isDumpLog, 0, 0x9206, 0, 0, 0, 0, 0));
+            commandPublisher.enqueueCommand(new PtpIpCommandGenericWithRetry(this, FOCUS_UNLOCK, 30, 200, false, isDumpLog, 0, 0x9206, 0, 0, 0, 0, 0));
         }
         catch (Exception e)
         {
@@ -129,7 +129,7 @@ public class NikonFocusingControl implements IFocusingControl, IPtpIpCommandCall
     public void halfPressShutter(boolean isPressed)
     {
         //unlockAutoFocus();
-        commandPublisher.enqueueCommand(new PtpIpCommandGenericWithRetry(this, FOCUS_MOVE, 30, 250, false, isDumpLog, 0, 0x90c1, 0, 0, 0, 0, 0));
+        commandPublisher.enqueueCommand(new PtpIpCommandGenericWithRetry(this, FOCUS_MOVE, 30, 200, false, isDumpLog, 0, 0x90c1, 0, 0, 0, 0, 0));
         //lockAutoFocus(new PointF(0.5f, 0.5f));
     }
 
@@ -141,9 +141,9 @@ public class NikonFocusingControl implements IFocusingControl, IPtpIpCommandCall
             int y = (0x0000ffff & (Math.round(point.y * maxPointLimitHeight) + 1));
             Log.v(TAG, "Lock AF: [" + x + ","+ y + "]");
             if (!not_support_focus_lock) {
-                commandPublisher.enqueueCommand(new PtpIpCommandGenericWithRetry(this, FOCUS_LOCK, 30, 250, false, isDumpLog, 0, 0x9205, 8, x, y, 0, 0));
+                commandPublisher.enqueueCommand(new PtpIpCommandGenericWithRetry(this, FOCUS_LOCK, 30, 200, false, isDumpLog, 0, 0x9205, 8, x, y, 0, 0));
             } else {
-                commandPublisher.enqueueCommand(new PtpIpCommandGenericWithRetry(this, FOCUS_MOVE, 30, 250, false, isDumpLog, 0, 0x90c1, 0, 0, 0, 0, 0));
+                commandPublisher.enqueueCommand(new PtpIpCommandGenericWithRetry(this, FOCUS_MOVE, 30, 200, false, isDumpLog, 0, 0x90c1, 0, 0, 0, 0, 0));
             }
         }
         catch (Exception e)

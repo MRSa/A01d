@@ -37,9 +37,9 @@ public class NikonCaptureControl implements ICaptureControl, IPtpIpCommandCallba
             Log.v(TAG, " doCapture() ");
 
             // シャッターを切る
-            commandPublisher.enqueueCommand(new PtpIpCommandGenericWithRetry(this, REQUEST_SHUTTER_ON, 50, 300, false, isDumpLog, 0, 0x9207, 8, 0xffffffff, 0x00, 0, 0));
-            commandPublisher.enqueueCommand(new PtpIpCommandGenericWithRetry(this, SEQ_DEVICE_READY, 50, 300, false, isDumpLog, 0, 0x90c8, 0, 0, 0, 0, 0));
-            commandPublisher.enqueueCommand(new PtpIpCommandGenericWithRetry(this, SEQ_GET_EVENT, 50, 300, false, isDumpLog, 0, 0x90c7, 0, 0, 0, 0, 0));
+            commandPublisher.enqueueCommand(new PtpIpCommandGenericWithRetry(this, REQUEST_SHUTTER_ON, 30, 200, false, isDumpLog, 0, 0x9207, 8, 0xffffffff, 0x00, 0, 0));
+            commandPublisher.enqueueCommand(new PtpIpCommandGenericWithRetry(this, SEQ_DEVICE_READY, 30, 200, false, isDumpLog, 0, 0x90c8, 0, 0, 0, 0, 0));
+            commandPublisher.enqueueCommand(new PtpIpCommandGenericWithRetry(this, SEQ_GET_EVENT, 30, 200, false, isDumpLog, 0, 0x90c7, 0, 0, 0, 0, 0));
         }
         catch (Exception e)
         {

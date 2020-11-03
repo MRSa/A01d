@@ -13,7 +13,7 @@ import net.osdn.gokigen.a01d.liveview.liveviewlistener.IImageDataReceiver
 import net.osdn.gokigen.a01d.liveview.liveviewlistener.ILiveViewListener
 import java.util.*
 
-class NikonLiveViewControl(private val context: AppCompatActivity, interfaceProvider: IPtpIpInterfaceProvider, private val delayMs: Int) : ILiveViewControl, ILiveViewListener, IPtpIpCommunication, IPtpIpLiveViewImageCallback, IPtpIpCommandCallback
+class NikonLiveViewControl(private val context: AppCompatActivity, interfaceProvider: IPtpIpInterfaceProvider, private val delayMs: Int, private val delayScale: Int) : ILiveViewControl, ILiveViewListener, IPtpIpCommunication, IPtpIpLiveViewImageCallback, IPtpIpCommandCallback
 {
     private val isDumpLog = false
     private val commandIssuer = interfaceProvider.commandPublisher
@@ -121,11 +121,12 @@ class NikonLiveViewControl(private val context: AppCompatActivity, interfaceProv
 
     private fun sendNextMessage()
     {
+        Log.v(TAG, "sendNextMessage(), sleep : ${delayMs.toLong() * delayScale} ms ")
         try
         {
             //Thread.sleep(delayMs.toLong())
             //commandIssuer.enqueueCommand(NikonStatusRequestMessage(statusReceiver, delayMs, isDumpLog))
-            Thread.sleep(delayMs.toLong())
+            Thread.sleep(delayMs.toLong() * delayScale)
             commandIssuer.enqueueCommand(NikonLiveViewRequestMessage(imageReceiver, delayMs, isDumpLog))
         }
         catch (e: Exception)
@@ -196,6 +197,7 @@ class NikonLiveViewControl(private val context: AppCompatActivity, interfaceProv
             }
 
             Log.v(TAG, String.format(" NikonLiveViewControl: ----- OK REPLY (ID : %d) ----- ", id))
+            waitSleep()
 
             when (id)
             {

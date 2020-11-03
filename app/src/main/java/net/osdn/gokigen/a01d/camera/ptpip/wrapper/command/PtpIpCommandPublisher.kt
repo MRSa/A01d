@@ -45,7 +45,7 @@ class PtpIpCommandPublisher(private val ipAddress : String, private val portNumb
             socket?.tcpNoDelay = tcpNoDelay
             if (tcpNoDelay)
             {
-                socket?.tcpNoDelay = true
+                //socket?.tcpNoDelay = true
                 //socket?.keepAlive = false
                 socket?.keepAlive = false
                 //socket?.setPerformancePreferences(0, 1, 2)
@@ -56,11 +56,11 @@ class PtpIpCommandPublisher(private val ipAddress : String, private val portNumb
                 socket?.oobInline = true
                 //socket?.reuseAddress = false
                 socket?.trafficClass = 0x80 // 0x80
-                //socket?.soTimeout = 800
                 socket?.soTimeout = 0
+                //socket?.soTimeout = 0
                 //socket?.receiveBufferSize = 8192  // 10240 // 16384 // 6144// 8192 // 49152 // 65536 // 32768
-                //socket?.sendBufferSize = 8192 // 4096 // 2048 // 10248
-                socket?.setSoLinger(true, 3000);
+                //socket?.sendBufferSize = 1024 // 8192 // 4096 // 2048 // 10240
+                socket?.setSoLinger(true, 500);
                 //socket?.setReceiveBufferSize(2097152);
                 //socket?.setSendBufferSize(524288);
 
@@ -198,7 +198,7 @@ class PtpIpCommandPublisher(private val ipAddress : String, private val portNumb
                 isHold = true
                 holdId = command.holdId
             }
-            //Log.v(TAG, "Enqueue : "  + command.getId());
+            Log.v(TAG, "Enqueue [ID: " + command.getId() + "] size: " + commandQueue.size);
             return (commandQueue.offer(command))
         }
         catch (e: Exception)
@@ -713,6 +713,6 @@ class PtpIpCommandPublisher(private val ipAddress : String, private val portNumb
         private const val BUFFER_SIZE = 1024 * 1024 + 16 // 受信バッファは 1MB
         private const val COMMAND_SEND_RECEIVE_DURATION_MS = 5
         private const val COMMAND_SEND_RECEIVE_DURATION_MAX = 3000
-        private const val COMMAND_POLL_QUEUE_MS = 5
+        private const val COMMAND_POLL_QUEUE_MS = 5 // 5
     }
 }
