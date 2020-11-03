@@ -208,6 +208,24 @@ class PtpIpCommandPublisher(private val ipAddress : String, private val portNumb
         return (false)
     }
 
+    override fun getCurrentQueueSize(): Int
+    {
+        return commandQueue.size
+    }
+
+    override fun isExistCommandMessageQueue(id: Int): Int
+    {
+        var count = 0
+        for (cmd in commandQueue)
+        {
+            if (cmd.id == id)
+            {
+                count++
+            }
+        }
+       return count
+    }
+
     override fun flushHoldQueue(): Boolean
     {
         Log.v(TAG, "  flushHoldQueue()")

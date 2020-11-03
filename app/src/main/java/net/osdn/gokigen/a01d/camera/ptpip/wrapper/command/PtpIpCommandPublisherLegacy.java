@@ -249,6 +249,27 @@ public class PtpIpCommandPublisherLegacy implements IPtpIpCommandPublisher, IPtp
     }
 
     @Override
+    public int getCurrentQueueSize()
+    {
+        return (commandQueue.size());
+    }
+
+
+    @Override
+    public int isExistCommandMessageQueue(int id)
+    {
+        int count = 0;
+        for (IPtpIpCommand cmd : commandQueue)
+        {
+            if (cmd.getId() == id)
+            {
+                count++;
+            }
+        }
+        return (count);
+    }
+
+    @Override
     public boolean flushHoldQueue()
     {
         Log.v(TAG, "  flushHoldQueue()");

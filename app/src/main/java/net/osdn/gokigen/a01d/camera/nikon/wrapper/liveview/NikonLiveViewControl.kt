@@ -4,9 +4,11 @@ import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import net.osdn.gokigen.a01d.camera.ILiveViewControl
 import net.osdn.gokigen.a01d.camera.nikon.wrapper.command.messages.specific.NikonLiveViewRequestMessage
-import net.osdn.gokigen.a01d.camera.nikon.wrapper.command.messages.specific.NikonStatusRequestMessage
 import net.osdn.gokigen.a01d.camera.ptpip.IPtpIpInterfaceProvider
-import net.osdn.gokigen.a01d.camera.ptpip.wrapper.command.*
+import net.osdn.gokigen.a01d.camera.ptpip.wrapper.command.IPtpIpCommandCallback
+import net.osdn.gokigen.a01d.camera.ptpip.wrapper.command.IPtpIpCommunication
+import net.osdn.gokigen.a01d.camera.ptpip.wrapper.command.IPtpIpMessages
+import net.osdn.gokigen.a01d.camera.ptpip.wrapper.command.PtpIpResponseReceiver
 import net.osdn.gokigen.a01d.camera.ptpip.wrapper.command.messages.PtpIpCommandGeneric
 import net.osdn.gokigen.a01d.camera.ptpip.wrapper.liveview.IPtpIpLiveViewImageCallback
 import net.osdn.gokigen.a01d.liveview.liveviewlistener.IImageDataReceiver
@@ -127,7 +129,10 @@ class NikonLiveViewControl(private val context: AppCompatActivity, interfaceProv
             //Thread.sleep(delayMs.toLong())
             //commandIssuer.enqueueCommand(NikonStatusRequestMessage(statusReceiver, delayMs, isDumpLog))
             Thread.sleep(delayMs.toLong() * delayScale)
-            commandIssuer.enqueueCommand(NikonLiveViewRequestMessage(imageReceiver, delayMs, isDumpLog))
+            if (commandIssuer.isExistCommandMessageQueue(IPtpIpMessages.SEQ_GET_VIEWFRAME) < 2)
+            {
+                commandIssuer.enqueueCommand(NikonLiveViewRequestMessage(imageReceiver, delayMs, isDumpLog))
+            }
         }
         catch (e: Exception)
         {
@@ -198,7 +203,6 @@ class NikonLiveViewControl(private val context: AppCompatActivity, interfaceProv
 
             Log.v(TAG, String.format(" NikonLiveViewControl: ----- OK REPLY (ID : %d) ----- ", id))
             waitSleep()
-
             when (id)
             {
                 IPtpIpMessages.SEQ_START_LIVEVIEW -> commandIssuer.enqueueCommand(PtpIpCommandGeneric(this, IPtpIpMessages.SEQ_DEVICE_READY, delayMs, isDumpLog, 0, 0x90c8, 0, 0x00, 0x00, 0x00, 0x00))
