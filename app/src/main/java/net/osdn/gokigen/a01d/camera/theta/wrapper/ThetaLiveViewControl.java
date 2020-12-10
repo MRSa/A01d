@@ -32,6 +32,7 @@ public class ThetaLiveViewControl implements ILiveViewControl
         {
             SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
             useOscV2 = preferences.getBoolean(IPreferencePropertyAccessor.USE_OSC_THETA_V21, false);
+            Log.v(TAG, " use OSC v2 : " + useOscV2);
         }
         catch (Exception e)
         {
@@ -112,7 +113,7 @@ public class ThetaLiveViewControl implements ILiveViewControl
 
                         // Create Slicer to open the stream and parse it.
                         slicer = new SimpleLiveviewSlicer();
-                        slicer.open(streamUrl, paramData);
+                        slicer.open(streamUrl, paramData, "application/json;charset=utf-8");
 
                         while (whileFetching)
                         {

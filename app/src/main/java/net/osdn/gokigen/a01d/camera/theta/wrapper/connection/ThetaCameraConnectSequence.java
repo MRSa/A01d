@@ -135,24 +135,24 @@ public class ThetaCameraConnectSequence implements Runnable
 
         try
         {
-            String responseS = SimpleHttpClient.httpPost(commandsExecuteUrl, startSessionData, TIMEOUT_MS);
-            Log.v(TAG, " " + commandsExecuteUrl + " " + startSessionData + " " + responseS);
+            String responseS = SimpleHttpClient.httpPostWithHeader(commandsExecuteUrl, startSessionData, null, "application/json;charset=utf-8", TIMEOUT_MS);
+            Log.v(TAG, " [ " + commandsExecuteUrl + " ] " + startSessionData + " ::: " + responseS);
 
-            String response = SimpleHttpClient.httpPost(getStateUrl, "", TIMEOUT_MS);
-            Log.v(TAG, " " + getStateUrl + " " + response);
+            String response = SimpleHttpClient.httpPostWithHeader(getStateUrl, "", null, null, TIMEOUT_MS);
+            Log.v(TAG, " (" + getStateUrl + ") " + response);
             if (response.length() > 0)
             {
                 int apiLevel = 1;
                 String sessionId = null;
-               JSONObject object = new JSONObject(response);
-               try
-               {
-                   apiLevel = object.getJSONObject("state").getInt("_apiVersion");
-               }
-               catch (Exception e)
-               {
-                   e.printStackTrace();
-               }
+                JSONObject object = new JSONObject(response);
+                try
+                {
+                    apiLevel = object.getJSONObject("state").getInt("_apiVersion");
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
                 try
                 {
                     sessionId = object.getJSONObject("state").getString("sessionId");
@@ -162,12 +162,12 @@ public class ThetaCameraConnectSequence implements Runnable
                 {
                     e.printStackTrace();
                 }
-               if (apiLevel != 2)
-               {
-                   String setApiLevelData = "{\"name\":\"camera.setOptions\",\"parameters\":{" + "\"sessionId\" : \"" + sessionId + "\", \"options\":{ \"clientVersion\":2}}}";
-                   String response3 = SimpleHttpClient.httpPost(commandsExecuteUrl, setApiLevelData, TIMEOUT_MS);
-                   Log.v(TAG, " " + commandsExecuteUrl + " " + setApiLevelData + " " + response3);
-               }
+                if (apiLevel != 2)
+                {
+                    String setApiLevelData = "{\"name\":\"camera.setOptions\",\"parameters\":{" + "\"sessionId\" : \"" + sessionId + "\", \"options\":{ \"clientVersion\":2}}}";
+                    String response3 = SimpleHttpClient.httpPostWithHeader(commandsExecuteUrl, setApiLevelData, null, "application/json;charset=utf-8", TIMEOUT_MS);
+                    Log.v(TAG, " " + commandsExecuteUrl + " " + setApiLevelData + " " + response3);
+                }
                 onConnectNotify();
             }
             else

@@ -60,7 +60,7 @@ public class ThetaSingleShotControl
                     {
                         String shootUrl = "http://192.168.1.1/osc/commands/execute";
                         String postData = (useThetaV21) ? "{\"name\":\"camera.takePicture\",\"parameters\":{\"timeout\":0}}" : "{\"name\":\"camera.takePicture\",\"parameters\":{\"sessionId\": \"" + sessionIdProvider.getSessionId() + "\"}}";
-                        String result = SimpleHttpClient.httpPost(shootUrl, postData, timeoutMs);
+                        String result = SimpleHttpClient.httpPostWithHeader(shootUrl, postData, null, "application/json;charset=utf-8", timeoutMs);
                         if ((result == null)||(result.length() < 1))
                         {
                             Log.v(TAG, "singleShot() reply is null.");

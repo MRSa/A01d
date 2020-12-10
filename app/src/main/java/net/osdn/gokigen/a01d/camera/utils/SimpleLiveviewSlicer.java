@@ -55,7 +55,7 @@ public class SimpleLiveviewSlicer
     }
 */
 
-    public void open(String liveviewUrl, String postData)
+    public void open(String liveviewUrl, String postData, String contentType)
     {
         OutputStream outputStream = null;
         OutputStreamWriter writer = null;
@@ -71,6 +71,10 @@ public class SimpleLiveviewSlicer
             mHttpConn = (HttpURLConnection) urlObj.openConnection();
             mHttpConn.setRequestMethod("POST");
             mHttpConn.setConnectTimeout(CONNECTION_TIMEOUT);
+            if (contentType != null)
+            {
+                mHttpConn.setRequestProperty("Content-Type", contentType);
+            }
             {
                 mHttpConn.setDoInput(true);
                 mHttpConn.setDoOutput(true);
