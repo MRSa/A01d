@@ -116,6 +116,10 @@ public interface IPreferencePropertyAccessor
 
     String SAVE_LOCAL_LOCATION = "save_local_location";
     boolean SAVE_LOCAL_LOCATION_DEFAULT_VALUE = false;
+
+    String CANON_HOST_IP = "canon_host_ip";
+    String CANON_HOST_IP_DEFAULT_VALUE = "192.168.0.1";
+
  /*
     int CHOICE_SPLASH_SCREEN = 10;
 

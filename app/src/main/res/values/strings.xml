@@ -345,4 +345,7 @@
     <string name="pref_save_local_location">Save local location(Liveview Image)</string>
     <string name="pref_summary_save_local_location">The liveview image saves in application local location.</string>
 
+    <string name="pref_canon_host_ip">Camera IP Address</string>
+    <string name="pref_summary_canon_host_ip">default: 192.168.0.1 </string>
+
 </resources>

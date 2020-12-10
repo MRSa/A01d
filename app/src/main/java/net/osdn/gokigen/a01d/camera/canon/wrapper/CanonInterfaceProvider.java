@@ -1,9 +1,11 @@
 package net.osdn.gokigen.a01d.camera.canon.wrapper;
 
 import android.app.Activity;
+import android.content.SharedPreferences;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
+import androidx.preference.PreferenceManager;
 
 import net.osdn.gokigen.a01d.IInformationReceiver;
 import net.osdn.gokigen.a01d.camera.ICameraConnection;
@@ -36,6 +38,7 @@ import net.osdn.gokigen.a01d.liveview.IAutoFocusFrameDisplay;
 import net.osdn.gokigen.a01d.liveview.ICameraStatusUpdateNotify;
 import net.osdn.gokigen.a01d.liveview.IIndicatorControl;
 import net.osdn.gokigen.a01d.liveview.liveviewlistener.ILiveViewListener;
+import net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor;
 
 public class CanonInterfaceProvider implements IPtpIpInterfaceProvider, IDisplayInjector
 {
@@ -44,34 +47,51 @@ public class CanonInterfaceProvider implements IPtpIpInterfaceProvider, IDisplay
     private static final int ASYNC_RESPONSE_PORT = 15741;  // ??
     private static final int CONTROL_PORT = 15740;
     private static final int EVENT_PORT = 15740;
-    private static final String CAMERA_IP = "192.168.0.1";
+    //private static final String CAMERA_IP = "192.168.0.1";
 
     private final Activity activity;
-    private final PtpIpRunMode runmode;
+    private final PtpIpRunMode runMode;
     private final CanonCameraInformation cameraInformation;
     private CanonCaptureControl captureControl;
     private CanonFocusingControl focusingControl;
-    private CanonConnection canonConnection;
-    private PtpIpCommandPublisher commandPublisher;
-    private CanonLiveViewControl liveViewControl;
-    private PtpIpAsyncResponseReceiver asyncReceiver;
-    private CanonZoomLensControl zoomControl;
-    private CanonStatusChecker statusChecker;
-    private ICameraStatusUpdateNotify statusListener;
-    private IInformationReceiver informationReceiver;
+    private final CanonConnection canonConnection;
+    private final PtpIpCommandPublisher commandPublisher;
+    private final CanonLiveViewControl liveViewControl;
+    private final PtpIpAsyncResponseReceiver asyncReceiver;
+    private final CanonZoomLensControl zoomControl;
+    private final CanonStatusChecker statusChecker;
+    private final ICameraStatusUpdateNotify statusListener;
+    private final IInformationReceiver informationReceiver;
 
     public CanonInterfaceProvider(@NonNull Activity context, @NonNull ICameraStatusReceiver provider, @NonNull ICameraStatusUpdateNotify statusListener, @NonNull IInformationReceiver informationReceiver)
     {
         this.activity = context;
-        commandPublisher = new PtpIpCommandPublisher(CAMERA_IP, CONTROL_PORT, false, false);
+
+        String ipAddress;
+        try
+        {
+            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+            ipAddress = preferences.getString(IPreferencePropertyAccessor.CANON_HOST_IP, IPreferencePropertyAccessor.CANON_HOST_IP_DEFAULT_VALUE);
+            if (ipAddress == null)
+            {
+                ipAddress = "192.168.0.1";
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            ipAddress = "192.168.0.1";
+        }
+        Log.v(TAG, " Canon IP : " + ipAddress);
+        commandPublisher = new PtpIpCommandPublisher(ipAddress, CONTROL_PORT, false, false);
         liveViewControl = new CanonLiveViewControl(context, this, 10);  //
-        asyncReceiver = new PtpIpAsyncResponseReceiver(CAMERA_IP, ASYNC_RESPONSE_PORT);
-        statusChecker = new CanonStatusChecker(context, commandPublisher, CAMERA_IP, EVENT_PORT);
+        asyncReceiver = new PtpIpAsyncResponseReceiver(ipAddress, ASYNC_RESPONSE_PORT);
+        statusChecker = new CanonStatusChecker(context, commandPublisher, ipAddress, EVENT_PORT);
         canonConnection = new CanonConnection(context, provider, this, statusChecker);
         cameraInformation = new CanonCameraInformation();
         zoomControl = new CanonZoomLensControl(context, commandPublisher);
         this.statusListener = statusListener;
-        this.runmode = new PtpIpRunMode();
+        this.runMode = new PtpIpRunMode();
         this.informationReceiver = informationReceiver;
     }
 
@@ -134,7 +154,7 @@ public class CanonInterfaceProvider implements IPtpIpInterfaceProvider, IDisplay
     @Override
     public IPtpIpRunModeHolder getRunModeHolder()
     {
-        return (runmode);
+        return (runMode);
     }
 
     @Override
