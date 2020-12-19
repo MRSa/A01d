@@ -29,7 +29,7 @@ public class CanonCameraConnectSequence implements Runnable, IPtpIpCommandCallba
     private final IPtpIpInterfaceProvider interfaceProvider;
     private final IPtpIpCommandPublisher commandIssuer;
     private final CanonStatusChecker statusChecker;
-    private boolean isDumpLog = false;
+    private final boolean isDumpLog = false;
 
     CanonCameraConnectSequence(@NonNull Activity context, @NonNull ICameraStatusReceiver statusReceiver, @NonNull final ICameraConnection cameraConnection, @NonNull IPtpIpInterfaceProvider interfaceProvider, @NonNull CanonStatusChecker statusChecker)
     {
@@ -157,7 +157,8 @@ public class CanonCameraConnectSequence implements Runnable, IPtpIpCommandCallba
             case SEQ_GET_EVENT1:
                 Log.v(TAG, " SEQ_GET_EVENT1 ");
                 interfaceProvider.getInformationReceiver().updateMessage(context.getString(R.string.canon_connect_connecting7), false, false, 0);
-                commandIssuer.enqueueCommand(new PtpIpCommandGeneric(this, SEQ_DEVICE_INFORMATION, isDumpLog, 0, 0x1001));
+                //commandIssuer.enqueueCommand(new PtpIpCommandGeneric(this, SEQ_DEVICE_INFORMATION, isDumpLog, 0, 0x1001));
+                commandIssuer.enqueueCommand(new PtpIpCommandGeneric(this, SEQ_SET_REMOTE_SHOOTING_MODE, isDumpLog, 0, 0x1001));
                 break;
 
             case SEQ_DEVICE_INFORMATION:
@@ -207,7 +208,27 @@ public class CanonCameraConnectSequence implements Runnable, IPtpIpCommandCallba
             case SEQ_SET_DEVICE_PROPERTY_3:
                 Log.v(TAG, " SEQ_SET_DEVICE_PROPERTY_3 ");
                 interfaceProvider.getInformationReceiver().updateMessage(context.getString(R.string.canon_connect_connecting12), false, false, 0);
+                //commandIssuer.enqueueCommand(new CanonSetDevicePropertyValue(this, SEQ_SET_REMOTE_SHOOTING_MODE, isDumpLog, 0, 300, 0xd1b0, 0x08));
                 commandIssuer.enqueueCommand(new CanonSetDevicePropertyValue(this, SEQ_DEVICE_PROPERTY_FINISHED, isDumpLog, 0, 300, 0xd1b0, 0x08));
+                break;
+
+            case SEQ_SET_REMOTE_SHOOTING_MODE:
+                Log.v(TAG, " SEQ_SET_REMOTE_SHOOTING_MODE ");
+                interfaceProvider.getInformationReceiver().updateMessage(context.getString(R.string.canon_connect_connecting12), false, false, 0);
+                try
+                {
+                    // ちょっと(250ms)待つ
+                    Thread.sleep(250);
+
+                    // コマンド発行
+                    //commandIssuer.enqueueCommand(new PtpIpCommandGeneric(this, SEQ_DEVICE_PROPERTY_FINISHED, isDumpLog, 0, 0x9086, 4, 0x00000001));
+                    commandIssuer.enqueueCommand(new PtpIpCommandGeneric(this, SEQ_DEVICE_INFORMATION, isDumpLog, 0, 0x9086, 4, 0x00000001));
+
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
                 break;
 
             case SEQ_DEVICE_PROPERTY_FINISHED:

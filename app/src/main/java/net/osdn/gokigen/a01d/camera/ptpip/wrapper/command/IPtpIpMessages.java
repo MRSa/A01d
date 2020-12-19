@@ -29,6 +29,7 @@ public interface IPtpIpMessages
     int SEQ_GET_DEVICE_PROP1 = 24;
     int SEQ_GET_DEVICE_PROP2 = 25;
     int SEQ_GET_CAMERASTATUS = 26;
+    int SEQ_SET_REMOTE_SHOOTING_MODE = 27;
 
     int GET_STORAGE_ID = 101;
     int GET_STORAGE_INFO = 102;

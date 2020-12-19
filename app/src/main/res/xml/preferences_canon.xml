@@ -53,6 +53,13 @@
             android:title="@string/pref_canon_host_ip"
             android:defaultValue="192.168.0.1"
             android:summary="@string/pref_summary_canon_host_ip" />
+
+        <EditTextPreference
+            android:key="canon_liveview_wait"
+            android:title="@string/pref_canon_liveview_wait"
+            android:defaultValue="25"
+            android:summary="@string/pref_summary_canon_liveview_wait" />
+
 <!--
         <CheckBoxPreference
             android:key="capture_both_camera_and_live_view"

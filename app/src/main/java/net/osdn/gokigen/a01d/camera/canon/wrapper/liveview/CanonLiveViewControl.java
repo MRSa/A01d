@@ -9,7 +9,7 @@ import net.osdn.gokigen.a01d.camera.ILiveViewControl;
 import net.osdn.gokigen.a01d.camera.ptpip.IPtpIpInterfaceProvider;
 import net.osdn.gokigen.a01d.camera.ptpip.wrapper.command.IPtpIpCommandPublisher;
 import net.osdn.gokigen.a01d.camera.ptpip.wrapper.command.IPtpIpCommunication;
-import net.osdn.gokigen.a01d.camera.ptpip.wrapper.command.messages.PtpIpCommandGeneric;
+import net.osdn.gokigen.a01d.camera.ptpip.wrapper.command.messages.PtpIpCommandGenericWithRetry;
 import net.osdn.gokigen.a01d.camera.ptpip.wrapper.liveview.IPtpIpLiveViewImageCallback;
 import net.osdn.gokigen.a01d.liveview.liveviewlistener.IImageDataReceiver;
 import net.osdn.gokigen.a01d.liveview.liveviewlistener.ILiveViewListener;
@@ -24,7 +24,8 @@ public class CanonLiveViewControl implements ILiveViewControl, ILiveViewListener
     private final String TAG = this.toString();
     private final IPtpIpCommandPublisher commandIssuer;
     private final int delayMs;
-    private CanonLiveViewImageReceiver imageReceiver;
+    //private CanonLiveViewImageReceiver imageReceiver;
+    private final CanonLiveViewImageReceiver imageReceiver;
     private IImageDataReceiver dataReceiver = null;
     private boolean liveViewIsReceiving = false;
     private boolean commandIssued = false;
@@ -33,7 +34,9 @@ public class CanonLiveViewControl implements ILiveViewControl, ILiveViewListener
     {
         this.commandIssuer = interfaceProvider.getCommandPublisher();
         this.delayMs = delayMs;
+        //this.imageReceiver = new CanonLiveViewImageReceiver(this);
         this.imageReceiver = new CanonLiveViewImageReceiver(this);
+        Log.v(TAG, " -=-=-=-=-=- CanonLiveViewControl : delay " + delayMs + " ms");
     }
 
     public ILiveViewListener getLiveViewListener()
@@ -65,7 +68,7 @@ public class CanonLiveViewControl implements ILiveViewControl, ILiveViewListener
                             if (!commandIssued)
                             {
                                 commandIssued = true;
-                                commandIssuer.enqueueCommand(new PtpIpCommandGeneric(imageReceiver, SEQ_GET_VIEWFRAME, 20, false, 0, 0x9153, 12, 0x00200000, 0x01, 0x00, 0x00));
+                                commandIssuer.enqueueCommand(new PtpIpCommandGenericWithRetry(imageReceiver, SEQ_GET_VIEWFRAME, delayMs, 2000, false, false, 0, 0x9153, 12, 0x00200000, 0x01, 0x00, 0x00));
                             }
                             try
                             {
@@ -152,7 +155,7 @@ public class CanonLiveViewControl implements ILiveViewControl, ILiveViewListener
         {
             if ((dataReceiver != null)&&(data != null))
             {
-                //Log.v(TAG, "  ---+++--- RECEIVED LV IMAGE ---+++--- : " + data.length + " bytes.");
+                Log.v(TAG, "  ---+++--- RECEIVED LV IMAGE ---+++--- : " + data.length + " bytes.");
                 //dataReceiver.setImageData(data, metadata);
                 if (data.length > 8)
                 {

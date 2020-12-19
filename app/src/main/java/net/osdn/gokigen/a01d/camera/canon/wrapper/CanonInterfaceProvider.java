@@ -68,6 +68,7 @@ public class CanonInterfaceProvider implements IPtpIpInterfaceProvider, IDisplay
         this.activity = context;
 
         String ipAddress;
+        int delayMs = 30;
         try
         {
             SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
@@ -75,6 +76,22 @@ public class CanonInterfaceProvider implements IPtpIpInterfaceProvider, IDisplay
             if (ipAddress == null)
             {
                 ipAddress = "192.168.0.1";
+            }
+            try
+            {
+                String delayMsStr = preferences.getString(IPreferencePropertyAccessor.CANON_LIVEVIEW_WAIT, IPreferencePropertyAccessor.CANON_LIVEVIEW_WAIT_DEFAULT_VALUE);
+                if (delayMsStr != null)
+                {
+                    delayMs = Integer.parseInt(delayMsStr);
+                }
+                if (delayMs < 10)
+                {
+                    delayMs = 10;
+                }
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
             }
         }
         catch (Exception e)
@@ -84,7 +101,7 @@ public class CanonInterfaceProvider implements IPtpIpInterfaceProvider, IDisplay
         }
         Log.v(TAG, " Canon IP : " + ipAddress);
         commandPublisher = new PtpIpCommandPublisher(ipAddress, CONTROL_PORT, false, false);
-        liveViewControl = new CanonLiveViewControl(context, this, 10);  //
+        liveViewControl = new CanonLiveViewControl(context, this, delayMs);  //
         asyncReceiver = new PtpIpAsyncResponseReceiver(ipAddress, ASYNC_RESPONSE_PORT);
         statusChecker = new CanonStatusChecker(context, commandPublisher, ipAddress, EVENT_PORT);
         canonConnection = new CanonConnection(context, provider, this, statusChecker);

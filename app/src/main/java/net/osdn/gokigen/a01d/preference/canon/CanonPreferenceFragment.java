@@ -136,6 +136,9 @@ public class CanonPreferenceFragment extends PreferenceFragmentCompat implements
             if (!items.containsKey(IPreferencePropertyAccessor.CANON_HOST_IP)) {
                 editor.putString(IPreferencePropertyAccessor.CANON_HOST_IP, IPreferencePropertyAccessor.CANON_HOST_IP_DEFAULT_VALUE);
             }
+            if (!items.containsKey(IPreferencePropertyAccessor.CANON_LIVEVIEW_WAIT)) {
+                editor.putString(IPreferencePropertyAccessor.CANON_LIVEVIEW_WAIT, IPreferencePropertyAccessor.CANON_LIVEVIEW_WAIT_DEFAULT_VALUE);
+            }
             editor.apply();
         }
         catch (Exception e)
@@ -304,6 +307,7 @@ public class CanonPreferenceFragment extends PreferenceFragmentCompat implements
      * @param key          Preference(データ)のキー
      * @param defaultValue Preferenceのデフォルト値
      */
+    @SuppressWarnings("SameParameterValue")
     private void setBooleanPreference(String pref_key, String key, boolean defaultValue)
     {
         try

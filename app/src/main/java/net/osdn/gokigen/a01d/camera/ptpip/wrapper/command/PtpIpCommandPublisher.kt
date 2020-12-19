@@ -198,7 +198,11 @@ class PtpIpCommandPublisher(private val ipAddress : String, private val portNumb
                 isHold = true
                 holdId = command.holdId
             }
-            Log.v(TAG, "Enqueue [ID: " + command.getId() + "] size: " + commandQueue.size);
+            if (commandQueue.size > 1)
+            {
+                // たまっているときだけログを吐く
+                Log.v(TAG, "Enqueue [ID: " + command.getId() + "] size: " + commandQueue.size)
+            }
             return (commandQueue.offer(command))
         }
         catch (e: Exception)

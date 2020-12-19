@@ -348,4 +348,7 @@
     <string name="pref_canon_host_ip">Camera IP Address</string>
     <string name="pref_summary_canon_host_ip">default: 192.168.0.1 </string>
 
+    <string name="pref_canon_liveview_wait">Liveview receive wait (default: 25)</string>
+    <string name="pref_summary_canon_liveview_wait"> </string>
+
 </resources>

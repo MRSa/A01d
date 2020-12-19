@@ -120,6 +120,9 @@ public interface IPreferencePropertyAccessor
     String CANON_HOST_IP = "canon_host_ip";
     String CANON_HOST_IP_DEFAULT_VALUE = "192.168.0.1";
 
+    String CANON_LIVEVIEW_WAIT = "canon_liveview_wait";
+    String CANON_LIVEVIEW_WAIT_DEFAULT_VALUE = "25";
+
  /*
     int CHOICE_SPLASH_SCREEN = 10;
 

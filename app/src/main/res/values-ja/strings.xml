@@ -343,4 +343,7 @@
     <string name="pref_canon_host_ip">カメラIPアドレス</string>
     <string name="pref_summary_canon_host_ip">通常、変更は不要です (初期値:192.168.0.1)</string>
 
+    <string name="pref_canon_liveview_wait">LV画像受信待ち間隔(default: 25)</string>
+    <string name="pref_summary_canon_liveview_wait">ライブビュー画像受信間隔を指定します</string>
+
 </resources>
