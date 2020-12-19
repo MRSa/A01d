@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
@@ -14,12 +15,14 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
+import androidx.preference.PreferenceManager;
 
 import net.osdn.gokigen.a01d.R;
 import net.osdn.gokigen.a01d.camera.ICameraConnection;
 import net.osdn.gokigen.a01d.camera.ICameraStatusReceiver;
 import net.osdn.gokigen.a01d.camera.ptpip.IPtpIpInterfaceProvider;
 import net.osdn.gokigen.a01d.camera.canon.wrapper.status.CanonStatusChecker;
+import net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor;
 
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -211,10 +214,10 @@ public class CanonConnection implements ICameraConnection
      */
     private void disconnectFromCamera(final boolean powerOff)
     {
-        Log.v(TAG, " disconnectFromCamera()");
+        Log.v(TAG, " disconnectFromCamera() : " + powerOff);
         try
         {
-            cameraExecutor.execute(new CanonCameraDisconnectSequence(context, interfaceProvider));
+            cameraExecutor.execute(new CanonCameraDisconnectSequence(interfaceProvider));
         }
         catch (Exception e)
         {
@@ -231,12 +234,39 @@ public class CanonConnection implements ICameraConnection
         connectionStatus = CameraConnectionStatus.CONNECTING;
         try
         {
-            cameraExecutor.execute(new CanonCameraConnectSequence(context, statusReceiver, this, interfaceProvider, statusChecker));
+            if (getConnectSequenceType() == 0)
+            {
+                cameraExecutor.execute(new CanonCameraConnectSequence(context, statusReceiver, this, interfaceProvider, statusChecker));
+            }
+            else
+            {
+                cameraExecutor.execute(new CanonCameraConnectSequenceType1(context, statusReceiver, this, interfaceProvider, statusChecker));
+            }
         }
         catch (Exception e)
         {
             Log.v(TAG, " connectToCamera() EXCEPTION : " + e.getMessage());
             e.printStackTrace();
         }
+    }
+
+    private int getConnectSequenceType()
+    {
+        int sequenceType = 0;
+        try
+        {
+            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+            String sequenceTypeStr = preferences.getString(IPreferencePropertyAccessor.CANON_CONNECTION_SEQUENCE, IPreferencePropertyAccessor.CANON_CONNECTION_SEQUENCE_DEFAULT_VALUE);
+            if (sequenceTypeStr != null)
+            {
+                sequenceType = Integer.parseInt(sequenceTypeStr);
+            }
+            Log.v(TAG, " Canon ConnectionSequence [" + sequenceType + "] " + sequenceTypeStr);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        return (sequenceType);
     }
 }

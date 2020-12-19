@@ -1,5 +1,6 @@
 package net.osdn.gokigen.a01d.camera.canon.wrapper.liveview
 
+import android.app.Activity
 import android.util.Log
 import net.osdn.gokigen.a01d.camera.ptpip.wrapper.command.IPtpIpCommandCallback
 import net.osdn.gokigen.a01d.camera.ptpip.wrapper.liveview.IPtpIpLiveViewImageCallback
@@ -7,7 +8,7 @@ import net.osdn.gokigen.a01d.camera.utils.SimpleLogDumper
 import java.io.ByteArrayOutputStream
 import java.util.*
 
-class CanonLiveViewImageReceiver(val callback: IPtpIpLiveViewImageCallback) : IPtpIpCommandCallback
+class CanonLiveViewImageReceiver(val activity: Activity, val callback: IPtpIpLiveViewImageCallback) : IPtpIpCommandCallback
 {
     private val isDumpLog = false
     private val byteStream = ByteArrayOutputStream()
@@ -15,6 +16,7 @@ class CanonLiveViewImageReceiver(val callback: IPtpIpLiveViewImageCallback) : IP
     private var receivedTotalBytes = 0
     private var receivedRemainBytes = 0
     private var receivedFirstData = false
+    private var dumpImageSize = -1   // 値をゼロにするとisDumpLogがtrueのときに受信データをファイルに出力する
 
     override fun receivedMessage(id: Int, rx_body: ByteArray?)
     {
@@ -133,12 +135,18 @@ class CanonLiveViewImageReceiver(val callback: IPtpIpLiveViewImageCallback) : IP
             {
                 val thumbNail = byteStream.toByteArray()
                 var dumpLength = thumbNail.size
-                if (dumpLength > 256)
+                if (dumpLength > 96)
                 {
-                    dumpLength = 256
+                    dumpLength = 96
                 }
                 SimpleLogDumper.dump_bytes(" [--ID:$id(>)--]", Arrays.copyOfRange(thumbNail, 0, dumpLength))
                 SimpleLogDumper.dump_bytes(" [-ID:$id(<)-]", Arrays.copyOfRange(thumbNail, thumbNail.size - dumpLength, thumbNail.size))
+                Log.v(TAG, " RECEIVED LENGTH : $thumbNail.size")
+                if ((dumpImageSize > 0)&&(dumpImageSize < 30))
+                {
+                    SimpleLogDumper.binaryOutputToFile(activity, "CANON-${dumpImageSize}_", byteStream.toByteArray())
+                    dumpImageSize++
+                }
             }
             callback.onCompleted(byteStream.toByteArray(), null)
             receivedFirstData = false
@@ -152,8 +160,6 @@ class CanonLiveViewImageReceiver(val callback: IPtpIpLiveViewImageCallback) : IP
             callback.onErrorOccurred(e)
         }
     }
-
-
 
     override fun isReceiveMulti(): Boolean
     {

@@ -123,6 +123,9 @@ public interface IPreferencePropertyAccessor
     String CANON_LIVEVIEW_WAIT = "canon_liveview_wait";
     String CANON_LIVEVIEW_WAIT_DEFAULT_VALUE = "25";
 
+    String CANON_CONNECTION_SEQUENCE = "canon_connection_mode";
+    String CANON_CONNECTION_SEQUENCE_DEFAULT_VALUE = "0";
+
  /*
     int CHOICE_SPLASH_SCREEN = 10;
 

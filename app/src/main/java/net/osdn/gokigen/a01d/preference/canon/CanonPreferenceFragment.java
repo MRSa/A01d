@@ -139,6 +139,9 @@ public class CanonPreferenceFragment extends PreferenceFragmentCompat implements
             if (!items.containsKey(IPreferencePropertyAccessor.CANON_LIVEVIEW_WAIT)) {
                 editor.putString(IPreferencePropertyAccessor.CANON_LIVEVIEW_WAIT, IPreferencePropertyAccessor.CANON_LIVEVIEW_WAIT_DEFAULT_VALUE);
             }
+            if (!items.containsKey(IPreferencePropertyAccessor.CANON_CONNECTION_SEQUENCE)) {
+                editor.putString(IPreferencePropertyAccessor.CANON_CONNECTION_SEQUENCE, IPreferencePropertyAccessor.CANON_CONNECTION_SEQUENCE_DEFAULT_VALUE);
+            }
             editor.apply();
         }
         catch (Exception e)

@@ -69,6 +69,8 @@ public class CanonInterfaceProvider implements IPtpIpInterfaceProvider, IDisplay
 
         String ipAddress;
         int delayMs = 30;
+        int sequenceType = 0;
+        boolean isSearchJpegHeader = false;
         try
         {
             SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
@@ -93,6 +95,23 @@ public class CanonInterfaceProvider implements IPtpIpInterfaceProvider, IDisplay
             {
                 e.printStackTrace();
             }
+            try
+            {
+                String sequenceTypeStr = preferences.getString(IPreferencePropertyAccessor.CANON_CONNECTION_SEQUENCE, IPreferencePropertyAccessor.CANON_CONNECTION_SEQUENCE_DEFAULT_VALUE);
+                if (sequenceTypeStr != null)
+                {
+                    sequenceType = Integer.parseInt(sequenceTypeStr);
+                }
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+            if (sequenceType == 1)
+            {
+                Log.v(TAG, " --- search JPEG header : true ");
+                isSearchJpegHeader = true;
+            }
         }
         catch (Exception e)
         {
@@ -101,7 +120,7 @@ public class CanonInterfaceProvider implements IPtpIpInterfaceProvider, IDisplay
         }
         Log.v(TAG, " Canon IP : " + ipAddress);
         commandPublisher = new PtpIpCommandPublisher(ipAddress, CONTROL_PORT, false, false);
-        liveViewControl = new CanonLiveViewControl(context, this, delayMs);  //
+        liveViewControl = new CanonLiveViewControl(context, this, delayMs, isSearchJpegHeader);  //
         asyncReceiver = new PtpIpAsyncResponseReceiver(ipAddress, ASYNC_RESPONSE_PORT);
         statusChecker = new CanonStatusChecker(context, commandPublisher, ipAddress, EVENT_PORT);
         canonConnection = new CanonConnection(context, provider, this, statusChecker);

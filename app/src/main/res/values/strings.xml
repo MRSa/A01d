@@ -351,4 +351,7 @@
     <string name="pref_canon_liveview_wait">Liveview receive wait (default: 25)</string>
     <string name="pref_summary_canon_liveview_wait"> </string>
 
+    <string name="pref_canon_connection_mode">Connection Sequence</string>
+    <string name="pref_summary_canon_connection_mode">default: TYPE0 </string>
+
 </resources>

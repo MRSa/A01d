@@ -60,6 +60,14 @@
             android:defaultValue="25"
             android:summary="@string/pref_summary_canon_liveview_wait" />
 
+        <ListPreference
+            android:title="@string/pref_canon_connection_mode"
+            android:summary="@string/pref_summary_canon_connection_mode"
+            android:entryValues="@array/canon_connection_mode_value"
+            android:entries="@array/canon_connection_mode"
+            android:key="canon_connection_mode"
+            android:defaultValue="0"/>
+
 <!--
         <CheckBoxPreference
             android:key="capture_both_camera_and_live_view"
