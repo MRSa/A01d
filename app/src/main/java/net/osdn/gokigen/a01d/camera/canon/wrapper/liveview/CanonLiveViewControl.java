@@ -26,7 +26,7 @@ public class CanonLiveViewControl implements ILiveViewControl, ILiveViewListener
     private final int delayMs;
     private final boolean isDumpLog = false;
     private final boolean isSearchJpegHeader;
-    private final int retryCount = 1500;
+    private final int retryCount = 1200;
     private final CanonLiveViewImageReceiver imageReceiver;
     private IImageDataReceiver dataReceiver = null;
     private boolean liveViewIsReceiving = false;
@@ -37,7 +37,6 @@ public class CanonLiveViewControl implements ILiveViewControl, ILiveViewListener
         this.commandIssuer = interfaceProvider.getCommandPublisher();
         this.isSearchJpegHeader = isSearchJpegHeader;
         this.delayMs = delayMs;
-        //this.imageReceiver = new CanonLiveViewImageReceiver(this);
         this.imageReceiver = new CanonLiveViewImageReceiver(context,this);
         Log.v(TAG, " -=-=-=-=-=- CanonLiveViewControl : delay " + delayMs + " ms");
     }

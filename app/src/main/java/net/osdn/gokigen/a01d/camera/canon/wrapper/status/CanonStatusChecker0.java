@@ -25,7 +25,7 @@ import java.util.List;
 
 import static net.osdn.gokigen.a01d.camera.utils.SimpleLogDumper.dump_bytes;
 
-public class CanonStatusChecker implements IPtpIpCommandCallback, ICameraStatusWatcher, ICameraStatus
+public class CanonStatusChecker0 implements IPtpIpCommandCallback, ICameraStatusWatcher, ICameraStatus
 {
     private final String TAG = toString();
 
@@ -33,9 +33,9 @@ public class CanonStatusChecker implements IPtpIpCommandCallback, ICameraStatusW
     private static final int STATUS_MESSAGE_HEADER_SIZE = 14;
     private final IPtpIpCommandPublisher issuer;
     private ICameraStatusUpdateNotify notifier = null;
-    private CanonStatusHolder statusHolder;
+    private final CanonStatusHolder statusHolder;
     private boolean whileFetching = false;
-    private boolean logcat = false;
+    private final boolean logcat = false;
     private final String ipAddress;
     private final int portNumber;
 
@@ -44,7 +44,7 @@ public class CanonStatusChecker implements IPtpIpCommandCallback, ICameraStatusW
     private BufferedReader bufferedReader = null;
     private int eventConnectionNumber = 0;
 
-    public CanonStatusChecker(@NonNull Activity activity, @NonNull IPtpIpCommandPublisher issuer, @NonNull String ip, int portNumber)
+    public CanonStatusChecker0(@NonNull Activity activity, @NonNull IPtpIpCommandPublisher issuer, @NonNull String ip, int portNumber)
     {
         this.issuer = issuer;
         this.statusHolder = new CanonStatusHolder();
@@ -80,7 +80,7 @@ public class CanonStatusChecker implements IPtpIpCommandCallback, ICameraStatusW
 
             if (data.length < STATUS_MESSAGE_HEADER_SIZE)
             {
-                Log.v(TAG, "received status length is short. (" + data.length + " bytes.)");
+                Log.v(TAG, " received status event length is short. (" + data.length + " bytes.)");
                 return;
             }
 /*
@@ -107,10 +107,6 @@ public class CanonStatusChecker implements IPtpIpCommandCallback, ICameraStatusW
     {
         try
         {
-            if (statusHolder == null)
-            {
-                return (new ArrayList<>());
-            }
             return (statusHolder.getAvailableItemList(key));
         }
         catch (Exception e)
@@ -125,10 +121,6 @@ public class CanonStatusChecker implements IPtpIpCommandCallback, ICameraStatusW
     {
         try
         {
-            if (statusHolder == null)
-            {
-                return ("");
-            }
             return (statusHolder.getItemStatus(key));
         }
         catch (Exception e)
@@ -304,7 +296,7 @@ public class CanonStatusChecker implements IPtpIpCommandCallback, ICameraStatusW
             if (isDumpReceiveLog)
             {
                 // ログに送信メッセージを出力する
-                dump_bytes("SEND[" + sendData.length + "] ", sendData);
+                dump_bytes("Evt.SEND[" + sendData.length + "] ", sendData);
             }
 
             // (データを)送信
@@ -393,7 +385,7 @@ public class CanonStatusChecker implements IPtpIpCommandCallback, ICameraStatusW
                 {
                     // ログに受信メッセージを出力する
                     Log.v(TAG, " receive_from_camera() : " + read_bytes + " bytes.");
-                    dump_bytes("RECV[" + receive_body.length + "] ", receive_body);
+                    dump_bytes(" Evt.RECV[" + receive_body.length + "] ", receive_body);
                 }
                 if (callback != null)
                 {

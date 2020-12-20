@@ -10,13 +10,13 @@ import net.osdn.gokigen.a01d.R;
 import net.osdn.gokigen.a01d.camera.ICameraConnection;
 import net.osdn.gokigen.a01d.camera.ICameraStatusReceiver;
 import net.osdn.gokigen.a01d.camera.canon.wrapper.command.messages.specific.CanonSetDevicePropertyValue;
+import net.osdn.gokigen.a01d.camera.canon.wrapper.status.CanonStatusChecker;
 import net.osdn.gokigen.a01d.camera.ptpip.IPtpIpInterfaceProvider;
 import net.osdn.gokigen.a01d.camera.canon.wrapper.command.messages.specific.CanonRegistrationMessage;
 import net.osdn.gokigen.a01d.camera.ptpip.wrapper.command.IPtpIpCommandCallback;
 import net.osdn.gokigen.a01d.camera.ptpip.wrapper.command.IPtpIpCommandPublisher;
 import net.osdn.gokigen.a01d.camera.ptpip.wrapper.command.IPtpIpMessages;
 import net.osdn.gokigen.a01d.camera.ptpip.wrapper.command.messages.PtpIpCommandGeneric;
-import net.osdn.gokigen.a01d.camera.canon.wrapper.status.CanonStatusChecker;
 
 /**
  *   従来のCanonカメラ接続シーケンス
