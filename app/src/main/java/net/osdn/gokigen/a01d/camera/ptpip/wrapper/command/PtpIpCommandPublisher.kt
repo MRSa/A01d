@@ -60,7 +60,7 @@ class PtpIpCommandPublisher(private val ipAddress : String, private val portNumb
                 //socket?.soTimeout = 0
                 //socket?.receiveBufferSize = 8192  // 10240 // 16384 // 6144// 8192 // 49152 // 65536 // 32768
                 //socket?.sendBufferSize = 1024 // 8192 // 4096 // 2048 // 10240
-                socket?.setSoLinger(true, 500);
+                socket?.setSoLinger(true, 500)
                 //socket?.setReceiveBufferSize(2097152);
                 //socket?.setSendBufferSize(524288);
 
@@ -201,7 +201,7 @@ class PtpIpCommandPublisher(private val ipAddress : String, private val portNumb
             if (commandQueue.size > 1)
             {
                 // たまっているときだけログを吐く
-                Log.v(TAG, "Enqueue [ID: " + command.getId() + "] size: " + commandQueue.size)
+                Log.v(TAG, "Enqueue [ID: " + command.id + "] size: " + commandQueue.size)
             }
             return (commandQueue.offer(command))
         }
@@ -215,6 +215,15 @@ class PtpIpCommandPublisher(private val ipAddress : String, private val portNumb
     override fun getCurrentQueueSize(): Int
     {
         return commandQueue.size
+    }
+
+    override fun flushQueue(): Boolean
+    {
+        Log.v(TAG, "  flushQueue()  size: ${commandQueue.size}")
+        // TODO: たまっているキューをダンプする
+        commandQueue.clear()
+        System.gc()
+        return (true)
     }
 
     override fun isExistCommandMessageQueue(id: Int): Int
@@ -505,6 +514,18 @@ class PtpIpCommandPublisher(private val ipAddress : String, private val portNumb
             {
                 // もう一回データを読み直す...
                 targetLength = parseDataLength(byteArray, readBytes)
+            }
+            if ((targetLength == 0)&&(readBytes > 0))
+            {
+                // 知らないデータがついている...ダンプしてみる
+                // Log.v(TAG, " RECEIVE UNKNOWN BYTES : ${readBytes}")
+                if (isDumpLog)
+                {
+                    // ログに送信メッセージを出力する
+                    SimpleLogDumper.dump_bytes("RECV.UNKNOWN[${readBytes}] ", byteArray)
+                }
+                callback?.receivedMessage(id, null)
+                return (false)
             }
 
             if ((targetLength <= 0)||(readBytes <= 0))

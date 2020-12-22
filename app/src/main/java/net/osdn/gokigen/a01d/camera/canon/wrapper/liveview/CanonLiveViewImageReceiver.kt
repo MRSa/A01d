@@ -22,7 +22,7 @@ class CanonLiveViewImageReceiver(val activity: Activity, val callback: IPtpIpLiv
     {
         if (rx_body == null)
         {
-            Log.v(TAG, " CanonLiveViewReceiver: MSG BODY IS NULL. (ID:$id)")
+            Log.v(TAG, " CanonLiveViewImageReceiver: MSG BODY IS NULL. (ID:$id)")
             callback.onCompleted(rx_body, null)
             return
         }
@@ -33,7 +33,7 @@ class CanonLiveViewImageReceiver(val activity: Activity, val callback: IPtpIpLiv
     {
         if (rx_body == null)
         {
-            Log.v(TAG, " CanonLiveViewReceiver: MSG BODY is NULL. ($currentBytes/$totalBytes)")
+            Log.v(TAG, " CanonLiveViewImageReceiver: MSG BODY is NULL. ($currentBytes/$totalBytes)")
             callback.onCompleted(rx_body, null)
             return
         }
