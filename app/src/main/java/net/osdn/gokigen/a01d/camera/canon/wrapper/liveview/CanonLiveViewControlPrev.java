@@ -19,7 +19,7 @@ import java.util.Map;
 
 import static net.osdn.gokigen.a01d.camera.ptpip.wrapper.command.IPtpIpMessages.SEQ_GET_VIEWFRAME;
 
-public class CanonLiveViewControl implements ILiveViewControl, ILiveViewListener, IPtpIpCommunication, IPtpIpLiveViewImageCallback
+public class CanonLiveViewControlPrev implements ILiveViewControl, ILiveViewListener, IPtpIpCommunication, IPtpIpLiveViewImageCallback
 {
     private final String TAG = this.toString();
     private final IPtpIpCommandPublisher commandIssuer;
@@ -32,7 +32,7 @@ public class CanonLiveViewControl implements ILiveViewControl, ILiveViewListener
     private boolean liveViewIsReceiving = false;
     private boolean commandIssued = false;
 
-    public CanonLiveViewControl(@NonNull Activity context, @NonNull IPtpIpInterfaceProvider interfaceProvider, int delayMs, boolean isSearchJpegHeader)
+    public CanonLiveViewControlPrev(@NonNull Activity context, @NonNull IPtpIpInterfaceProvider interfaceProvider, int delayMs, boolean isSearchJpegHeader)
     {
         this.commandIssuer = interfaceProvider.getCommandPublisher();
         this.isSearchJpegHeader = isSearchJpegHeader;
@@ -73,8 +73,11 @@ public class CanonLiveViewControl implements ILiveViewControl, ILiveViewListener
                                 {
                                     Log.v(TAG, " enqueueCommand() ");
                                 }
-                                commandIssued = true;
-                                commandIssuer.enqueueCommand(new PtpIpCommandGenericWithRetry(imageReceiver, SEQ_GET_VIEWFRAME, delayMs, retryCount, false, false, 0, 0x9153, 12, 0x00200000, 0x01, 0x00, 0x00));
+                                if (commandIssuer.getCurrentQueueSize() < 3)
+                                {
+                                    commandIssued = true;
+                                    commandIssuer.enqueueCommand(new PtpIpCommandGenericWithRetry(imageReceiver, SEQ_GET_VIEWFRAME, delayMs, retryCount, false, false, 0, 0x9153, 12, 0x00200000, 0x01, 0x00, 0x00));
+                                }
                             }
                             try
                             {

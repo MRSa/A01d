@@ -70,7 +70,7 @@ public class CanonInterfaceProvider implements IPtpIpInterfaceProvider, IDisplay
         String ipAddress;
         int delayMs = 30;
         int sequenceType = 0;
-        boolean isSearchJpegHeader = false;
+        boolean isSearchJpegHeader = true;
         try
         {
             SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
@@ -107,11 +107,9 @@ public class CanonInterfaceProvider implements IPtpIpInterfaceProvider, IDisplay
             {
                 e.printStackTrace();
             }
-            if (sequenceType == 1)
-            {
-                Log.v(TAG, " --- search JPEG header : true ");
-                isSearchJpegHeader = true;
-            }
+
+            isSearchJpegHeader = !(sequenceType == 2);
+            Log.v(TAG, " --- search JPEG header : " + isSearchJpegHeader);
         }
         catch (Exception e)
         {

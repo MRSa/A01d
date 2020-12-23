@@ -254,6 +254,14 @@ public class PtpIpCommandPublisherLegacy implements IPtpIpCommandPublisher, IPtp
         return (commandQueue.size());
     }
 
+    @Override
+    public boolean flushQueue()
+    {
+        Log.v(TAG, "  flushHoldQueue() : CLEAR QUEUE : " + commandQueue.size());
+        commandQueue.clear();
+        System.gc();
+        return (true);
+    }
 
     @Override
     public int isExistCommandMessageQueue(int id)

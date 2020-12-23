@@ -168,7 +168,7 @@ class CanonLiveViewImageReceiver(val activity: Activity, val callback: IPtpIpLiv
 
     companion object
     {
-        private val TAG = "CanonLiveViewReceiver"
+        private const val TAG = "CanonLiveViewReceiver"
     }
 
 }
