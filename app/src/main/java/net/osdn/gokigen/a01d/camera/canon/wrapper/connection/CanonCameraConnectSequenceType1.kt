@@ -123,8 +123,8 @@ class CanonCameraConnectSequenceType1(val context: Activity, val cameraStatusRec
                 commandIssuer.enqueueCommand(PtpIpCommandGeneric(this, IPtpIpMessages.SEQ_DEVICE_PROPERTY, isDumpLog, 0, 0x9127, 4, 0x0000d1af))
             }
             IPtpIpMessages.SEQ_DEVICE_PROPERTY -> {
-                Log.v(TAG, " SEQ_DEVICE_PROPERTY ")
                 requestMessageCount++
+                Log.v(TAG, " SEQ_DEVICE_PROPERTY : $requestMessageCount")
                 interfaceProvider.informationReceiver.updateMessage(context.getString(R.string.canon_connect_connecting9), false, false, 0)
                 if (rx_body[8] == 0x01.toByte() && rx_body[9] == 0x20.toByte())
                 {
@@ -134,10 +134,11 @@ class CanonCameraConnectSequenceType1(val context: Activity, val cameraStatusRec
                         // ちょっと(250ms)待つ
                         Thread.sleep(250)
 
-                        if (requestMessageCount >= 4)
+                        if (requestMessageCount >= 5)
                         {
                             // コマンド発行
-                            commandIssuer.enqueueCommand(CanonSetDevicePropertyValue(this, IPtpIpMessages.SEQ_SET_DEVICE_PROPERTY, isDumpLog, 0, 150, 0xd136, 0x00))
+                            //commandIssuer.enqueueCommand(CanonSetDevicePropertyValue(this, IPtpIpMessages.SEQ_SET_DEVICE_PROPERTY, isDumpLog, 0, 150, 0xd136, 0x00))
+                            commandIssuer.enqueueCommand(CanonSetDevicePropertyValue(this, IPtpIpMessages.SEQ_DEVICE_PROPERTY_FINISHED, isDumpLog, 0, 300, 0xd1b0, 0x09))
                         }
                     }
                     catch (e: Exception)

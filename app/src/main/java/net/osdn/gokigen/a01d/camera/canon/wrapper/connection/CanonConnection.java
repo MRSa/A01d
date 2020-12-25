@@ -234,13 +234,14 @@ public class CanonConnection implements ICameraConnection
         connectionStatus = CameraConnectionStatus.CONNECTING;
         try
         {
-            if (getConnectSequenceType() == 0)
+            if (getConnectSequenceType() == 1)
             {
-                cameraExecutor.execute(new CanonCameraConnectSequence(context, statusReceiver, this, interfaceProvider, statusChecker));
+                // 接続シーケンスが TYPE1 の時だけ有効とする (Power Shot Zoom用の接続シーケンス)
+                cameraExecutor.execute(new CanonCameraConnectSequenceType1(context, statusReceiver, this, interfaceProvider, statusChecker));
             }
             else
             {
-                cameraExecutor.execute(new CanonCameraConnectSequenceType1(context, statusReceiver, this, interfaceProvider, statusChecker));
+                cameraExecutor.execute(new CanonCameraConnectSequence(context, statusReceiver, this, interfaceProvider, statusChecker));
             }
         }
         catch (Exception e)
