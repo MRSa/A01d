@@ -11,12 +11,13 @@ import android.util.Log
 import androidx.preference.PreferenceManager
 import net.osdn.gokigen.a01d.R
 import net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor
+import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
 import java.text.SimpleDateFormat
 import java.util.*
 
-class StoreImage(private val context: Context, private val dumpLog : Boolean = false) : IStoreImage
+class StoreImage(private val context: Context, private val dumpLog: Boolean = false) : IStoreImage
 {
 
     override fun doStore(bitmapToStore: Bitmap)
@@ -24,19 +25,31 @@ class StoreImage(private val context: Context, private val dumpLog : Boolean = f
         try
         {
             // ここで 保存処理(プログレスダイアログ（「保存中...」）を表示
-
+            var isEquirectangular = false
             val preference = PreferenceManager.getDefaultSharedPreferences(context)
             val isLocalLocation = preference.getBoolean(
                     IPreferencePropertyAccessor.SAVE_LOCAL_LOCATION,
                     IPreferencePropertyAccessor.SAVE_LOCAL_LOCATION_DEFAULT_VALUE
             )
+            try
+            {
+                val connectionMethod = preference.getString(IPreferencePropertyAccessor.CONNECTION_METHOD, "OPC")
+                if (connectionMethod != null)
+                {
+                    isEquirectangular = connectionMethod.contains("THETA")
+                }
+            }
+            catch (e : Exception)
+            {
+                e.printStackTrace()
+            }
             if (isLocalLocation)
             {
                 saveImageLocal(bitmapToStore)
             }
             else
             {
-                saveImageExternal(bitmapToStore)
+                saveImageExternal(bitmapToStore, isEquirectangular)
             }
 
             // ここで 保存処理(プログレスダイアログ（「保存中...」）を削除
@@ -102,7 +115,7 @@ class StoreImage(private val context: Context, private val dumpLog : Boolean = f
      * @param targetImage  出力するビットマップイメージ
      */
     @Suppress("DEPRECATION")
-    private fun saveImageExternal(targetImage: Bitmap)
+    private fun saveImageExternal(targetImage: Bitmap, isEquirectangular: Boolean)
     {
         try
         {
@@ -150,7 +163,34 @@ class StoreImage(private val context: Context, private val dumpLog : Boolean = f
                 val outputStream = resolver.openOutputStream(imageUri, "wa")
                 if (outputStream != null)
                 {
-                    targetImage.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
+                    if (isEquirectangular)
+                    {
+                        val xmpValue = "http://ns.adobe.com/xap/1.0/"
+                        val xmpValue1 = "<?xpacket begin=\"" + "\" ?> <x:xmpmeta xmlns:x=\"adobe:ns:meta/\" xmptk=\"ThetaThoughtShutter\">" +
+                                "<rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\"><rdf:Description rdf:about=\"\" xmlns:GPano=\"http://ns.google.com/photos/1.0/panorama/\">" +
+                                "<GPano:UsePanoramaViewer>True</GPano:UsePanoramaViewer><GPano:ProjectionType>equirectangular</GPano:ProjectionType>" +
+                                "<GPano:FullPanoWidthPixels>${targetImage.width}</GPano:FullPanoWidthPixels><GPano:FullPanoHeightPixels>${targetImage.height}</GPano:FullPanoHeightPixels>" +
+                                "<GPano:CroppedAreaImageWidthPixels>${targetImage.width}</GPano:CroppedAreaImageWidthPixels><GPano:CroppedAreaImageHeightPixels>${targetImage.height}</GPano:CroppedAreaImageHeightPixels>"+
+                                "<GPano:CroppedAreaLeftPixels>0</GPano:CroppedAreaLeftPixels><GPano:CroppedAreaTopPixels>0</GPano:CroppedAreaTopPixels></rdf:Description></rdf:RDF></x:xmpmeta><?xpacket end=\"r\"?>"
+                        val xmpLength = xmpValue.length + xmpValue1.length + 3
+                        val byteArrayStream = ByteArrayOutputStream()
+                        targetImage.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayStream)
+                        val jpegImage = byteArrayStream.toByteArray()
+
+                        outputStream.write(jpegImage, 0, 20)
+                        outputStream.write(0xff)
+                        outputStream.write(0xe1)
+                        outputStream.write((xmpLength and 0xff00) shr 8)
+                        outputStream.write((xmpLength and 0x00ff))
+                        outputStream.write(xmpValue.toByteArray())
+                        outputStream.write(0x00)
+                        outputStream.write(xmpValue1.toByteArray())
+                        outputStream.write(jpegImage, 20, (jpegImage.size - 20))
+                    }
+                    else
+                    {
+                        targetImage.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
+                    }
                     outputStream.flush()
                     outputStream.close()
                 }
