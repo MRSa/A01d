@@ -432,7 +432,7 @@ public class KodakCommandCommunicator implements IKodakCommandPublisher, IKodakC
         Log.v(TAG, " send_secondary_message : [" + received_body[8] + "] [" + received_body[9] + "] ");
         try {
             byte[] message_to_send = null;
-            if ((received_body[8] == (byte) 0xd2) && (received_body[9] == (byte) 0xd7)) {
+            if ((received_body[8] == (byte) 0xd2) && (received_body[9] == (byte) 0x07)) {
                 message_to_send = new byte[]{
                         (byte) 0x2e, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
                         (byte) 0xd2, (byte) 0x07, (byte) 0x00, (byte) 0x00, (byte) 0x01, (byte) 0x10, (byte) 0x00, (byte) 0x80,
