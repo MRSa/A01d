@@ -43,26 +43,23 @@ public class KodakFocusingControl implements IFocusingControl, IKodakCommandCall
             return (false);
         }
         Log.v(TAG, "driveAutoFocus()");
-        Thread thread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try
+        Thread thread = new Thread(() -> {
+            try
+            {
+                PointF point = frameDisplayer.getPointWithEvent(motionEvent);
+                if (point != null)
                 {
-                    PointF point = frameDisplayer.getPointWithEvent(motionEvent);
-                    if (point != null)
+                    // preFocusFrameRect = getPreFocusFrameRect(point);
+                    // showFocusFrame(preFocusFrameRect, IAutoFocusFrameDisplay.FocusFrameStatus.Running, 1.0);
+                    if (frameDisplayer.isContainsPoint(point))
                     {
-                        // preFocusFrameRect = getPreFocusFrameRect(point);
-                        // showFocusFrame(preFocusFrameRect, IAutoFocusFrameDisplay.FocusFrameStatus.Running, 1.0);
-                        if (frameDisplayer.isContainsPoint(point))
-                        {
-                            lockAutoFocus(point);
-                        }
+                        lockAutoFocus(point);
                     }
                 }
-                catch (Exception e)
-                {
-                    e.printStackTrace();
-                }
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
             }
         });
         try
