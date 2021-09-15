@@ -5,15 +5,15 @@ public interface IKodakMessages
     int SEQ_DUMMY = 0;
     int SEQ_RECEIVE_ONLY = 1;
 
+    int SEQ_CHANGE_MODE = 9;
     int SEQ_SHUTTER = 10;
     int SEQ_FOCUS = 11;
     int SEQ_ZOOM = 12;
-
+    int SEQ_VIDEO = 13;
 
     int SEQ_FLASH_OFF = 20;
     int SEQ_FLASH_ON = 21;
     int SEQ_FLASH_AUTO = 22;
-
 
     int SEQ_CONNECT_01 = 101;
     int SEQ_CONNECT_02 = 102;

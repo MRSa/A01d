@@ -1,6 +1,5 @@
 package net.osdn.gokigen.a01d.camera.kodak.operation;
 
-
 import android.graphics.PointF;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -13,7 +12,6 @@ import net.osdn.gokigen.a01d.camera.kodak.wrapper.command.IKodakCommandPublisher
 import net.osdn.gokigen.a01d.camera.kodak.wrapper.command.messages.specific.KodakExecuteFocus;
 
 import net.osdn.gokigen.a01d.liveview.IAutoFocusFrameDisplay;
-
 
 public class KodakFocusingControl implements IFocusingControl, IKodakCommandCallback
 {
@@ -102,12 +100,17 @@ public class KodakFocusingControl implements IFocusingControl, IKodakCommandCall
 
     private void lockAutoFocus(PointF point)
     {
-        float maxPointLimitWidth = 1000000.0f;
-        float maxPointLimitHeight = 1000000.0f;
+        // 数値は現物合わせ...
+        float maxPointLimitWidth = 991684.0f;  // 1000000.0f;
+        float maxPointLimitHeight = 959912.0f; // 1000000.0f;
         try
         {
-            int x = (0x00ffffff & (Math.round(point.x * maxPointLimitWidth) + 1));
-            int y = (0x00ffffff & (Math.round(point.y * maxPointLimitHeight) + 1));
+            //int x = (0x00ffffff & (Math.round(point.x * maxPointLimitWidth) + 1));
+            //int y = (0x00ffffff & (Math.round(point.y * maxPointLimitHeight) + 1));
+
+            // 数値は現物合わせ...
+            int x = (0x00ffffff & (Math.round(point.x * maxPointLimitWidth) +  4150));
+            int y = (0x00ffffff & (Math.round(point.y * maxPointLimitHeight)+ 32528));
             Log.v(TAG, "Lock AF: [" + x + ","+ y + "]");
             commandPublisher.enqueueCommand(new KodakExecuteFocus(this, x, y));
         }
