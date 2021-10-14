@@ -48,55 +48,50 @@ public class PanasonicLiveViewControl implements ILiveViewControl
         Log.v(TAG, "startLiveView()");
         try
         {
-            Thread thread = new Thread(new Runnable()
-            {
-                @Override
-                public void run()
+            Thread thread = new Thread(() -> {
+                try
                 {
-                    try
+                    startReceiveStream();
+                    if (!whileStreamReceive)
                     {
-                        startReceiveStream();
-                        if (!whileStreamReceive)
+                        Log.v(TAG, "CANNOT OPEN : UDP RECEIVE SOCKET");
+                        return;
+                    }
+                    String requestUrl = camera.getCmdUrl() + LIVEVIEW_START_REQUEST;
+                    String reply = SimpleHttpClient.httpGet(requestUrl, TIMEOUT_MS);
+                    if (!reply.contains("<result>ok</result>"))
+                    {
+                        try
                         {
-                            Log.v(TAG, "CANNOT OPEN : UDP RECEIVE SOCKET");
-                            return;
-                        }
-                        String requestUrl = camera.getCmdUrl() + LIVEVIEW_START_REQUEST;
-                        String reply = SimpleHttpClient.httpGet(requestUrl, TIMEOUT_MS);
-                        if (!reply.contains("<result>ok</result>"))
-                        {
-                            try
+                            // エラー回数のカウントアップ
+                            errorOccur++;
+
+                            // 少し待つ...
+                            Thread.sleep(TIMEOUT_MS);
+
+                            if (errorOccur < ERROR_MAX)
                             {
-                                // エラー回数のカウントアップ
-                                errorOccur++;
-
-                                // 少し待つ...
-                                Thread.sleep(TIMEOUT_MS);
-
-                                if (errorOccur < ERROR_MAX)
-                                {
-                                    Log.v(TAG, "RETRY START LIVEVIEW... : " + errorOccur);
-                                    startLiveView();
-                                }
-                                else
-                                {
-                                    Log.v(TAG, "RETRY OVER : START LIVEVIEW");
-                                }
+                                Log.v(TAG, "RETRY START LIVEVIEW... : " + errorOccur);
+                                startLiveView();
                             }
-                            catch (Exception e)
+                            else
                             {
-                                e.printStackTrace();
+                                Log.v(TAG, "RETRY OVER : START LIVEVIEW");
                             }
                         }
-                        else
+                        catch (Exception e)
                         {
-                            Log.v(TAG, "   ----- START LIVEVIEW ----- : " + requestUrl);
+                            e.printStackTrace();
                         }
                     }
-                    catch (Exception e)
+                    else
                     {
-                        e.printStackTrace();
+                        Log.v(TAG, "   ----- START LIVEVIEW ----- : " + requestUrl);
                     }
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
                 }
             });
             thread.start();
@@ -113,30 +108,25 @@ public class PanasonicLiveViewControl implements ILiveViewControl
         Log.v(TAG, "stopLiveView()");
         try
         {
-            Thread thread = new Thread(new Runnable()
-            {
-                @Override
-                public void run()
+            Thread thread = new Thread(() -> {
+                try
                 {
-                    try
+                    String reply = SimpleHttpClient.httpGet(camera.getCmdUrl() + LIVEVIEW_STOP_REQUEST, TIMEOUT_MS);
+                    if (!reply.contains("<result>ok</result>"))
                     {
-                        String reply = SimpleHttpClient.httpGet(camera.getCmdUrl() + LIVEVIEW_STOP_REQUEST, TIMEOUT_MS);
-                        if (!reply.contains("<result>ok</result>"))
-                        {
-                            Log.v(TAG, "stopLiveview() reply is fail... " + reply);
-                        }
-                        else
-                        {
-                            Log.v(TAG, "stopLiveview() is issued.");
-                        }
-                        //  ライブビューウォッチャーを止める
-                        whileStreamReceive = false;
-                        closeReceiveSocket();
+                        Log.v(TAG, "stopLiveview() reply is fail... " + reply);
                     }
-                    catch (Exception e)
+                    else
                     {
-                        e.printStackTrace();
+                        Log.v(TAG, "stopLiveview() is issued.");
                     }
+                    //  ライブビューウォッチャーを止める
+                    whileStreamReceive = false;
+                    closeReceiveSocket();
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
                 }
             });
             thread.start();
@@ -193,12 +183,7 @@ public class PanasonicLiveViewControl implements ILiveViewControl
         }
 
         // 受信スレッドを動かす
-        Thread thread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                receiverThread();
-            }
-        });
+        Thread thread = new Thread(this::receiverThread);
         try
         {
             thread.start();
@@ -235,6 +220,10 @@ public class PanasonicLiveViewControl implements ILiveViewControl
                     {
                         break;
                     }
+                }
+                else
+                {
+                    searchIndex = 0;
                 }
             }
             catch (Exception e)
