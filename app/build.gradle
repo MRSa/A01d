@@ -2,13 +2,13 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 
 android {
-    compileSdkVersion 30
+    compileSdkVersion 31
     defaultConfig {
         applicationId "net.osdn.gokigen.a01d"
         minSdkVersion 14
-        targetSdkVersion 30
-        versionCode 10906
-        versionName "1.9.6"
+        targetSdkVersion 31
+        versionCode 10907
+        versionName "1.9.7"
     }
     buildTypes {
         release {
