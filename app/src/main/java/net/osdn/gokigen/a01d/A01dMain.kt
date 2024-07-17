@@ -1,268 +1,271 @@
-package net.osdn.gokigen.a01d;
+package net.osdn.gokigen.a01d
 
-import android.Manifest;
-import android.annotation.SuppressLint;
-import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
-import android.graphics.Color;
-import android.graphics.Typeface;
-import android.os.Bundle;
-import android.util.Log;
-import android.view.KeyEvent;
-import android.view.WindowManager;
-import android.widget.TextView;
-
-import net.osdn.gokigen.a01d.camera.CameraInterfaceProvider;
-import net.osdn.gokigen.a01d.camera.IInterfaceProvider;
-import net.osdn.gokigen.a01d.camera.fujix.cameraproperty.FujiXCameraCommandSendDialog;
-import net.osdn.gokigen.a01d.camera.olympus.cameraproperty.OlyCameraPropertyListFragment;
-import net.osdn.gokigen.a01d.camera.ICameraStatusReceiver;
-import net.osdn.gokigen.a01d.camera.ICameraConnection;
-import net.osdn.gokigen.a01d.camera.olympus.wrapper.connection.ble.ICameraPowerOn;
-import net.osdn.gokigen.a01d.camera.ptpip.operation.PtpIpCameraCommandSendDialog;
-import net.osdn.gokigen.a01d.camera.utils.SimpleHttpSendCommandDialog;
-import net.osdn.gokigen.a01d.camera.panasonic.operation.PanasonicSendCommandDialog;
-import net.osdn.gokigen.a01d.camera.ricohgr2.operation.RicohGr2SendCommandDialog;
-import net.osdn.gokigen.a01d.camera.sony.cameraproperty.SonyCameraApiListFragment;
-import net.osdn.gokigen.a01d.liveview.IStatusViewDrawer;
-import net.osdn.gokigen.a01d.liveview.LiveViewFragment;
-import net.osdn.gokigen.a01d.logcat.LogCatFragment;
-import net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor;
-import net.osdn.gokigen.a01d.preference.canon.CanonPreferenceFragment;
-import net.osdn.gokigen.a01d.preference.fujix.FujiXPreferenceFragment;
-import net.osdn.gokigen.a01d.preference.kodak.KodakPreferenceFragment;
-import net.osdn.gokigen.a01d.preference.nikon.NikonPreferenceFragment;
-import net.osdn.gokigen.a01d.preference.olympus.PreferenceFragment;
-import net.osdn.gokigen.a01d.preference.panasonic.PanasonicPreferenceFragment;
-import net.osdn.gokigen.a01d.preference.olympuspen.OlympusPreferenceFragment;
-import net.osdn.gokigen.a01d.preference.ricohgr2.RicohGr2PreferenceFragment;
-import net.osdn.gokigen.a01d.preference.sony.SonyPreferenceFragment;
-import net.osdn.gokigen.a01d.preference.summary.PreferenceFragmentSummary;
-import net.osdn.gokigen.a01d.preference.theta.ThetaPreferenceFragment;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-import androidx.fragment.app.FragmentTransaction;
-import androidx.preference.PreferenceFragmentCompat;
-import androidx.preference.PreferenceManager;
-
-import java.util.HashMap;
-import java.util.Map;
+import android.Manifest
+import android.content.pm.PackageManager
+import android.graphics.Color
+import android.graphics.Typeface
+import android.os.Bundle
+import android.util.Log
+import android.view.KeyEvent
+import android.view.WindowManager
+import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+import androidx.preference.PreferenceFragmentCompat
+import androidx.preference.PreferenceManager
+import net.osdn.gokigen.a01d.camera.CameraInterfaceProvider
+import net.osdn.gokigen.a01d.camera.ICameraConnection
+import net.osdn.gokigen.a01d.camera.ICameraConnection.CameraConnectionMethod
+import net.osdn.gokigen.a01d.camera.ICameraConnection.CameraConnectionStatus
+import net.osdn.gokigen.a01d.camera.ICameraStatusReceiver
+import net.osdn.gokigen.a01d.camera.IInterfaceProvider
+import net.osdn.gokigen.a01d.camera.fujix.cameraproperty.FujiXCameraCommandSendDialog
+import net.osdn.gokigen.a01d.camera.olympus.cameraproperty.OlyCameraPropertyListFragment
+import net.osdn.gokigen.a01d.camera.olympus.wrapper.connection.ble.ICameraPowerOn.PowerOnCameraCallback
+import net.osdn.gokigen.a01d.camera.panasonic.operation.PanasonicSendCommandDialog
+import net.osdn.gokigen.a01d.camera.ptpip.operation.PtpIpCameraCommandSendDialog
+import net.osdn.gokigen.a01d.camera.ricohgr2.operation.RicohGr2SendCommandDialog
+import net.osdn.gokigen.a01d.camera.sony.cameraproperty.SonyCameraApiListFragment
+import net.osdn.gokigen.a01d.camera.utils.SimpleHttpSendCommandDialog
+import net.osdn.gokigen.a01d.liveview.IStatusViewDrawer
+import net.osdn.gokigen.a01d.liveview.LiveViewFragment
+import net.osdn.gokigen.a01d.logcat.LogCatFragment
+import net.osdn.gokigen.a01d.preference.IPreferencePropertyAccessor
+import net.osdn.gokigen.a01d.preference.canon.CanonPreferenceFragment
+import net.osdn.gokigen.a01d.preference.fujix.FujiXPreferenceFragment
+import net.osdn.gokigen.a01d.preference.kodak.KodakPreferenceFragment
+import net.osdn.gokigen.a01d.preference.nikon.NikonPreferenceFragment
+import net.osdn.gokigen.a01d.preference.olympus.PreferenceFragment
+import net.osdn.gokigen.a01d.preference.olympuspen.OlympusPreferenceFragment
+import net.osdn.gokigen.a01d.preference.panasonic.PanasonicPreferenceFragment
+import net.osdn.gokigen.a01d.preference.ricohgr2.RicohGr2PreferenceFragment
+import net.osdn.gokigen.a01d.preference.sony.SonyPreferenceFragment
+import net.osdn.gokigen.a01d.preference.summary.PreferenceFragmentSummary
+import net.osdn.gokigen.a01d.preference.theta.ThetaPreferenceFragment
 
 /**
- *   A01d ;
+ * A01d
  *
  */
-public class A01dMain extends AppCompatActivity implements ICameraStatusReceiver, IChangeScene, ICameraPowerOn.PowerOnCameraCallback, IInformationReceiver, ICardSlotSelector
+class A01dMain : AppCompatActivity(), ICameraStatusReceiver, IChangeScene, PowerOnCameraCallback,
+    IInformationReceiver, ICardSlotSelector
 {
-    private final String TAG = toString();
-    private IInterfaceProvider interfaceProvider = null;
-    private IStatusViewDrawer statusViewDrawer = null;
+    private var interfaceProvider: IInterfaceProvider? = null
+    private var statusViewDrawer: IStatusViewDrawer? = null
 
-    private PreferenceFragmentCompat preferenceFragment = null;
-    private PreferenceFragmentCompat preferenceFragmentOPC = null;
-    private PreferenceFragmentCompat preferenceFragmentOlympus = null;
-    private PreferenceFragmentCompat preferenceFragmentSony = null;
-    private PreferenceFragmentCompat preferenceFragmentRicoh = null;
-    private PreferenceFragmentCompat preferenceFragmentTheta = null;
-    private PreferenceFragmentCompat preferenceFragmentFuji = null;
-    private PreferenceFragmentCompat preferenceFragmentPanasonic = null;
-    private PreferenceFragmentCompat preferenceFragmentCanon = null;
-    private PreferenceFragmentCompat preferenceFragmentNikon = null;
-    private PreferenceFragmentCompat preferenceFragmentKodak = null;
+    private var preferenceFragment: PreferenceFragmentCompat? = null
+    private var preferenceFragmentOPC: PreferenceFragmentCompat? = null
+    private var preferenceFragmentOlympus: PreferenceFragmentCompat? = null
+    private var preferenceFragmentSony: PreferenceFragmentCompat? = null
+    private var preferenceFragmentRicoh: PreferenceFragmentCompat? = null
+    private var preferenceFragmentTheta: PreferenceFragmentCompat? = null
+    private var preferenceFragmentFuji: PreferenceFragmentCompat? = null
+    private var preferenceFragmentPanasonic: PreferenceFragmentCompat? = null
+    private var preferenceFragmentCanon: PreferenceFragmentCompat? = null
+    private var preferenceFragmentNikon: PreferenceFragmentCompat? = null
+    private var preferenceFragmentKodak: PreferenceFragmentCompat? = null
 
-    private OlyCameraPropertyListFragment propertyListFragment = null;
-    private SonyCameraApiListFragment sonyApiListFragmentSony = null;
-    private LogCatFragment logCatFragment = null;
-    private LiveViewFragment liveViewFragment = null;
+    private var propertyListFragment: OlyCameraPropertyListFragment? = null
+    private var sonyApiListFragmentSony: SonyCameraApiListFragment? = null
+    private var logCatFragment: LogCatFragment? = null
+    private var liveViewFragment: LiveViewFragment? = null
 
-
-    @Override
-    @SuppressLint("InlinedApi")
-    protected void onCreate(Bundle savedInstanceState)
+    override fun onCreate(savedInstanceState: Bundle?)
     {
-        final int REQUEST_NEED_PERMISSIONS = 1010;
-
-        super.onCreate(savedInstanceState);
-/*
-        try {
-            // 全画面表示...
-            if (Build.VERSION.SDK_INT >= 19)
-            {
-                View decor = this.getWindow().getDecorView();
-                decor.setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
-            } else {
-                getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-            }
-        }
-        catch (Exception e)
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_a01d_main)
+        try
         {
-            e.printStackTrace();
+            val bar = supportActionBar
+            bar?.hide()
+            window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+
+            checkPermissions()
+
+            initializeClass()
+            initializeFragment()
+            onReadyClass()
         }
-*/
-        setContentView(R.layout.activity_a01d_main);
-
-        ActionBar bar = getSupportActionBar();
-        if (bar != null) {
-            // タイトルバーは表示しない
-            bar.hide();
+        catch (e: Exception)
+        {
+            e.printStackTrace()
         }
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-
-        // 外部メモリアクセス権のオプトイン
-        if ((ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) ||
-                (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) ||
-                (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_MEDIA_LOCATION) != PackageManager.PERMISSION_GRANTED) ||
-                (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_NETWORK_STATE) != PackageManager.PERMISSION_GRANTED) ||
-                (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_WIFI_STATE) != PackageManager.PERMISSION_GRANTED) ||
-                (ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH) != PackageManager.PERMISSION_GRANTED) ||
-                (ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_ADMIN) != PackageManager.PERMISSION_GRANTED) ||
-                (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) ||
-                (ContextCompat.checkSelfPermission(this, Manifest.permission.INTERNET) != PackageManager.PERMISSION_GRANTED)) {
-
-            ActivityCompat.requestPermissions(this,
-
-                    new String[]{
-                            Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                            Manifest.permission.READ_EXTERNAL_STORAGE,
-                            Manifest.permission.ACCESS_MEDIA_LOCATION,
-                            Manifest.permission.ACCESS_NETWORK_STATE,
-                            Manifest.permission.ACCESS_WIFI_STATE,
-                            Manifest.permission.BLUETOOTH,
-                            Manifest.permission.BLUETOOTH_ADMIN,
-                            Manifest.permission.ACCESS_COARSE_LOCATION,
-                            Manifest.permission.INTERNET,
-                    },
-                    REQUEST_NEED_PERMISSIONS);
-        }
-        initializeClass();
-        initializeFragment();
-        onReadyClass();
     }
 
+    private fun checkPermissions()
+    {
+        try {
+            // 外部メモリアクセス権のオプトイン
+            if ((ContextCompat.checkSelfPermission(
+                    this,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE
+                ) != PackageManager.PERMISSION_GRANTED) ||
+                (ContextCompat.checkSelfPermission(
+                    this,
+                    Manifest.permission.READ_EXTERNAL_STORAGE
+                ) != PackageManager.PERMISSION_GRANTED) ||
+                (ContextCompat.checkSelfPermission(
+                    this,
+                    Manifest.permission.ACCESS_MEDIA_LOCATION
+                ) != PackageManager.PERMISSION_GRANTED) ||
+                (ContextCompat.checkSelfPermission(
+                    this,
+                    Manifest.permission.ACCESS_NETWORK_STATE
+                ) != PackageManager.PERMISSION_GRANTED) ||
+                (ContextCompat.checkSelfPermission(
+                    this,
+                    Manifest.permission.ACCESS_WIFI_STATE
+                ) != PackageManager.PERMISSION_GRANTED) ||
+                (ContextCompat.checkSelfPermission(
+                    this,
+                    Manifest.permission.BLUETOOTH
+                ) != PackageManager.PERMISSION_GRANTED) ||
+                (ContextCompat.checkSelfPermission(
+                    this,
+                    Manifest.permission.BLUETOOTH_CONNECT
+                ) != PackageManager.PERMISSION_GRANTED) ||
+                (ContextCompat.checkSelfPermission(
+                    this,
+                    Manifest.permission.BLUETOOTH_ADMIN
+                ) != PackageManager.PERMISSION_GRANTED) ||
+                (ContextCompat.checkSelfPermission(
+                    this,
+                    Manifest.permission.ACCESS_COARSE_LOCATION
+                ) != PackageManager.PERMISSION_GRANTED) ||
+                (ContextCompat.checkSelfPermission(
+                    this,
+                    Manifest.permission.INTERNET
+                ) != PackageManager.PERMISSION_GRANTED)
+            ) {
+                ActivityCompat.requestPermissions(
+                    this,
+
+                    arrayOf(
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                        Manifest.permission.READ_EXTERNAL_STORAGE,
+                        Manifest.permission.ACCESS_MEDIA_LOCATION,
+                        Manifest.permission.ACCESS_NETWORK_STATE,
+                        Manifest.permission.ACCESS_WIFI_STATE,
+                        Manifest.permission.BLUETOOTH,
+                        Manifest.permission.BLUETOOTH_CONNECT,
+                        Manifest.permission.BLUETOOTH_ADMIN,
+                        Manifest.permission.ACCESS_COARSE_LOCATION,
+                        Manifest.permission.INTERNET,
+                    ),
+                    REQUEST_NEED_PERMISSIONS
+                )
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+
     /**
-     *   なぜか、onReadyClass() が有効ではなさそうなので...
+     * なぜか、onReadyClass() が有効ではなさそうなので...
      *
      */
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[]  permissions, @NonNull int[] grantResults)
-    {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        onReadyClass();
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        onReadyClass()
     }
 
     /**
      * クラスの初期化
      */
-    private void initializeClass()
+    private fun initializeClass()
     {
         try
         {
-            interfaceProvider = new CameraInterfaceProvider(this, this, this, this);
+            interfaceProvider = CameraInterfaceProvider(this, this, this, this)
         }
-        catch (Exception e)
+        catch (e: Exception)
         {
-            e.printStackTrace();
+            e.printStackTrace()
         }
     }
 
     /**
      * 初期化終了時の処理
      */
-    private void onReadyClass()
+    private fun onReadyClass()
     {
-        if (isBlePowerOn())
+        try
         {
-            // BLEでPower ONは、OPCのみ対応
-            if (interfaceProvider.getCammeraConnectionMethod() == ICameraConnection.CameraConnectionMethod.OPC)
+            if (isBlePowerOn)
             {
-                // BLEでカメラの電源をONにする設定だった時
-                try
+                // BLEでPower ONは、OPCのみ対応
+                if (interfaceProvider!!.cammeraConnectionMethod == CameraConnectionMethod.OPC)
                 {
-                    // カメラの電源ONクラスを呼び出しておく (電源ONができたら、コールバックをもらう）
-                    interfaceProvider.getOlympusInterface().getCameraPowerOn().wakeup(this);
-                }
-                catch (Exception e)
-                {
-                    e.printStackTrace();
+                    // BLEでカメラの電源をONにする設定だった時
+                    try
+                    {
+                        // カメラの電源ONクラスを呼び出しておく (電源ONができたら、コールバックをもらう）
+                        interfaceProvider!!.olympusInterface.cameraPowerOn.wakeup(this)
+                    }
+                    catch (e: Exception)
+                    {
+                        e.printStackTrace()
+                    }
                 }
             }
+            else if (isAutoConnectCamera)
+            {
+                // 自動接続の指示があったとき
+                changeCameraConnection()
+            }
         }
-        else if (isAutoConnectCamera())
+        catch (e: Exception)
         {
-            // 自動接続の指示があったとき
-            changeCameraConnection();
+            e.printStackTrace()
         }
     }
 
     /**
      * フラグメントの初期化
      */
-    private void initializeFragment()
+    private fun initializeFragment()
     {
         try
         {
-            //if (liveViewFragment == null)
-            {
-                liveViewFragment = LiveViewFragment.newInstance(this, interfaceProvider);
+            run {
+                liveViewFragment = LiveViewFragment.newInstance(
+                    this,
+                    interfaceProvider!!
+                )
             }
-            statusViewDrawer = liveViewFragment;
-            liveViewFragment.setRetainInstance(true);
-            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-            transaction.replace(R.id.fragment1, liveViewFragment);
-            transaction.commitAllowingStateLoss();
+            statusViewDrawer = liveViewFragment
+            liveViewFragment!!.retainInstance = true
+            val transaction = supportFragmentManager.beginTransaction()
+            transaction.replace(R.id.fragment1, liveViewFragment!!)
+            transaction.commitAllowingStateLoss()
         }
-        catch (Exception e)
+        catch (e: Exception)
         {
-            e.printStackTrace();
+            e.printStackTrace()
         }
     }
 
     /**
      *
      */
-    @Override
-    protected void onPause()
+    override fun onPause()
     {
-        super.onPause();
+        super.onPause()
         try
         {
-            ICameraConnection.CameraConnectionMethod method = interfaceProvider.getCammeraConnectionMethod();
-            ICameraConnection connection = getCameraConnection(method);
-            if (connection != null)
-            {
-                connection.stopWatchWifiStatus(this);
-            }
+            val method = interfaceProvider!!.cammeraConnectionMethod
+            val connection = getCameraConnection(method)
+            connection.stopWatchWifiStatus(this)
         }
-        catch (Exception e)
+        catch (e: Exception)
         {
-            e.printStackTrace();
-        }
-    }
-
-
-    /**
-     * カメラのプロパティ一覧画面を開く
-     * （カメラと接続中のときのみ、接続方式が Olympusのときのみ）
-     */
-    @Override
-    public void changeSceneToCameraPropertyList()
-    {
-        try
-        {
-            ICameraConnection.CameraConnectionMethod method = interfaceProvider.getCammeraConnectionMethod();
-            if (method == ICameraConnection.CameraConnectionMethod.OPC)
-            {
-                changeSceneToCameraPropertyList(method);
-            }
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
+            e.printStackTrace()
         }
     }
 
@@ -270,139 +273,184 @@ public class A01dMain extends AppCompatActivity implements ICameraStatusReceiver
      * カメラのプロパティ一覧画面を開く
      * （カメラと接続中のときのみ、接続方式が Olympusのときのみ）
      */
-    @Override
-    public void changeSceneToCameraPropertyList(ICameraConnection.CameraConnectionMethod connectionMethod)
+    override fun changeSceneToCameraPropertyList()
     {
         try
         {
-            if (connectionMethod == ICameraConnection.CameraConnectionMethod.RICOH_GR2)
+            val method = interfaceProvider!!.cammeraConnectionMethod
+            if (method == CameraConnectionMethod.OPC)
+            {
+                changeSceneToCameraPropertyList(method)
+            }
+        }
+        catch (e: Exception)
+        {
+            e.printStackTrace()
+        }
+    }
+
+    /**
+     * カメラのプロパティ一覧画面を開く
+     * （カメラと接続中のときのみ、接続方式が Olympusのときのみ）
+     */
+    override fun changeSceneToCameraPropertyList(connectionMethod: CameraConnectionMethod)
+    {
+        try
+        {
+            if (connectionMethod == CameraConnectionMethod.RICOH_GR2)
             {
                 try
                 {
                     // Ricohの場合は、コマンド送信ダイアログを表示する
-                    RicohGr2SendCommandDialog.newInstance().show(getSupportFragmentManager(), "RicohGr2SendCommandDialog");
+                    RicohGr2SendCommandDialog.newInstance()
+                        .show(supportFragmentManager, "RicohGr2SendCommandDialog")
                 }
-                catch (Exception e)
+                catch (e: Exception)
                 {
-                    e.printStackTrace();
+                    e.printStackTrace()
                 }
             }
-            else if (connectionMethod == ICameraConnection.CameraConnectionMethod.SONY)
+            else if (connectionMethod == CameraConnectionMethod.SONY)
             {
                 // SONYの場合は、API一覧画面へ遷移させる
-                changeSceneToApiList();
+                changeSceneToApiList()
             }
-            else if (connectionMethod == ICameraConnection.CameraConnectionMethod.PANASONIC)
+            else if (connectionMethod == CameraConnectionMethod.PANASONIC)
             {
                 try
                 {
                     // Panasonicの場合は、コマンド送信ダイアログを表示する
-                    PanasonicSendCommandDialog.newInstance(interfaceProvider.getPanasonicInterface()).show(getSupportFragmentManager(), "panasonicSendCommandDialog");
+                    PanasonicSendCommandDialog.newInstance(interfaceProvider!!.panasonicInterface)
+                        .show(
+                            supportFragmentManager, "panasonicSendCommandDialog"
+                        )
                 }
-                catch (Exception e)
+                catch (e: Exception)
                 {
-                    e.printStackTrace();
+                    e.printStackTrace()
                 }
             }
-            else if (connectionMethod == ICameraConnection.CameraConnectionMethod.FUJI_X)
+            else if (connectionMethod == CameraConnectionMethod.FUJI_X)
             {
                 try
                 {
                     // FUJI X Seriesの場合は、コマンド送信ダイアログを表示する
-                    FujiXCameraCommandSendDialog.newInstance(interfaceProvider.getFujiXInterface()).show(getSupportFragmentManager(), "sendCommandDialog");
+                    FujiXCameraCommandSendDialog.newInstance(interfaceProvider!!.fujiXInterface)
+                        .show(
+                            supportFragmentManager, "sendCommandDialog"
+                        )
                 }
-                catch (Exception e)
+                catch (e: Exception)
                 {
-                    e.printStackTrace();
+                    e.printStackTrace()
                 }
             }
-            else if (connectionMethod == ICameraConnection.CameraConnectionMethod.OLYMPUS)
+            else if (connectionMethod == CameraConnectionMethod.OLYMPUS)
             {
                 try
                 {
-                    Map<String, String> headerMap = new HashMap<>();
-                    headerMap.put("User-Agent", "OlympusCameraKit"); // "OI.Share"
-                    headerMap.put("X-Protocol", "OlympusCameraKit"); // "OI.Share"
+                    val headerMap: MutableMap<String, String> = HashMap()
+                    headerMap["User-Agent"] = "OlympusCameraKit" // "OI.Share"
+                    headerMap["X-Protocol"] = "OlympusCameraKit" // "OI.Share"
 
                     // Olympus Penの場合は、コマンド送信ダイアログを表示する
-                    SimpleHttpSendCommandDialog.newInstance("http://192.168.0.10/", interfaceProvider.getOlympusPenInterface().getLiveViewControl(), headerMap).show(getSupportFragmentManager(), "olympusPenSendCommandDialog");
+                    SimpleHttpSendCommandDialog.newInstance(
+                        "http://192.168.0.10/",
+                        interfaceProvider!!.olympusPenInterface.liveViewControl,
+                        headerMap
+                    ).show(
+                        supportFragmentManager, "olympusPenSendCommandDialog"
+                    )
                 }
-                catch (Exception e)
+                catch (e: Exception)
                 {
-                    e.printStackTrace();
+                    e.printStackTrace()
                 }
             }
-            else if (connectionMethod == ICameraConnection.CameraConnectionMethod.THETA)
+            else if (connectionMethod == CameraConnectionMethod.THETA)
             {
                 try
                 {
                     // THETA の場合は、HTTPコマンド送信ダイアログを表示する
-                    SimpleHttpSendCommandDialog.newInstance("http://192.168.1.1/", null, null).show(getSupportFragmentManager(), "thetaSendCommandDialog");
+                    SimpleHttpSendCommandDialog.newInstance("http://192.168.1.1/", null, null).show(
+                        supportFragmentManager, "thetaSendCommandDialog"
+                    )
                 }
-                catch (Exception e)
+                catch (e: Exception)
                 {
-                    e.printStackTrace();
+                    e.printStackTrace()
                 }
             }
-            else if (connectionMethod == ICameraConnection.CameraConnectionMethod.CANON)
+            else if (connectionMethod == CameraConnectionMethod.CANON)
             {
                 try
                 {
                     // CANON の場合は、PTPIPコマンド送信ダイアログを表示する
-                    PtpIpCameraCommandSendDialog.newInstance(interfaceProvider.getCanonInterface(), true).show(getSupportFragmentManager(), "ptpipSendCommandDialog");
+                    PtpIpCameraCommandSendDialog.newInstance(
+                        interfaceProvider!!.canonInterface,
+                        true
+                    ).show(
+                        supportFragmentManager, "ptpipSendCommandDialog"
+                    )
                 }
-                catch (Exception e)
+                catch (e: Exception)
                 {
-                    e.printStackTrace();
+                    e.printStackTrace()
                 }
             }
-            else if (connectionMethod == ICameraConnection.CameraConnectionMethod.NIKON)
+            else if (connectionMethod == CameraConnectionMethod.NIKON)
             {
                 try
                 {
                     // NIKON の場合は、PTPIPコマンド送信ダイアログを表示する
-                    PtpIpCameraCommandSendDialog.newInstance(interfaceProvider.getCanonInterface(), true).show(getSupportFragmentManager(), "ptpipSendCommandDialog");
+                    PtpIpCameraCommandSendDialog.newInstance(
+                        interfaceProvider!!.canonInterface,
+                        true
+                    ).show(
+                        supportFragmentManager, "ptpipSendCommandDialog"
+                    )
                 }
-                catch (Exception e)
+                catch (e: Exception)
                 {
-                    e.printStackTrace();
+                    e.printStackTrace()
                 }
             }
             else
             {
                 // OPC カメラの場合...;
-                Log.v(TAG, " Change Scene to propertyList :");
-                ICameraConnection connection = getCameraConnection(connectionMethod);
+                Log.v(TAG, " Change Scene to propertyList :")
+                val connection = getCameraConnection(connectionMethod)
                 if (connection != null)
                 {
-                    ICameraConnection.CameraConnectionStatus status = connection.getConnectionStatus();
-                    if (status == ICameraConnection.CameraConnectionStatus.CONNECTED)
+                    val status = connection.connectionStatus
+                    if (status == CameraConnectionStatus.CONNECTED)
                     {
-                        if (propertyListFragment == null)
-                        {
-                            propertyListFragment = OlyCameraPropertyListFragment.newInstance(this, interfaceProvider.getOlympusInterface().getCameraPropertyProvider());
+                        if (propertyListFragment == null) {
+                            propertyListFragment = OlyCameraPropertyListFragment.newInstance(
+                                this,
+                                interfaceProvider!!.olympusInterface.cameraPropertyProvider
+                            )
                         }
-                        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-                        transaction.replace(R.id.fragment1, propertyListFragment);
+                        val transaction = supportFragmentManager.beginTransaction()
+                        transaction.replace(R.id.fragment1, propertyListFragment!!)
                         // backstackに追加
-                        transaction.addToBackStack(null);
-                        transaction.commit();
+                        transaction.addToBackStack(null)
+                        transaction.commit()
                     }
                 }
             }
         }
-        catch (Exception e)
+        catch (e: Exception)
         {
-            e.printStackTrace();
+            e.printStackTrace()
         }
     }
 
     /**
-     *   設定画面を開く
+     * 設定画面を開く
      *
      */
-    @Override
-    public void changeSceneToConfiguration()
+    override fun changeSceneToConfiguration()
     {
         try
         {
@@ -410,193 +458,192 @@ public class A01dMain extends AppCompatActivity implements ICameraStatusReceiver
             {
                 try
                 {
-                    preferenceFragment = PreferenceFragmentSummary.newInstance(this, this);
+                    preferenceFragment = PreferenceFragmentSummary.newInstance(this, this)
                 }
-                catch (Exception e)
+                catch (e: Exception)
                 {
-                    e.printStackTrace();
+                    e.printStackTrace()
                 }
             }
-            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-            transaction.replace(R.id.fragment1, preferenceFragment);
-            transaction.addToBackStack(null);    // backstackに追加
-            transaction.commit();
+            val transaction = supportFragmentManager.beginTransaction()
+            transaction.replace(R.id.fragment1, preferenceFragment!!)
+            transaction.addToBackStack(null) // backstackに追加
+            transaction.commit()
         }
-        catch (Exception e)
+        catch (e: Exception)
         {
-            e.printStackTrace();
+            e.printStackTrace()
         }
     }
 
-    @Override
-    public void changeSceneToConfiguration(ICameraConnection.CameraConnectionMethod connectionMethod)
+    override fun changeSceneToConfiguration(connectionMethod: CameraConnectionMethod)
     {
         try
         {
-            PreferenceFragmentCompat targetFragment = null;
-            if (connectionMethod == ICameraConnection.CameraConnectionMethod.RICOH_GR2) {
-                if (preferenceFragmentRicoh == null)
-                {
-                    preferenceFragmentRicoh = RicohGr2PreferenceFragment.newInstance(this, this);
+            var targetFragment: PreferenceFragmentCompat? = null
+            when (connectionMethod) {
+                CameraConnectionMethod.RICOH_GR2 -> {
+                    if (preferenceFragmentRicoh == null) {
+                        preferenceFragmentRicoh = RicohGr2PreferenceFragment.newInstance(this, this)
+                    }
+                    targetFragment = preferenceFragmentRicoh
                 }
-                targetFragment = preferenceFragmentRicoh;
-            } else if (connectionMethod == ICameraConnection.CameraConnectionMethod.SONY) {
-                if (preferenceFragmentSony == null)
-                {
-                    preferenceFragmentSony = SonyPreferenceFragment.newInstance(this, this);
+                CameraConnectionMethod.SONY -> {
+                    if (preferenceFragmentSony == null) {
+                        preferenceFragmentSony = SonyPreferenceFragment.newInstance(this, this)
+                    }
+                    targetFragment = preferenceFragmentSony
                 }
-                targetFragment = preferenceFragmentSony;
-            } else if (connectionMethod == ICameraConnection.CameraConnectionMethod.PANASONIC) {
-                if (preferenceFragmentPanasonic == null)
-                {
-                    preferenceFragmentPanasonic = PanasonicPreferenceFragment.newInstance(this, this);
+                CameraConnectionMethod.PANASONIC -> {
+                    if (preferenceFragmentPanasonic == null) {
+                        preferenceFragmentPanasonic =
+                            PanasonicPreferenceFragment.newInstance(this, this)
+                    }
+                    targetFragment = preferenceFragmentPanasonic
                 }
-                targetFragment = preferenceFragmentPanasonic;
-            } else if (connectionMethod == ICameraConnection.CameraConnectionMethod.OLYMPUS) {
-                if (preferenceFragmentOlympus == null)
-                {
-                    preferenceFragmentOlympus = OlympusPreferenceFragment.newInstance(this, this);
+                CameraConnectionMethod.OLYMPUS -> {
+                    if (preferenceFragmentOlympus == null) {
+                        preferenceFragmentOlympus = OlympusPreferenceFragment.newInstance(this, this)
+                    }
+                    targetFragment = preferenceFragmentOlympus
                 }
-                targetFragment = preferenceFragmentOlympus;
-            } else if (connectionMethod == ICameraConnection.CameraConnectionMethod.FUJI_X) {
-                if (preferenceFragmentFuji == null)
-                {
-                    preferenceFragmentFuji = FujiXPreferenceFragment.newInstance(this, this);
+                CameraConnectionMethod.FUJI_X -> {
+                    if (preferenceFragmentFuji == null) {
+                        preferenceFragmentFuji = FujiXPreferenceFragment.newInstance(this, this)
+                    }
+                    targetFragment = preferenceFragmentFuji
                 }
-                targetFragment = preferenceFragmentFuji;
-            } else if (connectionMethod == ICameraConnection.CameraConnectionMethod.THETA) {
-                if (preferenceFragmentTheta == null)
-                {
-                    preferenceFragmentTheta = ThetaPreferenceFragment.newInstance(this, this);
+                CameraConnectionMethod.THETA -> {
+                    if (preferenceFragmentTheta == null) {
+                        preferenceFragmentTheta = ThetaPreferenceFragment.newInstance(this, this)
+                    }
+                    targetFragment = preferenceFragmentTheta
                 }
-                targetFragment = preferenceFragmentTheta;
-            } else if (connectionMethod == ICameraConnection.CameraConnectionMethod.CANON) {
-                if (preferenceFragmentCanon == null)
-                {
-                    preferenceFragmentCanon = CanonPreferenceFragment.newInstance(this, this);
+                CameraConnectionMethod.CANON -> {
+                    if (preferenceFragmentCanon == null) {
+                        preferenceFragmentCanon = CanonPreferenceFragment.newInstance(this, this)
+                    }
+                    targetFragment = preferenceFragmentCanon
                 }
-                targetFragment = preferenceFragmentCanon;
-            } else if (connectionMethod == ICameraConnection.CameraConnectionMethod.NIKON) {
-                if (preferenceFragmentNikon == null)
-                {
-                    preferenceFragmentNikon = NikonPreferenceFragment.newInstance(this, this);
+                CameraConnectionMethod.NIKON -> {
+                    if (preferenceFragmentNikon == null) {
+                        preferenceFragmentNikon = NikonPreferenceFragment.newInstance(this, this)
+                    }
+                    targetFragment = preferenceFragmentNikon
                 }
-                targetFragment = preferenceFragmentNikon;
-            } else if (connectionMethod == ICameraConnection.CameraConnectionMethod.KODAK) {
-                if (preferenceFragmentKodak == null)
-                {
-                    preferenceFragmentKodak = KodakPreferenceFragment.newInstance(this, this);
+                CameraConnectionMethod.KODAK -> {
+                    if (preferenceFragmentKodak == null) {
+                        preferenceFragmentKodak = KodakPreferenceFragment.newInstance(this, this)
+                    }
+                    targetFragment = preferenceFragmentKodak
                 }
-                targetFragment = preferenceFragmentKodak;
-            } else if (connectionMethod == ICameraConnection.CameraConnectionMethod.OPC) {
-                if (preferenceFragmentOPC == null)
-                {
-                    preferenceFragmentOPC = PreferenceFragment.newInstance(this, interfaceProvider, this);
+                CameraConnectionMethod.OPC -> {
+                    if (preferenceFragmentOPC == null) {
+                        preferenceFragmentOPC = PreferenceFragment.newInstance(
+                            this,
+                            interfaceProvider!!, this
+                        )
+                    }
+                    targetFragment = preferenceFragmentOPC
                 }
-                targetFragment = preferenceFragmentOPC;
             }
-            if (targetFragment != null)
-            {
-                FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-                transaction.replace(R.id.fragment1, targetFragment);
-                transaction.addToBackStack(null);   // backstackに追加
-                transaction.commit();
+            if (targetFragment != null) {
+                val transaction = supportFragmentManager.beginTransaction()
+                transaction.replace(R.id.fragment1, targetFragment)
+                transaction.addToBackStack(null) // backstackに追加
+                transaction.commit()
             }
         }
-        catch (Exception e)
+        catch (e: Exception)
         {
-            e.printStackTrace();
+            e.printStackTrace()
         }
     }
 
     /**
-     *   デバッグ情報画面を開く
+     * デバッグ情報画面を開く
      *
      */
-    @Override
-    public void changeSceneToDebugInformation()
+    override fun changeSceneToDebugInformation()
     {
         if (logCatFragment == null)
         {
-            logCatFragment = LogCatFragment.newInstance();
+            logCatFragment = LogCatFragment.newInstance()
         }
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.replace(R.id.fragment1, logCatFragment);
+        val transaction = supportFragmentManager.beginTransaction()
+        transaction.replace(R.id.fragment1, logCatFragment!!)
         // backstackに追加
-        transaction.addToBackStack(null);
-        transaction.commit();
+        transaction.addToBackStack(null)
+        transaction.commit()
     }
 
     /**
-     *   SonyのAPI List画面を開く
+     * SonyのAPI List画面を開く
      *
      */
-    @Override
-    public void changeSceneToApiList()
+    override fun changeSceneToApiList()
     {
         if (sonyApiListFragmentSony == null)
         {
-            sonyApiListFragmentSony = SonyCameraApiListFragment.newInstance(interfaceProvider);
+            sonyApiListFragmentSony = SonyCameraApiListFragment.newInstance(interfaceProvider!!)
         }
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.replace(R.id.fragment1, sonyApiListFragmentSony);
+        val transaction = supportFragmentManager.beginTransaction()
+        transaction.replace(R.id.fragment1, sonyApiListFragmentSony!!)
         // backstackに追加
-        transaction.addToBackStack(null);
-        transaction.commit();
+        transaction.addToBackStack(null)
+        transaction.commit()
     }
 
     /**
-     *   カメラとの接続・切断のシーケンス
+     * カメラとの接続・切断のシーケンス
      */
-    @Override
-    public void changeCameraConnection()
+    override fun changeCameraConnection()
     {
         if (interfaceProvider == null)
         {
-            Log.v(TAG, "changeCameraConnection() : interfaceProvider is NULL");
-            return;
+            Log.v(TAG, "changeCameraConnection() : interfaceProvider is NULL")
+            return
         }
         try
         {
-            ICameraConnection connection = getCameraConnection(interfaceProvider.getCammeraConnectionMethod());
+            val connection = getCameraConnection(interfaceProvider!!.cammeraConnectionMethod)
             if (connection != null)
             {
-                ICameraConnection.CameraConnectionStatus status = connection.getConnectionStatus();
-                if (status == ICameraConnection.CameraConnectionStatus.CONNECTED)
+                val status = connection.connectionStatus
+                if (status == CameraConnectionStatus.CONNECTED)
                 {
                     // 接続中のときには切断する
-                    connection.disconnect(false);
-                    return;
+                    connection.disconnect(false)
+                    return
                 }
                 // 接続中でない時は、接続中にする
-                connection.startWatchWifiStatus(this);
+                connection.startWatchWifiStatus(this)
             }
         }
-        catch (Exception e)
+        catch (e: Exception)
         {
-            e.printStackTrace();
+            e.printStackTrace()
         }
     }
 
     /**
      * アプリを抜ける
      */
-    @Override
-    public void exitApplication()
+    override fun exitApplication()
     {
-        Log.v(TAG, "exitApplication()");
+        Log.v(TAG, "exitApplication()")
         try
         {
-            ICameraConnection connection = getCameraConnection(interfaceProvider.getCammeraConnectionMethod());
+            val connection = getCameraConnection(interfaceProvider!!.cammeraConnectionMethod)
             if (connection != null)
             {
-                connection.disconnect(true);
+                connection.disconnect(true)
             }
-            finish();
+            finish()
         }
-        catch (Exception e)
+        catch (e: Exception)
         {
-            e.printStackTrace();
+            e.printStackTrace()
         }
     }
 
@@ -604,25 +651,24 @@ public class A01dMain extends AppCompatActivity implements ICameraStatusReceiver
      *
      *
      */
-    @Override
-    public void onStatusNotify(String message)
+    override fun onStatusNotify(message: String)
     {
-        Log.v(TAG, " CONNECTION MESSAGE : " + message);
+        Log.v(TAG, " CONNECTION MESSAGE : $message")
         try
         {
             if (statusViewDrawer != null)
             {
-                statusViewDrawer.updateStatusView(message);
-                ICameraConnection connection = getCameraConnection(interfaceProvider.getCammeraConnectionMethod());
+                statusViewDrawer!!.updateStatusView(message)
+                val connection = getCameraConnection(interfaceProvider!!.cammeraConnectionMethod)
                 if (connection != null)
                 {
-                    statusViewDrawer.updateConnectionStatus(connection.getConnectionStatus());
+                    statusViewDrawer!!.updateConnectionStatus(connection.connectionStatus)
                 }
             }
         }
-        catch (Exception e)
+        catch (e: Exception)
         {
-            e.printStackTrace();
+            e.printStackTrace()
         }
     }
 
@@ -630,30 +676,28 @@ public class A01dMain extends AppCompatActivity implements ICameraStatusReceiver
      *
      *
      */
-    @Override
-    public void onCameraConnected()
+    override fun onCameraConnected()
     {
-        Log.v(TAG, "onCameraConnected()");
-
+        Log.v(TAG, "onCameraConnected()")
         try
         {
-            ICameraConnection connection = getCameraConnection(interfaceProvider.getCammeraConnectionMethod());
+            val connection = getCameraConnection(interfaceProvider!!.cammeraConnectionMethod)
             if (connection != null)
             {
                 // クラス構造をミスった...のでこんなところで、無理やりステータスを更新する
-                connection.forceUpdateConnectionStatus(ICameraConnection.CameraConnectionStatus.CONNECTED);
+                connection.forceUpdateConnectionStatus(CameraConnectionStatus.CONNECTED)
             }
             if (statusViewDrawer != null)
             {
-                statusViewDrawer.updateConnectionStatus(ICameraConnection.CameraConnectionStatus.CONNECTED);
+                statusViewDrawer!!.updateConnectionStatus(CameraConnectionStatus.CONNECTED)
 
                 // ライブビューの開始...
-                statusViewDrawer.startLiveView();
+                statusViewDrawer!!.startLiveView()
             }
         }
-        catch (Exception e)
+        catch (e: Exception)
         {
-            e.printStackTrace();
+            e.printStackTrace()
         }
     }
 
@@ -661,14 +705,13 @@ public class A01dMain extends AppCompatActivity implements ICameraStatusReceiver
      *
      *
      */
-    @Override
-    public void onCameraDisconnected()
+    override fun onCameraDisconnected()
     {
-        Log.v(TAG, "onCameraDisconnected()");
+        Log.v(TAG, "onCameraDisconnected()")
         if (statusViewDrawer != null)
         {
-            statusViewDrawer.updateStatusView(getString(R.string.camera_disconnected));
-            statusViewDrawer.updateConnectionStatus(ICameraConnection.CameraConnectionStatus.DISCONNECTED);
+            statusViewDrawer!!.updateStatusView(getString(R.string.camera_disconnected))
+            statusViewDrawer!!.updateConnectionStatus(CameraConnectionStatus.DISCONNECTED)
         }
     }
 
@@ -676,224 +719,201 @@ public class A01dMain extends AppCompatActivity implements ICameraStatusReceiver
      *
      *
      */
-    @Override
-    public void onCameraOccursException(String message, Exception e)
+    override fun onCameraOccursException(message: String, e: Exception)
     {
-        Log.v(TAG, "onCameraOccursException() " + message);
+        Log.v(TAG, "onCameraOccursException() $message")
         try
         {
-            e.printStackTrace();
-            ICameraConnection connection = getCameraConnection(interfaceProvider.getCammeraConnectionMethod());
+            e.printStackTrace()
+            val connection = getCameraConnection(interfaceProvider!!.cammeraConnectionMethod)
             if (connection != null)
             {
-                connection.alertConnectingFailed(message + " " + e.getLocalizedMessage());
+                connection.alertConnectingFailed(message + " " + e.localizedMessage)
             }
             if (statusViewDrawer != null)
             {
-                statusViewDrawer.updateStatusView(message);
+                statusViewDrawer!!.updateStatusView(message)
                 if (connection != null)
                 {
-                    statusViewDrawer.updateConnectionStatus(connection.getConnectionStatus());
+                    statusViewDrawer!!.updateConnectionStatus(connection.connectionStatus)
                 }
             }
         }
-        catch (Exception ee)
+        catch (ee: Exception)
         {
-            ee.printStackTrace();
+            ee.printStackTrace()
         }
     }
 
-    /**
-     *   BLE経由でカメラの電源を入れるかどうか
-     *
-     */
-    private boolean isBlePowerOn()
-    {
-        boolean ret = false;
-        try
-        {
-            if (interfaceProvider.getCammeraConnectionMethod() == ICameraConnection.CameraConnectionMethod.OPC)
-            {
-                SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-                ret = preferences.getBoolean(IPreferencePropertyAccessor.BLE_POWER_ON, false);
-                // Log.v(TAG, "isBlePowerOn() : " + ret);
+    private val isBlePowerOn: Boolean
+        /**
+         * BLE経由でカメラの電源を入れるかどうか
+         *
+         */
+        get() {
+            var ret = false
+            try {
+                if (interfaceProvider!!.cammeraConnectionMethod == CameraConnectionMethod.OPC) {
+                    val preferences = PreferenceManager.getDefaultSharedPreferences(
+                        this
+                    )
+                    ret = preferences.getBoolean(IPreferencePropertyAccessor.BLE_POWER_ON, false)
+                    // Log.v(TAG, "isBlePowerOn() : " + ret);
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
             }
+            return (ret)
         }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-        return (ret);
-    }
 
-    /**
-     *    カメラへの自動接続を行うかどうか
-     *
-     */
-    private boolean isAutoConnectCamera()
-    {
-        boolean ret = true;
-        try
-        {
-            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-            ret = preferences.getBoolean(IPreferencePropertyAccessor.AUTO_CONNECT_TO_CAMERA, true);
-            // Log.v(TAG, "isAutoConnectCamera() : " + ret);
+    private val isAutoConnectCamera: Boolean
+        /**
+         * カメラへの自動接続を行うかどうか
+         *
+         */
+        get() {
+            var ret = true
+            try {
+                val preferences = PreferenceManager.getDefaultSharedPreferences(
+                    this
+                )
+                ret =
+                    preferences.getBoolean(IPreferencePropertyAccessor.AUTO_CONNECT_TO_CAMERA, true)
+                // Log.v(TAG, "isAutoConnectCamera() : " + ret);
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+            return (ret)
         }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-        return (ret);
-    }
 
     /**
      *
      *
      *
      */
-    private ICameraConnection getCameraConnection(ICameraConnection.CameraConnectionMethod connectionMethod)
+    private fun getCameraConnection(connectionMethod: CameraConnectionMethod): ICameraConnection
     {
-        ICameraConnection connection;
-        if (connectionMethod == ICameraConnection.CameraConnectionMethod.RICOH_GR2)
+        val connection = if (connectionMethod == CameraConnectionMethod.RICOH_GR2) {
+            interfaceProvider!!.ricohGr2Infterface.ricohGr2CameraConnection
+        } else if (connectionMethod == CameraConnectionMethod.SONY) {
+            interfaceProvider!!.sonyInterface.sonyCameraConnection
+        } else if (connectionMethod == CameraConnectionMethod.PANASONIC) {
+            interfaceProvider!!.panasonicInterface.panasonicCameraConnection
+        } else if (connectionMethod == CameraConnectionMethod.FUJI_X) {
+            interfaceProvider!!.fujiXInterface.fujiXCameraConnection
+        } else if (connectionMethod == CameraConnectionMethod.OLYMPUS) {
+            interfaceProvider!!.olympusPenInterface.olyCameraConnection
+        } else if (connectionMethod == CameraConnectionMethod.THETA) {
+            interfaceProvider!!.thetaInterface.cameraConnection
+        } else if (connectionMethod == CameraConnectionMethod.CANON) {
+            interfaceProvider!!.canonInterface.cameraConnection
+        } else if (connectionMethod == CameraConnectionMethod.NIKON) {
+            interfaceProvider!!.nikonInterface.cameraConnection
+        } else if (connectionMethod == CameraConnectionMethod.KODAK) {
+            interfaceProvider!!.kodakInterface.cameraConnection
+        } else  // if (connectionMethod == ICameraConnection.CameraConnectionMethod.OPC)
         {
-            connection = interfaceProvider.getRicohGr2Infterface().getRicohGr2CameraConnection();
+            interfaceProvider!!.olympusInterface.olyCameraConnection
         }
-        else if  (connectionMethod == ICameraConnection.CameraConnectionMethod.SONY)
-        {
-            connection = interfaceProvider.getSonyInterface().getSonyCameraConnection();
-        }
-        else if  (connectionMethod == ICameraConnection.CameraConnectionMethod.PANASONIC)
-        {
-            connection = interfaceProvider.getPanasonicInterface().getPanasonicCameraConnection();
-        }
-        else if  (connectionMethod == ICameraConnection.CameraConnectionMethod.FUJI_X)
-        {
-            connection = interfaceProvider.getFujiXInterface().getFujiXCameraConnection();
-        }
-        else if  (connectionMethod == ICameraConnection.CameraConnectionMethod.OLYMPUS)
-        {
-            connection = interfaceProvider.getOlympusPenInterface().getOlyCameraConnection();
-        }
-        else if  (connectionMethod == ICameraConnection.CameraConnectionMethod.THETA)
-        {
-            connection = interfaceProvider.getThetaInterface().getCameraConnection();
-        }
-        else if  (connectionMethod == ICameraConnection.CameraConnectionMethod.CANON)
-        {
-            connection = interfaceProvider.getCanonInterface().getCameraConnection();
-        }
-        else if  (connectionMethod == ICameraConnection.CameraConnectionMethod.NIKON)
-        {
-            connection = interfaceProvider.getNikonInterface().getCameraConnection();
-        }
-        else if  (connectionMethod == ICameraConnection.CameraConnectionMethod.KODAK)
-        {
-            connection = interfaceProvider.getKodakInterface().getCameraConnection();
-        }
-        else // if (connectionMethod == ICameraConnection.CameraConnectionMethod.OPC)
-        {
-            connection = interfaceProvider.getOlympusInterface().getOlyCameraConnection();
-        }
-        return (connection);
+        return (connection)
     }
 
     /**
-     *   カメラへのBLE接続指示が完了したとき
+     * カメラへのBLE接続指示が完了したとき
      *
      * @param isExecuted  true : BLEで起動した, false : 起動していない、その他
      */
-    @Override
-    public void wakeupExecuted(boolean isExecuted)
+    override fun wakeupExecuted(isExecuted: Boolean)
     {
-        Log.v(TAG, "wakeupExecuted() : " + isExecuted);
-        if (isAutoConnectCamera())
+        Log.v(TAG, "wakeupExecuted() : $isExecuted")
+        if (isAutoConnectCamera)
         {
             // カメラへ自動接続する設定だった場合、カメラへWiFi接続する (BLEで起動しなくても)
-            changeCameraConnection();
+            changeCameraConnection()
         }
     }
 
 
-    @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event)
+    override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean
     {
-        Log.v(TAG, "onKeyDown()" + " " + keyCode);
+        Log.v(TAG, "onKeyDown() $keyCode")
         try
         {
-            if ((event.getAction() == KeyEvent.ACTION_DOWN)&&
-                    ((keyCode == KeyEvent.KEYCODE_VOLUME_UP)||(keyCode == KeyEvent.KEYCODE_CAMERA)))
-            {
+            if ((event.action == KeyEvent.ACTION_DOWN) &&
+                ((keyCode == KeyEvent.KEYCODE_VOLUME_UP) || (keyCode == KeyEvent.KEYCODE_CAMERA))
+            ) {
                 if (liveViewFragment != null)
                 {
-                    return (liveViewFragment.handleKeyDown(keyCode, event));
+                    return (liveViewFragment!!.handleKeyDown(keyCode, event))
                 }
             }
         }
-        catch (Exception e)
+        catch (e: Exception)
         {
-            e.printStackTrace();
+            e.printStackTrace()
         }
-        return (super.onKeyDown(keyCode, event));
+        return (super.onKeyDown(keyCode, event))
     }
 
-    @Override
-    public void updateMessage(final String message, final boolean isBold, final boolean isColor, final int color)
+    override fun updateMessage(message: String, isBold: Boolean, isColor: Boolean, color: Int)
     {
-        Log.v(TAG, " updateMessage() : " + message);
-/**/
-        try {
-            final TextView messageArea = findViewById(R.id.message);
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        if ((messageArea != null) && (message != null))
-                        {
-                            messageArea.setText(message);
-                            if (isBold)
-                            {
-                                messageArea.setTypeface(Typeface.DEFAULT_BOLD);
-                            }
-                            if (isColor)
-                            {
-                                messageArea.setTextColor(color);
-                            }
-                            else
-                            {
-                                messageArea.setTextColor(Color.DKGRAY);
-                            }
-                            messageArea.invalidate();
-                        }
-                    }
-                    catch (Exception e)
+        Log.v(TAG, " updateMessage() : $message")
+        try
+        {
+            val messageArea = findViewById<TextView>(R.id.message)
+            runOnUiThread {
+                try
+                {
+                    if ((messageArea != null) && (message != null))
                     {
-                        e.printStackTrace();
+                        messageArea.text = message
+                        if (isBold)
+                        {
+                            messageArea.typeface = Typeface.DEFAULT_BOLD
+                        }
+                        if (isColor)
+                        {
+                            messageArea.setTextColor(color)
+                        }
+                        else
+                        {
+                            messageArea.setTextColor(Color.DKGRAY)
+                        }
+                        messageArea.invalidate()
                     }
                 }
-            });
+                catch (e: Exception)
+                {
+                    e.printStackTrace()
+                }
+            }
         }
-        catch (Exception e)
+        catch (e: Exception)
         {
-            e.printStackTrace();
+            e.printStackTrace()
         }
-/**/
     }
 
-    @Override
-    public void setupSlotSelector(boolean isEnable, @Nullable ICardSlotSelectionReceiver slotSelectionReceiver)
-    {
-        // 特に何もしない
-    }
+    override fun setupSlotSelector(isEnable: Boolean, slotSelectionReceiver: ICardSlotSelectionReceiver?) { }
+    override fun selectSlot(slotId: String) { }
+    override fun changedCardSlot(slotId: String) { }
 
-    @Override
-    public void selectSlot(@NonNull String slotId)
+    companion object
     {
-        // 特に何もしない
-    }
+        private val TAG = A01dMain::class.java.simpleName
+        private const val REQUEST_NEED_PERMISSIONS = 1010
 
-    @Override
-    public void changedCardSlot(@NonNull String slotId)
-    {
-        // 特に何もしない
+        private val REQUIRED_PERMISSIONS = arrayOf(
+            Manifest.permission.WRITE_EXTERNAL_STORAGE,
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.ACCESS_MEDIA_LOCATION,
+            Manifest.permission.ACCESS_NETWORK_STATE,
+            Manifest.permission.ACCESS_WIFI_STATE,
+            Manifest.permission.BLUETOOTH,
+            Manifest.permission.BLUETOOTH_CONNECT,
+            Manifest.permission.BLUETOOTH_ADMIN,
+            Manifest.permission.ACCESS_COARSE_LOCATION,
+            Manifest.permission.INTERNET,
+        )
     }
 }
