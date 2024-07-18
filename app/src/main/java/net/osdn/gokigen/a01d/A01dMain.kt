@@ -53,7 +53,7 @@ import net.osdn.gokigen.a01d.preference.theta.ThetaPreferenceFragment
 class A01dMain : AppCompatActivity(), ICameraStatusReceiver, IChangeScene, PowerOnCameraCallback,
     IInformationReceiver, ICardSlotSelector
 {
-    private var interfaceProvider: IInterfaceProvider? = null
+    private lateinit var interfaceProvider: IInterfaceProvider
     private var statusViewDrawer: IStatusViewDrawer? = null
 
     private var preferenceFragment: PreferenceFragmentCompat? = null
@@ -70,8 +70,8 @@ class A01dMain : AppCompatActivity(), ICameraStatusReceiver, IChangeScene, Power
 
     private var propertyListFragment: OlyCameraPropertyListFragment? = null
     private var sonyApiListFragmentSony: SonyCameraApiListFragment? = null
-    private var logCatFragment: LogCatFragment? = null
-    private var liveViewFragment: LiveViewFragment? = null
+    private lateinit var logCatFragment: LogCatFragment
+    private lateinit var liveViewFragment: LiveViewFragment
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
@@ -101,7 +101,6 @@ class A01dMain : AppCompatActivity(), ICameraStatusReceiver, IChangeScene, Power
             e.printStackTrace()
         }
     }
-
 
     private fun allPermissionsGranted() : Boolean
     {
@@ -154,23 +153,30 @@ class A01dMain : AppCompatActivity(), ICameraStatusReceiver, IChangeScene, Power
         grantResults: IntArray
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        Log.v(TAG, "------------------------- onRequestPermissionsResult() ")
-        if (requestCode == REQUEST_NEED_PERMISSIONS)
+        try
         {
-            if (allPermissionsGranted())
+            Log.v(TAG, "------------------------- onRequestPermissionsResult() ")
+            if (requestCode == REQUEST_NEED_PERMISSIONS)
             {
-                // ----- 権限が有効だった、最初の画面を開く
-                Log.v(TAG, "onRequestPermissionsResult()")
-                initializeClass()
-                initializeFragment()
-                onReadyClass()
+                if (allPermissionsGranted())
+                {
+                    // ----- 権限が有効だった、最初の画面を開く
+                    Log.v(TAG, "onRequestPermissionsResult()")
+                    initializeClass()
+                    initializeFragment()
+                    onReadyClass()
+                }
+                else
+                {
+                    Log.v(TAG, "----- onRequestPermissionsResult() : false")
+                    Toast.makeText(this, getString(R.string.permission_not_granted), Toast.LENGTH_SHORT).show()
+                    finish()
+                }
             }
-            else
-            {
-                Log.v(TAG, "----- onRequestPermissionsResult() : false")
-                Toast.makeText(this, getString(R.string.permission_not_granted), Toast.LENGTH_SHORT).show()
-                finish()
-            }
+        }
+        catch (e: Exception)
+        {
+            e.printStackTrace()
         }
     }
 
@@ -196,16 +202,16 @@ class A01dMain : AppCompatActivity(), ICameraStatusReceiver, IChangeScene, Power
     {
         try
         {
-            if (isBlePowerOn)
+            if ((isBlePowerOn)&&(::interfaceProvider.isInitialized))
             {
                 // BLEでPower ONは、OPCのみ対応
-                if (interfaceProvider!!.cammeraConnectionMethod == CameraConnectionMethod.OPC)
+                if (interfaceProvider.cammeraConnectionMethod == CameraConnectionMethod.OPC)
                 {
                     // BLEでカメラの電源をONにする設定だった時
                     try
                     {
                         // カメラの電源ONクラスを呼び出しておく (電源ONができたら、コールバックをもらう）
-                        interfaceProvider!!.olympusInterface.cameraPowerOn.wakeup(this)
+                        interfaceProvider.olympusInterface.cameraPowerOn.wakeup(this)
                     }
                     catch (e: Exception)
                     {
@@ -235,13 +241,14 @@ class A01dMain : AppCompatActivity(), ICameraStatusReceiver, IChangeScene, Power
             run {
                 liveViewFragment = LiveViewFragment.newInstance(
                     this,
-                    interfaceProvider!!
+                    interfaceProvider
                 )
             }
             statusViewDrawer = liveViewFragment
-            liveViewFragment!!.retainInstance = true
+            @Suppress("DEPRECATION")
+            liveViewFragment.retainInstance = true
             val transaction = supportFragmentManager.beginTransaction()
-            transaction.replace(R.id.fragment1, liveViewFragment!!)
+            transaction.replace(R.id.fragment1, liveViewFragment)
             transaction.commitAllowingStateLoss()
         }
         catch (e: Exception)
@@ -258,7 +265,7 @@ class A01dMain : AppCompatActivity(), ICameraStatusReceiver, IChangeScene, Power
         super.onPause()
         try
         {
-            val method = interfaceProvider!!.cammeraConnectionMethod
+            val method = interfaceProvider.cammeraConnectionMethod
             val connection = getCameraConnection(method)
             connection.stopWatchWifiStatus(this)
         }
@@ -276,7 +283,7 @@ class A01dMain : AppCompatActivity(), ICameraStatusReceiver, IChangeScene, Power
     {
         try
         {
-            val method = interfaceProvider!!.cammeraConnectionMethod
+            val method = interfaceProvider.cammeraConnectionMethod
             if (method == CameraConnectionMethod.OPC)
             {
                 changeSceneToCameraPropertyList(method)
@@ -319,7 +326,7 @@ class A01dMain : AppCompatActivity(), ICameraStatusReceiver, IChangeScene, Power
                 try
                 {
                     // Panasonicの場合は、コマンド送信ダイアログを表示する
-                    PanasonicSendCommandDialog.newInstance(interfaceProvider!!.panasonicInterface)
+                    PanasonicSendCommandDialog.newInstance(interfaceProvider.panasonicInterface)
                         .show(
                             supportFragmentManager, "panasonicSendCommandDialog"
                         )
@@ -334,7 +341,7 @@ class A01dMain : AppCompatActivity(), ICameraStatusReceiver, IChangeScene, Power
                 try
                 {
                     // FUJI X Seriesの場合は、コマンド送信ダイアログを表示する
-                    FujiXCameraCommandSendDialog.newInstance(interfaceProvider!!.fujiXInterface)
+                    FujiXCameraCommandSendDialog.newInstance(interfaceProvider.fujiXInterface)
                         .show(
                             supportFragmentManager, "sendCommandDialog"
                         )
@@ -355,7 +362,7 @@ class A01dMain : AppCompatActivity(), ICameraStatusReceiver, IChangeScene, Power
                     // Olympus Penの場合は、コマンド送信ダイアログを表示する
                     SimpleHttpSendCommandDialog.newInstance(
                         "http://192.168.0.10/",
-                        interfaceProvider!!.olympusPenInterface.liveViewControl,
+                        interfaceProvider.olympusPenInterface.liveViewControl,
                         headerMap
                     ).show(
                         supportFragmentManager, "olympusPenSendCommandDialog"
@@ -386,7 +393,7 @@ class A01dMain : AppCompatActivity(), ICameraStatusReceiver, IChangeScene, Power
                 {
                     // CANON の場合は、PTPIPコマンド送信ダイアログを表示する
                     PtpIpCameraCommandSendDialog.newInstance(
-                        interfaceProvider!!.canonInterface,
+                        interfaceProvider.canonInterface,
                         true
                     ).show(
                         supportFragmentManager, "ptpipSendCommandDialog"
@@ -403,7 +410,7 @@ class A01dMain : AppCompatActivity(), ICameraStatusReceiver, IChangeScene, Power
                 {
                     // NIKON の場合は、PTPIPコマンド送信ダイアログを表示する
                     PtpIpCameraCommandSendDialog.newInstance(
-                        interfaceProvider!!.canonInterface,
+                        interfaceProvider.canonInterface,
                         true
                     ).show(
                         supportFragmentManager, "ptpipSendCommandDialog"
@@ -419,23 +426,20 @@ class A01dMain : AppCompatActivity(), ICameraStatusReceiver, IChangeScene, Power
                 // OPC カメラの場合...;
                 Log.v(TAG, " Change Scene to propertyList :")
                 val connection = getCameraConnection(connectionMethod)
-                if (connection != null)
+                val status = connection.connectionStatus
+                if (status == CameraConnectionStatus.CONNECTED)
                 {
-                    val status = connection.connectionStatus
-                    if (status == CameraConnectionStatus.CONNECTED)
-                    {
-                        if (propertyListFragment == null) {
-                            propertyListFragment = OlyCameraPropertyListFragment.newInstance(
-                                this,
-                                interfaceProvider!!.olympusInterface.cameraPropertyProvider
-                            )
-                        }
-                        val transaction = supportFragmentManager.beginTransaction()
-                        transaction.replace(R.id.fragment1, propertyListFragment!!)
-                        // backstackに追加
-                        transaction.addToBackStack(null)
-                        transaction.commit()
+                    if (propertyListFragment == null) {
+                        propertyListFragment = OlyCameraPropertyListFragment.newInstance(
+                            this,
+                            interfaceProvider.olympusInterface.cameraPropertyProvider
+                        )
                     }
+                    val transaction = supportFragmentManager.beginTransaction()
+                    transaction.replace(R.id.fragment1, propertyListFragment!!)
+                    // backstackに追加
+                    transaction.addToBackStack(null)
+                    transaction.commit()
                 }
             }
         }
@@ -540,7 +544,7 @@ class A01dMain : AppCompatActivity(), ICameraStatusReceiver, IChangeScene, Power
                     if (preferenceFragmentOPC == null) {
                         preferenceFragmentOPC = PreferenceFragment.newInstance(
                             this,
-                            interfaceProvider!!, this
+                            interfaceProvider, this
                         )
                     }
                     targetFragment = preferenceFragmentOPC
@@ -565,15 +569,22 @@ class A01dMain : AppCompatActivity(), ICameraStatusReceiver, IChangeScene, Power
      */
     override fun changeSceneToDebugInformation()
     {
-        if (logCatFragment == null)
+        try
         {
-            logCatFragment = LogCatFragment.newInstance()
+            if (!::logCatFragment.isInitialized)
+            {
+                logCatFragment = LogCatFragment.newInstance()
+            }
+            val transaction = supportFragmentManager.beginTransaction()
+            transaction.replace(R.id.fragment1, logCatFragment)
+            // backstackに追加
+            transaction.addToBackStack(null)
+            transaction.commit()
         }
-        val transaction = supportFragmentManager.beginTransaction()
-        transaction.replace(R.id.fragment1, logCatFragment!!)
-        // backstackに追加
-        transaction.addToBackStack(null)
-        transaction.commit()
+        catch (e: Exception)
+        {
+            e.printStackTrace()
+        }
     }
 
     /**
@@ -582,15 +593,22 @@ class A01dMain : AppCompatActivity(), ICameraStatusReceiver, IChangeScene, Power
      */
     override fun changeSceneToApiList()
     {
-        if (sonyApiListFragmentSony == null)
+        try
         {
-            sonyApiListFragmentSony = SonyCameraApiListFragment.newInstance(interfaceProvider!!)
+            if (sonyApiListFragmentSony == null)
+            {
+                sonyApiListFragmentSony = SonyCameraApiListFragment.newInstance(interfaceProvider)
+            }
+            val transaction = supportFragmentManager.beginTransaction()
+            transaction.replace(R.id.fragment1, sonyApiListFragmentSony!!)
+            // backstackに追加
+            transaction.addToBackStack(null)
+            transaction.commit()
         }
-        val transaction = supportFragmentManager.beginTransaction()
-        transaction.replace(R.id.fragment1, sonyApiListFragmentSony!!)
-        // backstackに追加
-        transaction.addToBackStack(null)
-        transaction.commit()
+        catch (e: Exception)
+        {
+            e.printStackTrace()
+        }
     }
 
     /**
@@ -598,26 +616,18 @@ class A01dMain : AppCompatActivity(), ICameraStatusReceiver, IChangeScene, Power
      */
     override fun changeCameraConnection()
     {
-        if (interfaceProvider == null)
-        {
-            Log.v(TAG, "changeCameraConnection() : interfaceProvider is NULL")
-            return
-        }
         try
         {
-            val connection = getCameraConnection(interfaceProvider!!.cammeraConnectionMethod)
-            if (connection != null)
+            val connection = getCameraConnection(interfaceProvider.cammeraConnectionMethod)
+            val status = connection.connectionStatus
+            if (status == CameraConnectionStatus.CONNECTED)
             {
-                val status = connection.connectionStatus
-                if (status == CameraConnectionStatus.CONNECTED)
-                {
-                    // 接続中のときには切断する
-                    connection.disconnect(false)
-                    return
-                }
-                // 接続中でない時は、接続中にする
-                connection.startWatchWifiStatus(this)
+                // 接続中のときには切断する
+                connection.disconnect(false)
+                return
             }
+            // 接続中でない時は、接続中にする
+            connection.startWatchWifiStatus(this)
         }
         catch (e: Exception)
         {
@@ -633,11 +643,8 @@ class A01dMain : AppCompatActivity(), ICameraStatusReceiver, IChangeScene, Power
         Log.v(TAG, "exitApplication()")
         try
         {
-            val connection = getCameraConnection(interfaceProvider!!.cammeraConnectionMethod)
-            if (connection != null)
-            {
-                connection.disconnect(true)
-            }
+            val connection = getCameraConnection(interfaceProvider.cammeraConnectionMethod)
+            connection.disconnect(true)
             finish()
         }
         catch (e: Exception)
@@ -655,15 +662,9 @@ class A01dMain : AppCompatActivity(), ICameraStatusReceiver, IChangeScene, Power
         Log.v(TAG, " CONNECTION MESSAGE : $message")
         try
         {
-            if (statusViewDrawer != null)
-            {
-                statusViewDrawer!!.updateStatusView(message)
-                val connection = getCameraConnection(interfaceProvider!!.cammeraConnectionMethod)
-                if (connection != null)
-                {
-                    statusViewDrawer!!.updateConnectionStatus(connection.connectionStatus)
-                }
-            }
+            val connection = getCameraConnection(interfaceProvider.cammeraConnectionMethod)
+            statusViewDrawer?.updateStatusView(message)
+            statusViewDrawer?.updateConnectionStatus(connection.connectionStatus)
         }
         catch (e: Exception)
         {
@@ -680,19 +681,13 @@ class A01dMain : AppCompatActivity(), ICameraStatusReceiver, IChangeScene, Power
         Log.v(TAG, "onCameraConnected()")
         try
         {
-            val connection = getCameraConnection(interfaceProvider!!.cammeraConnectionMethod)
-            if (connection != null)
-            {
-                // クラス構造をミスった...のでこんなところで、無理やりステータスを更新する
-                connection.forceUpdateConnectionStatus(CameraConnectionStatus.CONNECTED)
-            }
-            if (statusViewDrawer != null)
-            {
-                statusViewDrawer!!.updateConnectionStatus(CameraConnectionStatus.CONNECTED)
+            val connection = getCameraConnection(interfaceProvider.cammeraConnectionMethod)
+            // クラス構造をミスった...のでこんなところで、無理やりステータスを更新する
+            connection.forceUpdateConnectionStatus(CameraConnectionStatus.CONNECTED)
 
-                // ライブビューの開始...
-                statusViewDrawer!!.startLiveView()
-            }
+            statusViewDrawer?.updateConnectionStatus(CameraConnectionStatus.CONNECTED)
+            // ライブビューの開始...
+            statusViewDrawer?.startLiveView()
         }
         catch (e: Exception)
         {
@@ -707,10 +702,14 @@ class A01dMain : AppCompatActivity(), ICameraStatusReceiver, IChangeScene, Power
     override fun onCameraDisconnected()
     {
         Log.v(TAG, "onCameraDisconnected()")
-        if (statusViewDrawer != null)
+        try
         {
-            statusViewDrawer!!.updateStatusView(getString(R.string.camera_disconnected))
-            statusViewDrawer!!.updateConnectionStatus(CameraConnectionStatus.DISCONNECTED)
+            statusViewDrawer?.updateStatusView(getString(R.string.camera_disconnected))
+            statusViewDrawer?.updateConnectionStatus(CameraConnectionStatus.DISCONNECTED)
+        }
+        catch (e: Exception)
+        {
+            e.printStackTrace()
         }
     }
 
@@ -724,18 +723,12 @@ class A01dMain : AppCompatActivity(), ICameraStatusReceiver, IChangeScene, Power
         try
         {
             e.printStackTrace()
-            val connection = getCameraConnection(interfaceProvider!!.cammeraConnectionMethod)
-            if (connection != null)
-            {
-                connection.alertConnectingFailed(message + " " + e.localizedMessage)
-            }
+            val connection = getCameraConnection(interfaceProvider.cammeraConnectionMethod)
+            connection.alertConnectingFailed(message + " " + e.localizedMessage)
             if (statusViewDrawer != null)
             {
-                statusViewDrawer!!.updateStatusView(message)
-                if (connection != null)
-                {
-                    statusViewDrawer!!.updateConnectionStatus(connection.connectionStatus)
-                }
+                statusViewDrawer?.updateStatusView(message)
+                statusViewDrawer?.updateConnectionStatus(connection.connectionStatus)
             }
         }
         catch (ee: Exception)
@@ -752,7 +745,7 @@ class A01dMain : AppCompatActivity(), ICameraStatusReceiver, IChangeScene, Power
         get() {
             var ret = false
             try {
-                if (interfaceProvider!!.cammeraConnectionMethod == CameraConnectionMethod.OPC) {
+                if (interfaceProvider.cammeraConnectionMethod == CameraConnectionMethod.OPC) {
                     val preferences = PreferenceManager.getDefaultSharedPreferences(
                         this
                     )
@@ -793,26 +786,26 @@ class A01dMain : AppCompatActivity(), ICameraStatusReceiver, IChangeScene, Power
     private fun getCameraConnection(connectionMethod: CameraConnectionMethod): ICameraConnection
     {
         val connection = if (connectionMethod == CameraConnectionMethod.RICOH_GR2) {
-            interfaceProvider!!.ricohGr2Infterface.ricohGr2CameraConnection
+            interfaceProvider.ricohGr2Infterface.ricohGr2CameraConnection
         } else if (connectionMethod == CameraConnectionMethod.SONY) {
-            interfaceProvider!!.sonyInterface.sonyCameraConnection
+            interfaceProvider.sonyInterface.sonyCameraConnection
         } else if (connectionMethod == CameraConnectionMethod.PANASONIC) {
-            interfaceProvider!!.panasonicInterface.panasonicCameraConnection
+            interfaceProvider.panasonicInterface.panasonicCameraConnection
         } else if (connectionMethod == CameraConnectionMethod.FUJI_X) {
-            interfaceProvider!!.fujiXInterface.fujiXCameraConnection
+            interfaceProvider.fujiXInterface.fujiXCameraConnection
         } else if (connectionMethod == CameraConnectionMethod.OLYMPUS) {
-            interfaceProvider!!.olympusPenInterface.olyCameraConnection
+            interfaceProvider.olympusPenInterface.olyCameraConnection
         } else if (connectionMethod == CameraConnectionMethod.THETA) {
-            interfaceProvider!!.thetaInterface.cameraConnection
+            interfaceProvider.thetaInterface.cameraConnection
         } else if (connectionMethod == CameraConnectionMethod.CANON) {
-            interfaceProvider!!.canonInterface.cameraConnection
+            interfaceProvider.canonInterface.cameraConnection
         } else if (connectionMethod == CameraConnectionMethod.NIKON) {
-            interfaceProvider!!.nikonInterface.cameraConnection
+            interfaceProvider.nikonInterface.cameraConnection
         } else if (connectionMethod == CameraConnectionMethod.KODAK) {
-            interfaceProvider!!.kodakInterface.cameraConnection
+            interfaceProvider.kodakInterface.cameraConnection
         } else  // if (connectionMethod == ICameraConnection.CameraConnectionMethod.OPC)
         {
-            interfaceProvider!!.olympusInterface.olyCameraConnection
+            interfaceProvider.olympusInterface.olyCameraConnection
         }
         return (connection)
     }
@@ -841,10 +834,7 @@ class A01dMain : AppCompatActivity(), ICameraStatusReceiver, IChangeScene, Power
             if ((event.action == KeyEvent.ACTION_DOWN) &&
                 ((keyCode == KeyEvent.KEYCODE_VOLUME_UP) || (keyCode == KeyEvent.KEYCODE_CAMERA))
             ) {
-                if (liveViewFragment != null)
-                {
-                    return (liveViewFragment!!.handleKeyDown(keyCode, event))
-                }
+                return (liveViewFragment.handleKeyDown(keyCode, event))
             }
         }
         catch (e: Exception)
@@ -863,7 +853,7 @@ class A01dMain : AppCompatActivity(), ICameraStatusReceiver, IChangeScene, Power
             runOnUiThread {
                 try
                 {
-                    if ((messageArea != null) && (message != null))
+                    if (messageArea != null)
                     {
                         messageArea.text = message
                         if (isBold)
