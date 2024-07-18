@@ -4,11 +4,13 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.graphics.Typeface
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.KeyEvent
 import android.view.WindowManager
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -81,11 +83,18 @@ class A01dMain : AppCompatActivity(), ICameraStatusReceiver, IChangeScene, Power
             bar?.hide()
             window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
-            checkPermissions()
-
-            initializeClass()
-            initializeFragment()
-            onReadyClass()
+            if (allPermissionsGranted())
+            {
+                Log.v(TAG, "allPermissionsGranted() : true")
+                initializeClass()
+                initializeFragment()
+                onReadyClass()
+            }
+            else
+            {
+                Log.v(TAG, "====== REQUEST PERMISSIONS ======")
+                ActivityCompat.requestPermissions(this, REQUIRED_PERMISSIONS, REQUEST_NEED_PERMISSIONS)
+            }
         }
         catch (e: Exception)
         {
@@ -93,86 +102,76 @@ class A01dMain : AppCompatActivity(), ICameraStatusReceiver, IChangeScene, Power
         }
     }
 
-    private fun checkPermissions()
-    {
-        try {
-            // 外部メモリアクセス権のオプトイン
-            if ((ContextCompat.checkSelfPermission(
-                    this,
-                    Manifest.permission.WRITE_EXTERNAL_STORAGE
-                ) != PackageManager.PERMISSION_GRANTED) ||
-                (ContextCompat.checkSelfPermission(
-                    this,
-                    Manifest.permission.READ_EXTERNAL_STORAGE
-                ) != PackageManager.PERMISSION_GRANTED) ||
-                (ContextCompat.checkSelfPermission(
-                    this,
-                    Manifest.permission.ACCESS_MEDIA_LOCATION
-                ) != PackageManager.PERMISSION_GRANTED) ||
-                (ContextCompat.checkSelfPermission(
-                    this,
-                    Manifest.permission.ACCESS_NETWORK_STATE
-                ) != PackageManager.PERMISSION_GRANTED) ||
-                (ContextCompat.checkSelfPermission(
-                    this,
-                    Manifest.permission.ACCESS_WIFI_STATE
-                ) != PackageManager.PERMISSION_GRANTED) ||
-                (ContextCompat.checkSelfPermission(
-                    this,
-                    Manifest.permission.BLUETOOTH
-                ) != PackageManager.PERMISSION_GRANTED) ||
-                (ContextCompat.checkSelfPermission(
-                    this,
-                    Manifest.permission.BLUETOOTH_CONNECT
-                ) != PackageManager.PERMISSION_GRANTED) ||
-                (ContextCompat.checkSelfPermission(
-                    this,
-                    Manifest.permission.BLUETOOTH_ADMIN
-                ) != PackageManager.PERMISSION_GRANTED) ||
-                (ContextCompat.checkSelfPermission(
-                    this,
-                    Manifest.permission.ACCESS_COARSE_LOCATION
-                ) != PackageManager.PERMISSION_GRANTED) ||
-                (ContextCompat.checkSelfPermission(
-                    this,
-                    Manifest.permission.INTERNET
-                ) != PackageManager.PERMISSION_GRANTED)
-            ) {
-                ActivityCompat.requestPermissions(
-                    this,
 
-                    arrayOf(
-                        Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                        Manifest.permission.READ_EXTERNAL_STORAGE,
-                        Manifest.permission.ACCESS_MEDIA_LOCATION,
-                        Manifest.permission.ACCESS_NETWORK_STATE,
-                        Manifest.permission.ACCESS_WIFI_STATE,
-                        Manifest.permission.BLUETOOTH,
-                        Manifest.permission.BLUETOOTH_CONNECT,
-                        Manifest.permission.BLUETOOTH_ADMIN,
-                        Manifest.permission.ACCESS_COARSE_LOCATION,
-                        Manifest.permission.INTERNET,
-                    ),
-                    REQUEST_NEED_PERMISSIONS
-                )
+    private fun allPermissionsGranted() : Boolean
+    {
+        var result = true
+        for (param in REQUIRED_PERMISSIONS)
+        {
+            if (ContextCompat.checkSelfPermission(
+                    baseContext,
+                    param
+                ) != PackageManager.PERMISSION_GRANTED
+            )
+            {
+                // ----- Permission Denied...
+                if ((param == Manifest.permission.ACCESS_MEDIA_LOCATION)&&(Build.VERSION.SDK_INT < Build.VERSION_CODES.Q))
+                {
+                    //　この場合は権限付与の判断を除外 (デバイスが (10) よりも古く、ACCESS_MEDIA_LOCATION がない場合）
+                }
+                else if ((param == Manifest.permission.READ_EXTERNAL_STORAGE)&&(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU))
+                {
+                    // この場合は、権限付与の判断を除外 (SDK: 33以上はエラーになる...)
+                }
+                else if ((param == Manifest.permission.WRITE_EXTERNAL_STORAGE)&&(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU))
+                {
+                    // この場合は、権限付与の判断を除外 (SDK: 33以上はエラーになる...)
+                }
+                else if ((param == Manifest.permission.BLUETOOTH_SCAN)&&(Build.VERSION.SDK_INT < Build.VERSION_CODES.S))
+                {
+                    // この場合は、権限付与の判断を除外 (SDK: 31よりも下はエラーになるはず...)
+                    Log.v(TAG, "BLUETOOTH_SCAN")
+                }
+                else if ((param == Manifest.permission.BLUETOOTH_CONNECT)&&(Build.VERSION.SDK_INT < Build.VERSION_CODES.S))
+                {
+                    // この場合は、権限付与の判断を除外 (SDK: 31よりも下はエラーになるはず...)
+                    Log.v(TAG, "BLUETOOTH_CONNECT")
+                }
+                else
+                {
+                    // ----- 権限が得られなかった場合...
+                    Log.v(TAG, " Permission: $param : ${Build.VERSION.SDK_INT}")
+                    result = false
+                }
             }
-        } catch (e: Exception) {
-            e.printStackTrace()
         }
+        return (result)
     }
 
-
-    /**
-     * なぜか、onReadyClass() が有効ではなさそうなので...
-     *
-     */
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<String>,
         grantResults: IntArray
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        onReadyClass()
+        Log.v(TAG, "------------------------- onRequestPermissionsResult() ")
+        if (requestCode == REQUEST_NEED_PERMISSIONS)
+        {
+            if (allPermissionsGranted())
+            {
+                // ----- 権限が有効だった、最初の画面を開く
+                Log.v(TAG, "onRequestPermissionsResult()")
+                initializeClass()
+                initializeFragment()
+                onReadyClass()
+            }
+            else
+            {
+                Log.v(TAG, "----- onRequestPermissionsResult() : false")
+                Toast.makeText(this, getString(R.string.permission_not_granted), Toast.LENGTH_SHORT).show()
+                finish()
+            }
+        }
     }
 
     /**
@@ -910,6 +909,7 @@ class A01dMain : AppCompatActivity(), ICameraStatusReceiver, IChangeScene, Power
             Manifest.permission.ACCESS_NETWORK_STATE,
             Manifest.permission.ACCESS_WIFI_STATE,
             Manifest.permission.BLUETOOTH,
+            Manifest.permission.BLUETOOTH_SCAN,
             Manifest.permission.BLUETOOTH_CONNECT,
             Manifest.permission.BLUETOOTH_ADMIN,
             Manifest.permission.ACCESS_COARSE_LOCATION,
