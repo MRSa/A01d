@@ -349,4 +349,5 @@
     <string name="pref_canon_connection_mode">接続シーケンス</string>
     <string name="pref_summary_canon_connection_mode">通常、変更は不要です (初期値: TYPE0)</string>
 
+    <string name="permission_not_granted">許可が得られませんでした。</string>
 </resources>
