@@ -902,6 +902,7 @@ class A01dMain : AppCompatActivity(), ICameraStatusReceiver, IChangeScene, Power
             Manifest.permission.BLUETOOTH_SCAN,
             Manifest.permission.BLUETOOTH_CONNECT,
             Manifest.permission.BLUETOOTH_ADMIN,
+            Manifest.permission.ACCESS_FINE_LOCATION,
             Manifest.permission.ACCESS_COARSE_LOCATION,
             Manifest.permission.INTERNET,
         )

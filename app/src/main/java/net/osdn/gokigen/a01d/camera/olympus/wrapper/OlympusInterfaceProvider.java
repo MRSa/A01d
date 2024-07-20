@@ -1,6 +1,7 @@
 package net.osdn.gokigen.a01d.camera.olympus.wrapper;
 
 import android.app.Activity;
+import android.os.Build;
 
 import net.osdn.gokigen.a01d.camera.ICameraInformation;
 import net.osdn.gokigen.a01d.camera.IFocusingModeNotify;
@@ -15,6 +16,7 @@ import net.osdn.gokigen.a01d.camera.ICameraConnection;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.connection.OlyCameraConnection;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.connection.ble.ICameraPowerOn;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.connection.ble.PowerOnCamera;
+import net.osdn.gokigen.a01d.camera.olympus.wrapper.connection.ble.PowerOnCameraLP;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.property.IOlyCameraPropertyProvider;
 import net.osdn.gokigen.a01d.camera.olympus.wrapper.property.OlyCameraPropertyProxy;
 import net.osdn.gokigen.a01d.liveview.IAutoFocusFrameDisplay;
@@ -45,7 +47,14 @@ public class OlympusInterfaceProvider implements IOlympusInterfaceProvider, IDis
         this.hardwareStatus = new OlyCameraHardwareStatus(this.wrapper.getOLYCamera());
         this.propertyListener = new OLYCameraPropertyListenerImpl(this.wrapper.getOLYCamera());
         this.zoomLensControl = new OlyCameraZoomLensControl(context, this.wrapper.getOLYCamera());
-        this.cameraPowerOn = new PowerOnCamera(context, this.wrapper.getOLYCamera());
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+        {
+            this.cameraPowerOn = new PowerOnCameraLP(context, this.wrapper.getOLYCamera());
+        }
+        else
+        {
+            this.cameraPowerOn = new PowerOnCamera(context, this.wrapper.getOLYCamera());
+        }
     }
 
     @Override
