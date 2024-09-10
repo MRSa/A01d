@@ -64,7 +64,7 @@ public class PanasonicCameraWrapper implements IPanasonicCameraHolder, IPanasoni
             //this.panasonicCameraApi = PanasonicCameraApi.newInstance(panasonicCamera);
             if (eventObserver == null)
             {
-                eventObserver = CameraEventObserver.newInstance(context, panasonicCamera, cardSlotSelector);
+                eventObserver = CameraEventObserver.Companion.newInstance(context, panasonicCamera, cardSlotSelector);
             }
             if (liveViewControl == null)
             {
