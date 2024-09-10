@@ -1,16 +1,11 @@
-package net.osdn.gokigen.a01d.camera.panasonic.wrapper;
+package net.osdn.gokigen.a01d.camera.panasonic.wrapper
 
+import net.osdn.gokigen.a01d.camera.ICameraChangeListener
 
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-
-import net.osdn.gokigen.a01d.camera.ICameraChangeListener;
-
-public interface IPanasonicCameraHolder
+interface IPanasonicCameraHolder
 {
-    void detectedCamera(@NonNull IPanasonicCamera camera);
-    void prepare();
-    void startRecMode();
-    void startEventWatch(@Nullable ICameraChangeListener listener);
+    fun detectedCamera(camera: IPanasonicCamera)
+    fun prepare()
+    fun startRecMode()
+    fun startEventWatch(listener: ICameraChangeListener?)
 }

@@ -1,80 +1,62 @@
-package net.osdn.gokigen.a01d.camera.panasonic.operation.takepicture;
+package net.osdn.gokigen.a01d.camera.panasonic.operation.takepicture
 
-import android.util.Log;
+import android.util.Log
+import net.osdn.gokigen.a01d.camera.panasonic.wrapper.IPanasonicCamera
+import net.osdn.gokigen.a01d.camera.utils.SimpleHttpClient
+import net.osdn.gokigen.a01d.liveview.IAutoFocusFrameDisplay
+import net.osdn.gokigen.a01d.liveview.IIndicatorControl
 
-import net.osdn.gokigen.a01d.camera.panasonic.wrapper.IPanasonicCamera;
-import net.osdn.gokigen.a01d.camera.utils.SimpleHttpClient;
-import net.osdn.gokigen.a01d.liveview.IAutoFocusFrameDisplay;
-import net.osdn.gokigen.a01d.liveview.IIndicatorControl;
-
-import androidx.annotation.NonNull;
-
-public class SingleShotControl
+class SingleShotControl(private val frameDisplayer: IAutoFocusFrameDisplay, private val indicator: IIndicatorControl)
 {
-    private static final String TAG = SingleShotControl.class.getSimpleName();
-    private static final int TIMEOUT_MS = 3000;
-    private final IAutoFocusFrameDisplay frameDisplayer;
-    private final IIndicatorControl indicator;
-    private IPanasonicCamera camera = null;
+    private lateinit var camera: IPanasonicCamera
 
-    /**
-     *
-     *
-     */
-    public SingleShotControl(@NonNull IAutoFocusFrameDisplay frameDisplayer, @NonNull IIndicatorControl indicator)
-    {
-        this.frameDisplayer = frameDisplayer;
-        this.indicator = indicator;
+    fun setCamera(panasonicCamera: IPanasonicCamera) {
+        this.camera = panasonicCamera
     }
 
-    /**
-     *
-     *
-     */
-    public void setCamera(@NonNull IPanasonicCamera panasonicCamera)
+    fun singleShot()
     {
-        this.camera = panasonicCamera;
-    }
-
-    /**
-     *
-     *
-     */
-    public void singleShot()
-    {
-        Log.v(TAG, "singleShot()");
-        if (camera == null)
+        Log.v(TAG, "singleShot()")
+        if (!::camera.isInitialized)
         {
-            Log.v(TAG, "IPanasonicCamera is null...");
-            return;
+            Log.v(TAG, "IPanasonicCamera is not initialized...")
+            return
         }
         try
         {
-            Thread thread = new Thread(new Runnable()
-            {
-                @Override
-                public void run()
+            val thread = Thread {
+                try
                 {
-                    try
-                    {
-                        String reply = SimpleHttpClient.httpGet(camera.getCmdUrl() + "cam.cgi?mode=camcmd&value=capture", TIMEOUT_MS);
-                        if (!reply.contains("ok"))
-                        {
-                            Log.v(TAG, "Capture Failure... : " + reply);
-                        }
+                    val sessionId = camera.getCommunicationSessionId()
+                    val urlToSend = "${camera.getCmdUrl()}cam.cgi?mode=camcmd&value=capture"
+                    val reply = if (!sessionId.isNullOrEmpty()) {
+                        val headerMap: MutableMap<String, String> = HashMap()
+                        headerMap["X-SESSION_ID"] = sessionId
+                        SimpleHttpClient.httpGetWithHeader(urlToSend, headerMap, null, TIMEOUT_MS)
+                    } else {
+                        SimpleHttpClient.httpGet(urlToSend, TIMEOUT_MS)
                     }
-                    catch (Exception e)
-                    {
-                        e.printStackTrace();
+                    if (!reply.contains("ok")) {
+                        Log.v(TAG, "Capture Failure... : $reply")
                     }
-                    frameDisplayer.hideFocusFrame();
                 }
-            });
-            thread.start();
+                catch (e: Exception)
+                {
+                    e.printStackTrace()
+                }
+                frameDisplayer.hideFocusFrame()
+            }
+            thread.start()
         }
-        catch (Exception e)
+        catch (e: Exception)
         {
-            e.printStackTrace();
+            e.printStackTrace()
         }
+    }
+
+    companion object
+    {
+        private val TAG: String = SingleShotControl::class.java.simpleName
+        private const val TIMEOUT_MS = 3000
     }
 }

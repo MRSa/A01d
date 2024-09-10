@@ -1,7 +1,7 @@
-package net.osdn.gokigen.a01d.camera.panasonic.wrapper;
+package net.osdn.gokigen.a01d.camera.panasonic.wrapper
 
-public interface IPanasonicApiService
+interface IPanasonicApiService
 {
-    String getName();
-    String getActionUrl();
+    fun getName(): String
+    fun getActionUrl(): String
 }

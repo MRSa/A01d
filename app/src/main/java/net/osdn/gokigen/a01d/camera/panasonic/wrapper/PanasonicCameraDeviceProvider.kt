@@ -37,7 +37,7 @@ class PanasonicCameraDeviceProvider private constructor(
         {
             for (apiService in apiServices)
             {
-                if (serviceName == apiService.name)
+                if (serviceName == apiService.getName())
                 {
                     return (true)
                 }

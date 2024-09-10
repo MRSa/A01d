@@ -12,7 +12,7 @@ import net.osdn.gokigen.a01d.liveview.liveviewlistener.ILiveViewListener
 
 interface IPanasonicInterfaceProvider
 {
-    fun getPanasonicCameraConnection(): ICameraConnection?
+    fun getPanasonicCameraConnection(): ICameraConnection
     fun getPanasonicLiveViewControl(): ILiveViewControl?
     fun getLiveViewListener(): ILiveViewListener?
     fun getFocusingControl(): IFocusingControl?

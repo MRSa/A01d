@@ -1,18 +1,16 @@
-package net.osdn.gokigen.a01d.camera.panasonic.wrapper.eventlistener;
+package net.osdn.gokigen.a01d.camera.panasonic.wrapper.eventlistener
 
-import androidx.annotation.NonNull;
+import net.osdn.gokigen.a01d.camera.ICameraChangeListener
 
-import net.osdn.gokigen.a01d.camera.ICameraChangeListener;
-
-public interface ICameraEventObserver
+interface ICameraEventObserver
 {
-    void activate();
-    boolean start();
-    void stop();
-    void release();
+    fun activate()
+    fun start(): Boolean
+    fun stop()
+    fun release()
 
-    void setEventListener(@NonNull ICameraChangeListener listener);
-    void clearEventListener();
+    fun setEventListener(listener: ICameraChangeListener)
+    fun clearEventListener()
 
-    ICameraStatusHolder getCameraStatusHolder();
+    fun getCameraStatusHolder(): ICameraStatusHolder
 }

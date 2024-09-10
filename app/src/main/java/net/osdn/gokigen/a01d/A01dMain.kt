@@ -824,27 +824,38 @@ class A01dMain : AppCompatActivity(), ICameraStatusReceiver, IChangeScene, Power
      */
     private fun getCameraConnection(connectionMethod: CameraConnectionMethod): ICameraConnection
     {
-        val connection = if (connectionMethod == CameraConnectionMethod.RICOH_GR2) {
-            interfaceProvider.ricohGr2Infterface.ricohGr2CameraConnection
-        } else if (connectionMethod == CameraConnectionMethod.SONY) {
-            interfaceProvider.sonyInterface.sonyCameraConnection
-        } else if (connectionMethod == CameraConnectionMethod.PANASONIC) {
-            interfaceProvider.panasonicInterface.panasonicCameraConnection
-        } else if (connectionMethod == CameraConnectionMethod.FUJI_X) {
-            interfaceProvider.fujiXInterface.fujiXCameraConnection
-        } else if (connectionMethod == CameraConnectionMethod.OLYMPUS) {
-            interfaceProvider.olympusPenInterface.olyCameraConnection
-        } else if (connectionMethod == CameraConnectionMethod.THETA) {
-            interfaceProvider.thetaInterface.cameraConnection
-        } else if (connectionMethod == CameraConnectionMethod.CANON) {
-            interfaceProvider.canonInterface.cameraConnection
-        } else if (connectionMethod == CameraConnectionMethod.NIKON) {
-            interfaceProvider.nikonInterface.cameraConnection
-        } else if (connectionMethod == CameraConnectionMethod.KODAK) {
-            interfaceProvider.kodakInterface.cameraConnection
-        } else  // if (connectionMethod == ICameraConnection.CameraConnectionMethod.OPC)
-        {
-            interfaceProvider.olympusInterface.olyCameraConnection
+        val connection = when (connectionMethod) {
+            CameraConnectionMethod.RICOH_GR2 -> {
+                interfaceProvider.ricohGr2Infterface.ricohGr2CameraConnection
+            }
+            CameraConnectionMethod.SONY -> {
+                interfaceProvider.sonyInterface.sonyCameraConnection
+            }
+            CameraConnectionMethod.PANASONIC -> {
+                interfaceProvider.panasonicInterface.getPanasonicCameraConnection()
+            }
+            CameraConnectionMethod.FUJI_X -> {
+                interfaceProvider.fujiXInterface.fujiXCameraConnection
+            }
+            CameraConnectionMethod.OLYMPUS -> {
+                interfaceProvider.olympusPenInterface.olyCameraConnection
+            }
+            CameraConnectionMethod.THETA -> {
+                interfaceProvider.thetaInterface.cameraConnection
+            }
+            CameraConnectionMethod.CANON -> {
+                interfaceProvider.canonInterface.cameraConnection
+            }
+            CameraConnectionMethod.NIKON -> {
+                interfaceProvider.nikonInterface.cameraConnection
+            }
+            CameraConnectionMethod.KODAK -> {
+                interfaceProvider.kodakInterface.cameraConnection
+            }
+            else  // if (connectionMethod == ICameraConnection.CameraConnectionMethod.OPC)
+            -> {
+                interfaceProvider.olympusInterface.olyCameraConnection
+            }
         }
         return (connection)
     }

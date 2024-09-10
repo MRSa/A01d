@@ -1,191 +1,180 @@
-package net.osdn.gokigen.a01d.camera.panasonic.wrapper.eventlistener;
+package net.osdn.gokigen.a01d.camera.panasonic.wrapper.eventlistener
 
-import android.content.Context;
-import android.util.Log;
+import android.content.Context
+import android.util.Log
+import net.osdn.gokigen.a01d.ICardSlotSelectionReceiver
+import net.osdn.gokigen.a01d.ICardSlotSelector
+import net.osdn.gokigen.a01d.camera.ICameraChangeListener
+import net.osdn.gokigen.a01d.camera.panasonic.wrapper.IPanasonicCamera
+import net.osdn.gokigen.a01d.camera.utils.SimpleHttpClient
 
-import androidx.annotation.NonNull;
-
-import net.osdn.gokigen.a01d.ICardSlotSelectionReceiver;
-import net.osdn.gokigen.a01d.ICardSlotSelector;
-import net.osdn.gokigen.a01d.camera.ICameraChangeListener;
-import net.osdn.gokigen.a01d.camera.panasonic.wrapper.IPanasonicCamera;
-import net.osdn.gokigen.a01d.camera.utils.SimpleHttpClient;
-
-import java.util.List;
-
-public class CameraStatusHolder implements ICameraStatusHolder, ICardSlotSelectionReceiver
+class CameraStatusHolder(private val context: Context, private val remote: IPanasonicCamera, private val cardSlotSelector: ICardSlotSelector) : ICameraStatusHolder, ICardSlotSelectionReceiver
 {
-    private static final String TAG = CameraStatusHolder.class.getSimpleName();
-    private final Context context;
-    private final IPanasonicCamera remote;
-    private static final int TIMEOUT_MS = 3000;
-    private final ICardSlotSelector cardSlotSelector;
-    private ICameraChangeListener listener = null;
-    private String current_sd = "sd1";
-    private boolean isInitialized = false;
-    private boolean isDualSlot = false;
+    private var listener: ICameraChangeListener? = null
+    private var currentSd = "sd1"
+    private var isInitialized = false
+    private var isDualSlot = false
 
-    CameraStatusHolder(@NonNull Context context, @NonNull IPanasonicCamera apiClient, @NonNull ICardSlotSelector cardSlotSelector)
-    {
-        this.context = context;
-        this.remote = apiClient;
-        this.cardSlotSelector = cardSlotSelector;
-
-    }
-
-    void parse(String reply)
+    fun parse(reply: String)
     {
         try
         {
             // Log.v(TAG, " getState : " + reply);
 
-            boolean isEnableDualSlot = false;
-            if (reply.contains("<sd_memory>set</sd_memory>") && (reply.contains("<sd2_memory>set</sd2_memory>")))
-            {
+            var isEnableDualSlot = false
+            if (reply.contains("<sd_memory>set</sd_memory>") && (reply.contains("<sd2_memory>set</sd2_memory>"))) {
                 // カードが2枚刺さっている場合...
-                isEnableDualSlot = true;
+                isEnableDualSlot = true
             }
-            if ((!isInitialized)||(isDualSlot != isEnableDualSlot))
-            {
+            if ((!isInitialized) || (isDualSlot != isEnableDualSlot)) {
                 // 初回だけの実行...
-                if (isEnableDualSlot)
-                {
+                if (isEnableDualSlot) {
                     // カードが2枚刺さっている場合...
-                    cardSlotSelector.setupSlotSelector(true, this);
-                }
-                else
-                {
+                    cardSlotSelector.setupSlotSelector(true, this)
+                } else {
                     // カードが１つしか刺さっていない場合...
-                    cardSlotSelector.setupSlotSelector(false, null);
+                    cardSlotSelector.setupSlotSelector(false, null)
                 }
-                isInitialized = true;
-                isDualSlot = isEnableDualSlot;
+                isInitialized = true
+                isDualSlot = isEnableDualSlot
             }
-            checkCurrentSlot(reply);
+            checkCurrentSlot(reply)
         }
-        catch (Exception e)
+        catch (e: Exception)
         {
-            e.printStackTrace();
+            e.printStackTrace()
         }
     }
 
-    private void checkCurrentSlot(String reply)
+    private fun checkCurrentSlot(reply: String)
     {
         try
         {
-            String header = "<current_sd>";
-            int indexStart = reply.indexOf(header);
-            int indexEnd = reply.indexOf("</current_sd>");
-            if ((indexStart > 0)&&(indexEnd > 0)&&(indexStart < indexEnd))
+            val header = "<current_sd>"
+            val indexStart = reply.indexOf(header)
+            val indexEnd = reply.indexOf("</current_sd>")
+            if ((indexStart > 0) && (indexEnd > 0) && (indexStart < indexEnd))
             {
-                String currentSlot = reply.substring(indexStart + header.length(), indexEnd);
-                if (!current_sd.equals(currentSlot))
+                val currentSlot = reply.substring(indexStart + header.length, indexEnd)
+                if (currentSd != currentSlot)
                 {
-                    current_sd = currentSlot;
-                    cardSlotSelector.changedCardSlot(current_sd);
+                    currentSd = currentSlot
+                    cardSlotSelector.changedCardSlot(currentSd)
                 }
             }
         }
-        catch (Exception e)
+        catch (e: Exception)
         {
-            e.printStackTrace();
+            e.printStackTrace()
         }
     }
 
-    void setEventChangeListener(@NonNull ICameraChangeListener listener)
+    fun setEventChangeListener(listener: ICameraChangeListener)
     {
-        this.listener = listener;
+        this.listener = listener
     }
 
-    void clearEventChangeListener()
+    fun clearEventChangeListener()
     {
-        this.listener = null;
+        this.listener = null
     }
 
-    @Override
-    public String getCameraStatus()
+    override fun getCameraStatus(): String
     {
-        return (null);
+        return ("")
     }
 
-    @Override
-    public boolean getLiveviewStatus()
+    override fun getLiveviewStatus(): Boolean
     {
-        return (false);
+        return (false)
     }
 
-    @Override
-    public String getShootMode()
+    override fun getShootMode(): String
     {
-        return (null);
+        return ("")
     }
 
-    @Override
-    public List<String> getAvailableShootModes()
+    override fun getAvailableShootModes(): List<String>
     {
-        return (null);
+        return (arrayListOf())
     }
 
-    @Override
-    public int getZoomPosition()
+    override fun getZoomPosition(): Int
     {
-        return (0);
+        return (0)
     }
 
-    @Override
-    public String getStorageId()
+    override fun getStorageId(): String
     {
-        return (current_sd);
+        return (currentSd)
     }
 
-    @Override
-    public void slotSelected(@NonNull String slotId)
+    override fun slotSelected(slotId: String)
     {
-        Log.v(TAG, " slotSelected : " + slotId);
-        if (!current_sd.equals(slotId))
+        Log.v(TAG, " slotSelected : $slotId")
+        if (currentSd != slotId)
         {
             // スロットを変更したい！
-            requestToChangeSlot(slotId);
+            requestToChangeSlot(slotId)
         }
     }
 
-
-    private void requestToChangeSlot(final String slotId)
+    private fun requestToChangeSlot(slotId: String)
     {
         try
         {
-            Thread thread = new Thread(new Runnable() {
-                @Override
-                public void run()
+            val thread = Thread {
+                try
                 {
-                    try
+                    var loop = true
+                    while (loop)
                     {
-                        boolean loop = true;
-                        while (loop)
+                        val sessionId = remote.getCommunicationSessionId()
+                        val urlToSend = "${remote.getCmdUrl()}cam.cgi?mode=setsetting&type=current_sd&value=$slotId"
+                        val reply = if (!sessionId.isNullOrEmpty())
                         {
-                            String reply = SimpleHttpClient.httpGet(remote.getCmdUrl() + "cam.cgi?mode=setsetting&type=current_sd&value=" + slotId, TIMEOUT_MS);
-                            if (reply.indexOf("<result>ok</result>") > 0)
+                            val headerMap: MutableMap<String, String> = HashMap()
+                            headerMap["X-SESSION_ID"] = sessionId
+                            SimpleHttpClient.httpGetWithHeader(urlToSend, headerMap, null, TIMEOUT_MS)
+                        }
+                        else
+                        {
+                            SimpleHttpClient.httpGet(urlToSend, TIMEOUT_MS)
+                        }
+                        if (reply.indexOf("<result>ok</result>") > 0)
+                        {
+                            loop = false
+                            cardSlotSelector.selectSlot(slotId)
+                        }
+                        else
+                        {
+                            try
                             {
-                                loop = false;
-                                cardSlotSelector.selectSlot(slotId);
+                                Thread.sleep(1000) // 1秒待つ
                             }
-                            else
+                            catch (e: Exception)
                             {
-                                Thread.sleep(1000);  // 1秒待つ
+                                e.printStackTrace()
                             }
                         }
                     }
-                    catch (Exception e)
-                    {
-                        e.printStackTrace();
-                    }
                 }
-            });
-            thread.start();
+                catch (e: Exception)
+                {
+                    e.printStackTrace()
+                }
+            }
+            thread.start()
         }
-        catch (Exception e)
+        catch (e: Exception)
         {
-            e.printStackTrace();
+            e.printStackTrace()
         }
+    }
+
+    companion object
+    {
+        private val TAG: String = CameraStatusHolder::class.java.simpleName
+        private const val TIMEOUT_MS = 3000
     }
 }
