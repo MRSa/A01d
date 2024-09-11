@@ -1,312 +1,292 @@
-package net.osdn.gokigen.a01d.camera.panasonic.wrapper;
+package net.osdn.gokigen.a01d.camera.panasonic.wrapper
 
-import android.util.Log;
+import android.util.Log
+import net.osdn.gokigen.a01d.camera.ILiveViewControl
+import net.osdn.gokigen.a01d.camera.utils.SimpleHttpClient
+import net.osdn.gokigen.a01d.liveview.liveviewlistener.CameraLiveViewListenerImpl
+import net.osdn.gokigen.a01d.liveview.liveviewlistener.ILiveViewListener
+import java.net.DatagramPacket
+import java.net.DatagramSocket
+import java.util.Arrays
 
-import net.osdn.gokigen.a01d.camera.ILiveViewControl;
-import net.osdn.gokigen.a01d.camera.utils.SimpleHttpClient;
-import net.osdn.gokigen.a01d.liveview.liveviewlistener.ILiveViewListener;
-import net.osdn.gokigen.a01d.liveview.liveviewlistener.CameraLiveViewListenerImpl;
-
-import androidx.annotation.NonNull;
-
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.util.Arrays;
-
-public class PanasonicLiveViewControl implements ILiveViewControl
+class PanasonicLiveViewControl internal constructor(private val camera: IPanasonicCamera) : ILiveViewControl
 {
-    private final String TAG = toString();
-    private final IPanasonicCamera camera;
-    //private final BlockingQueue<byte[]> mJpegQueue = new ArrayBlockingQueue<>(2);
-    private final CameraLiveViewListenerImpl liveViewListener;
-    private DatagramSocket receiveSocket = null;
-    private boolean whileStreamReceive = false;
-    private int errorOccur = 0;
-    private static final int TIMEOUT_MAX = 3;
-    private static final int ERROR_MAX = 30;
-    private static final int RECEIVE_BUFFER_SIZE = 1024 * 1024 * 4;
-    private static final int TIMEOUT_MS = 1500;
-    private static final int LIVEVIEW_PORT = 49152;
-    private final String LIVEVIEW_START_REQUEST = "cam.cgi?mode=startstream&value=49152";
-    private final String LIVEVIEW_STOP_REQUEST = "cam.cgi?mode=stopstream";
+    private val liveViewListener = CameraLiveViewListenerImpl()
+    private var receiveSocket: DatagramSocket? = null
+    private var whileStreamReceive = false
+    private var errorOccur = 0
 
-    PanasonicLiveViewControl(@NonNull IPanasonicCamera camera)
-    {
-        this.camera = camera;
-        liveViewListener = new CameraLiveViewListenerImpl();
-    }
 
-    @Override
-    public void changeLiveViewSize(String size)
+    override fun changeLiveViewSize(size: String)
     {
 
     }
 
-    @Override
-    public void startLiveView()
+    override fun startLiveView()
     {
-        Log.v(TAG, "startLiveView()");
+        Log.v(TAG, "startLiveView()")
         try
         {
-            Thread thread = new Thread(() -> {
+            val thread = Thread(Runnable {
                 try
                 {
-                    startReceiveStream();
-                    if (!whileStreamReceive)
-                    {
-                        Log.v(TAG, "CANNOT OPEN : UDP RECEIVE SOCKET");
-                        return;
+                    startReceiveStream()
+                    if (!whileStreamReceive) {
+                        Log.v(TAG, "CANNOT OPEN : UDP RECEIVE SOCKET")
+                        return@Runnable
                     }
-                    String requestUrl = camera.getCmdUrl() + LIVEVIEW_START_REQUEST;
-                    String reply = SimpleHttpClient.httpGet(requestUrl, TIMEOUT_MS);
+                    val requestUrl = camera.getCmdUrl() + LIVEVIEW_START_REQUEST
+                    val sessionId = camera.getCommunicationSessionId()
+                    val reply = if (!sessionId.isNullOrEmpty())
+                    {
+                        val headerMap: MutableMap<String, String> = HashMap()
+                        headerMap["X-SESSION_ID"] = sessionId
+                        SimpleHttpClient.httpGetWithHeader(requestUrl, headerMap, null,
+                            TIMEOUT_MS
+                        )
+                    }
+                    else
+                    {
+                        SimpleHttpClient.httpGet(requestUrl, TIMEOUT_MS)
+                    }
                     if (!reply.contains("<result>ok</result>"))
                     {
                         try
                         {
                             // エラー回数のカウントアップ
-                            errorOccur++;
+                            errorOccur++
 
                             // 少し待つ...
-                            Thread.sleep(TIMEOUT_MS);
+                            Thread.sleep(TIMEOUT_MS.toLong())
 
-                            if (errorOccur < ERROR_MAX)
-                            {
-                                Log.v(TAG, "RETRY START LIVEVIEW... : " + errorOccur);
-                                startLiveView();
+                            if (errorOccur < ERROR_MAX) {
+                                Log.v(TAG, "RETRY START LIVEVIEW... : $errorOccur")
+                                startLiveView()
+                            } else {
+                                Log.v(TAG, "RETRY OVER : START LIVEVIEW")
                             }
-                            else
-                            {
-                                Log.v(TAG, "RETRY OVER : START LIVEVIEW");
-                            }
+                        } catch (e: Exception) {
+                            e.printStackTrace()
                         }
-                        catch (Exception e)
-                        {
-                            e.printStackTrace();
-                        }
+                    } else {
+                        Log.v(TAG, "   ----- START LIVEVIEW ----- : $requestUrl")
                     }
-                    else
-                    {
-                        Log.v(TAG, "   ----- START LIVEVIEW ----- : " + requestUrl);
-                    }
+                } catch (e: Exception) {
+                    e.printStackTrace()
                 }
-                catch (Exception e)
-                {
-                    e.printStackTrace();
-                }
-            });
-            thread.start();
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
+            })
+            thread.start()
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
     }
 
-    @Override
-    public void stopLiveView()
-    {
-        Log.v(TAG, "stopLiveView()");
+    override fun stopLiveView() {
+        Log.v(TAG, "stopLiveView()")
         try
         {
-            Thread thread = new Thread(() -> {
+            val thread = Thread {
                 try
                 {
-                    String reply = SimpleHttpClient.httpGet(camera.getCmdUrl() + LIVEVIEW_STOP_REQUEST, TIMEOUT_MS);
-                    if (!reply.contains("<result>ok</result>"))
+                    val requestUrl = camera.getCmdUrl() + LIVEVIEW_STOP_REQUEST
+                    val sessionId = camera.getCommunicationSessionId()
+                    val reply = if (!sessionId.isNullOrEmpty())
                     {
-                        Log.v(TAG, "stopLiveview() reply is fail... " + reply);
+                        val headerMap: MutableMap<String, String> = HashMap()
+                        headerMap["X-SESSION_ID"] = sessionId
+                        SimpleHttpClient.httpGetWithHeader(requestUrl, headerMap, null,
+                            TIMEOUT_MS
+                        )
                     }
                     else
                     {
-                        Log.v(TAG, "stopLiveview() is issued.");
+                        SimpleHttpClient.httpGet(requestUrl, TIMEOUT_MS)
+                    }
+                    if (!reply.contains("<result>ok</result>"))
+                    {
+                        Log.v(TAG, "stopLiveview() reply is fail... $reply")
+                    }
+                    else
+                    {
+                        Log.v(TAG, "stopLiveview() is issued.")
                     }
                     //  ライブビューウォッチャーを止める
-                    whileStreamReceive = false;
-                    closeReceiveSocket();
+                    whileStreamReceive = false
+                    closeReceiveSocket()
                 }
-                catch (Exception e)
+                catch (e: Exception)
                 {
-                    e.printStackTrace();
+                    e.printStackTrace()
                 }
-            });
-            thread.start();
+            }
+            thread.start()
         }
-        catch (Exception e)
+        catch (e: Exception)
         {
-            e.printStackTrace();
+            e.printStackTrace()
         }
     }
 
-    @Override
-    public void updateDigitalZoom()
-    {
-
+    override fun updateDigitalZoom() {
     }
 
-    @Override
-    public void updateMagnifyingLiveViewScale(boolean isChangeScale)
-    {
-
+    override fun updateMagnifyingLiveViewScale(isChangeScale: Boolean) {
     }
 
-    @Override
-    public float getMagnifyingLiveViewScale()
-    {
-        return (1.0f);
+    override fun getMagnifyingLiveViewScale(): Float {
+        return (1.0f)
     }
 
-    @Override
-    public float getDigitalZoomScale()
-    {
-        return (1.0f);
+    override fun getDigitalZoomScale(): Float {
+        return (1.0f)
     }
 
-    private void startReceiveStream()
-    {
-        if (whileStreamReceive)
-        {
-            Log.v(TAG, "startReceiveStream() : already starting.");
-            return;
+    private fun startReceiveStream() {
+        if (whileStreamReceive) {
+            Log.v(TAG, "startReceiveStream() : already starting.")
+            return
         }
 
         // ソケットをあける (UDP)
-        try
-        {
-            receiveSocket = new DatagramSocket(LIVEVIEW_PORT);
-            whileStreamReceive = true;
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-            whileStreamReceive = false;
-            receiveSocket = null;
+        try {
+            receiveSocket = DatagramSocket(LIVEVIEW_PORT)
+            whileStreamReceive = true
+        } catch (e: Exception) {
+            e.printStackTrace()
+            whileStreamReceive = false
+            receiveSocket = null
         }
 
         // 受信スレッドを動かす
-        Thread thread = new Thread(this::receiverThread);
-        try
-        {
-            thread.start();
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
+        val thread = Thread { this.receiverThread() }
+        try {
+            thread.start()
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
     }
 
-    private void checkReceiveImage(@NonNull DatagramPacket packet)
-    {
-        int dataLength = packet.getLength();
-        int searchIndex = 0;
-        int startPosition = 0;
-        int[] startmarker = { 0xff, 0xd8 };
-        byte[] receivedData = packet.getData();
-        if (receivedData == null)
-        {
+    private fun checkReceiveImage(packet: DatagramPacket) {
+        val dataLength = packet.length
+        var searchIndex = 0
+        var startPosition = 0
+        val startmarker = intArrayOf(0xff, 0xd8)
+        val receivedData = packet.data
+        if (receivedData == null) {
             // 受信データが取れなかったので終了する
-            Log.v(TAG, "RECEIVED DATA IS NULL...");
-            return;
+            Log.v(TAG, "RECEIVED DATA IS NULL...")
+            return
         }
         //Log.v(TAG, "RECEIVED PACKET : " + dataLength);
-        while (startPosition < dataLength)
-        {
+        while (startPosition < dataLength) {
             // 先頭のjpegマーカーが出てくるまで読み飛ばす
-            try
-            {
-                if (receivedData[startPosition++] == (byte) startmarker[searchIndex])
-                {
-                    searchIndex++;
-                    if (searchIndex >= startmarker.length)
-                    {
-                        break;
+            try {
+                if (receivedData[startPosition++] == startmarker[searchIndex].toByte()) {
+                    searchIndex++
+                    if (searchIndex >= startmarker.size) {
+                        break
                     }
+                } else {
+                    searchIndex = 0
                 }
-                else
-                {
-                    searchIndex = 0;
-                }
-            }
-            catch (Exception e)
-            {
-                e.printStackTrace();
-                return;
+            } catch (e: Exception) {
+                e.printStackTrace()
+                return
             }
         }
-        int offset = startPosition - startmarker.length;
-        //liveViewListener.onUpdateLiveView(Arrays.copyOfRange(receivedData, offset, dataLength - offset), null);
-        liveViewListener.onUpdateLiveView(Arrays.copyOfRange(receivedData, offset, dataLength), null);
+        val offset = startPosition - startmarker.size
+        liveViewListener.onUpdateLiveView(
+            Arrays.copyOfRange(receivedData, offset, dataLength),
+            null
+        )
     }
 
-    private void receiverThread()
-    {
-        int exceptionCount = 0;
-        byte[] buffer = new byte[RECEIVE_BUFFER_SIZE];
-        while (whileStreamReceive)
-        {
-            try
-            {
-                DatagramPacket receive_packet = new DatagramPacket(buffer, buffer.length);
-                if (receiveSocket != null)
-                {
-                    receiveSocket.setSoTimeout(TIMEOUT_MS);
-                    receiveSocket.receive(receive_packet);
-                    checkReceiveImage(receive_packet);
-                    exceptionCount = 0;
+    private fun receiverThread() {
+        var exceptionCount = 0
+        val buffer = ByteArray(RECEIVE_BUFFER_SIZE)
+        while (whileStreamReceive) {
+            try {
+                val receive_packet = DatagramPacket(buffer, buffer.size)
+                if (receiveSocket != null) {
+                    receiveSocket!!.soTimeout = TIMEOUT_MS
+                    receiveSocket!!.receive(receive_packet)
+                    checkReceiveImage(receive_packet)
+                    exceptionCount = 0
+                } else {
+                    Log.v(TAG, "receiveSocket is NULL...")
                 }
-                else
-                {
-                    Log.v(TAG, "receiveSocket is NULL...");
-                }
-            }
-            catch (Exception e)
-            {
-                exceptionCount++;
-                e.printStackTrace();
-                if (exceptionCount > TIMEOUT_MAX)
-                {
+            } catch (e: Exception) {
+                exceptionCount++
+                e.printStackTrace()
+                if (exceptionCount > TIMEOUT_MAX) {
                     try
                     {
-                        Log.v(TAG, "LV : RETRY REQUEST");
+                        Log.v(TAG, "LV : RETRY REQUEST")
+                        exceptionCount = 0
 
-                        exceptionCount = 0;
-                        String reply = SimpleHttpClient.httpGet(camera.getCmdUrl() + LIVEVIEW_START_REQUEST, TIMEOUT_MS);
+                        val requestUrl = camera.getCmdUrl() + LIVEVIEW_START_REQUEST
+                        val sessionId = camera.getCommunicationSessionId()
+                        val reply = if (!sessionId.isNullOrEmpty())
+                        {
+                            val headerMap: MutableMap<String, String> = HashMap()
+                            headerMap["X-SESSION_ID"] = sessionId
+                            SimpleHttpClient.httpGetWithHeader(requestUrl, headerMap, null,
+                                TIMEOUT_MS
+                            )
+                        }
+                        else
+                        {
+                            SimpleHttpClient.httpGet(requestUrl, TIMEOUT_MS)
+                        }
                         if (!reply.contains("ok"))
                         {
-                            Log.v(TAG, "LV : RETRY COMMAND FAIL...");
+                            Log.v(TAG, "LV : RETRY COMMAND FAIL...")
                         }
                     }
-                    catch (Exception ee)
+                    catch (ee: Exception)
                     {
-                        ee.printStackTrace();
+                        ee.printStackTrace()
                     }
                 }
             }
         }
-        closeReceiveSocket();
-        Log.v(TAG, "  ----- startReceiveStream() : Finished.");
-        System.gc();
+        closeReceiveSocket()
+        Log.v(TAG, "  ----- startReceiveStream() : Finished.")
+        System.gc()
     }
 
-    public ILiveViewListener getLiveViewListener()
+    fun getLiveViewListener(): ILiveViewListener
     {
-        return (liveViewListener);
+        return (liveViewListener)
     }
 
-    private void closeReceiveSocket()
+    private fun closeReceiveSocket()
     {
-        Log.v(TAG, "closeReceiveSocket()");
+        Log.v(TAG, "closeReceiveSocket()")
         try
         {
             if (receiveSocket != null)
             {
-                Log.v(TAG, "  ----- SOCKET CLOSE -----  ");
-                receiveSocket.close();
-                receiveSocket = null;
+                Log.v(TAG, "  ----- SOCKET CLOSE -----  ")
+                receiveSocket?.close()
+                receiveSocket = null
             }
         }
-        catch (Exception e)
+        catch (e: Exception)
         {
-            e.printStackTrace();
+            e.printStackTrace()
         }
+    }
+
+    companion object
+    {
+        private val TAG: String = PanasonicLiveViewControl::class.java.simpleName
+        private const val LIVEVIEW_START_REQUEST = "cam.cgi?mode=startstream&value=49152"
+        private const val LIVEVIEW_STOP_REQUEST = "cam.cgi?mode=stopstream"
+        private const val TIMEOUT_MAX = 3
+        private const val ERROR_MAX = 30
+        private const val RECEIVE_BUFFER_SIZE = 1024 * 1024 * 4
+        private const val TIMEOUT_MS = 1500
+        private const val LIVEVIEW_PORT = 49152
     }
 }

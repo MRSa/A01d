@@ -1,112 +1,117 @@
-package net.osdn.gokigen.a01d.camera.panasonic.wrapper;
+package net.osdn.gokigen.a01d.camera.panasonic.wrapper
 
-import android.app.Activity;
-import android.util.Log;
+import android.app.Activity
+import android.util.Log
+import net.osdn.gokigen.a01d.ICardSlotSelector
+import net.osdn.gokigen.a01d.camera.ICameraChangeListener
+import net.osdn.gokigen.a01d.camera.ICameraConnection
+import net.osdn.gokigen.a01d.camera.ICameraInformation
+import net.osdn.gokigen.a01d.camera.ICameraStatusReceiver
+import net.osdn.gokigen.a01d.camera.ICaptureControl
+import net.osdn.gokigen.a01d.camera.IDisplayInjector
+import net.osdn.gokigen.a01d.camera.IFocusingControl
+import net.osdn.gokigen.a01d.camera.IFocusingModeNotify
+import net.osdn.gokigen.a01d.camera.ILiveViewControl
+import net.osdn.gokigen.a01d.camera.IZoomLensControl
+import net.osdn.gokigen.a01d.camera.panasonic.IPanasonicInterfaceProvider
+import net.osdn.gokigen.a01d.camera.panasonic.operation.PanasonicCameraCaptureControl
+import net.osdn.gokigen.a01d.camera.panasonic.operation.PanasonicCameraFocusControl
+import net.osdn.gokigen.a01d.camera.panasonic.operation.PanasonicCameraZoomLensControl
+import net.osdn.gokigen.a01d.camera.panasonic.wrapper.connection.PanasonicCameraConnection
+import net.osdn.gokigen.a01d.camera.panasonic.wrapper.eventlistener.CameraEventObserver.Companion.newInstance
+import net.osdn.gokigen.a01d.camera.panasonic.wrapper.eventlistener.ICameraEventObserver
+import net.osdn.gokigen.a01d.camera.utils.SimpleHttpClient
+import net.osdn.gokigen.a01d.liveview.IAutoFocusFrameDisplay
+import net.osdn.gokigen.a01d.liveview.IIndicatorControl
+import net.osdn.gokigen.a01d.liveview.liveviewlistener.ILiveViewListener
 
-import net.osdn.gokigen.a01d.ICardSlotSelector;
-import net.osdn.gokigen.a01d.camera.ICameraChangeListener;
-import net.osdn.gokigen.a01d.camera.ICameraConnection;
-import net.osdn.gokigen.a01d.camera.ICameraInformation;
-import net.osdn.gokigen.a01d.camera.ICameraStatusReceiver;
-import net.osdn.gokigen.a01d.camera.ICaptureControl;
-import net.osdn.gokigen.a01d.camera.IDisplayInjector;
-import net.osdn.gokigen.a01d.camera.IFocusingControl;
-import net.osdn.gokigen.a01d.camera.ILiveViewControl;
-import net.osdn.gokigen.a01d.camera.IZoomLensControl;
-import net.osdn.gokigen.a01d.camera.IFocusingModeNotify;
-import net.osdn.gokigen.a01d.camera.panasonic.IPanasonicInterfaceProvider;
-import net.osdn.gokigen.a01d.camera.panasonic.operation.PanasonicCameraCaptureControl;
-import net.osdn.gokigen.a01d.camera.panasonic.operation.PanasonicCameraFocusControl;
-import net.osdn.gokigen.a01d.camera.panasonic.operation.PanasonicCameraZoomLensControl;
-import net.osdn.gokigen.a01d.camera.panasonic.wrapper.connection.PanasonicCameraConnection;
-import net.osdn.gokigen.a01d.camera.panasonic.wrapper.eventlistener.CameraEventObserver;
-import net.osdn.gokigen.a01d.camera.panasonic.wrapper.eventlistener.ICameraEventObserver;
-import net.osdn.gokigen.a01d.camera.panasonic.wrapper.eventlistener.ICameraStatusHolder;
-import net.osdn.gokigen.a01d.camera.utils.SimpleHttpClient;
-import net.osdn.gokigen.a01d.liveview.IAutoFocusFrameDisplay;
-import net.osdn.gokigen.a01d.liveview.IIndicatorControl;
-import net.osdn.gokigen.a01d.liveview.liveviewlistener.ILiveViewListener;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-
-public class PanasonicCameraWrapper implements IPanasonicCameraHolder, IPanasonicInterfaceProvider, IDisplayInjector
+class PanasonicCameraWrapper(
+    private val context: Activity,
+    private val provider: ICameraStatusReceiver,
+    private val listener: ICameraChangeListener,
+    private val cardSlotSelector: ICardSlotSelector
+) :
+    IPanasonicCameraHolder, IPanasonicInterfaceProvider, IDisplayInjector
 {
-    private final String TAG = toString();
-    private final Activity context;
-    private static final int TIMEOUT_MS = 3000;
-    private final ICameraStatusReceiver provider;
-    private final ICameraChangeListener listener;
-    private final ICardSlotSelector cardSlotSelector;
-    private IPanasonicCamera panasonicCamera = null;
-    //private IPanasonicCameraApi panasonicCameraApi = null;
-    private ICameraEventObserver eventObserver = null;
-    private PanasonicLiveViewControl liveViewControl = null;
-    private PanasonicCameraFocusControl focusControl = null;
-    private PanasonicCameraCaptureControl captureControl = null;
-    private PanasonicCameraZoomLensControl zoomControl = null;
-    private PanasonicCameraConnection cameraConnection = null;
+    private var panasonicCamera: IPanasonicCamera? = null
+    private var eventObserver: ICameraEventObserver? = null
+    private var liveViewControl: PanasonicLiveViewControl? = null
+    private var focusControl: PanasonicCameraFocusControl? = null
+    private var captureControl: PanasonicCameraCaptureControl? = null
+    private var zoomControl: PanasonicCameraZoomLensControl? = null
+    private lateinit var cameraConnection: PanasonicCameraConnection
 
-    public PanasonicCameraWrapper(final Activity context, final ICameraStatusReceiver statusReceiver , final @NonNull ICameraChangeListener listener, @NonNull ICardSlotSelector cardSlotSelector)
+    override fun prepare()
     {
-        this.context = context;
-        this.provider = statusReceiver;
-        this.listener = listener;
-        this.cardSlotSelector = cardSlotSelector;
-    }
-
-    @Override
-    public void prepare()
-    {
-        Log.v(TAG, " prepare : " + panasonicCamera.getFriendlyName() + " " + panasonicCamera.getModelName());
+        Log.v(
+            TAG,
+            " prepare : " + panasonicCamera?.getFriendlyName() + " " + panasonicCamera?.getModelName()
+        )
         try
         {
-            //this.panasonicCameraApi = PanasonicCameraApi.newInstance(panasonicCamera);
-            if (eventObserver == null)
-            {
-                eventObserver = CameraEventObserver.Companion.newInstance(context, panasonicCamera, cardSlotSelector);
+            if (eventObserver == null) {
+                eventObserver = newInstance(context, panasonicCamera!!, cardSlotSelector)
             }
-            if (liveViewControl == null)
-            {
-                liveViewControl = new PanasonicLiveViewControl(panasonicCamera);
+            if (liveViewControl == null) {
+                liveViewControl = PanasonicLiveViewControl(panasonicCamera!!)
             }
-            focusControl.setCamera(panasonicCamera);
-            captureControl.setCamera(panasonicCamera);
-            zoomControl.setCamera(panasonicCamera);
+            focusControl?.setCamera(panasonicCamera!!)
+            captureControl?.setCamera(panasonicCamera!!)
+            zoomControl?.setCamera(panasonicCamera!!)
         }
-        catch (Exception e)
+        catch (e: Exception)
         {
-            e.printStackTrace();
+            e.printStackTrace()
         }
     }
 
-    @Override
-    public void startRecMode()
+    override fun startRecMode()
     {
         try
         {
             // 撮影モード(RecMode)に切り替え
-            String reply = SimpleHttpClient.httpGet(this.panasonicCamera.getCmdUrl() + "cam.cgi?mode=camcmd&value=recmode", TIMEOUT_MS);
-            if (!reply.contains("ok"))
+            val sessionId = panasonicCamera?.getCommunicationSessionId()
+            val urlToSend = "${panasonicCamera?.getCmdUrl()}cam.cgi?mode=camcmd&value=recmode"
+            val reply = if (!sessionId.isNullOrEmpty())
             {
-                Log.v(TAG, "CAMERA REPLIED ERROR : CHANGE RECMODE.");
+                val headerMap: MutableMap<String, String> = HashMap()
+                headerMap["X-SESSION_ID"] = sessionId
+                SimpleHttpClient.httpGetWithHeader(urlToSend, headerMap, null,
+                    TIMEOUT_MS
+                )
+            }
+            else
+            {
+                SimpleHttpClient.httpGet(urlToSend, TIMEOUT_MS)
             }
 
-            //  フォーカスに関しては、１点に切り替える（仮）
-            reply = SimpleHttpClient.httpGet(this.panasonicCamera.getCmdUrl() + "cam.cgi?mode=setsetting&type=afmode&value=1area", TIMEOUT_MS);
-            if (!reply.contains("ok"))
+
+            if (!reply.contains("ok")) {
+                Log.v(TAG, "CAMERA REPLIED ERROR : CHANGE RECMODE.")
+            }
+
+            val urlToSend2 = "${panasonicCamera?.getCmdUrl()}cam.cgi?mode=setsetting&type=afmode&value=1area"
+            val reply2 = if (!sessionId.isNullOrEmpty())
             {
-                Log.v(TAG, "CAMERA REPLIED ERROR : CHANGE AF MODE 1area.");
+                val headerMap: MutableMap<String, String> = HashMap()
+                headerMap["X-SESSION_ID"] = sessionId
+                SimpleHttpClient.httpGetWithHeader(urlToSend2, headerMap, null,
+                    TIMEOUT_MS
+                )
+            } else {
+                SimpleHttpClient.httpGet(urlToSend, TIMEOUT_MS)
+            }
+            if (!reply2.contains("ok")) {
+                Log.v(TAG, "CAMERA REPLIED ERROR : CHANGE AF MODE 1area.")
             }
         }
-        catch (Exception e)
+        catch (e: Exception)
         {
-            e.printStackTrace();
+            e.printStackTrace()
         }
     }
 
-    @Override
-    public void startEventWatch(@Nullable ICameraChangeListener listener)
+    override fun startEventWatch(listener: ICameraChangeListener?)
     {
         try
         {
@@ -114,96 +119,92 @@ public class PanasonicCameraWrapper implements IPanasonicCameraHolder, IPanasoni
             {
                 if (listener != null)
                 {
-                    eventObserver.setEventListener(listener);
+                    eventObserver!!.setEventListener(listener)
                 }
-                eventObserver.activate();
-                eventObserver.start();
-                ICameraStatusHolder holder = eventObserver.getCameraStatusHolder();
-                if (holder != null)
-                {
-                    holder.getLiveviewStatus();
-                }
+                eventObserver?.activate()
+                eventObserver?.start()
+                eventObserver?.getCameraStatusHolder()?.getLiveviewStatus()
             }
         }
-        catch (Exception e)
+        catch (e: Exception)
         {
-            e.printStackTrace();
+            e.printStackTrace()
         }
     }
 
-    @Override
-    public void detectedCamera(@NonNull IPanasonicCamera camera)
+    override fun detectedCamera(camera: IPanasonicCamera)
     {
-        Log.v(TAG, "detectedCamera()");
-        panasonicCamera = camera;
+        Log.v(TAG, "detectedCamera()")
+        panasonicCamera = camera
     }
 
-    @Override
-    public ICameraConnection getPanasonicCameraConnection()
+    override fun getPanasonicCameraConnection(): ICameraConnection
     {
-        // PanasonicCameraConnectionは複数生成しない。
-        if (cameraConnection == null)
+        if (!::cameraConnection.isInitialized)
         {
-            cameraConnection = new PanasonicCameraConnection(context, provider, this, listener);
+            cameraConnection = PanasonicCameraConnection(
+                context, provider, this,
+                listener
+            )
         }
-        return (cameraConnection);
+        return (cameraConnection)
     }
 
-    @Override
-    public ILiveViewControl getPanasonicLiveViewControl()
+    override fun getPanasonicLiveViewControl(): ILiveViewControl?
     {
-        return (liveViewControl);
+        return (liveViewControl)
     }
 
-    @Override
-    public ILiveViewListener getLiveViewListener()
+    override fun getLiveViewListener(): ILiveViewListener?
     {
-        return (liveViewControl.getLiveViewListener());
+        return (liveViewControl?.getLiveViewListener())
     }
 
-    @Override
-    public IFocusingControl getFocusingControl()
+    override fun getFocusingControl(): IFocusingControl?
     {
-        return (focusControl);
+        return (focusControl)
     }
 
-    @Override
-    public ICameraInformation getCameraInformation()
+    override fun getCameraInformation(): ICameraInformation?
     {
-        return null;
+        return null
     }
 
-    @Override
-    public IZoomLensControl getZoomLensControl()
+    override fun getZoomLensControl(): IZoomLensControl?
     {
-        return (zoomControl);
+        return (zoomControl)
     }
 
-    @Override
-    public ICaptureControl getCaptureControl()
+    override fun getCaptureControl(): ICaptureControl?
     {
-        return (captureControl);
+        return (captureControl)
     }
 
-    @Override
-    public IDisplayInjector getDisplayInjector()
+    override fun getDisplayInjector(): IDisplayInjector
     {
-        return (this);
+        return (this)
     }
 
-    @Override
-    public IPanasonicCamera getPanasonicCamera()
+    override fun getPanasonicCamera(): IPanasonicCamera?
     {
-        return (panasonicCamera);
+        return (panasonicCamera)
     }
 
-    @Override
-    public void injectDisplay(@NonNull IAutoFocusFrameDisplay frameDisplayer, @NonNull IIndicatorControl indicator, @NonNull IFocusingModeNotify focusingModeNotify)
-    {
-        Log.v(TAG, "injectDisplay()");
+    override fun injectDisplay(
+        frameDisplayer: IAutoFocusFrameDisplay,
+        indicator: IIndicatorControl,
+        focusingModeNotify: IFocusingModeNotify
+    ) {
+        Log.v(TAG, "injectDisplay()")
 
-        focusControl = new PanasonicCameraFocusControl(frameDisplayer, indicator);
-        captureControl = new PanasonicCameraCaptureControl(frameDisplayer, indicator);
-        zoomControl = new PanasonicCameraZoomLensControl();
+        focusControl = PanasonicCameraFocusControl(frameDisplayer, indicator)
+        captureControl = PanasonicCameraCaptureControl(frameDisplayer, indicator)
+        zoomControl = PanasonicCameraZoomLensControl()
+    }
+
+    companion object
+    {
+        private val TAG: String = PanasonicCameraWrapper::class.java.simpleName
+        private const val TIMEOUT_MS = 3000
     }
 }
