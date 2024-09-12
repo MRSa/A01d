@@ -8,12 +8,16 @@ import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.KeyEvent
+import android.view.View
 import android.view.WindowManager
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updatePadding
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.PreferenceManager
 import net.osdn.gokigen.a01d.camera.CameraInterfaceProvider
@@ -83,6 +87,15 @@ class A01dMain : AppCompatActivity(), ICameraStatusReceiver, IChangeScene, Power
             bar?.hide()
             window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
+            try
+            {
+                setupWindowInset(findViewById(R.id.base_layout))
+            }
+            catch (e: Exception)
+            {
+                e.printStackTrace()
+            }
+
             if (allPermissionsGranted())
             {
                 Log.v(TAG, "allPermissionsGranted() : true")
@@ -94,6 +107,32 @@ class A01dMain : AppCompatActivity(), ICameraStatusReceiver, IChangeScene, Power
             {
                 Log.v(TAG, "====== REQUEST PERMISSIONS ======")
                 ActivityCompat.requestPermissions(this, REQUIRED_PERMISSIONS, REQUEST_NEED_PERMISSIONS)
+            }
+        }
+        catch (e: Exception)
+        {
+            e.printStackTrace()
+        }
+    }
+
+    private fun setupWindowInset(view: View)
+    {
+        try
+        {
+            // Display cutout insets
+            //   https://developer.android.com/develop/ui/views/layout/edge-to-edge
+            ViewCompat.setOnApplyWindowInsetsListener(view) { v, insets ->
+                val bars = insets.getInsets(
+                    WindowInsetsCompat.Type.systemBars()
+                            or WindowInsetsCompat.Type.displayCutout()
+                )
+                v.updatePadding(
+                    left = bars.left,
+                    top = bars.top,
+                    right = bars.right,
+                    bottom = bars.bottom,
+                )
+                WindowInsetsCompat.CONSUMED
             }
         }
         catch (e: Exception)
@@ -785,27 +824,38 @@ class A01dMain : AppCompatActivity(), ICameraStatusReceiver, IChangeScene, Power
      */
     private fun getCameraConnection(connectionMethod: CameraConnectionMethod): ICameraConnection
     {
-        val connection = if (connectionMethod == CameraConnectionMethod.RICOH_GR2) {
-            interfaceProvider.ricohGr2Infterface.ricohGr2CameraConnection
-        } else if (connectionMethod == CameraConnectionMethod.SONY) {
-            interfaceProvider.sonyInterface.sonyCameraConnection
-        } else if (connectionMethod == CameraConnectionMethod.PANASONIC) {
-            interfaceProvider.panasonicInterface.panasonicCameraConnection
-        } else if (connectionMethod == CameraConnectionMethod.FUJI_X) {
-            interfaceProvider.fujiXInterface.fujiXCameraConnection
-        } else if (connectionMethod == CameraConnectionMethod.OLYMPUS) {
-            interfaceProvider.olympusPenInterface.olyCameraConnection
-        } else if (connectionMethod == CameraConnectionMethod.THETA) {
-            interfaceProvider.thetaInterface.cameraConnection
-        } else if (connectionMethod == CameraConnectionMethod.CANON) {
-            interfaceProvider.canonInterface.cameraConnection
-        } else if (connectionMethod == CameraConnectionMethod.NIKON) {
-            interfaceProvider.nikonInterface.cameraConnection
-        } else if (connectionMethod == CameraConnectionMethod.KODAK) {
-            interfaceProvider.kodakInterface.cameraConnection
-        } else  // if (connectionMethod == ICameraConnection.CameraConnectionMethod.OPC)
-        {
-            interfaceProvider.olympusInterface.olyCameraConnection
+        val connection = when (connectionMethod) {
+            CameraConnectionMethod.RICOH_GR2 -> {
+                interfaceProvider.ricohGr2Infterface.ricohGr2CameraConnection
+            }
+            CameraConnectionMethod.SONY -> {
+                interfaceProvider.sonyInterface.sonyCameraConnection
+            }
+            CameraConnectionMethod.PANASONIC -> {
+                interfaceProvider.panasonicInterface.getPanasonicCameraConnection()
+            }
+            CameraConnectionMethod.FUJI_X -> {
+                interfaceProvider.fujiXInterface.fujiXCameraConnection
+            }
+            CameraConnectionMethod.OLYMPUS -> {
+                interfaceProvider.olympusPenInterface.olyCameraConnection
+            }
+            CameraConnectionMethod.THETA -> {
+                interfaceProvider.thetaInterface.cameraConnection
+            }
+            CameraConnectionMethod.CANON -> {
+                interfaceProvider.canonInterface.cameraConnection
+            }
+            CameraConnectionMethod.NIKON -> {
+                interfaceProvider.nikonInterface.cameraConnection
+            }
+            CameraConnectionMethod.KODAK -> {
+                interfaceProvider.kodakInterface.cameraConnection
+            }
+            else  // if (connectionMethod == ICameraConnection.CameraConnectionMethod.OPC)
+            -> {
+                interfaceProvider.olympusInterface.olyCameraConnection
+            }
         }
         return (connection)
     }
