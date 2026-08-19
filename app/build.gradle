@@ -2,24 +2,27 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 
 android {
-    compileSdk 35
+    compileSdk 37
     defaultConfig {
         applicationId "net.osdn.gokigen.a01d"
         minSdkVersion 14
-        targetSdkVersion 35
-        versionCode 10909
-        versionName "1.9.9"
+        targetSdkVersion 37
+        versionCode 10910
+        versionName "1.9.10"
         multiDexEnabled true
     }
     buildTypes {
         release {
             minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_17
-        targetCompatibility JavaVersion.VERSION_17
+        sourceCompatibility JavaVersion.VERSION_21
+        targetCompatibility JavaVersion.VERSION_21
+    }
+    kotlinOptions {
+        jvmTarget = "21"
     }
     namespace 'net.osdn.gokigen.a01d'
 }
