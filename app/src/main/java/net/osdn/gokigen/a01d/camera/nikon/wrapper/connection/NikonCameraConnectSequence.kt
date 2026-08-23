@@ -1,22 +1,309 @@
-package net.osdn.gokigen.a01d.camera.nikon.wrapper.connection;
+package net.osdn.gokigen.a01d.camera.nikon.wrapper.connection
 
-import android.app.Activity;
-import android.graphics.Color;
-import android.util.Log;
+import android.content.Context
+import android.graphics.Color
+import android.os.Handler
+import android.os.Looper
+import android.util.Log
+import net.osdn.gokigen.a01d.R
+import net.osdn.gokigen.a01d.camera.ICameraConnection
+import net.osdn.gokigen.a01d.camera.ICameraStatusReceiver
+import net.osdn.gokigen.a01d.camera.nikon.wrapper.command.messages.specific.NikonRegistrationMessage
+import net.osdn.gokigen.a01d.camera.nikon.wrapper.status.NikonStatusChecker
+import net.osdn.gokigen.a01d.camera.ptpip.IPtpIpInterfaceProvider
+import net.osdn.gokigen.a01d.camera.ptpip.wrapper.command.IPtpIpCommandCallback
+import net.osdn.gokigen.a01d.camera.ptpip.wrapper.command.IPtpIpCommandPublisher
+import net.osdn.gokigen.a01d.camera.ptpip.wrapper.command.IPtpIpMessages
+import net.osdn.gokigen.a01d.camera.ptpip.wrapper.command.messages.PtpIpCommandGeneric
+import java.nio.ByteBuffer
+import java.nio.ByteOrder
 
-import androidx.annotation.NonNull;
+class NikonCameraConnectSequence(
+    context: Context,
+    statusReceiver: ICameraStatusReceiver,
+    cameraConnection: ICameraConnection,
+    interfaceProvider: IPtpIpInterfaceProvider,
+    statusChecker: NikonStatusChecker
+) : Runnable, IPtpIpCommandCallback {
+    private val appContext: Context
+    private val cameraConnection: ICameraConnection
+    private val cameraStatusReceiver: ICameraStatusReceiver
+    private val interfaceProvider: IPtpIpInterfaceProvider
+    private val commandIssuer: IPtpIpCommandPublisher
+    private val statusChecker: NikonStatusChecker
+    private val mainHandler = Handler(Looper.getMainLooper())
+    private val isDumpLog = false
 
-import net.osdn.gokigen.a01d.R;
-import net.osdn.gokigen.a01d.camera.ICameraConnection;
-import net.osdn.gokigen.a01d.camera.ICameraStatusReceiver;
-import net.osdn.gokigen.a01d.camera.nikon.wrapper.command.messages.specific.NikonRegistrationMessage;
-import net.osdn.gokigen.a01d.camera.nikon.wrapper.status.NikonStatusChecker;
-import net.osdn.gokigen.a01d.camera.ptpip.IPtpIpInterfaceProvider;
-import net.osdn.gokigen.a01d.camera.ptpip.wrapper.command.IPtpIpCommandCallback;
-import net.osdn.gokigen.a01d.camera.ptpip.wrapper.command.IPtpIpCommandPublisher;
-import net.osdn.gokigen.a01d.camera.ptpip.wrapper.command.IPtpIpMessages;
-import net.osdn.gokigen.a01d.camera.ptpip.wrapper.command.messages.PtpIpCommandGeneric;
+    init {
+        Log.v(TAG, "NikonCameraConnectSequence initialized")
+        this.appContext = context.applicationContext
+        this.cameraConnection = cameraConnection
+        this.cameraStatusReceiver = statusReceiver
+        this.interfaceProvider = interfaceProvider
+        this.commandIssuer = interfaceProvider.getCommandPublisher()
+        this.statusChecker = statusChecker
+    }
 
+    override fun run() {
+        try {
+            val issuer = interfaceProvider.getCommandPublisher()
+            if (!issuer.isConnected()) {
+                if (!interfaceProvider.getCommandCommunication().connect()) {
+                    updateUiMessage(
+                        appContext.getString(R.string.dialog_title_connect_failed_nikon),
+                        b1 = false,
+                        b2 = true,
+                        color = Color.RED
+                    )
+                    onConnectError(appContext.getString(R.string.dialog_title_connect_failed_nikon))
+                    return
+                }
+            } else {
+                Log.v(TAG, "SOCKET IS ALREADY CONNECTED...")
+            }
+
+            // コマンドタスクの実行開始
+            issuer.start()
+
+            // 接続シーケンスの開始
+            sendRegistrationMessage()
+        } catch (e: Exception) {
+            Log.e(TAG, "Error in connect sequence run", e)
+            updateUiMessage(
+                appContext.getString(R.string.dialog_title_connect_failed_nikon),
+                b1 = false,
+                b2 = true,
+                color = Color.RED
+            )
+            onConnectError(e.localizedMessage)
+        }
+    }
+
+    override fun onReceiveProgress(currentBytes: Int, totalBytes: Int, body: ByteArray?) {
+        Log.v(TAG, "Progress: $currentBytes/$totalBytes")
+    }
+
+    override fun isReceiveMulti(): Boolean {
+        return false
+    }
+
+    override fun receivedMessage(id: Int, rxBody: ByteArray?) {
+        when (id) {
+            IPtpIpMessages.SEQ_REGISTRATION -> if (checkRegistrationMessage(rxBody)) {
+                sendInitEventRequest(rxBody)
+            } else {
+                onConnectError(appContext.getString(R.string.connect_error_message))
+            }
+
+            IPtpIpMessages.SEQ_EVENT_INITIALIZE -> {
+                updateUiMessage(
+                    appContext.getString(R.string.nikon_connect_connecting1),
+                    b1 = false,
+                    b2 = false,
+                    color = 0
+                )
+                // GetDeviceInfo
+                commandIssuer.enqueueCommand(
+                    PtpIpCommandGeneric(
+                        this,
+                        IPtpIpMessages.SEQ_INIT_SESSION,
+                        50,
+                        isDumpLog,
+                        0,
+                        0x1001,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0
+                    )
+                )
+            }
+
+            IPtpIpMessages.SEQ_INIT_SESSION -> if (checkEventInitialize(rxBody)) {
+                updateUiMessage(
+                    appContext.getString(R.string.nikon_connect_connecting2),
+                    b1 = false,
+                    b2 = false,
+                    color = 0
+                )
+                // OpenSession
+                commandIssuer.enqueueCommand(
+                    PtpIpCommandGeneric(
+                        this,
+                        IPtpIpMessages.SEQ_OPEN_SESSION,
+                        50,
+                        isDumpLog,
+                        0,
+                        0x1002,
+                        4,
+                        0x41,
+                        0,
+                        0,
+                        0
+                    )
+                )
+            } else {
+                onConnectError(appContext.getString(R.string.connect_error_message))
+            }
+
+            IPtpIpMessages.SEQ_OPEN_SESSION -> {
+                updateUiMessage(
+                    appContext.getString(R.string.nikon_connect_connecting3),
+                    b1 = false,
+                    b2 = false,
+                    color = 0
+                )
+                commandIssuer.enqueueCommand(
+                    PtpIpCommandGeneric(
+                        this,
+                        IPtpIpMessages.SEQ_CHANGE_REMOTE,
+                        50,
+                        isDumpLog,
+                        0,
+                        0x902c,
+                        4,
+                        0x01,
+                        0,
+                        0,
+                        0
+                    )
+                )
+            }
+
+            IPtpIpMessages.SEQ_CHANGE_REMOTE, IPtpIpMessages.SEQ_SET_EVENT_MODE -> {
+                updateUiMessage(
+                    appContext.getString(R.string.connect_connect_finished),
+                    b1 = false,
+                    b2 = false,
+                    color = 0
+                )
+                connectFinished()
+                Log.v(TAG, "CONNECT TO CAMERA : DONE.")
+            }
+
+            else -> {
+                Log.w(TAG, "RECEIVED UNKNOWN ID : $id")
+                onConnectError(appContext.getString(R.string.connect_receive_unknown_message))
+            }
+        }
+    }
+
+    private fun sendRegistrationMessage() {
+        updateUiMessage(appContext.getString(R.string.connect_start),
+            b1 = false,
+            b2 = false,
+            color = 0
+        )
+        notifyStatus(appContext.getString(R.string.connect_start))
+        commandIssuer.enqueueCommand(NikonRegistrationMessage(this))
+    }
+
+    private fun sendInitEventRequest(receiveData: ByteArray?) {
+        updateUiMessage(appContext.getString(R.string.connect_start_2),
+            b1 = false,
+            b2 = false,
+            color = 0
+        )
+        notifyStatus(appContext.getString(R.string.connect_start_2))
+
+        if (receiveData == null || receiveData.size < 12) {
+            onConnectError("Invalid receive data length for InitEventRequest")
+            return
+        }
+
+        try {
+            // ByteBufferを使用して安全かつシンプルにリトルエンディアン整数値を解析
+            val eventConnectionNumber = ByteBuffer.wrap(receiveData, 8, 4)
+                .order(ByteOrder.LITTLE_ENDIAN)
+                .getInt()
+
+            statusChecker.setEventConnectionNumber(eventConnectionNumber)
+            interfaceProvider.getCameraStatusWatcher()
+                .startStatusWatch(interfaceProvider.getStatusListener())
+
+            // 必要に応じてコマンドを発行
+            commandIssuer.enqueueCommand(
+                PtpIpCommandGeneric(
+                    this,
+                    IPtpIpMessages.SEQ_OPEN_SESSION,
+                    50,
+                    isDumpLog,
+                    0,
+                    0x1002,
+                    4,
+                    0x41,
+                    0,
+                    0,
+                    0
+                )
+            )
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to send InitEventRequest", e)
+            onConnectError(e.message)
+        }
+    }
+
+    private fun checkRegistrationMessage(receiveData: ByteArray?): Boolean {
+        return receiveData != null && receiveData.size >= 12
+    }
+
+    private fun checkEventInitialize(receiveData: ByteArray?): Boolean {
+        Log.v(TAG, "checkEventInitialize()")
+        return receiveData != null
+    }
+
+    private fun connectFinished() {
+        updateUiMessage(appContext.getString(R.string.connect_connected),
+            b1 = false,
+            b2 = false,
+            color = 0
+        )
+
+        // UIスレッドをブロックしないよう Handler でディレイ実行
+        mainHandler.postDelayed({
+            updateUiMessage(appContext.getString(R.string.connect_connected),
+                b1 = false,
+                b2 = false,
+                color = 0
+            )
+            onConnectNotify()
+        }, 1000)
+    }
+
+    private fun onConnectNotify() {
+        // MainThread 経由で呼び出すことで不要なスレッド生成を回避
+        mainHandler.post {
+            try {
+                cameraStatusReceiver.onStatusNotify(appContext.getString(R.string.connect_connected))
+                cameraStatusReceiver.onCameraConnected()
+                Log.v(TAG, "onConnectNotify() executed on main thread")
+            } catch (e: Exception) {
+                Log.e(TAG, "Error during connection notification", e)
+            }
+        }
+    }
+
+    private fun onConnectError(reason: String?) {
+        mainHandler.post { cameraConnection.alertConnectingFailed(reason) }
+    }
+
+    private fun updateUiMessage(message: String?, b1: Boolean, b2: Boolean, color: Int) {
+        mainHandler.post {
+            interfaceProvider.getInformationReceiver().updateMessage(message, b1, b2, color)
+        }
+    }
+
+    private fun notifyStatus(status: String?) {
+        mainHandler.post { cameraStatusReceiver.onStatusNotify(status) }
+    }
+
+    companion object {
+        private val TAG: String = NikonCameraConnectSequence::class.java.getSimpleName()
+    }
+}
+
+/*
 public class NikonCameraConnectSequence implements Runnable, IPtpIpCommandCallback, IPtpIpMessages
 {
     private final String TAG = this.toString();
@@ -231,3 +518,5 @@ public class NikonCameraConnectSequence implements Runnable, IPtpIpCommandCallba
         }
     }
 }
+*/
+

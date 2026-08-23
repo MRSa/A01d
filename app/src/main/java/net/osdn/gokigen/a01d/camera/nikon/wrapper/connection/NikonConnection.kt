@@ -1,250 +1,507 @@
-package net.osdn.gokigen.a01d.camera.nikon.wrapper.connection;
+package net.osdn.gokigen.a01d.camera.nikon.wrapper.connection
 
+import android.app.Activity
+import android.content.ActivityNotFoundException
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
+import android.net.ConnectivityManager
+import android.net.Network
+import android.net.NetworkCapabilities
+import android.net.NetworkInfo
+import android.net.NetworkRequest
+import android.net.wifi.WifiManager
+import android.os.Build
+import android.provider.Settings
+import android.util.Log
+import androidx.annotation.RequiresApi
+import androidx.appcompat.app.AlertDialog
+import net.osdn.gokigen.a01d.R
+import net.osdn.gokigen.a01d.camera.ICameraConnection
+import net.osdn.gokigen.a01d.camera.ICameraStatusReceiver
+import net.osdn.gokigen.a01d.camera.nikon.wrapper.status.NikonStatusChecker
+import net.osdn.gokigen.a01d.camera.ptpip.IPtpIpInterfaceProvider
+import java.lang.ref.WeakReference
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
 
-import android.app.Activity;
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.IntentFilter;
-import android.net.ConnectivityManager;
-import android.net.wifi.WifiInfo;
-import android.net.wifi.WifiManager;
-import android.provider.Settings;
-import android.util.Log;
+class NikonConnection(
+    activity: Activity,
+    private val statusReceiver: ICameraStatusReceiver,
+    private val interfaceProvider: IPtpIpInterfaceProvider,
+    statusChecker: NikonStatusChecker
+) : ICameraConnection {
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
+    // メモリリーク防止のため ApplicationContext を保持
+    private val appContext: Context = activity.applicationContext
 
-import net.osdn.gokigen.a01d.R;
-import net.osdn.gokigen.a01d.camera.ICameraConnection;
-import net.osdn.gokigen.a01d.camera.ICameraStatusReceiver;
-import net.osdn.gokigen.a01d.camera.nikon.wrapper.status.NikonStatusChecker;
-import net.osdn.gokigen.a01d.camera.ptpip.IPtpIpInterfaceProvider;
+    // UI (AlertDialog) 表示用に Activity を WeakReference で保持
+    private val activityRef = WeakReference(activity)
 
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
+    private val connectivityManager =
+        appContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
 
-public class NikonConnection implements ICameraConnection
-{
-    private final String TAG = toString();
-    private final Activity context;
-    private final ICameraStatusReceiver statusReceiver;
-    private final IPtpIpInterfaceProvider interfaceProvider;
-    private final BroadcastReceiver connectionReceiver;
-    private final Executor cameraExecutor = Executors.newFixedThreadPool(1);
+    private val cameraExecutor: ExecutorService = Executors.newSingleThreadExecutor()
 
-    private ICameraConnection.CameraConnectionStatus connectionStatus = CameraConnectionStatus.UNKNOWN;
+    @Volatile
+    private var connectionStatus: ICameraConnection.CameraConnectionStatus? = ICameraConnection.CameraConnectionStatus.UNKNOWN
 
-    private final NikonCameraConnectSequence connectSequence;
-    private final NikonCameraDisconnectSequence disconnectSequence;
+    // 監視状態フラグ・オブジェクト
+    private var isReceiverRegistered = false
+    private var networkCallback: ConnectivityManager.NetworkCallback? = null
 
-    public NikonConnection(@NonNull final Activity context, @NonNull final ICameraStatusReceiver statusReceiver, @NonNull IPtpIpInterfaceProvider interfaceProvider, @NonNull NikonStatusChecker statusChecker)
-    {
-        Log.v(TAG, "NikonConnection()");
-        this.context = context;
-        this.statusReceiver = statusReceiver;
-        this.interfaceProvider = interfaceProvider;
-        connectionReceiver = new BroadcastReceiver()
-        {
-            @Override
-            public void onReceive(Context context, Intent intent)
-            {
-                onReceiveBroadcastOfConnection(context, intent);
-            }
-        };
-        connectSequence = new NikonCameraConnectSequence(context, statusReceiver, this, interfaceProvider, statusChecker);
-        disconnectSequence = new NikonCameraDisconnectSequence(context, interfaceProvider, statusChecker);
+    private val connectSequence = NikonCameraConnectSequence(
+        appContext,
+        statusReceiver,
+        this,
+        interfaceProvider,
+        statusChecker
+    )
+    private val disconnectSequence = NikonCameraDisconnectSequence(interfaceProvider, statusChecker)
+
+    // API 20 以下用の BroadcastReceiver
+    private val connectionReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            onReceiveBroadcastOfConnection(context, intent)
+        }
     }
 
     /**
-     *
-     *
+     * Wi-Fi ネットワーク状態の監視を開始
+     * API 21 以上: NetworkCallback
+     * API 20 以下: BroadcastReceiver
      */
-    private void onReceiveBroadcastOfConnection(Context context, Intent intent)
-    {
-        interfaceProvider.getInformationReceiver().updateMessage(context.getString(R.string.connect_check_wifi), false, false, 0);
-        statusReceiver.onStatusNotify(context.getString(R.string.connect_check_wifi));
+    override fun startWatchWifiStatus(context: Context) {
+        Log.v(TAG, "startWatchWifiStatus()")
 
-        Log.v(TAG, context.getString(R.string.connect_check_wifi));
+        interfaceProvider.getInformationReceiver()
+            .updateMessage(appContext.getString(R.string.connect_prepare), false, false, 0)
+        statusReceiver.onStatusNotify("prepare")
 
-        String action = intent.getAction();
-        if (action == null)
-        {
-            Log.v(TAG, "intent.getAction() : null");
-            return;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            startWatchWifiStatusApi21()
+        } else {
+            startWatchWifiStatusLegacy()
+        }
+    }
+
+    /**
+     * API 21 以上向けの NetworkCallback 登録
+     */
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
+    private fun startWatchWifiStatusApi21() {
+        if (networkCallback != null) {
+            Log.w(TAG, "NetworkCallback is already registered.")
+            return
         }
 
-        try
-        {
-            if (action.equals(ConnectivityManager.CONNECTIVITY_ACTION))
-            {
-                Log.v(TAG, "onReceiveBroadcastOfConnection() : CONNECTIVITY_ACTION");
+        val request = NetworkRequest.Builder()
+            .addTransportType(NetworkCapabilities.TRANSPORT_WIFI)
+            .build()
 
-                WifiManager wifiManager = (WifiManager) context.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-                if (wifiManager != null)
-                {
-                    WifiInfo info = wifiManager.getConnectionInfo();
-                    if (wifiManager.isWifiEnabled() && info != null)
-                    {
-                        if (info.getNetworkId() != -1)
-                        {
-                            Log.v(TAG, "Network ID is -1, there is no currently connected network.");
+        networkCallback = object : ConnectivityManager.NetworkCallback() {
+            override fun onAvailable(network: Network) {
+                Log.v(TAG, "NetworkCallback: Wi-Fi Available")
+                notifyWifiChecking()
+                connectToCamera()
+            }
+
+            override fun onLost(network: Network) {
+                Log.v(TAG, "NetworkCallback: Wi-Fi Lost")
+                disconnect(false)
+            }
+        }
+
+        try {
+            connectivityManager.registerNetworkCallback(request, networkCallback!!)
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to register network callback", e)
+        }
+    }
+
+    /**
+     * API 20 以下（minSdk 14〜20）向けの BroadcastReceiver 登録
+     */
+    private fun startWatchWifiStatusLegacy() {
+        if (isReceiverRegistered) {
+            Log.w(TAG, "connectionReceiver is already registered.")
+            return
+        }
+
+        val filter = IntentFilter().apply {
+            addAction(WifiManager.NETWORK_STATE_CHANGED_ACTION)
+            @Suppress("DEPRECATION")
+            addAction(ConnectivityManager.CONNECTIVITY_ACTION)
+        }
+
+        try {
+            appContext.registerReceiver(connectionReceiver, filter)
+            isReceiverRegistered = true
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to register connectionReceiver", e)
+        }
+    }
+
+    /**
+     * 監視を停止（両 API レベルに対応）
+     */
+    override fun stopWatchWifiStatus(context: Context) {
+        Log.v(TAG, "stopWatchWifiStatus()")
+
+        // API 21+ NetworkCallback の解除
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            networkCallback?.let {
+                try {
+                    connectivityManager.unregisterNetworkCallback(it)
+                } catch (e: Exception) {
+                    Log.e(TAG, "Failed to unregister network callback", e)
+                }
+                networkCallback = null
+            }
+        }
+
+        // API 20- BroadcastReceiver の解除
+        if (isReceiverRegistered) {
+            try {
+                appContext.unregisterReceiver(connectionReceiver)
+            } catch (e: Exception) {
+                Log.e(TAG, "Failed to unregister connectionReceiver", e)
+            } finally {
+                isReceiverRegistered = false
+            }
+        }
+
+        disconnect(false)
+    }
+
+    /**
+     * API 20 以下用の Broadcast 受信ハンドラー
+     */
+    private fun onReceiveBroadcastOfConnection(context: Context, intent: Intent) {
+        notifyWifiChecking()
+
+        val action = intent.action ?: run {
+            Log.v(TAG, "intent.action is null")
+            return
+        }
+
+        try {
+            @Suppress("DEPRECATION")
+            if (action == ConnectivityManager.CONNECTIVITY_ACTION || action == WifiManager.NETWORK_STATE_CHANGED_ACTION) {
+                val cm = context.getSystemService(Context.CONNECTIVITY_SERVICE) as? ConnectivityManager
+                @Suppress("DEPRECATION")
+                val activeNetwork: NetworkInfo? = cm?.activeNetworkInfo
+
+                @Suppress("DEPRECATION")
+                if (activeNetwork != null && activeNetwork.type == ConnectivityManager.TYPE_WIFI && activeNetwork.isConnected) {
+                    Log.v(TAG, "Legacy Receiver: Wi-Fi connected.")
+                    connectToCamera()
+                } else {
+                    Log.v(TAG, "Legacy Receiver: Wi-Fi is not connected.")
+                }
+            }
+        } catch (e: Exception) {
+            Log.w(TAG, "onReceiveBroadcastOfConnection EXCEPTION: ${e.message}", e)
+        }
+    }
+
+    private fun notifyWifiChecking() {
+        interfaceProvider.getInformationReceiver()
+            .updateMessage(appContext.getString(R.string.connect_check_wifi), false, false, 0)
+        statusReceiver.onStatusNotify(appContext.getString(R.string.connect_check_wifi))
+    }
+
+    override fun disconnect(powerOff: Boolean) {
+        Log.v(TAG, "disconnect(): powerOff=$powerOff")
+        disconnectFromCamera(powerOff)
+        connectionStatus = ICameraConnection.CameraConnectionStatus.DISCONNECTED
+        statusReceiver.onCameraDisconnected()
+    }
+
+    override fun connect() {
+        Log.v(TAG, "connect()")
+        connectToCamera()
+    }
+
+    override fun alertConnectingFailed(message: String?) {
+        Log.v(TAG, "alertConnectingFailed(): $message")
+
+        val currentActivity = activityRef.get() ?: run {
+            Log.w(TAG, "Activity context is lost. Cannot show alert dialog.")
+            return
+        }
+
+        // API 17 未満への安全対策（isDestroyed は API 17〜）
+        val isDestroyed = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+            currentActivity.isDestroyed
+        } else {
+            false
+        }
+
+        if (currentActivity.isFinishing || isDestroyed) {
+            Log.w(TAG, "Activity is finishing or destroyed. Cannot show alert dialog.")
+            return
+        }
+
+        currentActivity.runOnUiThread {
+            try {
+                AlertDialog.Builder(currentActivity)
+                    .setTitle(R.string.dialog_title_connect_failed_nikon)
+                    .setMessage(message)
+                    .setPositiveButton(R.string.dialog_title_button_retry) { _, _ ->
+                        disconnect(false)
+                        connect()
+                    }
+                    .setNeutralButton(R.string.dialog_title_button_network_settings) { _, _ ->
+                        try {
+                            currentActivity.startActivity(Intent(Settings.ACTION_WIFI_SETTINGS))
+                        } catch (ex: ActivityNotFoundException) {
+                            Log.v(TAG, "ActivityNotFoundException for Wi-Fi settings : ${ex.localizedMessage}")
+                            connect()
+                        } catch (e: Exception) {
+                            Log.e(TAG, "Failed to open Wi-Fi settings", e)
+                        }
+                    }
+                    .show()
+            } catch (e: Exception) {
+                Log.e(TAG, "Error showing dialog", e)
+            }
+        }
+    }
+
+    override fun getConnectionStatus(): ICameraConnection.CameraConnectionStatus? {
+        Log.v(TAG, "getConnectionStatus()")
+        return connectionStatus
+    }
+
+    override fun forceUpdateConnectionStatus(status: ICameraConnection.CameraConnectionStatus?) {
+        Log.v(TAG, "forceUpdateConnectionStatus(): $status")
+        connectionStatus = status
+    }
+
+    private fun disconnectFromCamera(powerOff: Boolean) {
+        Log.v(TAG, "disconnectFromCamera(): $powerOff")
+        try {
+            cameraExecutor.execute(disconnectSequence)
+        } catch (e: Exception) {
+            Log.e(TAG, "Execution failed in disconnectFromCamera", e)
+        }
+    }
+
+    private fun connectToCamera() {
+        Log.v(TAG, "connectToCamera()")
+        connectionStatus = ICameraConnection.CameraConnectionStatus.CONNECTING
+        try {
+            cameraExecutor.execute(connectSequence)
+        } catch (e: Exception) {
+            Log.e(TAG, "Execution failed in connectToCamera", e)
+        }
+    }
+
+    // オブジェクト破棄時や終了時に呼び出して Executor を解放する
+    fun release() {
+        cameraExecutor.shutdown()
+    }
+
+    companion object {
+        private val TAG: String = NikonConnection::class.java.simpleName
+    }
+}
+/*
+class NikonConnection(
+    context: Activity,
+    statusReceiver: ICameraStatusReceiver,
+    interfaceProvider: IPtpIpInterfaceProvider,
+    statusChecker: NikonStatusChecker
+) : ICameraConnection {
+    private val TAG = toString()
+    private val context: Activity
+    private val statusReceiver: ICameraStatusReceiver
+    private val interfaceProvider: IPtpIpInterfaceProvider
+    private val connectionReceiver: BroadcastReceiver
+    private val cameraExecutor: Executor = Executors.newFixedThreadPool(1)
+
+    private var connectionStatus: CameraConnectionStatus? = CameraConnectionStatus.UNKNOWN
+
+    private val connectSequence: NikonCameraConnectSequence
+    private val disconnectSequence: NikonCameraDisconnectSequence
+
+    init {
+        Log.v(TAG, "NikonConnection()")
+        this.context = context
+        this.statusReceiver = statusReceiver
+        this.interfaceProvider = interfaceProvider
+        connectionReceiver = object : BroadcastReceiver() {
+            override fun onReceive(context: Context, intent: Intent) {
+                onReceiveBroadcastOfConnection(context, intent)
+            }
+        }
+        connectSequence = NikonCameraConnectSequence(
+            context,
+            statusReceiver,
+            this,
+            interfaceProvider,
+            statusChecker
+        )
+        disconnectSequence = NikonCameraDisconnectSequence(interfaceProvider, statusChecker)
+    }
+
+    /**
+     * 
+     * 
+     */
+    private fun onReceiveBroadcastOfConnection(context: Context, intent: Intent) {
+        interfaceProvider.getInformationReceiver()
+            .updateMessage(context.getString(R.string.connect_check_wifi), false, false, 0)
+        statusReceiver.onStatusNotify(context.getString(R.string.connect_check_wifi))
+
+        Log.v(TAG, context.getString(R.string.connect_check_wifi))
+
+        val action = intent.getAction()
+        if (action == null) {
+            Log.v(TAG, "intent.getAction() : null")
+            return
+        }
+
+        try {
+            if (action == ConnectivityManager.CONNECTIVITY_ACTION) {
+                Log.v(TAG, "onReceiveBroadcastOfConnection() : CONNECTIVITY_ACTION")
+
+                val wifiManager = context.applicationContext
+                    .getSystemService(Context.WIFI_SERVICE) as WifiManager?
+                if (wifiManager != null) {
+                    val info = wifiManager.getConnectionInfo()
+                    if (wifiManager.isWifiEnabled() && info != null) {
+                        if (info.getNetworkId() != -1) {
+                            Log.v(TAG, "Network ID is -1, there is no currently connected network.")
                         }
                         // 自動接続が指示されていた場合は、カメラとの接続処理を行う
-                        connectToCamera();
+                        connectToCamera()
                     } else {
                         if (info == null) {
-                            Log.v(TAG, "NETWORK INFO IS NULL.");
+                            Log.v(TAG, "NETWORK INFO IS NULL.")
                         } else {
-                            Log.v(TAG, "isWifiEnabled : " + wifiManager.isWifiEnabled() + " NetworkId : " + info.getNetworkId());
+                            Log.v(
+                                TAG,
+                                "isWifiEnabled : " + wifiManager.isWifiEnabled + " NetworkId : " + info.networkId
+                            )
                         }
                     }
                 }
             }
-        } catch (Exception e) {
-            Log.w(TAG, "onReceiveBroadcastOfConnection() EXCEPTION" + e.getMessage());
-            e.printStackTrace();
+        } catch (e: Exception) {
+            Log.w(TAG, "onReceiveBroadcastOfConnection() EXCEPTION" + e.message)
+            e.printStackTrace()
         }
     }
 
-    @Override
-    public void startWatchWifiStatus(Context context)
-    {
-        Log.v(TAG, "startWatchWifiStatus()");
-        interfaceProvider.getInformationReceiver().updateMessage(context.getString(R.string.connect_prepare), false, false, 0);
-        statusReceiver.onStatusNotify("prepare");
+    override fun startWatchWifiStatus(context: Context) {
+        Log.v(TAG, "startWatchWifiStatus()")
+        interfaceProvider.getInformationReceiver()
+            .updateMessage(context.getString(R.string.connect_prepare), false, false, 0)
+        statusReceiver.onStatusNotify("prepare")
 
-        IntentFilter filter = new IntentFilter();
-        filter.addAction(WifiManager.NETWORK_STATE_CHANGED_ACTION);
-        filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
-        context.registerReceiver(connectionReceiver, filter);
+        val filter = IntentFilter()
+        filter.addAction(WifiManager.NETWORK_STATE_CHANGED_ACTION)
+        filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION)
+        context.registerReceiver(connectionReceiver, filter)
     }
 
-    @Override
-    public void stopWatchWifiStatus(Context context)
-    {
-        Log.v(TAG, "stopWatchWifiStatus()");
-        context.unregisterReceiver(connectionReceiver);
-        disconnect(false);
+    override fun stopWatchWifiStatus(context: Context) {
+        Log.v(TAG, "stopWatchWifiStatus()")
+        context.unregisterReceiver(connectionReceiver)
+        disconnect(false)
     }
 
-    @Override
-    public void disconnect(boolean powerOff)
-    {
-        Log.v(TAG, "disconnect()");
-        disconnectFromCamera(powerOff);
-        connectionStatus = CameraConnectionStatus.DISCONNECTED;
-        statusReceiver.onCameraDisconnected();
+    override fun disconnect(powerOff: Boolean) {
+        Log.v(TAG, "disconnect()")
+        disconnectFromCamera(powerOff)
+        connectionStatus = CameraConnectionStatus.DISCONNECTED
+        statusReceiver.onCameraDisconnected()
     }
 
-    @Override
-    public void connect()
-    {
-        Log.v(TAG, "connect()");
-        connectToCamera();
+    override fun connect() {
+        Log.v(TAG, "connect()")
+        connectToCamera()
     }
 
-    @Override
-    public void alertConnectingFailed(String message)
-    {
-        Log.v(TAG, "alertConnectingFailed() : " + message);
-        final AlertDialog.Builder builder = new AlertDialog.Builder(context)
-                .setTitle(context.getString(R.string.dialog_title_connect_failed_nikon))
-                .setMessage(message)
-                .setPositiveButton(context.getString(R.string.dialog_title_button_retry), new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which)
-                    {
-                        disconnect(false);
-                        connect();
+    override fun alertConnectingFailed(message: String?) {
+        Log.v(TAG, "alertConnectingFailed() : " + message)
+        val builder = AlertDialog.Builder(context)
+            .setTitle(context.getString(R.string.dialog_title_connect_failed_nikon))
+            .setMessage(message)
+            .setPositiveButton(
+                context.getString(R.string.dialog_title_button_retry),
+                object : DialogInterface.OnClickListener {
+                    override fun onClick(dialog: DialogInterface?, which: Int) {
+                        disconnect(false)
+                        connect()
                     }
                 })
-                .setNeutralButton(R.string.dialog_title_button_network_settings, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which)
-                    {
-                        try
-                        {
+            .setNeutralButton(
+                R.string.dialog_title_button_network_settings,
+                object : DialogInterface.OnClickListener {
+                    override fun onClick(dialog: DialogInterface?, which: Int) {
+                        try {
                             // Wifi 設定画面を表示する
-                            context.startActivity(new Intent(Settings.ACTION_WIFI_SETTINGS));
-                        }
-                        catch (android.content.ActivityNotFoundException ex)
-                        {
+                            context.startActivity(Intent(Settings.ACTION_WIFI_SETTINGS))
+                        } catch (ex: ActivityNotFoundException) {
                             // Activity が存在しなかった...設定画面が起動できなかった
-                            Log.v(TAG, "android.content.ActivityNotFoundException...");
+                            Log.v(TAG, "android.content.ActivityNotFoundException...")
 
                             // この場合は、再試行と等価な動きとする
-                            connect();
-                        }
-                        catch (Exception e)
-                        {
-                            e.printStackTrace();
+                            connect()
+                        } catch (e: Exception) {
+                            e.printStackTrace()
                         }
                     }
-                });
-        context.runOnUiThread(new Runnable()
-        {
-            @Override
-            public void run()
-            {
-                try
-                {
-                    builder.show();
-                }
-                catch (Exception e)
-                {
-                    e.printStackTrace();
+                })
+        context.runOnUiThread(object : Runnable {
+            override fun run() {
+                try {
+                    builder.show()
+                } catch (e: Exception) {
+                    e.printStackTrace()
                 }
             }
-        });
+        })
     }
 
-    @Override
-    public CameraConnectionStatus getConnectionStatus()
-    {
-        Log.v(TAG, " getConnectionStatus()");
-        return (connectionStatus);
+    override fun getConnectionStatus(): CameraConnectionStatus? {
+        Log.v(TAG, " getConnectionStatus()")
+        return (connectionStatus)
     }
 
-    @Override
-    public void forceUpdateConnectionStatus(CameraConnectionStatus status)
-    {
-        Log.v(TAG, " forceUpdateConnectionStatus()");
-        connectionStatus = status;
+    override fun forceUpdateConnectionStatus(status: CameraConnectionStatus?) {
+        Log.v(TAG, " forceUpdateConnectionStatus()")
+        connectionStatus = status
     }
 
     /**
      * カメラとの切断処理
      */
-    private void disconnectFromCamera(final boolean powerOff)
-    {
-        Log.v(TAG, " disconnectFromCamera() : " + powerOff);
-        try
-        {
-            cameraExecutor.execute(disconnectSequence);
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
+    private fun disconnectFromCamera(powerOff: Boolean) {
+        Log.v(TAG, " disconnectFromCamera() : " + powerOff)
+        try {
+            cameraExecutor.execute(disconnectSequence)
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
     }
 
     /**
      * カメラとの接続処理
      */
-    private void connectToCamera()
-    {
-        Log.v(TAG, " connectToCamera()");
-        connectionStatus = CameraConnectionStatus.CONNECTING;
-        try
-        {
-            cameraExecutor.execute(connectSequence);
-        }
-        catch (Exception e)
-        {
-            Log.v(TAG, " connectToCamera() EXCEPTION : " + e.getMessage());
-            e.printStackTrace();
+    private fun connectToCamera() {
+        Log.v(TAG, " connectToCamera()")
+        connectionStatus = CameraConnectionStatus.CONNECTING
+        try {
+            cameraExecutor.execute(connectSequence)
+        } catch (e: Exception) {
+            Log.v(TAG, " connectToCamera() EXCEPTION : " + e.message)
+            e.printStackTrace()
         }
     }
 }
+*/
